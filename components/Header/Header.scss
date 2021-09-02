@@ -1,0 +1,35 @@
+#Header {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  padding: 32px;
+  @include flex-right;
+
+  @include mobile {
+    padding: 16px;
+  }
+
+  #Header-logo {
+    width: 64px;
+    margin-right: auto;
+  }
+
+  > ul .se-button {
+    margin-right: 32px;
+  }
+
+  #Header-donate {
+    margin-right: 8px;
+  }
+
+  .Header-link {
+    opacity: 0.6;
+    &.active {
+      opacity: 1;
+    }
+    @include hover {
+      opacity: 1;
+    }
+  }
+}

@@ -1,0 +1,22 @@
+#Splash {
+  @include page;
+  background: var(--se-green-gradient);
+  min-height: 84vh;
+  padding-top: 128px;
+  @include mobile {
+    padding-top: 128px;
+  }
+
+  #Splash-content {
+    @include mobile {
+      text-align: center;
+    }
+    @include desktop {
+      max-width: 72%;
+
+      .subheader {
+        max-width: 84%;
+      }
+    }
+  }
+}

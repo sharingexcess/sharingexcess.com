@@ -1,0 +1,144 @@
+.se-text {
+  position: relative;
+  font-family: 'Montserrat';
+
+  &.primary-header {
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 84px;
+
+    &.shadow {
+      text-shadow: 0px 4px 4px var(--se-black-transparent);
+    }
+
+    @include mobile {
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 32px;
+
+      &.shadow {
+        text-shadow: 0px 2px 2px var(--se-black-transparent);
+      }
+    }
+  }
+
+  &.secondary-header {
+    font-size: 48px;
+    line-height: 64px;
+    font-weight: 700;
+
+    &.shadow {
+      text-shadow: 0px 2px 4px var(--se-black-transparent);
+    }
+
+    @include mobile {
+      font-size: 20px;
+      line-height: 30px;
+
+      &.shadow {
+        text-shadow: 0px 1px 2px var(--se-black-transparent);
+      }
+    }
+  }
+
+  &.section-header {
+    font-size: 28px;
+    line-height: 40px;
+    font-weight: 700;
+
+    &.shadow {
+      text-shadow: 0px 1px 4px var(--se-black-transparent);
+    }
+
+    @include mobile {
+      font-size: 18px;
+      line-height: 24px;
+
+      &.shadow {
+        text-shadow: 0px 1px 2px var(--se-black-transparent);
+      }
+    }
+  }
+
+  &.subheader {
+    font-size: 20px;
+    font-weight: bolder;
+    line-height: 32px;
+    font-weight: 400;
+
+    &.shadow {
+      text-shadow: 0px 1px 2px var(--se-black-transparent);
+    }
+
+    @include mobile {
+      font-size: 14px;
+      line-height: 20px;
+
+      &.shadow {
+        text-shadow: 0px 1px 1px var(--se-black-transparent);
+      }
+    }
+  }
+
+  &.small-header {
+    font-size: 22px;
+    line-height: 24px;
+    letter-spacing: 8px;
+    font-weight: 700;
+
+    &.shadow {
+      text-shadow: 0px 1px 2px var(--se-black-transparent);
+    }
+
+    @include mobile {
+      font-size: 12px;
+      font-weight: bolder;
+      line-height: 16px;
+      letter-spacing: 8px;
+
+      &.shadow {
+        text-shadow: 0px 1px 1px var(--se-black-transparent);
+      }
+    }
+  }
+
+  &.paragraph {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+  }
+
+  &.small {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+  }
+
+  &.left {
+    text-align: left;
+  }
+
+  &.center {
+    text-align: center;
+  }
+
+  &.right {
+    text-align: right;
+  }
+
+  &.no-wrap {
+    @include ellipsis;
+  }
+
+  &.white {
+    color: var(--se-white);
+  }
+
+  &.green {
+    color: var(--se-green-primary);
+  }
+
+  &.black {
+    color: var(--se-black);
+  }
+}

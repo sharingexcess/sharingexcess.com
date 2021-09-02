@@ -1,0 +1,25 @@
+#Carousel {
+  position: relative;
+  height: 200px;
+  width: 100%;
+  padding: 0 64px;
+  margin-top: -100px;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  .izo-image {
+    height: 200px;
+    width: 200px;
+    object-fit: cover;
+    border: 8px solid var(--se-white);
+    border-radius: 50%;
+    box-shadow: 0px 8px 8px 0 var(--se-black-transparent);
+
+    &.focus {
+      height: 500px;
+      width: 500px;
+    }
+  }
+}

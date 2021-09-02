@@ -1,0 +1,128 @@
+@import '../components/SEDS/index.scss';
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  font-size: 16px;
+  font-family: var(--font-body);
+  background: var(--se-white);
+  color: var(--se-black);
+  padding: var(--page-margin);
+  overflow-y: auto;
+  border-radius: 0;
+  font-family: var(--font-body), -apple-system, BlinkMacSystemFont, Segoe UI,
+    Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+    sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img,
+svg {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+a {
+  color: unset;
+  text-decoration: unset;
+}
+
+@mixin hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      &:not(:disabled) {
+        @content;
+      }
+    }
+  }
+}
+
+@mixin active {
+  &:active {
+    &:not(:disabled) {
+      @content;
+    }
+  }
+}
+
+@mixin ellipsis {
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  min-width: 0 !important;
+  display: block !important;
+}
+
+@mixin fade-in {
+  opacity: 0;
+  animation: fade-in 0.2s ease forwards;
+}
+
+@mixin flex-left {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+@mixin flex-vertical-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+@mixin flex-vertical-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-vertical-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+@mixin page {
+  padding: 64px;
+  @include mobile {
+    padding: 16px;
+  }
+}
+
+@import './components.scss';

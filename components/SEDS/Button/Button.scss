@@ -1,0 +1,179 @@
+.se-button {
+  font-family: var(--font-header);
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 64px;
+  transition: all 0.1s ease;
+  position: relative;
+  border: none;
+
+  &.size-small {
+    font-size: 12px;
+    padding: 4px 8px;
+    box-shadow: 0 2px 4px 0 var(--se-black-transparent);
+
+    @include hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px 0 var(--se-black-transparent);
+    }
+
+    @include active {
+      box-shadow: 0 1px 1px 0 var(--se-black-transparent);
+    }
+  }
+
+  &.size-medium {
+    font-size: 16px;
+    padding: 12px 24px;
+    box-shadow: 0 4px 8px 0 var(--se-black-transparent);
+
+    @include hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 12px 0 var(--se-black-transparent);
+    }
+
+    @include active {
+      box-shadow: 0 1px 1px 0 var(--se-black-transparent);
+    }
+
+    @include mobile {
+      font-size: 14px;
+      padding: 8px 16px;
+      box-shadow: 0 4px 8px 0 var(--se-black-transparent);
+
+      @include hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 12px 0 var(--se-black-transparent);
+      }
+
+      @include active {
+        box-shadow: 0 1px 1px 0 var(--se-black-transparent);
+      }
+    }
+  }
+
+  &.size-large {
+    font-size: 20px;
+    font-weight: 700;
+    padding: 16px 32px;
+    box-shadow: 0 6px 12px 0 var(--se-black-transparent);
+
+    @include hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 16px 0 var(--se-black-transparent);
+    }
+
+    @include active {
+      box-shadow: 0 2px 2px 0 var(--se-black-transparent);
+    }
+
+    @include mobile {
+      font-size: 18px;
+      font-weight: 700;
+      padding: 12px 24px;
+      box-shadow: 0 6px 12px 0 var(--se-black-transparent);
+
+      @include hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 16px 0 var(--se-black-transparent);
+      }
+
+      @include active {
+        box-shadow: 0 2px 2px 0 var(--se-black-transparent);
+      }
+    }
+  }
+
+  &.type-primary {
+    &.color-white {
+      background: var(--se-white);
+      color: var(--se-black);
+      @include hover {
+        color: var(--se-blue);
+      }
+    }
+
+    &.color-blue {
+      background: var(--se-blue);
+      color: var(--se-white);
+      @include hover {
+        background: var(--se-white);
+        color: var(--se-blue);
+      }
+    }
+
+    &.color-yellow {
+      background: var(--se-yellow);
+      color: var(--se-black);
+      @include hover {
+        color: var(--se-white);
+      }
+    }
+
+    &.color-red {
+      background: var(--se-red);
+      color: var(--se-white);
+      @include hover {
+        color: var(--se-yellow);
+      }
+    }
+  }
+
+  &.type-secondary {
+    &.color-white {
+      background: var(--se-white-transparent);
+      color: var(--se-white);
+    }
+    &.color-black {
+      background: var(--se-black-transparent);
+      color: var(--se-black);
+    }
+
+    &.color-green {
+      background: var(--se-green-transparent);
+      color: var(--se-green-primary);
+    }
+  }
+
+  &.type-tertiary {
+    background: var(--se-transparent);
+    box-shadow: none;
+    font-weight: 600;
+    padding: 0;
+
+    @include hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    @include active {
+      transform: none;
+      box-shadow: none;
+    }
+
+    &.color-white {
+      color: var(--se-white);
+      &:after {
+        background: var(--se-white);
+      }
+    }
+
+    &.color-green {
+      color: var(--se-green);
+      &:after {
+        background: var(--se-green);
+      }
+    }
+
+    &.color-black {
+      color: var(--se-black);
+      &:after {
+        background: var(--se-black);
+      }
+    }
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
