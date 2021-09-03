@@ -1,8 +1,11 @@
 import { Image } from 'components/SEDS'
+import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
 
 export const Carousel: FC = () => {
-  return (
+  const isMobile = useIsMobile()
+
+  return isMobile ? null : (
     <div id="Carousel">
       <Image
         src="/splash1.png"

@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 
 export function useWidth(): number | undefined {
   const [width, setWidth] = useState<number | undefined>()
-  let debounce_timer: NodeJS.Timeout
 
   useEffect(() => {
     setWidth(window.innerWidth)
@@ -11,12 +10,9 @@ export function useWidth(): number | undefined {
   }, []) // eslint-disable-line
 
   function updateWidth() {
-    debounce_timer && clearTimeout(debounce_timer)
-    debounce_timer = setTimeout(() => {
-      if (window.innerWidth !== width) {
-        setWidth(window.innerWidth)
-      }
-    }, 100)
+    if (window.innerWidth !== width) {
+      setWidth(window.innerWidth)
+    }
   }
 
   return width

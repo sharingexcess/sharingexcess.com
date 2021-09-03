@@ -2,6 +2,7 @@ import { FC } from 'react'
 import { useRouter } from 'next/dist/client/router'
 import { Button } from 'components/SEDS'
 import { useIsMobile } from 'hooks'
+import Link from 'next/link'
 
 const pages = [
   {
@@ -26,21 +27,24 @@ const pages = [
   },
 ]
 
-export const PageLinks: FC = () => {
-  const { pathname } = useRouter()
-  const isMobile = useIsMobile()
+interface PageLinksProps {
+  color: string
+}
 
-  return isMobile ? null : (
+export const PageLinks: FC<PageLinksProps> = ({ color }) => {
+  const { pathname } = useRouter()
+
+  return (
     <ul>
       {pages.map(({ title, path }) => (
         <Button
           key={title}
           type="tertiary"
-          color="white"
+          color={color}
           classList={['Header-link', path === pathname ? 'active' : 'inactive']}
           id={`Header-link-${title.toLowerCase()}`}
         >
-          {title}
+          <Link href={path}>{title}</Link>
         </Button>
       ))}
     </ul>

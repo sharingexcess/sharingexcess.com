@@ -1,3 +1,4 @@
+import { Carousel } from 'components'
 import { Button, Spacer, Text } from 'components/SEDS'
 import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
@@ -34,10 +35,11 @@ export const Splash: FC = () => {
           over 10,000 lbs. of food every day.
         </Text>
         <Spacer height={32} />
-        <Button size="large" color="white">
+        <Button size="large" color="white" type="primary">
           Donate $10 to Rescue 80 Meals
         </Button>
       </div>
+      <Carousel />
     </div>
   )
 }

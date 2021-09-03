@@ -23,5 +23,5 @@ import SpacerProps from './Spacer.interface'
  * @return empty, invisible HTML <div/> element to create empty space
  */
 export const Spacer: FC<SpacerProps> = ({ height = 8, width = 8 }) => {
-  return <div className="izo-spacer" style={{ height, width }} />
+  return <div className="se-spacer" style={{ height, width }} />
 }

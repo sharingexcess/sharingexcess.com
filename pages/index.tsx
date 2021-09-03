@@ -1,4 +1,4 @@
-import { Carousel, Header, Splash } from 'components'
+import { Header, Splash } from 'components'
 import type { NextPage } from 'next'
 
 const Home: NextPage = () => {
@@ -6,7 +6,6 @@ const Home: NextPage = () => {
     <div>
       <Header />
       <Splash />
-      <Carousel />
     </div>
   )
 }
