@@ -7,9 +7,28 @@
   left: 0;
   padding: 32px;
   @include flex-right;
+  transition: all 0.4s ease;
 
   @include mobile {
     padding: 16px;
+  }
+
+  &.with-background {
+    padding: 8px 32px;
+    background: var(--se-white);
+    box-shadow: 0 8px 8px 0 var(--se-black-transparent);
+
+    #Header-logo img {
+      box-shadow: none;
+    }
+
+    @include mobile {
+      padding: 16px;
+
+      #Header-menu-button {
+        color: var(--se-grey-primary);
+      }
+    }
   }
 
   #Header-logo {

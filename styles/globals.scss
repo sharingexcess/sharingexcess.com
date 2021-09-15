@@ -1,5 +1,5 @@
-@import '../components/SEDS/index.scss';
 @import '@fortawesome/fontawesome-svg-core/styles.css';
+@import '@sharingexcess/designsystem/build/index.scss';
 
 :root {
   --se-min-page-width: 300px;
@@ -132,6 +132,7 @@ a {
 
 @mixin page {
   padding: 64px;
+  position: relative;
   @include mobile {
     padding: 16px;
   }

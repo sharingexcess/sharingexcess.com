@@ -1,7 +1,6 @@
 import { FC } from 'react'
 import { useRouter } from 'next/dist/client/router'
-import { Button } from 'components/SEDS'
-import { useIsMobile } from 'hooks'
+import { Button } from '@sharingexcess/designsystem'
 import Link from 'next/link'
 
 const pages = [
@@ -28,7 +27,7 @@ const pages = [
 ]
 
 interface PageLinksProps {
-  color: string
+  color: 'black' | 'green' | 'white'
 }
 
 export const PageLinks: FC<PageLinksProps> = ({ color }) => {

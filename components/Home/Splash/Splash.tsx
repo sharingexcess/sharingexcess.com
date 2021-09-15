@@ -1,5 +1,5 @@
 import { Carousel } from 'components'
-import { Button, Spacer, Text } from 'components/SEDS'
+import { Button, Spacer, Text } from '@sharingexcess/designsystem'
 import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
 

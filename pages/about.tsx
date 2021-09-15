@@ -1,5 +1,5 @@
 import { Header } from 'components'
-import { Text } from 'components/SEDS'
+import { Text } from '@sharingexcess/designsystem'
 import type { NextPage } from 'next'
 
 const Home: NextPage = () => {

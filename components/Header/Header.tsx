@@ -1,18 +1,39 @@
-import React, { FC, useState } from 'react'
-import { Button, Image } from 'components/SEDS'
+import React, { FC, useEffect, useState } from 'react'
+import { Button, Image } from '@sharingexcess/designsystem'
 import { PageLinks } from './Header.children'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useWidth } from 'hooks'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
+import { useScrollPosition } from 'hooks/useScrollPosition'
 
 export const Header: FC = () => {
   const width = useWidth()
+  const scroll = useScrollPosition()
+  const [prevScroll, setPrevScroll] = useState(scroll)
+  const [background, setBackground] = useState(false)
   const isCondensed = width && width < 1000
   const [menu, setMenu] = useState(false)
 
+  useEffect(() => {
+    console.log(scroll, prevScroll)
+    if (scroll < 100) {
+      setBackground(false)
+    } else if (scroll > 100 && scroll > prevScroll) {
+      setBackground(true)
+    } else if (scroll < prevScroll) {
+      setBackground(true)
+    }
+    setPrevScroll(scroll)
+  }, [scroll]) // eslint-disable-line
+
+  useEffect(() => {
+    console.log('background is', background)
+  }, [background])
+
   const toggleMenu = () => setMenu(currMenu => !currMenu)
+
   return (
     <>
       <Head>
@@ -20,17 +41,25 @@ export const Header: FC = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <link rel="icon" type="image/png" href="/logo.png" />
       </Head>
-      <header id="Header">
+      <header id="Header" className={background ? 'with-background' : ''}>
         <Link href="/">
           <a id="Header-logo">
             <Image src="/logo.png" alt="Sharing Excess Logo" />
           </a>
         </Link>
-        {!isCondensed && <PageLinks color="white" />}
-        <Button type="primary" id="Header-donate">
+        {!isCondensed && <PageLinks color={background ? 'black' : 'white'} />}
+        <Button
+          type="primary"
+          id="Header-donate"
+          color={background ? 'green' : 'white'}
+        >
           Donate
         </Button>
-        <Button type="secondary" id="Header-sign-in">
+        <Button
+          type="secondary"
+          color={background ? 'green' : 'white'}
+          id="Header-sign-in"
+        >
           Sign In
         </Button>
         {isCondensed && (

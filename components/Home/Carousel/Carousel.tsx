@@ -1,4 +1,4 @@
-import { Image } from 'components/SEDS'
+import { Image } from '@sharingexcess/designsystem'
 import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
 
