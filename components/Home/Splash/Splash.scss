@@ -5,9 +5,10 @@
   min-width: var(--se-min-splash-width);
   padding-top: 128px;
   padding-bottom: 0;
+  padding: 128px 64px 0 64px;
 
   @include mobile {
-    padding-top: 128px;
+    padding-top: 96px;
     min-width: var(--se-min-page-width);
   }
 
@@ -16,8 +17,13 @@
     padding: 0 48px;
     @include slide-in;
 
+    .subheader {
+      max-width: 400px;
+    }
+
     @include mobile {
       text-align: center;
+      padding: 0;
     }
   }
 }

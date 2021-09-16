@@ -143,10 +143,17 @@ a {
 }
 
 @mixin page {
-  padding: 96px;
+  // Page views should have 96px on top and bottom,
+  // and at least 64px on left and right.
+  // For large window sizes, we want to constrain the content
+  // to the center 1200px. Therefore, our max padding is
+  // 50vw - 600px on the left and right,
+  // which is half the difference between the
+  // window width, and 1200px
+  padding: 96px max(64px, calc(50vw - 600px));
   position: relative;
   @include mobile {
-    padding: 16px;
+    padding: 48px 16px;
   }
 }
 

@@ -1,4 +1,5 @@
 import { Button, Image, Spacer, Text } from '@sharingexcess/designsystem'
+import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
 
 const content = [
@@ -20,29 +21,31 @@ const content = [
 ]
 
 export const Impact: FC = () => {
+  const isMobile = useIsMobile()
   return (
     <div id="Impact">
       <Text type="small-header" color="white" shadow>
         OUR IMPACT
       </Text>
-      <Spacer height={32} />
+      <Spacer height={isMobile ? 12 : 32} />
       <Text type="primary-header" color="white" shadow>
-        Partnering with 150 local orgs to distribute 100,000lbs. monthly.
+        Partnering with over 150 organizations, redistributing 100,000 lbs.
+        every month.
       </Text>
-      <Spacer height={16} />
-      <Text type="subheader" color="white" shadow>
+      <Spacer height={isMobile ? 8 : 16} />
+      <Text type="subheader" color="white">
         That&apos;s approximately 120 billion pounds of food ending up in
         landfills each year, needlessly wasted for logistical reasons like
         inventory turnover, lack of affordable transportation, and
         non-standardized expiration dates.
       </Text>
-      <Spacer height={64} />
+      <Spacer height={isMobile ? 48 : 64} />
       <section id="Impact-content">
         {content.map(c => (
           <div key={c.header}>
             <Image src={c.image} alt={c.header} />
             <Spacer height={16} />
-            <Text type="section-header" color="white" align="center" shadow>
+            <Text type="secondary-header" color="white" align="center" shadow>
               {c.header}
             </Text>
             <Text type="paragraph" color="white" align="center">
@@ -51,7 +54,7 @@ export const Impact: FC = () => {
           </div>
         ))}
       </section>
-      <Spacer height={64} />
+      {!isMobile && <Spacer height={64} />}
       <Button type="primary" size="large" color="white">
         Read More About Our Impact
       </Button>

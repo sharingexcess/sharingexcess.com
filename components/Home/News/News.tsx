@@ -4,7 +4,9 @@ import {
   Spacer,
   Text,
   ExternalLink,
+  Card,
 } from '@sharingexcess/designsystem'
+import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
 
 const content = [
@@ -45,24 +47,26 @@ const content = [
 ]
 
 export const News: FC = () => {
+  const isMobile = useIsMobile()
+
   return (
     <div id="News">
       <Text type="small-header" color="green" shadow>
         IN THE NEWS
       </Text>
-      <Spacer height={32} />
+      <Spacer height={isMobile ? 8 : 32} />
       <Text type="primary-header" color="white" shadow>
-        We’ve grown from a crazy idea, to a national movement.{' '}
+        We’ve grown from a crazy idea, to a national movement.
       </Text>
-      <Spacer height={16} />
-      <Text type="subheader" color="white" shadow>
+      <Spacer height={isMobile ? 8 : 16} />
+      <Text type="subheader" color="grey" shadow>
         With chapters at 12 campuses, Sharing Excess is continually growing to
         become the leader in food redistribution around the country.
       </Text>
-      <Spacer height={64} />
+      <Spacer height={isMobile ? 32 : 64} />
       <section id="News-content">
         {content.map(c => (
-          <div className="News-article" key={c.header}>
+          <Card classList={['News-article']} key={c.header}>
             <Image src={c.image} alt={c.header} />
             <Spacer height={16} />
             <Text
@@ -101,10 +105,10 @@ export const News: FC = () => {
                 Read More
               </Button>
             </ExternalLink>
-          </div>
+          </Card>
         ))}
       </section>
-      <Spacer height={64} />
+      <Spacer height={isMobile ? 16 : 64} />
       <Button type="primary" size="large" color="white">
         Read More News Stories
       </Button>

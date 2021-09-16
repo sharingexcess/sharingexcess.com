@@ -1,6 +1,7 @@
 #Carousel {
-  height: 16vw;
+  height: 12vw;
   width: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: row-reverse;
   justify-content: space-between;
@@ -8,16 +9,43 @@
   transform: translateY(8vw);
   @include fade-in(1s, 0.2s);
 
-  .se-image {
-    position: relative;
-    object-fit: cover;
-    border: clamp(4px, 0.64vw, 8px) solid var(--se-white);
-    border-radius: 50%;
-    box-shadow: var(--se-shadow-medium);
-    width: clamp(96px, 16vw, 20%);
+  @include desktop {
+    .se-image {
+      position: relative;
+      object-fit: cover;
+      border: clamp(4px, 0.64vw, 8px) solid var(--se-white);
+      border-radius: 50%;
+      box-shadow: var(--se-shadow-medium);
+      width: clamp(96px, 16vw, 20%);
 
-    &.focus {
-      width: clamp(96px, 32vw, 40%);
+      &.focus {
+        width: clamp(96px, 32vw, 40%);
+      }
+    }
+  }
+
+  @include mobile {
+    position: relative;
+    width: calc(100% + 32px);
+    overflow-x: auto;
+    margin-left: -16px;
+    height: 50vw;
+    transform: none;
+    flex-direction: row;
+    margin-bottom: 32px;
+
+    .carousel-root {
+      aside {
+        transition: padding 0.5s ease;
+        padding: 24px;
+        .se-image {
+          border-radius: 50%;
+          border: 4px solid var(--se-white);
+        }
+      }
+      .selected aside {
+        padding: 0;
+      }
     }
   }
 }

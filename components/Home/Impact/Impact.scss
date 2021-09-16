@@ -3,16 +3,12 @@
   background: var(--se-green-gradient);
   @include flex-vertical-left;
 
-  > .se-text {
-    max-width: 900px;
-  }
-
   #Impact-content {
     @include flex-center;
     width: 100%;
     justify-content: space-around;
     align-items: flex-start;
-    div {
+    > div {
       @include flex-vertical-center;
       margin: 0 8px;
       .se-text {
@@ -25,6 +21,17 @@
         border-radius: 50%;
         border: 6px solid var(--se-white);
         box-shadow: var(--se-shadow-medium);
+      }
+    }
+
+    @include mobile {
+      @include flex-vertical-center;
+      > div {
+        margin: 0 0 32px 0;
+        .se-image {
+          width: 72vw;
+          height: 72vw;
+        }
       }
     }
   }

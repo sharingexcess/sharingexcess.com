@@ -8,6 +8,7 @@ export const Splash: FC = () => {
 
   return (
     <div id="Splash">
+      {isMobile && <Carousel />}
       <div id="Splash-content">
         <Text
           type="primary-header"
@@ -28,18 +29,15 @@ export const Splash: FC = () => {
           align={isMobile ? 'center' : 'left'}
           shadow
         >
-          Partnering with wholesale markets, stores, and restaurants,
-          <br />
-          Sharing Excess rescues and redistributes
-          <br />
-          over 10,000 lbs. of food every day.
+          Partnering with wholesale markets, stores, and restaurants, Sharing
+          Excess rescues and redistributes over 10,000 lbs. of food every day.
         </Text>
         <Spacer height={32} />
         <Button size="large" color="white" type="primary">
           Donate $10 to Rescue 80 Meals
         </Button>
       </div>
-      <Carousel />
+      {!isMobile && <Carousel />}
     </div>
   )
 }
