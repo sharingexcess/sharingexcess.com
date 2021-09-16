@@ -1,0 +1,35 @@
+#Impact {
+  @include page;
+  background: var(--se-green-gradient);
+  @include flex-vertical-left;
+
+  > .se-text {
+    max-width: 900px;
+  }
+
+  #Impact-content {
+    @include flex-center;
+    width: 100%;
+    justify-content: space-around;
+    align-items: flex-start;
+    div {
+      @include flex-vertical-center;
+      margin: 0 8px;
+      .se-text {
+        width: 100%;
+      }
+      .se-image {
+        width: clamp(96px, 24vw, 320px);
+        height: clamp(96px, 24vw, 320px);
+        object-fit: cover;
+        border-radius: 50%;
+        border: 6px solid var(--se-white);
+        box-shadow: var(--se-shadow-medium);
+      }
+    }
+  }
+
+  .se-button {
+    margin: 24px auto;
+  }
+}

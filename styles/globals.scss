@@ -77,16 +77,28 @@ a {
   white-space: nowrap !important;
   text-overflow: ellipsis !important;
   min-width: 0 !important;
-  display: block !important;
 }
 
-@mixin fade-in {
+@mixin fade-in($time: 0.2s, $delay: 0s) {
   opacity: 0;
-  animation: fade-in 0.2s ease forwards;
+  animation: fade-in $time ease forwards $delay;
 
   @keyframes fade-in {
     to {
       opacity: 1;
+    }
+  }
+}
+
+@mixin slide-in($x: -64px, $y: 0, $time: 1s) {
+  opacity: 0;
+  transform: translate($x, $y);
+  animation: slide-in $time ease forwards;
+
+  @keyframes slide-in {
+    to {
+      opacity: 1;
+      transform: translate(0, 0);
     }
   }
 }
@@ -131,7 +143,7 @@ a {
 }
 
 @mixin page {
-  padding: 64px;
+  padding: 96px;
   position: relative;
   @include mobile {
     padding: 16px;

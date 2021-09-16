@@ -1,11 +1,29 @@
-import { Button, Image, Spacer, Text } from '@sharingexcess/designsystem'
 import React, { FC } from 'react'
+import { Button, Image, Spacer, Text } from '@sharingexcess/designsystem'
+import { Carousel } from 'react-responsive-carousel'
+import 'react-responsive-carousel/lib/styles/carousel.min.css'
 
 export const Solution: FC = () => {
   return (
     <div id="Solution">
       <section id="Solution-carousel">
-        <Image src="/splash5.jpg" alt="Test" />
+        <Carousel
+          autoPlay
+          infiniteLoop
+          interval={3000}
+          transitionTime={600}
+          showArrows={false}
+          dynamicHeight={true}
+          showThumbs={false}
+          showStatus={false}
+          swipeable={false}
+          stopOnHover={false}
+        >
+          <Image src="/solution1.png" alt="Test" />
+          <Image src="/solution2.png" alt="Test" />
+          <Image src="/solution3.png" alt="Test" />
+          <Image src="/solution4.png" alt="Test" />
+        </Carousel>
       </section>
       <section id="Solution-content">
         <Text type="small-header" color="green" align="right">
@@ -22,7 +40,7 @@ export const Solution: FC = () => {
           members free of charge. See how we do it:
         </Text>
         <Spacer height={32} />
-        <Button type="primary" size="large" color="green">
+        <Button type="primary" size="medium" color="green">
           Learn More About Our Programs
         </Button>
       </section>

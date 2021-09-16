@@ -2,27 +2,22 @@
   --se-min-splash-width: 700px;
   @include page;
   background: var(--se-green-gradient);
-  min-height: 76vh;
   min-width: var(--se-min-splash-width);
   padding-top: 128px;
   padding-bottom: 0;
+
   @include mobile {
     padding-top: 128px;
     min-width: var(--se-min-page-width);
   }
 
   #Splash-content {
+    width: 100%;
+    padding: 0 48px;
+    @include slide-in;
+
     @include mobile {
       text-align: center;
-    }
-    @include desktop {
-      max-width: 72%;
-      min-width: var(--se-min-splash-width);
-
-      .subheader {
-        max-width: 84%;
-        min-width: var(--se-min-splash-width);
-      }
     }
   }
 }

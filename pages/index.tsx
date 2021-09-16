@@ -1,4 +1,5 @@
-import { Header, Splash, Solution } from 'components'
+import { Spacer } from '@sharingexcess/designsystem'
+import { Header, Splash, Solution, Impact, News } from 'components'
 import type { NextPage } from 'next'
 
 const Home: NextPage = () => {
@@ -6,7 +7,10 @@ const Home: NextPage = () => {
     <div>
       <Header />
       <Splash />
+      <Spacer height={250} />
       <Solution />
+      <Impact />
+      <News />
     </div>
   )
 }

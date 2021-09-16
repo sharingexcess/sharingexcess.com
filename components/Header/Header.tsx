@@ -8,6 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
 import { useScrollPosition } from 'hooks/useScrollPosition'
 
+const BACKGROUND_THRESHOLD = 200
+
 export const Header: FC = () => {
   const width = useWidth()
   const scroll = useScrollPosition()
@@ -15,22 +17,28 @@ export const Header: FC = () => {
   const [background, setBackground] = useState(false)
   const isCondensed = width && width < 1000
   const [menu, setMenu] = useState(false)
+  const [position, setPosition] = useState(0)
 
   useEffect(() => {
-    console.log(scroll, prevScroll)
-    if (scroll < 100) {
+    // handle scroll up to top of page, switch to transparent header
+    if (scroll < BACKGROUND_THRESHOLD) {
       setBackground(false)
-    } else if (scroll > 100 && scroll > prevScroll) {
+    }
+    // handle scroll down page, switch to white header
+    if (scroll > BACKGROUND_THRESHOLD && scroll > prevScroll) {
       setBackground(true)
-    } else if (scroll < prevScroll) {
+    }
+    // handle
+    if (scroll > prevScroll) {
+      setPosition(Math.max(-100, position - 20))
+    }
+    // handle scroll up, but not to top of page
+    if (scroll > BACKGROUND_THRESHOLD && scroll < prevScroll) {
       setBackground(true)
+      setPosition(0)
     }
     setPrevScroll(scroll)
   }, [scroll]) // eslint-disable-line
-
-  useEffect(() => {
-    console.log('background is', background)
-  }, [background])
 
   const toggleMenu = () => setMenu(currMenu => !currMenu)
 
@@ -41,7 +49,11 @@ export const Header: FC = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <link rel="icon" type="image/png" href="/logo.png" />
       </Head>
-      <header id="Header" className={background ? 'with-background' : ''}>
+      <header
+        id="Header"
+        className={background ? 'with-background' : ''}
+        style={{ top: position }}
+      >
         <Link href="/">
           <a id="Header-logo">
             <Image src="/logo.png" alt="Sharing Excess Logo" />
