@@ -1,6 +1,7 @@
 import { Button, Image, Spacer, Text } from '@sharingexcess/designsystem'
 import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
+import Link from 'next/link'
 
 const content = [
   {
@@ -55,9 +56,11 @@ export const Impact: FC = () => {
         ))}
       </section>
       {!isMobile && <Spacer height={64} />}
-      <Button type="primary" size="large" color="white">
-        Read More About Our Impact
-      </Button>
+      <Link href="/impact" passHref>
+        <Button type="primary" size="large" color="white">
+          Read More About Our Impact
+        </Button>
+      </Link>
     </div>
   )
 }

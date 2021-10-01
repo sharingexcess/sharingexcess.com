@@ -26,6 +26,9 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      @include mobile {
+        filter: brightness(0.8);
+      }
     }
   }
   #Solution-content {
@@ -37,6 +40,13 @@
 
     @include mobile {
       padding: 32px 16px;
+      background: none;
+      .primary-header {
+        background: var(--se-green-primary);
+        margin: 4px 0;
+        padding: 1px 4px;
+        box-shadow: var(--se-shadow-medium);
+      }
     }
   }
 }

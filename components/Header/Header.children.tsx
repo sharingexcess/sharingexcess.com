@@ -24,6 +24,10 @@ const pages = [
     title: 'CONTACT',
     path: '/contact',
   },
+  {
+    title: 'STORE',
+    path: '/store',
+  },
 ]
 
 interface PageLinksProps {

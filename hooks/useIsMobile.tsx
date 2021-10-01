@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 
 export function useIsMobile(): boolean {
   const width = useWidth()
-  const [isMobile, setIsMobile] = useState(width && width < 600 ? true : false)
+  const [isMobile, setIsMobile] = useState(true)
 
   useEffect(() => {
     if (!isMobile && width && width < 600) {

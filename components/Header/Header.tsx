@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react'
-import { Button, Image } from '@sharingexcess/designsystem'
+import { Button, Image, ExternalLink } from '@sharingexcess/designsystem'
 import { PageLinks } from './Header.children'
 import Head from 'next/head'
 import Link from 'next/link'
@@ -60,20 +60,24 @@ export const Header: FC = () => {
           </a>
         </Link>
         {!isCondensed && <PageLinks color={background ? 'black' : 'white'} />}
-        <Button
-          type="primary"
-          id="Header-donate"
-          color={background ? 'green' : 'white'}
-        >
-          Donate
-        </Button>
-        <Button
-          type="secondary"
-          color={background ? 'green' : 'white'}
-          id="Header-sign-in"
-        >
-          Sign In
-        </Button>
+        <ExternalLink to="https://app.mobilecause.com/form/l2Z4OQ?vid=lpnht">
+          <Button
+            type="primary"
+            id="Header-donate"
+            color={background ? 'green' : 'white'}
+          >
+            Donate
+          </Button>
+        </ExternalLink>
+        <ExternalLink to="https://sharingexcess.web.app">
+          <Button
+            type="secondary"
+            color={background ? 'green' : 'white'}
+            id="Header-sign-in"
+          >
+            Sign In
+          </Button>
+        </ExternalLink>
         {isCondensed && (
           <Button type="tertiary" id="Header-menu-button" handler={toggleMenu}>
             <FontAwesomeIcon icon={faBars} id="Header-menu-icon" />

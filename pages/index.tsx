@@ -1,5 +1,14 @@
 import { Spacer } from '@sharingexcess/designsystem'
-import { Header, Splash, Solution, Impact, News } from 'components'
+import {
+  Header,
+  Splash,
+  Solution,
+  Impact,
+  News,
+  Volunteer,
+  Donate,
+  Footer,
+} from 'components'
 import { useIsMobile } from 'hooks'
 import type { NextPage } from 'next'
 
@@ -14,6 +23,9 @@ const Home: NextPage = () => {
       <Solution />
       <Impact />
       <News />
+      <Volunteer />
+      <Donate />
+      <Footer />
     </div>
   )
 }

@@ -3,13 +3,15 @@ const path = require('path') // eslint-disable-line
 
 module.exports = {
   assetPrefix: './',
-  reactStrictMode: true,
+  reactStrictMode: false,
   webpack: (config, { defaultLoaders }) => {
     if (process.env.NODE_ENV === 'development') {
       config.resolve.alias = {
         ...config.resolve.alias,
-        "@sharingexcess/designsystem": path.resolve('../designsystem/src'),
-        "@sharingexcess/designsystem/build/index.scss": path.resolve('../designsystem/src'),
+        '@sharingexcess/designsystem': path.resolve('../designsystem/src'),
+        '@sharingexcess/designsystem/build/index.scss': path.resolve(
+          '../designsystem/src'
+        ),
       }
       config.module.rules.push({
         test: /\.(ts|tsx)$/,
@@ -17,6 +19,6 @@ module.exports = {
         use: [defaultLoaders.babel],
       })
     }
-    return config;
+    return config
   },
 }

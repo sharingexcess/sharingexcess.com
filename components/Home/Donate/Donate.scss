@@ -1,0 +1,83 @@
+#Donate {
+  @include page;
+  background: var(--se-green-gradient);
+  @include flex-vertical-left;
+
+  #Donate-widget {
+    position: relative;
+    width: 100%;
+    padding: 64px;
+    max-width: 800px;
+    margin: auto;
+    @include flex-vertical-center;
+
+    @include mobile {
+      padding: 32px 8px;
+    }
+
+    #Donate-meals-text {
+      background: var(--se-white);
+      padding: 16px 32px;
+      border-radius: 96px;
+      z-index: 1;
+    }
+
+    .Donate-widget-icon {
+      position: absolute;
+      color: var(--se-white);
+      opacity: 0.2;
+      z-index: 0;
+      font-size: 24px;
+      transition: all 0.2s ease;
+
+      @include mobile {
+        font-size: 16px;
+      }
+    }
+
+    #Donate-slider {
+      width: 100%;
+      padding: 32px 0;
+      position: relative;
+      z-index: 1;
+
+      #Donate-slider-track {
+        width: 100%;
+        height: 8px;
+        background: var(--se-white);
+        box-shadow: var(--se-shadow-small);
+        border-radius: 8px;
+      }
+
+      #Donate-slider-handle {
+        position: absolute;
+        top: 0;
+        left: 0;
+        border-radius: 50%;
+        @include flex-center;
+        height: 64px;
+        width: 64px;
+        background: var(--se-blue-primary);
+        box-shadow: var(--se-shadow-medium);
+        border: 3px solid var(--se-white);
+        cursor: pointer;
+        z-index: 2;
+      }
+
+      #Donate-slider-labels {
+        @include flex-center;
+        justify-content: space-between;
+        opacity: 50%;
+        padding: 0 4%;
+      }
+    }
+  }
+
+  #Donate-button {
+    margin: auto;
+    .green {
+      color: var(--se-green-primary);
+      font-weight: 800;
+    }
+  }
+}

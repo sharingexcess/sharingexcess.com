@@ -1,7 +1,6 @@
 #Carousel {
   height: 12vw;
   width: 100%;
-  overflow: hidden;
   display: flex;
   flex-direction: row-reverse;
   justify-content: space-between;
@@ -27,7 +26,6 @@
   @include mobile {
     position: relative;
     width: calc(100% + 32px);
-    overflow-x: auto;
     margin-left: -16px;
     height: 50vw;
     transform: none;
@@ -41,6 +39,7 @@
         .se-image {
           border-radius: 50%;
           border: 4px solid var(--se-white);
+          box-shadow: var(--se-shadow-medium);
         }
       }
       .selected aside {

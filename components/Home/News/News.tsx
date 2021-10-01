@@ -56,7 +56,7 @@ export const News: FC = () => {
       </Text>
       <Spacer height={isMobile ? 8 : 32} />
       <Text type="primary-header" color="white" shadow>
-        We’ve grown from a crazy idea, to a national movement.
+        We’ve grown from a student startup, to a national movement.
       </Text>
       <Spacer height={isMobile ? 8 : 16} />
       <Text type="subheader" color="grey" shadow>

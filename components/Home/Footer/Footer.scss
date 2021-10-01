@@ -1,0 +1,11 @@
+#Footer {
+  @include page;
+  @include flex-left;
+  padding-top: 32px;
+  padding-bottom: 32px;
+
+  .se-image {
+    width: 64px;
+    margin-right: 16px;
+  }
+}
