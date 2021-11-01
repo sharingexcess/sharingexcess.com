@@ -75,9 +75,13 @@
 
   #Donate-button {
     margin: auto;
+    display: block;
     .green {
       color: var(--se-green-primary);
       font-weight: 800;
+    }
+    @include mobile {
+      font-size: 14px;
     }
   }
 }

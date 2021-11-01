@@ -6,17 +6,17 @@ import Link from 'next/link'
 const content = [
   {
     image: '/solution1.png',
-    header: '3,177,738 lbs.',
+    header: '4,606,254 lbs.',
     body: 'Total food rescued since 2018',
   },
   {
     image: '/solution2.png',
-    header: '$9,088,331',
+    header: '$9,266,148',
     body: 'Retail value ($2.86/lb average)',
   },
   {
     image: '/solution3.png',
-    header: '11,630,522 lbs.',
+    header: '16,858,890 lbs.',
     body: 'CO2 diverted ($3.66/lb average)',
   },
 ]
