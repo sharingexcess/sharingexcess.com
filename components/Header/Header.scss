@@ -54,8 +54,10 @@
   #Header-donate {
     margin-right: 8px;
   }
+
   #Header-menu-button {
     margin-left: 24px;
+    border-radius: 0;
 
     #Header-menu-icon {
       font-size: 32px;
@@ -87,6 +89,9 @@
 
     @include mobile {
       padding: 28px 16px;
+      .se-button {
+        border-radius: 0;
+      }
     }
 
     #Header-menu-button {

@@ -1,63 +1,76 @@
-import { Button, Image, Spacer, Text } from '@sharingexcess/designsystem'
-import { useIsMobile } from 'hooks'
+import { Button, Spacer, Text } from '@sharingexcess/designsystem'
 import React, { FC } from 'react'
+import TrackVisibility from 'react-on-screen'
 import Link from 'next/link'
+import { useIsMobile } from 'hooks'
 
 const content = [
   {
-    image: '/solution1.png',
     header: '4,606,254 lbs.',
-    body: 'Total food rescued since 2018',
+    subheader: 'Total Food Rescued since 2018',
+    body: 'Partnering with wholesale markets, grocery stores, restaurants, and community organizations, Sharing Excess has rescued, transported, and delivered food to over 150 local nonprofits and food pantries.',
   },
   {
-    image: '/solution2.png',
     header: '$9,266,148',
-    body: 'Retail value ($2.86/lb average)',
+    subheader: 'Total Retail Value of Rescued Food',
+    body: 'With an average retail value of $2.86 per pound, Sharing Excess has returned over $9 million of valuable, fresh food to the local economy and community.',
   },
   {
-    image: '/solution3.png',
     header: '16,858,890 lbs.',
-    body: 'CO2 diverted ($3.66/lb average)',
+    subheader: 'Total CO2 Diverted from Landfills',
+    body: "By keeping food waste out of landfills, Sharing Excess's work has diverted over 16 million pounds of carbon dioxide from the atmosphere.",
   },
 ]
 
+const ImpactContentChunk: FC<{
+  data: { header: string; body: string; subheader: string }
+  isVisible: boolean
+}> = ({ data, isVisible }) => {
+  return (
+    <div
+      className={`Impact-content-chunk ${isVisible ? 'focused' : 'unfocused'}`}
+    >
+      <Text type="primary-header" color="white" align="center" shadow>
+        {data.header}
+      </Text>
+      <Spacer height={24} />
+      <Text type="small-header" color="white" align="center" shadow>
+        {data.subheader}
+      </Text>
+      <Spacer height={8} />
+      <Text type="paragraph" color="white" align="center">
+        {data.body}
+      </Text>
+    </div>
+  )
+}
+
 export const Impact: FC = () => {
   const isMobile = useIsMobile()
+
   return (
     <div id="Impact">
-      <Text type="small-header" color="white" shadow>
-        OUR IMPACT
+      <Text
+        id="Impact-title"
+        type="small-header"
+        color="white"
+        shadow
+        align="center"
+      >
+        OUR IMPACT: BY THE NUMBERS
       </Text>
-      <Spacer height={isMobile ? 12 : 32} />
-      <Text type="primary-header" color="white" shadow>
-        Partnering with over 150 organizations, redistributing 100,000 lbs.
-        every month.
-      </Text>
-      <Spacer height={isMobile ? 8 : 16} />
-      <Text type="subheader" color="white">
-        That&apos;s approximately 120 billion pounds of food ending up in
-        landfills each year, needlessly wasted for logistical reasons like
-        inventory turnover, lack of affordable transportation, and
-        non-standardized expiration dates.
-      </Text>
-      <Spacer height={isMobile ? 48 : 64} />
       <section id="Impact-content">
         {content.map(c => (
-          <div key={c.header}>
-            <Image src={c.image} alt={c.header} />
-            <Spacer height={16} />
-            <Text type="secondary-header" color="white" align="center" shadow>
-              {c.header}
-            </Text>
-            <Text type="paragraph" color="white" align="center">
-              {c.body}
-            </Text>
-          </div>
+          <TrackVisibility key={c.header}>
+            {({ isVisible }) => (
+              <ImpactContentChunk data={c} isVisible={isVisible} />
+            )}
+          </TrackVisibility>
         ))}
       </section>
-      {!isMobile && <Spacer height={64} />}
+      <Spacer height={isMobile ? 32 : 64} />
       <Link href="/impact" passHref>
-        <Button type="primary" size="large" color="white">
+        <Button type="primary" size="large" color="white" fullWidth={isMobile}>
           Read More About Our Impact
         </Button>
       </Link>

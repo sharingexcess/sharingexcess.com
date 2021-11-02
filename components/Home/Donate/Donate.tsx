@@ -44,7 +44,7 @@ const y = [
 
 export const Donate: FC = () => {
   const isMobile = useIsMobile()
-  const [dollars, setDollars] = useState(100)
+  const [dollars, setDollars] = useState(10)
 
   function handleDrag(_e: Event, data: DraggableData): void {
     const parent = document.getElementById('Donate-slider')

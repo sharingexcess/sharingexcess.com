@@ -1,0 +1,29 @@
+#About {
+  @include page;
+  background: var(--se-green-gradient);
+
+  #About-team {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(192px, 1fr));
+    grid-gap: 32px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    @include mobile {
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    .About-team-person {
+      text-align: center;
+      .subheader {
+        font-weight: 700;
+      }
+      .se-image {
+        width: 100%;
+        border-radius: 50%;
+        border: 4px solid var(--se-white);
+        box-shadow: var(--se-shadow-medium);
+      }
+    }
+  }
+}

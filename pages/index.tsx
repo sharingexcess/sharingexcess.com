@@ -8,6 +8,7 @@ import {
   Volunteer,
   Donate,
   Footer,
+  Problem,
 } from 'components'
 import { useIsMobile } from 'hooks'
 import type { NextPage } from 'next'
@@ -19,7 +20,8 @@ const Home: NextPage = () => {
     <div>
       <Header />
       <Splash />
-      {!isMobile && <Spacer height={250} />}
+      {!isMobile && <Spacer height={32} />}
+      <Problem />
       <Solution />
       <Impact />
       <News />

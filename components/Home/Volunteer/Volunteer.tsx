@@ -48,13 +48,15 @@ export const Volunteer: FC = () => {
         {content.map(c => (
           <div key={c.header}>
             <Image src={c.image} alt={c.header} />
-            <Spacer height={16} />
+            <Spacer height={24} />
             <Text type="secondary-header" color="black" align="center">
               {c.header}
             </Text>
+            <Spacer height={8} />
             <Text type="small" color="grey" align="center">
               {c.body}
             </Text>
+            <Spacer height={8} />
             <Button type="primary" size="medium" color="green">
               {c.button}
             </Button>

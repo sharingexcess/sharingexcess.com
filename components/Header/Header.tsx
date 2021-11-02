@@ -28,8 +28,8 @@ export const Header: FC = () => {
     if (scroll > BACKGROUND_THRESHOLD && scroll > prevScroll) {
       setBackground(true)
     }
-    // handle
-    if (scroll > prevScroll) {
+    // handle scroll down
+    if (scroll > prevScroll && scroll > 0) {
       setPosition(Math.max(-100, position - 10))
     }
     // handle scroll up, but not to top of page

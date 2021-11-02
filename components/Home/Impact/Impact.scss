@@ -2,17 +2,53 @@
   @include page;
   background: var(--se-green-gradient);
   @include flex-vertical-left;
+  text-align: center;
+
+  #Impact-title {
+    width: 100%;
+  }
 
   #Impact-content {
-    @include flex-center;
-    width: 100%;
-    justify-content: space-around;
-    align-items: flex-start;
-    > div {
+    @include flex-vertical-center;
+    overflow-x: hidden;
+
+    .Impact-content-chunk {
       @include flex-vertical-center;
+      width: 100%;
       margin: 0 8px;
+      transition: opacity 0.2s ease;
+      padding: 72px 0;
+      opacity: 0.4;
+
+      &.focused {
+        opacity: 1;
+        cursor: default;
+      }
+
+      @include mobile {
+        opacity: 1;
+        padding: 24px 0;
+      }
+
       .se-text {
-        width: 100%;
+        &.primary-header {
+          font-size: clamp(10px, 11vw, 180px);
+          text-shadow: 0 clamp(4px, 0.72vw, 36px) clamp(4px, 0.72vw, 36px)
+            var(--se-black-transparent);
+          font-weight: 900;
+          white-space: nowrap;
+        }
+        &.small-header {
+          font-size: clamp(20px, 2vw, 48px);
+          text-transform: uppercase;
+        }
+        &.paragraph {
+          max-width: min(72%, 800px);
+
+          @include mobile {
+            max-width: 84%;
+          }
+        }
       }
       .se-image {
         width: clamp(96px, 24vw, 320px);
@@ -37,6 +73,6 @@
   }
 
   .se-button {
-    margin: 24px auto;
+    margin: auto;
   }
 }
