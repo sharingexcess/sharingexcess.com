@@ -1,5 +1,10 @@
 #Problem {
   @include page;
+  padding-top: 64px;
+
+  @include mobile {
+    padding-top: 32px;
+  }
 
   #Problem-content {
     @include flex-center;

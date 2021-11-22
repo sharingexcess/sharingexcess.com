@@ -26,8 +26,12 @@
       color: var(--se-grey-primary);
     }
 
-    #Header-logo img {
-      box-shadow: none;
+    #Header-logo {
+      padding: 8px;
+      img {
+        box-shadow: var(--se-shadow-small);
+        width: 48px;
+      }
     }
 
     @include mobile {
@@ -37,9 +41,12 @@
 
   #Header-logo {
     margin-right: auto;
+    transition: padding 0.32s ease 0.2s;
     img {
       width: 64px;
-      box-shadow: var(--se-shadow-small);
+      box-shadow: var(--se-shadow-medium);
+      border-radius: 4px;
+      transition: width 0.32s ease 0.32s;
 
       @include mobile {
         width: 48px;

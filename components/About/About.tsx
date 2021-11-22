@@ -1,106 +1,261 @@
-import React, { FC } from 'react'
+import React, { FC, useState } from 'react'
 import Head from 'next/head'
-import { Image, Spacer, Text } from '@sharingexcess/designsystem'
+import {
+  Image,
+  Spacer,
+  Text,
+  FlexContainer,
+  Button,
+} from '@sharingexcess/designsystem'
 import { team } from 'content/team'
+import { useIsMobile } from 'hooks'
+import { PageHeader } from 'components'
+import { volunteering } from 'content'
 
 export const About: FC = () => {
+  const isMobile = useIsMobile()
+  const [section, setSection] = useState<'team' | 'partners' | 'history'>(
+    'history'
+  )
+
   return (
     <div id="About">
       <Head>
         <title>About | Sharing Excess</title>
       </Head>
-      <Text type="primary-header" color="white" shadow>
-        Sharing Excess is a solution to scarcity.
-      </Text>
-      <Spacer height={32} />
-      <Text type="paragraph" color="white">
-        In communities everywhere, vital basic resources are going to waste,
-        while people continue to suffer from the lack of those very same
-        resources. This is a disconnect created by logistical barriers between
-        excess and scarcity. If solved, this connection could ensure basic
-        necessities for all people alive today.
-      </Text>
-      <Spacer height={24} />
-      <Text type="paragraph" color="white">
-        Sharing Excess is scaling human compassion to meet a global challenge
-        that has existed long before this idea was born. Founded in Philadelphia
-        Pennsylvania in 2018, our movement aims to address the crucial need for
-        food by delivering regular surplus from grocers, restaurants,
-        wholesalers, and farmers to communities experiencing food insecurity.
-      </Text>
-      <Spacer height={24} />
-      <Text type="paragraph" color="white">
-        By engaging the imagination of students, and the hearts of the people we
-        serve, we have created a dynamic community that plays a unique role in
-        regularly rescuing and distributing food excess to underserved areas.
-        Together with our partners, clever logistics, and custom technologies,
-        members of Sharing Excess aim to address needs within social margins
-        that are unmet by current solutions.
-      </Text>
-      <Spacer height={48} />
-      <Text type="section-header" color="white" shadow>
-        And we think food waste is bananas…
-      </Text>
-      <Spacer height={24} />
-      <Text type="paragraph" color="white">
-        In the United States, nearly 40% of the food we produce goes to waste.
-        That's approximately 120 billion pounds of food ending up in landfills
-        each year; enough to fill more than 700 NFL stadiums from the ground to
-        the very top with uneaten food. Food surplus is inevitable for
-        producers, retailers, and consumers, but it often goes to waste for
-        logistical reasons like poor inventory management, lack of affordable
-        transportation, and non-standardized expiration dates.
-      </Text>
-      <Spacer height={24} />
-      <Text type="paragraph" color="white">
-        All the while, upwards of 40 million Americans experience food
-        insecurity in our country. Considering the fact that 50-60% of U.S.
-        residents are living paycheck to paycheck, food is often the first
-        necessity to be jeopardized. Research shows that children and students
-        are particularly vulnerable to food insecurity, as more than 10 million
-        children live in food insecure households, and more than 40% of
-        four-year college students regularly skip meals on a daily and weekly
-        basis. Every single community in the United States is home to families
-        that experience food insecurity, and often times, they are not eligible
-        to receive federal support and must rely on food donations from
-        shelters, food banks, and community organizations.
-      </Text>
-      <Spacer height={24} />
-      <Text type="paragraph" color="white">
-        Sharing Excess aims to solve this broken equation with innovative
-        last-mile delivery, and big ideas that spread love, happiness, and
-        compassion.
-      </Text>
-      <Spacer height={64} />
-      <Text type="primary-header" color="white" shadow>
-        Meet the team!
-      </Text>
-      <Spacer height={32} />
-      <Text type="paragraph" color="white">
-        Sharing Excess is proudly powered by passionate college students and
-        recent grads. The crew consists of folks working in full-time,
-        part-time, co-op, internship, and volunteer positions. The five
-        departments that make the magic happen include Distribution, Technology,
-        Campus, Finance, and Marketing. Collaborating remotely around from
-        anywhere, we work year-round to support hundreds of thousands of people
-        with free food. Our work has proven that college students can play a
-        vital role in solving one of the world's greatest problems.
-      </Text>
-      <Spacer height={64} />
-      <section id="About-team">
-        {team.map(i => (
-          <div key={i.name} className="About-team-person">
-            <Image src={i.image} alt={i.name} />
-            <Spacer height={12} />
-            <Text type="subheader" color="white" shadow align="center">
-              {i.name}
+      <PageHeader
+        image="/about1.jpeg"
+        label="ABOUT US"
+        title={`Sharing Excess is using surplus\nto fight scarcity.`}
+      />
+
+      <Spacer height={isMobile ? 48 : 64} />
+
+      <FlexContainer
+        className="About-content-section"
+        direction={isMobile ? 'vertical-reverse' : 'horizontal'}
+        primaryAlign="start"
+        secondaryAlign="center"
+      >
+        <video src="/about4.mp4" autoPlay muted loop />
+        <Spacer width={32} height={32} />
+        <FlexContainer
+          direction="vertical"
+          primaryAlign={isMobile ? 'center' : 'start'}
+          secondaryAlign={isMobile ? 'center' : 'start'}
+        >
+          <Text type="paragraph" color="black">
+            In communities around the country, food waste and hunger go hand in
+            hand. While 10 million children go hungry each and every day,{' '}
+            <strong>over 10 billion meals are thrown away</strong> annually.
+          </Text>
+          <Spacer height={24} />
+          <Text type="paragraph" color="black">
+            But as vast a problem as food waste is, the solution often boils
+            down to simple last mile logistics and delivery.{' '}
+            <span className="green">Sharing Excess</span> is meeting this
+            challenge with the power of people, technology, and compassion.
+          </Text>
+        </FlexContainer>
+      </FlexContainer>
+
+      <Spacer height={isMobile ? 64 : 112} />
+
+      <FlexContainer
+        className="About-content-section"
+        direction={isMobile ? 'vertical' : 'horizontal'}
+        primaryAlign="start"
+        secondaryAlign="center"
+      >
+        <FlexContainer
+          direction="vertical"
+          primaryAlign={isMobile ? 'center' : 'start'}
+          secondaryAlign={isMobile ? 'center' : 'start'}
+        >
+          <Text type="paragraph" color="black">
+            Founded in Philadelphia in 2018, we work every day to fight food
+            insecurity by delivering surplus from wholesalers, grocers,
+            restaurants, and farmers to communities in need.
+          </Text>
+          <Spacer height={24} />
+          <Text type="paragraph" color="black">
+            By engaging the imagination of students and our own custom software
+            to source and distribute surplus food, we&apos;ve rescued and
+            distributed over{' '}
+            <strong>
+              <span className="green">4,000,000 lbs.</span> of food since 2018
+            </strong>
+            . Together with our 170+ local partners, Sharing Excess is building
+            a uniquely scalable solution to an unthinkably large scale problem.
+          </Text>
+        </FlexContainer>
+        <Spacer width={32} height={32} />
+        <video autoPlay muted loop src="/about3.mp4" />
+      </FlexContainer>
+
+      <Spacer height={isMobile ? 64 : 96} />
+
+      <FlexContainer
+        id="About-section-buttons"
+        fullWidth
+        direction={isMobile ? 'vertical' : 'horizontal'}
+      >
+        <Button
+          type={section === 'history' ? 'primary' : 'secondary'}
+          color="green"
+          size="large"
+          handler={() => setSection('history')}
+          fullWidth={isMobile}
+        >
+          Our History
+        </Button>
+        <Button
+          type={section === 'team' ? 'primary' : 'secondary'}
+          color="green"
+          size="large"
+          handler={() => setSection('team')}
+          fullWidth={isMobile}
+        >
+          Meet the Team
+        </Button>
+        <Button
+          type={section === 'partners' ? 'primary' : 'secondary'}
+          color="green"
+          size="large"
+          handler={() => setSection('partners')}
+          fullWidth={isMobile}
+        >
+          Our Partners
+        </Button>
+      </FlexContainer>
+
+      <Spacer height={isMobile ? 48 : 64} />
+
+      {section === 'team' && (
+        <section id="About-team">
+          <FlexContainer
+            id="About-section-header"
+            secondaryAlign="center"
+            primaryAlign="center"
+          >
+            <Image src="/about2.png" alt="Sharing Excess Team" />
+            <Text type="primary-header" color="white" shadow>
+              Meet the team!
             </Text>
-            <Text type="small" color="white" align="center">
-              {i.title}
-            </Text>
+          </FlexContainer>
+
+          <Spacer height={isMobile ? 24 : 48} />
+
+          <Text type="paragraph" color="black">
+            Sharing Excess is a lean startup team, proudly powered by passionate
+            college students and recent grads. The crew consists of folks
+            working in full-time, part-time, co-op, internship, and volunteer
+            positions. Collaborating remotely around from anywhere, our work has
+            proven that college students can play a vital role in solving one of
+            the world&apos;s greatest problems.
+          </Text>
+
+          <Spacer height={isMobile ? 24 : 48} />
+
+          <div className="About-team-members">
+            {team.map(i => (
+              <div key={i.name} className="About-team-person">
+                <Image src={i.image} alt={i.name} />
+                <Spacer height={12} />
+                <Text type="subheader" color="green" align="center">
+                  {i.name}
+                </Text>
+                <Text type="small" color="black" align="center">
+                  {i.title}
+                </Text>
+              </div>
+            ))}
           </div>
-        ))}
-      </section>
+
+          <Spacer height={isMobile ? 32 : 64} />
+
+          <FlexContainer direction="vertical">
+            <Text type="secondary-header" color="green" align="center">
+              Looking to get involved?!?
+            </Text>
+
+            <Spacer height={16} />
+
+            <Text type="paragraph" color="black">
+              Whether you can drive a car, organize volunteers, or write
+              jAvAScRIPT, <strong>we can use your help!</strong> Use the forms
+              below to reach out to our team and we'll be sure to get back to
+              you as soon as humanly possible.
+            </Text>
+            <Spacer height={16} />
+          </FlexContainer>
+          <Spacer height={isMobile ? 24 : 48} />
+          <section id="About-team-volunteer">
+            {volunteering.map(c => (
+              <div key={c.header}>
+                <Image src={c.image} alt={c.header} />
+                <Spacer height={24} />
+                <Text type="secondary-header" color="black" align="center">
+                  {c.header}
+                </Text>
+                <Spacer height={8} />
+                <Text type="small" color="grey" align="center">
+                  {c.body}
+                </Text>
+                <Spacer height={16} />
+                <Button type="primary" size="medium" color="green">
+                  {c.button}
+                </Button>
+              </div>
+            ))}
+          </section>
+        </section>
+      )}
+
+      {section === 'history' && (
+        <section id="About-history">
+          <FlexContainer
+            id="About-section-header"
+            secondaryAlign="center"
+            primaryAlign="center"
+          >
+            <Image src="/about5.png" alt="Sharing Excess Team" />
+            <Text type="primary-header" color="white" shadow>
+              How We Got Here
+            </Text>
+          </FlexContainer>
+
+          <Spacer height={isMobile ? 24 : 48} />
+
+          <Text type="paragraph" color="black">
+            Since we got started in 2018, we&apos;ve grown from a simple
+            donation of meal swipes to a team of more than 50 employees and
+            volunteers.
+          </Text>
+        </section>
+      )}
+
+      {section === 'partners' && (
+        <section id="About-partners">
+          <FlexContainer
+            id="About-section-header"
+            secondaryAlign="center"
+            primaryAlign="center"
+          >
+            <Image src="/partners.png" alt="Sharing Excess Team" />
+            <Text type="primary-header" color="white" shadow>
+              Our Partners
+            </Text>
+          </FlexContainer>
+
+          <Spacer height={isMobile ? 24 : 48} />
+
+          <Text type="paragraph" color="black">
+            It&apos;s actually just Evan&apos; family and nobody else and he has
+            just managed to hide that this entire time... pretty cool :shrug:
+          </Text>
+        </section>
+      )}
     </div>
   )
 }

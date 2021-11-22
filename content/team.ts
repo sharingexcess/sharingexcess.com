@@ -6,32 +6,32 @@ export const team: { name: string; title: string; image: string }[] = [
   },
   {
     name: 'Victoria Wilson',
-    title: 'Operations Director',
+    title: 'Director of Operations',
     image: '/team/victoria_wilson.png',
   },
   {
     name: 'Alex Havertine',
-    title: 'Sourcing Director',
+    title: 'Director of Food Sourcing',
     image: '/team/alex_havertine.png',
   },
   {
     name: 'Sarah DiPasquale',
-    title: 'Distribution Director',
+    title: 'Director of Food Distribution',
     image: '/team/sarah_dipasquale.png',
   },
   {
     name: 'Ryan McHenry',
-    title: 'Technology Director',
+    title: 'Director of Technology',
     image: '/team/ryan_mchenry.png',
   },
   {
     name: 'Sonali Mehta',
-    title: 'Data Director',
+    title: 'Director of Data',
     image: '/team/sonali_mehta.png',
   },
   {
     name: 'Cara DePiano',
-    title: 'Campus Director',
+    title: 'Director of Campus',
     image: '/team/cara_depiano.png',
   },
   {

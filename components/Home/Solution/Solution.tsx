@@ -74,15 +74,13 @@ export const Solution: FC = () => {
           members free of charge. See how we do it:
         </Text>
         <Spacer height={isMobile ? 16 : 32} />
-        <Link href="/about" passHref>
-          <Button
-            type="primary"
-            size="medium"
-            color={isMobile ? 'white' : 'green'}
-          >
-            Learn About Our Programs
-          </Button>
-        </Link>
+        <Button
+          type="primary"
+          size="medium"
+          color={isMobile ? 'white' : 'green'}
+        >
+          <Link href="/about">Learn About Our Programs</Link>
+        </Button>
       </Card>
     </div>
   )

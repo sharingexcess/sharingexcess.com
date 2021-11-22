@@ -1,0 +1,46 @@
+#PageHeader {
+  $marginLeftRight: max(96px, calc(50vw - 500px));
+  position: relative;
+  width: calc(100% + calc(2 * #{$marginLeftRight}));
+  margin: -144px 0 0 calc(-1 * #{$marginLeftRight});
+  height: 84vh;
+  background: var(--se-black);
+
+  @include mobile {
+    width: calc(100% + 32px);
+    margin: -96px 0 0 -16px;
+  }
+
+  #PageHeader-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    filter: brightness(0.5);
+    @include fade-in(1.5s);
+  }
+
+  #PageHeader-content {
+    z-index: 1;
+    padding: 64px $marginLeftRight;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(
+      to bottom,
+      var(--se-transparent) 0%,
+      var(--se-transparent) 50%,
+      rgba(0, 0, 0, 0.4) 100%
+    );
+
+    @include mobile {
+      padding: 32px 16px;
+    }
+
+    #PageHeader-title {
+      white-space: pre-line;
+    }
+  }
+}

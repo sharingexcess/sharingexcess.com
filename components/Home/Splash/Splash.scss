@@ -1,21 +1,56 @@
 #Splash {
   --se-min-splash-width: 700px;
+  --se-min-splash-height: 84vh;
   @include page;
-  background: var(--se-green-gradient);
   min-width: var(--se-min-splash-width);
-  padding-bottom: 0;
+  min-height: var(--se-min-splash-height);
+  display: flex;
+  align-items: center;
+  padding-top: 128px;
+  padding-bottom: 128px;
 
   @include mobile {
-    min-width: var(--se-min-page-width);
+    min-width: 100vw;
+  }
+
+  #Splash-video-background,
+  #Splash-image-background {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    filter: brightness(0.3);
+    display: flex;
+    align-items: center;
+    background: var(--se-black);
   }
 
   #Splash-content {
     width: 100%;
     padding: 0 48px;
+    z-index: 3;
     @include slide-in;
 
     .subheader {
       max-width: 400px;
+    }
+
+    .primary-header {
+      .se-spacer {
+        display: inline-block;
+      }
+    }
+
+    .green {
+      color: var(--se-green-primary);
+      font-weight: 900;
+    }
+
+    .se-text {
+      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     }
 
     @include mobile {

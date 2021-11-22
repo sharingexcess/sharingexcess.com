@@ -146,12 +146,12 @@ a {
   // Page views should have 144px on top and bottom,
   // and at least 96px on left and right.
   // For large window sizes, we want to constrain the content
-  // to the center 1200px. Therefore, our max padding is
-  // 50vw - 600px on the left and right,
+  // to the center 1000px. Therefore, our max padding is
+  // 50vw - 500px on the left and right,
   // which is half the difference between the
-  // window width, and 1200px
-  padding: 144px max(96px, calc(50vw - 600px)) 64px
-    max(96px, calc(50vw - 600px));
+  // window width, and 1000px
+  padding: 144px max(96px, calc(50vw - 500px)) 64px
+    max(96px, calc(50vw - 500px));
   position: relative;
   @include mobile {
     padding: 96px 16px;

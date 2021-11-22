@@ -56,7 +56,7 @@ export const Header: FC = () => {
       >
         <Link href="/">
           <a id="Header-logo">
-            <Image src="/logo.png" alt="Sharing Excess Logo" />
+            <Image src="/logo_green.png" alt="Sharing Excess Logo" />
           </a>
         </Link>
         {!isCondensed && <PageLinks color={background ? 'black' : 'white'} />}
