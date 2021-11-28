@@ -8,7 +8,7 @@ const ENCODED_PASS_CODE =
 
 function getVersion() {
   // eslint-disable-next-line
-  var pjson = require('./package.json')
+  var pjson = require('../package.json')
   console.log(pjson.version)
   return pjson.version
 }
@@ -72,6 +72,26 @@ async function requestPassCodeAuthorization() {
   })
 }
 
+async function confirmVersion() {
+  console.log(`\n\nCurrent Version is: ${getVersion()}`)
+  // eslint-disable-next-line
+  const rl = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  })
+
+  return new Promise(resolve => {
+    rl.question(
+      colors.cyan('\n\nEnter "yee" to confirm this is a new version number: '),
+      res => {
+        rl.close()
+        const input = res.toLowerCase()
+        resolve(input === 'yee')
+      }
+    )
+  })
+}
+
 async function runCommand(command, callback) {
   console.log(colors.yellow('\n\nRUNNING:', command))
   const process = exec(command, error => {
@@ -85,52 +105,51 @@ async function runCommand(command, callback) {
 }
 
 async function main() {
-  const valid_git_state = await validateGitState()
-  if (!valid_git_state) return
-  const approved = await requestPassCodeAuthorization()
-  if (approved) {
-    series(
-      [
-        callback =>
-          runCommand('cp environments/.env.prod .env.local', callback),
-        callback => runCommand('rm -rf out', callback),
-        callback => runCommand('rm -rf node_modules', callback),
-        callback => runCommand('npm ci', callback),
-        callback => runCommand('npm run export', callback),
-        callback => runCommand('cp environments/.env.dev .env.local', callback),
-        callback =>
-          runCommand(
-            'cp environments/firebase.prod.json firebase.json',
-            callback
-          ),
-        callback => runCommand('npm version minor', callback),
-        callback =>
-          runCommand(`echo "New version is ${getVersion()}"`, callback),
-        callback => runCommand('firebase use prod', callback),
-        callback =>
-          runCommand(
-            'firebase deploy --only hosting:sharingexcessdotcom',
-            callback
-          ),
-        callback =>
-          runCommand(
-            'cp environments/firebase.dev.json firebase.json',
-            callback
-          ),
-        callback => runCommand('firebase use default', callback),
-        callback =>
-          runCommand(
-            `sentry-cli releases -o sharingexcess -p sharingexcess-dot-com -e production deploys ${getVersion()}`,
-            callback
-          ),
-      ],
-      err => {
-        err
-          ? console.error('Error in deployment:', err)
-          : console.log(colors.green.bold('\n\nDEPLOYMENT SUCCESSFUL!\n'))
+  if (await confirmVersion()) {
+    if (await validateGitState()) {
+      if (await requestPassCodeAuthorization()) {
+        series(
+          [
+            callback =>
+              runCommand('cp environments/.env.prod .env.local', callback),
+            callback => runCommand('rm -rf out', callback),
+            callback => runCommand('rm -rf node_modules', callback),
+            callback => runCommand('npm ci', callback),
+            callback => runCommand('npm run export', callback),
+            callback =>
+              runCommand('cp environments/.env.dev .env.local', callback),
+            callback =>
+              runCommand(
+                'cp environments/firebase.prod.json firebase.json',
+                callback
+              ),
+            callback => runCommand('firebase use prod', callback),
+            callback =>
+              runCommand(
+                'firebase deploy --only hosting:sharingexcessdotcom',
+                callback
+              ),
+            callback =>
+              runCommand(
+                'cp environments/firebase.dev.json firebase.json',
+                callback
+              ),
+            callback => runCommand('firebase use default', callback),
+            callback =>
+              runCommand(
+                `sentry-cli releases -o sharingexcess -p sharingexcess-dot-com -e production deploys ${getVersion()}`,
+                callback
+              ),
+          ],
+          err => {
+            err
+              ? console.error('Error in deployment:', err)
+              : console.log(colors.green.bold('\n\nDEPLOYMENT SUCCESSFUL!\n'))
+          }
+        )
       }
-    )
-  } else console.log('Invalid pass code. Exiting...')
+    } else console.log('Invalid pass code. Exiting...')
+  } else console.log('No worries fam, cancelling deploy...')
 }
 
 main()
