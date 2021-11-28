@@ -123,7 +123,6 @@ async function main() {
                 'cp environments/firebase.prod.json firebase.json',
                 callback
               ),
-            callback => runCommand('firebase use prod', callback),
             callback =>
               runCommand(
                 'firebase deploy --only hosting:sharingexcessdotcom',
@@ -134,7 +133,6 @@ async function main() {
                 'cp environments/firebase.dev.json firebase.json',
                 callback
               ),
-            callback => runCommand('firebase use default', callback),
             callback =>
               runCommand(
                 `sentry-cli releases -o sharingexcess -p sharingexcess-dot-com -e production deploys ${getVersion()}`,
