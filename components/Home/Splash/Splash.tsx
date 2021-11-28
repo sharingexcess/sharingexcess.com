@@ -23,7 +23,7 @@ export const Splash: FC = () => {
           preload="auto"
           muted
           loop
-          poster="/splash3.png"
+          poster="/headers/home.gif"
         />
       )}
       <div id="Splash-content">
@@ -41,6 +41,13 @@ export const Splash: FC = () => {
           to solve scarcity.
         </Text>
         <Spacer height={16} />
+        <button
+          onClick={() => {
+            throw new Error('hello sentry')
+          }}
+        >
+          test
+        </button>
         <Text
           type="subheader"
           color="white"

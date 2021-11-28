@@ -4,6 +4,15 @@ import '@fortawesome/fontawesome-svg-core/styles.css'
 config.autoAddCss = false
 import 'styles/globals.scss'
 import { initializeApp } from 'firebase/app'
+import * as Sentry from '@sentry/react'
+import { Integrations } from '@sentry/tracing'
+
+Sentry.init({
+  dsn: 'https://43c8f67fd12341ae80e7c512807f6c30@o1079715.ingest.sentry.io/6084786',
+  integrations: [new Integrations.BrowserTracing()],
+  tracesSampleRate: 1.0,
+  environment: process.env.SENTRY_ENV || 'development',
+})
 
 const firebaseConfig = {
   apiKey: 'AIzaSyCtfJwIfZEuejWShXm3qSL3s1hcDsk7RDo',

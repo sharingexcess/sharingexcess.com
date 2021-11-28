@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import Head from 'next/head'
 import {
   Image,
@@ -11,12 +11,18 @@ import { team } from 'content/team'
 import { useIsMobile } from 'hooks'
 import { PageHeader } from 'components'
 import { volunteering } from 'content'
+import { useRouter } from 'next/router'
 
 export const About: FC = () => {
   const isMobile = useIsMobile()
-  const [section, setSection] = useState<'team' | 'partners' | 'history'>(
-    'history'
-  )
+  const [section, setSection] = useState('history')
+  const router = useRouter()
+
+  useEffect(() => {
+    if (router?.query?.section && typeof router.query.section === 'string') {
+      setSection(router.query.section)
+    }
+  }, [router.query])
 
   return (
     <div id="About">
@@ -138,7 +144,7 @@ export const About: FC = () => {
             secondaryAlign="center"
             primaryAlign="center"
           >
-            <Image src="/about2.png" alt="Sharing Excess Team" />
+            <Image src="/about/team.png" alt="Sharing Excess Team" />
             <Text type="primary-header" color="white" shadow>
               Meet the team!
             </Text>

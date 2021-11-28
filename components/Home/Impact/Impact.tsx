@@ -75,7 +75,7 @@ export const Impact: FC = () => {
       </section>
       <Spacer height={isMobile ? 32 : 64} />
       <Button type="primary" size="large" color="white" fullWidth={isMobile}>
-        <Link href="/impact">Read More About Our Impact</Link>
+        <Link href="/about">Read More About Our Impact</Link>
       </Button>
     </div>
   )

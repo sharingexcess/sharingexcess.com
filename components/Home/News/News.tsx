@@ -9,6 +9,7 @@ import {
 import { articles } from 'content'
 import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
+import Link from 'next/link'
 
 export const News: FC = () => {
   const isMobile = useIsMobile()
@@ -76,7 +77,7 @@ export const News: FC = () => {
       </section>
       <Spacer height={isMobile ? 16 : 64} />
       <Button type="primary" size="large" color="white">
-        Read More News Stories
+        <Link href="/news">Read More News Stories</Link>
       </Button>
     </div>
   )

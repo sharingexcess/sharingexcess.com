@@ -23,6 +23,7 @@ export const Header: FC = () => {
     // handle scroll up to top of page, switch to transparent header
     if (scroll < BACKGROUND_THRESHOLD) {
       setBackground(false)
+      setPosition(0)
     }
     // handle scroll down page, switch to white header
     if (scroll > BACKGROUND_THRESHOLD && scroll > prevScroll) {
@@ -30,7 +31,7 @@ export const Header: FC = () => {
     }
     // handle scroll down
     if (scroll > prevScroll && scroll > 0) {
-      setPosition(Math.max(-100, position - 10))
+      setPosition(Math.max(-100, position - 20))
     }
     // handle scroll up, but not to top of page
     if (scroll > BACKGROUND_THRESHOLD && scroll < prevScroll) {

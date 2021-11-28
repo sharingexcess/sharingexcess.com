@@ -1,6 +1,7 @@
 import { Button, Spacer, Text } from '@sharingexcess/designsystem'
 import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
+import Link from 'next/link'
 
 export const Problem: FC = () => {
   const isMobile = useIsMobile()
@@ -49,7 +50,7 @@ export const Problem: FC = () => {
       </section>
       <Spacer height={isMobile ? 64 : 96} />
       <Button type="primary" size="large" color="black">
-        Read More About Our Cause
+        <Link href="/about">Read More About Our Cause</Link>
       </Button>
     </div>
   )

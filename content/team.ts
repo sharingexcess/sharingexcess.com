@@ -1,7 +1,7 @@
 export const team: { name: string; title: string; image: string }[] = [
   {
     name: 'Evan Ehlers',
-    title: 'Founder, Executive Director',
+    title: 'Executive Director, Founder',
     image: '/team/evan_ehlers.png',
   },
   {
@@ -26,7 +26,7 @@ export const team: { name: string; title: string; image: string }[] = [
   },
   {
     name: 'Sonali Mehta',
-    title: 'Director of Data',
+    title: 'Director of Data Analytics',
     image: '/team/sonali_mehta.png',
   },
   {
