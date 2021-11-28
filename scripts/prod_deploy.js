@@ -3,6 +3,8 @@ const crypto = require('crypto') // eslint-disable-line
 const colors = require('colors') // eslint-disable-line
 const { series } = require('async') // eslint-disable-line
 const git = require('git-state') // eslint-disable-line
+require('dotenv').config({ path: 'environments/.env.prod' }) // eslint-disable-line
+
 const ENCODED_PASS_CODE =
   '10a35f32b13f533407ce443ab0d4aa5d734db37586c95e1e3bd116227b695ca1'
 
@@ -135,7 +137,23 @@ async function main() {
               ),
             callback =>
               runCommand(
-                `sentry-cli releases -o sharingexcess -p sharingexcess-dot-com -e production deploys ${getVersion()}`,
+                `SENTRY_AUTH_TOKEN=${
+                  process.env.SENTRY_AUTH_TOKEN
+                } sentry-cli releases --org sharingexcess new ${getVersion()}`,
+                callback
+              ),
+            callback =>
+              runCommand(
+                `SENTRY_AUTH_TOKEN=${
+                  process.env.SENTRY_AUTH_TOKEN
+                } sentry-cli releases --org sharingexcess -p sharingexcess-dot-com deploys ${getVersion()}`,
+                callback
+              ),
+            callback =>
+              runCommand(
+                `SENTRY_AUTH_TOKEN=${
+                  process.env.SENTRY_AUTH_TOKEN
+                } sentry-cli releases --org sharingexcess finalize ${getVersion()}`,
                 callback
               ),
           ],
