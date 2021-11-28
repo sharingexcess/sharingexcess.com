@@ -1,7 +1,7 @@
 import { Button, ExternalLink, Spacer, Text } from '@sharingexcess/designsystem'
 import { useIsMobile } from 'hooks'
 import React, { FC, useState } from 'react'
-import Draggable, { DraggableData } from 'react-draggable'
+import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faAppleAlt,
@@ -46,7 +46,7 @@ export const Donate: FC = () => {
   const isMobile = useIsMobile()
   const [dollars, setDollars] = useState(10)
 
-  function handleDrag(_e: Event, data: DraggableData): void {
+  function handleDrag(_e: DraggableEvent, data: DraggableData): void {
     const parent = document.getElementById('Donate-slider')
     if (parent) {
       const parentWidth = parent.offsetWidth - 64 // subtract width of handle

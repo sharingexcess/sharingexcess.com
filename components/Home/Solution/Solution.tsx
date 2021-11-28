@@ -1,7 +1,5 @@
 import React, { FC } from 'react'
 import { Button, Image, Spacer, Text, Card } from '@sharingexcess/designsystem'
-import { Carousel } from 'react-responsive-carousel'
-import 'react-responsive-carousel/lib/styles/carousel.min.css'
 import { useIsMobile } from 'hooks'
 import Link from 'next/link'
 
@@ -10,28 +8,8 @@ export const Solution: FC = () => {
 
   return (
     <div id="Solution">
-      <section id="Solution-carousel">
-        {isMobile ? (
-          <Image src="/solution1.png" alt="Test" />
-        ) : (
-          <Carousel
-            autoPlay
-            infiniteLoop
-            interval={3000}
-            transitionTime={600}
-            showArrows={false}
-            dynamicHeight={true}
-            showThumbs={false}
-            showStatus={false}
-            swipeable={false}
-            stopOnHover={false}
-          >
-            <Image src="/solution1.png" alt="Test" />
-            <Image src="/solution2.png" alt="Test" />
-            <Image src="/solution3.png" alt="Test" />
-            <Image src="/solution4.png" alt="Test" />
-          </Carousel>
-        )}
+      <section id="Solution-background">
+        <Image src="/home/pwpm.png" alt="Test" />
       </section>
       <Card id="Solution-content">
         <Text

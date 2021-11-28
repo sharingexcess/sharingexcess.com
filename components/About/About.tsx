@@ -4,8 +4,8 @@ import {
   Image,
   Spacer,
   Text,
-  FlexContainer,
   Button,
+  FlexContainer,
 } from '@sharingexcess/designsystem'
 import { team } from 'content/team'
 import { useIsMobile } from 'hooks'
@@ -24,7 +24,7 @@ export const About: FC = () => {
         <title>About | Sharing Excess</title>
       </Head>
       <PageHeader
-        image="/about1.jpeg"
+        image={isMobile ? '/headers/about_mobile.jpeg' : '/headers/about.jpeg'}
         label="ABOUT US"
         title={`Sharing Excess is using surplus\nto fight scarcity.`}
       />
@@ -37,7 +37,7 @@ export const About: FC = () => {
         primaryAlign="start"
         secondaryAlign="center"
       >
-        <video src="/about4.mp4" autoPlay muted loop />
+        <Image src="/about/popup.gif" alt="About Sharing Excess" />
         <Spacer width={32} height={32} />
         <FlexContainer
           direction="vertical"
@@ -90,7 +90,7 @@ export const About: FC = () => {
           </Text>
         </FlexContainer>
         <Spacer width={32} height={32} />
-        <video autoPlay muted loop src="/about3.mp4" />
+        <Image src="/about/billboard.gif" alt="About Sharing Excess" />
       </FlexContainer>
 
       <Spacer height={isMobile ? 64 : 96} />
@@ -184,8 +184,8 @@ export const About: FC = () => {
             <Text type="paragraph" color="black">
               Whether you can drive a car, organize volunteers, or write
               jAvAScRIPT, <strong>we can use your help!</strong> Use the forms
-              below to reach out to our team and we'll be sure to get back to
-              you as soon as humanly possible.
+              below to reach out to our team and we&apos;ll be sure to get back
+              to you as soon as humanly possible.
             </Text>
             <Spacer height={16} />
           </FlexContainer>
@@ -219,7 +219,7 @@ export const About: FC = () => {
             secondaryAlign="center"
             primaryAlign="center"
           >
-            <Image src="/about5.png" alt="Sharing Excess Team" />
+            <Image src="/about/history.png" alt="Sharing Excess Team" />
             <Text type="primary-header" color="white" shadow>
               How We Got Here
             </Text>
@@ -242,7 +242,7 @@ export const About: FC = () => {
             secondaryAlign="center"
             primaryAlign="center"
           >
-            <Image src="/partners.png" alt="Sharing Excess Team" />
+            <Image src="/about/partners.png" alt="Sharing Excess Team" />
             <Text type="primary-header" color="white" shadow>
               Our Partners
             </Text>

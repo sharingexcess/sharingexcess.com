@@ -47,7 +47,7 @@ export const Header: FC = () => {
       <Head>
         <title>Sharing Excess | Let&apos;s Free Food!</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-        <link rel="icon" type="image/png" href="/logo.png" />
+        <link rel="icon" type="image/png" href="/logos/green.png" />
       </Head>
       <header
         id="Header"
@@ -56,7 +56,7 @@ export const Header: FC = () => {
       >
         <Link href="/">
           <a id="Header-logo">
-            <Image src="/logo_green.png" alt="Sharing Excess Logo" />
+            <Image src="/logos/green.png" alt="Sharing Excess Logo" />
           </a>
         </Link>
         {!isCondensed && <PageLinks color={background ? 'black' : 'white'} />}

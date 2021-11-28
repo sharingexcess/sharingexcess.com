@@ -1,10 +1,4 @@
-import {
-  Button,
-  Spacer,
-  Text,
-  ExternalLink,
-  Image,
-} from '@sharingexcess/designsystem'
+import { Button, Spacer, Text, ExternalLink } from '@sharingexcess/designsystem'
 import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
 
@@ -13,14 +7,25 @@ export const Splash: FC = () => {
 
   return (
     <div id="Splash">
-      <video
-        id="Splash-video-background"
-        src="/this_is_sharing_excess.mp4"
-        autoPlay
-        muted
-        loop
-        poster="/splash3.png"
-      />
+      {isMobile ? (
+        // eslint-disable-next-line
+        <img
+          id="Splash-video-background"
+          src="/headers/home.gif"
+          alt="This is Sharing Excess"
+        />
+      ) : (
+        <video
+          id="Splash-video-background"
+          src="/headers/home.mp4"
+          autoPlay
+          playsInline
+          preload="auto"
+          muted
+          loop
+          poster="/splash3.png"
+        />
+      )}
       <div id="Splash-content">
         <Text
           type="primary-header"

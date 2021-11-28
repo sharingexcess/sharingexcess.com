@@ -1,4 +1,4 @@
-import { Header, News } from 'components'
+import { Footer, Header, News } from 'components'
 import type { NextPage } from 'next'
 
 const about: NextPage = () => {
@@ -6,6 +6,7 @@ const about: NextPage = () => {
     <>
       <Header />
       <News />
+      <Footer />
     </>
   )
 }

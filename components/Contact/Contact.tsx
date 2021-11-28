@@ -3,6 +3,7 @@ import { useForm } from '@formspree/react'
 import { PageHeader } from 'components'
 import { Text, Spacer } from '@sharingexcess/designsystem'
 import validator from 'validator'
+import { useIsMobile } from 'hooks'
 
 // For our contact form, we use a free service called FormSpree
 // Here's the link to our form:
@@ -28,6 +29,7 @@ const initFormData = {
 }
 
 export const Contact: FC = () => {
+  const isMobile = useIsMobile()
   const [state, handleSubmit] = useForm('xeqnjkaq')
   const [formData, setFormData] = useState<formContent>(initFormData)
 
@@ -65,7 +67,9 @@ export const Contact: FC = () => {
       <PageHeader
         label="GET IN TOUCH"
         title="We simply can NOT wait to hear from you!"
-        image="/contact.png"
+        image={
+          isMobile ? '/headers/contact_mobile.png' : '/headers/contact.png'
+        }
       />
       <Spacer height={32} />
       <Text type="secondary-header" color="green">

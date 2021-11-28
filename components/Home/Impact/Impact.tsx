@@ -1,4 +1,4 @@
-import { Button, Spacer, Text } from '@sharingexcess/designsystem'
+import { Button, Spacer, Text, Image } from '@sharingexcess/designsystem'
 import React, { FC } from 'react'
 import TrackVisibility from 'react-on-screen'
 import Link from 'next/link'
@@ -6,16 +6,19 @@ import { useIsMobile } from 'hooks'
 
 const content = [
   {
+    image: '/icons/package.png',
     header: '4,606,254 lbs.',
     subheader: 'Total Food Rescued since 2018',
     body: 'Partnering with wholesale markets, grocery stores, restaurants, and community organizations, Sharing Excess has rescued, transported, and delivered food to over 150 local nonprofits and food pantries.',
   },
   {
+    image: '/icons/money.png',
     header: '$9,266,148',
     subheader: 'Total Retail Value of Rescued Food',
     body: 'With an average retail value of $2.86 per pound, Sharing Excess has returned over $9 million of valuable, fresh food to the local economy and community.',
   },
   {
+    image: '/icons/cloud.png',
     header: '16,858,890 lbs.',
     subheader: 'Total CO2 Diverted from Landfills',
     body: "By keeping food waste out of landfills, Sharing Excess's work has diverted over 16 million pounds of carbon dioxide from the atmosphere.",
@@ -23,13 +26,15 @@ const content = [
 ]
 
 const ImpactContentChunk: FC<{
-  data: { header: string; body: string; subheader: string }
+  data: { header: string; body: string; subheader: string; image: string }
   isVisible: boolean
 }> = ({ data, isVisible }) => {
   return (
     <div
       className={`Impact-content-chunk ${isVisible ? 'focused' : 'unfocused'}`}
     >
+      <Image src={data.image} alt="Impact" />
+      <Spacer height={24} />
       <Text type="primary-header" color="white" align="center" shadow>
         {data.header}
       </Text>
@@ -61,7 +66,7 @@ export const Impact: FC = () => {
       </Text>
       <section id="Impact-content">
         {content.map(c => (
-          <TrackVisibility key={c.header}>
+          <TrackVisibility key={c.header} offset={200}>
             {({ isVisible }) => (
               <ImpactContentChunk data={c} isVisible={isVisible} />
             )}

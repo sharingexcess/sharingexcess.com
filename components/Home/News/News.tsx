@@ -29,6 +29,7 @@ export const News: FC = () => {
       </Text>
       <Spacer height={isMobile ? 32 : 64} />
       <section id="News-content">
+        <Spacer className="News-content-spacer" />
         {articles.map(c => (
           <Card classList={['News-article']} key={c.header}>
             <Image src={c.image} alt={c.header} />
@@ -71,6 +72,7 @@ export const News: FC = () => {
             </ExternalLink>
           </Card>
         ))}
+        <Spacer className="News-content-spacer" />
       </section>
       <Spacer height={isMobile ? 16 : 64} />
       <Button type="primary" size="large" color="white">

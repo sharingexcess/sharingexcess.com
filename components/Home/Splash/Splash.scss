@@ -22,10 +22,14 @@
     height: 100%;
     width: 100%;
     object-fit: cover;
-    filter: brightness(0.3);
+    filter: brightness(0.4);
     display: flex;
     align-items: center;
     background: var(--se-black);
+
+    @include mobile {
+      filter: brightness(0.5);
+    }
   }
 
   #Splash-content {

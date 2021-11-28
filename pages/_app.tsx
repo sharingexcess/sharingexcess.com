@@ -4,7 +4,7 @@ import '@fortawesome/fontawesome-svg-core/styles.css'
 config.autoAddCss = false
 import 'styles/globals.scss'
 import { initializeApp } from 'firebase/app'
-import { getAnalytics } from 'firebase/analytics'
+
 const firebaseConfig = {
   apiKey: 'AIzaSyCtfJwIfZEuejWShXm3qSL3s1hcDsk7RDo',
   authDomain: 'sharingexcessdotcom.firebaseapp.com',
@@ -16,9 +16,9 @@ const firebaseConfig = {
 }
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig)
-const analytics = getAnalytics(app)
+initializeApp(firebaseConfig)
 
+// eslint-disable-next-line
 function MyApp({ Component, pageProps }: AppProps) {
   return <Component {...pageProps} />
 }

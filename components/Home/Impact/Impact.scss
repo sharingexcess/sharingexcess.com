@@ -11,6 +11,7 @@
   #Impact-content {
     @include flex-vertical-center;
     overflow-x: hidden;
+    width: 100%;
 
     .Impact-content-chunk {
       @include flex-vertical-center;
@@ -32,11 +33,15 @@
 
       .se-text {
         &.primary-header {
-          font-size: clamp(10px, 11vw, 180px);
+          font-size: clamp(10px, 8vw, 120px);
           text-shadow: 0 clamp(4px, 0.72vw, 36px) clamp(4px, 0.72vw, 36px)
             var(--se-black-transparent);
           font-weight: 900;
           white-space: nowrap;
+
+          @include mobile {
+            font-size: clamp(10px, 10vw, 120px);
+          }
         }
         &.small-header {
           font-size: clamp(20px, 2vw, 48px);
@@ -51,12 +56,10 @@
         }
       }
       .se-image {
-        width: clamp(96px, 24vw, 320px);
-        height: clamp(96px, 24vw, 320px);
+        width: clamp(96px, 16vw, 320px);
+        height: clamp(96px, 16vw, 320px);
         object-fit: cover;
-        border-radius: 50%;
-        border: 6px solid var(--se-white);
-        box-shadow: var(--se-shadow-medium);
+        filter: drop-shadow(var(--se-shadow-large));
       }
     }
 

@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { Image, Text, FlexContainer, Spacer } from '@sharingexcess/designsystem'
+import { Image, Text, Spacer, FlexContainer } from '@sharingexcess/designsystem'
 
 interface PageHeaderProps {
   image: string
@@ -26,6 +26,8 @@ export const PageHeader: FC<PageHeaderProps> = ({
           id="PageHeader-video"
           src={video}
           autoPlay
+          playsInline
+          preload="auto"
           muted
           loop
           poster={image}

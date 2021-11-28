@@ -1,0 +1,60 @@
+#Footer {
+  @include page;
+  @include flex-left;
+  padding-top: 32px;
+  padding-bottom: 32px;
+
+  @include mobile {
+    padding-top: 32px;
+    padding-bottom: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .se-image {
+    width: 64px;
+    margin-right: 16px;
+  }
+
+  #Footer-links {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: 50% 50%;
+    flex-wrap: wrap;
+    padding-right: 32px;
+    text-align: left;
+
+    .se-button {
+      padding: 4px 16px;
+      text-align: left;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--se-grey-primary);
+
+      @include hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  #Footer-legal {
+    flex: 1 1 50%;
+    margin-left: auto;
+    max-width: 500px;
+
+    div {
+      text-align: right;
+
+      @include mobile {
+        text-align: center;
+      }
+    }
+
+    @include mobile {
+      margin-left: 0;
+      padding-top: 32px;
+      text-align: center;
+    }
+  }
+}

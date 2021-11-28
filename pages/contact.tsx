@@ -1,4 +1,4 @@
-import { Contact, Header } from 'components'
+import { Contact, Footer, Header } from 'components'
 import type { NextPage } from 'next'
 
 const Impact: NextPage = () => {
@@ -6,6 +6,7 @@ const Impact: NextPage = () => {
     <>
       <Header />
       <Contact />
+      <Footer />
     </>
   )
 }

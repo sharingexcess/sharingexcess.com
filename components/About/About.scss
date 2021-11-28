@@ -7,8 +7,7 @@
   }
 
   .About-content-section {
-    .se-image,
-    video {
+    .se-image {
       height: 32vh;
       max-width: 50%;
       object-fit: cover;
@@ -19,6 +18,7 @@
         height: unset;
       }
     }
+
     .green {
       color: var(--se-green-primary);
       font-weight: 700;
