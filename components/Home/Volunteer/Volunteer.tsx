@@ -2,6 +2,7 @@ import { Button, Image, Spacer, Text } from '@sharingexcess/designsystem'
 import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
 import { volunteering } from 'content'
+import Link from 'next/link'
 
 export const Volunteer: FC = () => {
   const isMobile = useIsMobile()
@@ -37,7 +38,7 @@ export const Volunteer: FC = () => {
             </Text>
             <Spacer height={8} />
             <Button type="primary" size="medium" color="green">
-              {c.button}
+              <Link href={c.link}>{c.button}</Link>
             </Button>
           </div>
         ))}

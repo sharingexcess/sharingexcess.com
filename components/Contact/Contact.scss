@@ -1,0 +1,111 @@
+#Contact {
+  @include page;
+
+  form {
+    max-width: 600px;
+    margin: 32px auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+
+    .Contact-italics {
+      font-style: italic;
+    }
+
+    .Contact-form-group {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 16px 0;
+      width: 100%;
+
+      label {
+        font-family: var(--font-header);
+        font-size: 18px;
+        color: var(--se-black);
+        font-weight: 500;
+        padding-bottom: 4px;
+      }
+
+      input {
+        border: none;
+        font-family: var(--font-body);
+        background: var(--se-grey-light);
+        font-size: 18px;
+        color: var(--se-black);
+        font-weight: 700;
+        padding: 12px 16px;
+        border-radius: 8px;
+        width: 100%;
+        transition: all 0.1s ease;
+        outline: none;
+
+        @include focus {
+          background: var(--se-blue-light);
+        }
+
+        &.valid {
+          background: var(--se-green-light);
+        }
+
+        &.invalid {
+          background: var(--se-red-light);
+        }
+      }
+
+      textarea {
+        border: none;
+        font-family: var(--font-body);
+        background: var(--se-grey-light);
+        font-size: 18px;
+        color: var(--se-black);
+        font-weight: 700;
+        padding: 12px 16px;
+        border-radius: 8px;
+        width: 100%;
+        transition: all 0.1s ease;
+        outline: none;
+
+        @include focus {
+          background: var(--se-blue-light);
+        }
+
+        &.valid {
+          background: var(--se-green-light);
+        }
+
+        &.invalid {
+          background: var(--se-red-light);
+        }
+      }
+
+      select {
+        border: none;
+        font-family: var(--font-body);
+        background: var(--se-grey-light);
+        font-size: 18px;
+        color: var(--se-black);
+        font-weight: 700;
+        padding: 12px 16px;
+        border-radius: 8px;
+        width: 100%;
+        transition: all 0.1s ease;
+        outline: none;
+
+        @include focus {
+          background: var(--se-blue-light);
+        }
+
+        &.valid {
+          background: var(--se-green-light);
+        }
+
+        &.invalid {
+          background: var(--se-red-light);
+        }
+      }
+    }
+  }
+}

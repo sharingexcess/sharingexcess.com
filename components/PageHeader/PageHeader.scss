@@ -3,7 +3,7 @@
   position: relative;
   width: calc(100% + calc(2 * #{$marginLeftRight}));
   margin: -144px 0 0 calc(-1 * #{$marginLeftRight});
-  height: 84vh;
+  height: 72vh;
   background: var(--se-black);
 
   @include mobile {
