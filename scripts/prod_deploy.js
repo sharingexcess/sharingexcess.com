@@ -146,7 +146,7 @@ async function main() {
               runCommand(
                 `SENTRY_AUTH_TOKEN=${
                   process.env.SENTRY_AUTH_TOKEN
-                } sentry-cli releases --org sharingexcess -p sharingexcess-dot-com deploys ${getVersion()}`,
+                } sentry-cli releases --org sharingexcess -p sharingexcess-dot-com deploys ${getVersion()} new -e production`,
                 callback
               ),
             callback =>
