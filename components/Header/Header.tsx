@@ -53,6 +53,7 @@ export const Header: FC = () => {
       </Head>
       <Script
         strategy="beforeInteractive"
+        id="hotjar"
         dangerouslySetInnerHTML={{
           __html: `
     (function(h,o,t,j,a,r){
