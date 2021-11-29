@@ -3,6 +3,7 @@ import { Button, Image, ExternalLink } from '@sharingexcess/designsystem'
 import { PageLinks } from './Header.children'
 import Head from 'next/head'
 import Link from 'next/link'
+import Script from 'next/script'
 import { useWidth } from 'hooks'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
@@ -50,6 +51,21 @@ export const Header: FC = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <link rel="icon" type="image/png" href="/logos/green.png" />
       </Head>
+      <Script
+        strategy="beforeInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+    (function(h,o,t,j,a,r){
+      h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+      h._hjSettings={hjid:2723482,hjsv:6};
+      a=o.getElementsByTagName('head')[0];
+      r=o.createElement('script');r.async=1;
+      r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+      a.appendChild(r);
+  })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+  `,
+        }}
+      />
       <header
         id="Header"
         className={background ? 'with-background' : ''}
@@ -61,15 +77,13 @@ export const Header: FC = () => {
           </a>
         </Link>
         {!isCondensed && <PageLinks color={background ? 'black' : 'white'} />}
-        <ExternalLink to="https://app.mobilecause.com/form/l2Z4OQ?vid=lpnht">
-          <Button
-            type="primary"
-            id="Header-donate"
-            color={background ? 'green' : 'white'}
-          >
-            Donate
-          </Button>
-        </ExternalLink>
+        <Button
+          type="primary"
+          id="Header-donate"
+          color={background ? 'green' : 'white'}
+        >
+          <Link href="/donate">Donate</Link>
+        </Button>
         <ExternalLink to="https://sharingexcess.web.app">
           <Button
             type="secondary"

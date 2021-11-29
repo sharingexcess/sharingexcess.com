@@ -12,34 +12,14 @@ export const Solution: FC = () => {
         <Image src="/home/pwpm.png" alt="Test" />
       </section>
       <Card id="Solution-content">
-        <Text
-          type="small-header"
-          color={isMobile ? 'white' : 'green'}
-          align="right"
-        >
-          OUR SOLUTION
+        <Text type="primary-header" color="black" align="right">
+          We Rescue,
         </Text>
-        <Spacer height={isMobile ? 4 : 16} />
-        <Text
-          type="primary-header"
-          color={isMobile ? 'white' : 'black'}
-          align="right"
-        >
-          Rescue,
+        <Text type="primary-header" color="black" align="right">
+          Deliver &
         </Text>
-        <Text
-          type="primary-header"
-          color={isMobile ? 'white' : 'black'}
-          align="right"
-        >
-          Transport,
-        </Text>
-        <Text
-          type="primary-header"
-          color={isMobile ? 'white' : 'black'}
-          align="right"
-        >
-          Deliver.
+        <Text type="primary-header" color="black" align="right">
+          Distribute.
         </Text>
         <Spacer height={16} />
         <Text
@@ -47,9 +27,9 @@ export const Solution: FC = () => {
           color={isMobile ? 'white' : 'grey'}
           align="right"
         >
-          We identify vendors with surplus, dispatch drivers to rescue food, and
-          distribute this perfectly edible and delicious food to community
-          members free of charge. See how we do it:
+          Sharing Excess specializes in last-mile logistics. We use technology
+          and clever innovation to deliver food excess to communities free of
+          charge, before it goes to waste.
         </Text>
         <Spacer height={isMobile ? 16 : 32} />
         <Button

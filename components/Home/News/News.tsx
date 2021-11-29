@@ -68,7 +68,7 @@ export const News: FC = () => {
             <Spacer height={24} />
             <ExternalLink to={c.url}>
               <Button type="primary" size="small" fullWidth>
-                Read More
+                {c.button || 'Read More'}
               </Button>
             </ExternalLink>
           </Card>

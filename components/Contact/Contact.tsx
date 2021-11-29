@@ -142,6 +142,9 @@ export const Contact: FC = () => {
             <option value="Make a Financial Contribution">
               Make a Financial Contribution
             </option>
+            <option value="Start a Campus Chapter">
+              Start a Campus Chapter
+            </option>
             <option value="other">Other</option>
           </select>
         </div>

@@ -5,24 +5,25 @@ import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faAppleAlt,
-  faBacon,
+  faLemon,
   faBreadSlice,
   faCarrot,
-  faFish,
-  faDrumstickBite,
-  faHamburger,
-  faHotdog,
+  faSeedling,
+  faCookieBite,
+  faCheese,
+  faUtensils,
 } from '@fortawesome/free-solid-svg-icons'
+import { DONATE_LINK } from 'utils/constants'
 
 const foodIcons = [
   faAppleAlt,
-  faBacon,
+  faLemon,
   faBreadSlice,
   faCarrot,
-  faFish,
-  faDrumstickBite,
-  faHamburger,
-  faHotdog,
+  faSeedling,
+  faCookieBite,
+  faCheese,
+  faUtensils,
 ]
 
 const x = [
@@ -64,7 +65,7 @@ export const Donate: FC = () => {
       </Text>
       <Spacer height={isMobile ? 12 : 32} />
       <Text type="primary-header" color="white" shadow>
-        For every $1 donated, we can rescue and distribute 8 meals.
+        For every $1 donated, we can rescue and distribute 16 meals.
       </Text>
       <Spacer height={isMobile ? 8 : 16} />
       <Text type="subheader" color="white">
@@ -80,7 +81,7 @@ export const Donate: FC = () => {
           color="black"
           align="center"
         >
-          {dollars * 8} Meals
+          {dollars * 16} Meals
         </Text>
         <Spacer height={isMobile ? 32 : 64} />
         <div id="Donate-slider">
@@ -125,13 +126,10 @@ export const Donate: FC = () => {
         ))}
       </section>
       <Spacer height={16} />
-      <ExternalLink
-        fullWidth
-        to="https://app.mobilecause.com/form/l2Z4OQ?vid=lpnht"
-      >
+      <ExternalLink fullWidth to={DONATE_LINK}>
         <Button id="Donate-button" type="primary" size="large" color="white">
           Donate <span className="green">${dollars}</span> to Rescue{' '}
-          <span className="green">{dollars * 8}</span> Meals
+          <span className="green">{dollars * 16}</span> Meals
         </Button>
       </ExternalLink>
     </div>

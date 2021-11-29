@@ -1,6 +1,7 @@
 import { Button, Spacer, Text, ExternalLink } from '@sharingexcess/designsystem'
 import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
+import { DONATE_LINK } from 'utils/constants'
 
 export const Splash: FC = () => {
   const isMobile = useIsMobile()
@@ -47,13 +48,14 @@ export const Splash: FC = () => {
           align={isMobile ? 'center' : 'left'}
           shadow
         >
-          Partnering with wholesale markets, stores, and restaurants, Sharing
-          Excess rescues and redistributes over 10,000 lbs. of food every day.
+          By partnering with grocery stores, restaurants, wholesalers, and
+          farmers, Sharing Excess rescues and redistributes over 10,000 lbs. of
+          food every day.
         </Text>
         <Spacer height={32} />
-        <ExternalLink to="https://app.mobilecause.com/form/l2Z4OQ?vid=lpnht">
+        <ExternalLink to={DONATE_LINK}>
           <Button size="large" color="green" type="primary">
-            Donate $10 to Rescue 80 Meals
+            Donate $20 to Rescue 320 Meals
           </Button>
         </ExternalLink>
       </div>

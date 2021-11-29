@@ -5,6 +5,7 @@ export const articles: {
   date: string
   url: string
   body: string
+  button?: string
 }[] = [
   {
     image: '/articles/phillymag.png',
@@ -14,6 +15,15 @@ export const articles: {
     date: 'February 23, 2021',
     url: 'https://www.phillymag.com/be-well-philly/2021/02/23/sharingexcess/',
     body: 'Last March, as Philly scrambled to adjust our lives to Governor Tom Wolf’s new shutdown orders, Drexel alum and Sharing Excess founder Evan Ehlers realized something: Restaurants prepared for a busy week would suddenly find themselves awash in leftover food. Sharing Excess, the fledgling food rescue nonprofit founded by Ehlers and staffed by college students, sprung into action. In 48 hours, Ehlers and his team rescued more than 10,000 pounds of food — enough to feed roughly 90 families of four for a week — from 24 different restaurants, including Saxby’s cafes and Stephen Starr locations. ',
+  },
+  {
+    image: '/articles/drexel.png',
+    header: "National TV Ad: Because community can't wait.",
+    publisher: 'Drexel University',
+    date: 'Dec 15, 2020',
+    url: 'https://www.youtube.com/watch?v=nKjWTX4jI9A',
+    body: "Evan Ehlers, an alum from the Charles D. Close School of Entrepreneurship, built Sharing Excess, a nonprofit organization with a mission to address food insecurity in Philadelphia and around the country. Dragons are extraordinary and making a difference in this changing world. Because community can't wait.",
+    button: 'Watch Now',
   },
   {
     image: '/articles/bloomberg.png',

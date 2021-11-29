@@ -1,57 +1,56 @@
-import { Button, Spacer, Text } from '@sharingexcess/designsystem'
+import { Button, ExternalLink, Spacer, Text } from '@sharingexcess/designsystem'
 import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
 import Link from 'next/link'
+import { DONATE_LINK } from 'utils/constants'
 
 export const Problem: FC = () => {
   const isMobile = useIsMobile()
 
   return (
     <div id="Problem">
-      <Text type="small-header" color="green">
-        THE PROBLEM
-      </Text>
-      <Spacer height={isMobile ? 8 : 32} />
       <Text type="primary-header" color="black">
-        Over 40% of food in the USA goes to waste every year.
+        Over 40% of food produced in the USA goes to waste every year.
       </Text>
       <Spacer height={isMobile ? 8 : 16} />
       <Text type="subheader" color="grey">
-        That&apos;s 120 billion pounds of food, needlessly wasted for logistical
-        reasons like inventory turnover, lack of affordable transportation, and
-        non-standardized expiration dates. Meanwhile, food scarcity is an
-        increasingly common reality for many families.
+        That&apos;s 120 billion pounds of completely edible food, needlessly
+        wasted for logistical reasons like inventory turnover, lack of
+        affordable transportation, and non-standardized expiration dates.
+        Meanwhile, 38 million Americans experience food insecurity every year.
       </Text>
       <Spacer height={isMobile ? 48 : 96} />
       <section id="Problem-content">
         <div id="Problem-content-left">
           <Text type="primary-header" color="white" align="center">
-            10 billion
+            100 billion
           </Text>
           <Spacer height={12} />
           <Text type="subheader" color="grey" align="center">
-            Meals Wasted Annually in the US
+            Meals wasted annually in the USA
           </Text>
         </div>
         <div id="Problem-content-center">
-          <Text type="secondary-header" color="black" align="center">
-            vs.
+          <Text type="primary-header" color="black" align="center">
+            &gt;
           </Text>
         </div>
         <div id="Problem-content-right">
           <Text type="primary-header" color="white" align="center">
-            10 million
+            41.6 billion
           </Text>
           <Spacer height={12} />
           <Text type="subheader" color="grey" align="center">
-            Children facing hunger in the US
+            Meals missed due to food insecurity
           </Text>
         </div>
       </section>
       <Spacer height={isMobile ? 64 : 96} />
-      <Button type="primary" size="large" color="black">
-        <Link href="/about">Read More About Our Cause</Link>
-      </Button>
+      <ExternalLink to={DONATE_LINK}>
+        <Button type="primary" size="large" color="black">
+          Help Fix This Broken Equation
+        </Button>
+      </ExternalLink>
     </div>
   )
 }

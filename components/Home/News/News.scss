@@ -26,7 +26,7 @@
       background: linear-gradient(
         to right,
         var(--se-black),
-        var(--se-transparent)
+        rgba(33, 36, 41, 0)
       );
 
       @include mobile {

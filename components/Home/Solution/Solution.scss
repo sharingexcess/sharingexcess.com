@@ -27,7 +27,7 @@
   #Solution-content {
     @include flex-vertical-right;
     z-index: 2;
-    width: clamp(300px, 36%, 500px);
+    width: clamp(300px, 42%, 500px);
     padding: 48px 24px;
     box-shadow: var(--se-shadow-large);
 
@@ -35,7 +35,7 @@
       padding: 32px 16px;
       background: none;
       .primary-header {
-        background: var(--se-green-primary);
+        background: var(--se-white);
         margin: 4px 0;
         padding: 1px 4px;
         box-shadow: var(--se-shadow-medium);

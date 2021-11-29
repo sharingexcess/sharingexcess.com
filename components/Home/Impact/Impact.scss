@@ -6,6 +6,7 @@
 
   #Impact-title {
     width: 100%;
+    letter-spacing: 0.8px;
   }
 
   #Impact-content {
@@ -58,7 +59,7 @@
       .se-image {
         width: clamp(96px, 16vw, 320px);
         height: clamp(96px, 16vw, 320px);
-        object-fit: cover;
+        object-fit: contain;
         filter: drop-shadow(var(--se-shadow-large));
       }
     }

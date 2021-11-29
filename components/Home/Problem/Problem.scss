@@ -15,9 +15,10 @@
 
     #Problem-content-left,
     #Problem-content-right {
-      width: 40%;
       flex-shrink: 0;
       .primary-header {
+        padding-left: 24px;
+        padding-right: 24px;
         font-size: clamp(48px, 6vw, 180px);
         white-space: nowrap;
         background: var(--se-green-primary);
@@ -29,9 +30,9 @@
     }
 
     #Problem-content-center {
-      width: 20%;
-      flex-shrink: 1;
+      flex-shrink: 0;
       .se-text {
+        padding: 24px;
         font-weight: 900;
       }
     }

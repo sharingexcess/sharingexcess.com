@@ -1,3 +1,5 @@
+import { DONATE_LINK } from 'utils/constants'
+
 export const volunteering = [
   {
     image: '/home/rescue.png',
@@ -11,7 +13,7 @@ export const volunteering = [
     header: 'Donate',
     body: 'Help support our mission to reduce food waste and fight food insecurity in our communities. 100% of your tax deductible donation goes to our rescuing and redistributing food.',
     button: 'Start a Donation',
-    link: 'https://app.mobilecause.com/form/l2Z4OQ?vid=nyq24',
+    link: DONATE_LINK,
   },
   {
     image: '/home/team.png',
