@@ -16,12 +16,18 @@
     #Problem-content-left,
     #Problem-content-right {
       flex-shrink: 0;
+      @include mobile {
+        width: 92%;
+      }
       .primary-header {
         padding-left: 24px;
         padding-right: 24px;
         font-size: clamp(48px, 6vw, 180px);
         white-space: nowrap;
         background: var(--se-green-primary);
+        @include mobile {
+          width: 100%;
+        }
       }
       .subheader {
         font-size: clamp(16px, 1.8vw, 180px);
@@ -40,13 +46,11 @@
     @include mobile {
       @include flex-vertical-center;
 
-      #Problem-content-left,
-      #Problem-content-right {
-        width: 80%;
-      }
-
       #Problem-content-center {
-        padding: 24px 0;
+        .se-text {
+          font-size: 100px;
+          line-height: 1;
+        }
       }
     }
   }

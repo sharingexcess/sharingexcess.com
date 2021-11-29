@@ -20,7 +20,7 @@
       height: 100%;
       object-fit: cover;
       @include mobile {
-        filter: brightness(0.8);
+        filter: brightness(0.6);
       }
     }
   }

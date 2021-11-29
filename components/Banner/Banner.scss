@@ -12,8 +12,8 @@
   @include flex-left;
 
   @include mobile {
-    padding: 16px;
-    height: 164px;
+    padding: 16px 16px 0 16px;
+    height: 148px;
   }
 
   &.hidden {
