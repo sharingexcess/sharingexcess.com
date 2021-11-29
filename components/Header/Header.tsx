@@ -3,11 +3,11 @@ import { Button, Image, ExternalLink } from '@sharingexcess/designsystem'
 import { PageLinks } from './Header.children'
 import Head from 'next/head'
 import Link from 'next/link'
-import Script from 'next/script'
 import { useWidth } from 'hooks'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
 import { useScrollPosition } from 'hooks/useScrollPosition'
+import { hotjar } from 'react-hotjar'
 
 const BACKGROUND_THRESHOLD = 200
 
@@ -19,6 +19,10 @@ export const Header: FC = () => {
   const isCondensed = width && width < 1000
   const [menu, setMenu] = useState(false)
   const [position, setPosition] = useState(0)
+
+  useEffect(() => {
+    hotjar.initialize(2723482, 6)
+  }, [])
 
   useEffect(() => {
     // handle scroll up to top of page, switch to transparent header
@@ -51,22 +55,6 @@ export const Header: FC = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <link rel="icon" type="image/png" href="/logos/green.png" />
       </Head>
-      <Script
-        strategy="beforeInteractive"
-        id="hotjar"
-        dangerouslySetInnerHTML={{
-          __html: `
-    (function(h,o,t,j,a,r){
-      h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-      h._hjSettings={hjid:2723482,hjsv:6};
-      a=o.getElementsByTagName('head')[0];
-      r=o.createElement('script');r.async=1;
-      r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-      a.appendChild(r);
-  })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-  `,
-        }}
-      />
       <header
         id="Header"
         className={background ? 'with-background' : ''}
