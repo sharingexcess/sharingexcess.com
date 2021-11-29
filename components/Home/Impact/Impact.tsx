@@ -52,7 +52,7 @@ const ImpactContentChunk: FC<{
     }
   }, [value, isVisible, data.header])
 
-  function numberWithCommas(x) {
+  function numberWithCommas(x: number) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
   }
 
