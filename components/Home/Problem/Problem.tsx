@@ -41,7 +41,7 @@ export const Problem: FC = () => {
           </Text>
           <Spacer height={12} />
           <Text type="subheader" color="grey" align="center">
-            Meals missed due to food insecurity
+            Meals needed to feed 38 million people
           </Text>
         </div>
       </section>
