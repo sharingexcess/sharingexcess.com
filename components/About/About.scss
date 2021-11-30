@@ -7,6 +7,9 @@
   }
 
   .About-content-section {
+    .se-spacer {
+      flex-shrink: 0;
+    }
     .se-image {
       height: 32vh;
       max-width: 50%;
@@ -22,6 +25,10 @@
     .green {
       color: var(--se-green-primary);
       font-weight: 700;
+    }
+
+    .underline {
+      text-decoration: underline;
     }
   }
 
@@ -130,5 +137,9 @@
         }
       }
     }
+  }
+
+  #About-app-video {
+    width: 100%;
   }
 }

@@ -47,7 +47,7 @@ export const About: FC = () => {
         secondaryAlign="center"
       >
         <Image src="/about/popup.gif" alt="About Sharing Excess" />
-        <Spacer width={32} height={32} />
+        <Spacer width={48} height={32} />
         <FlexContainer
           direction="vertical"
           primaryAlign={isMobile ? 'center' : 'start'}
@@ -99,7 +99,7 @@ export const About: FC = () => {
             scarcity.
           </Text>
         </FlexContainer>
-        <Spacer width={32} height={32} />
+        <Spacer width={48} height={32} />
         <Image src="/about/billboard.gif" alt="About Sharing Excess" />
       </FlexContainer>
 
@@ -135,7 +135,7 @@ export const About: FC = () => {
           handler={() => setSection('app')}
           fullWidth={isMobile}
         >
-          Our Food Rescue App
+          Food Rescue App
         </Button>
       </FlexContainer>
 
@@ -246,7 +246,7 @@ export const About: FC = () => {
             secondaryAlign="center"
           >
             <Image src="/about/history1.png" alt="About Sharing Excess" />
-            <Spacer width={32} height={32} />
+            <Spacer width={48} height={32} />
             <FlexContainer
               direction="vertical"
               primaryAlign={isMobile ? 'center' : 'start'}
@@ -304,7 +304,7 @@ export const About: FC = () => {
                 with the help of Sharing Excess and its volunteers.
               </Text>
             </FlexContainer>
-            <Spacer width={32} height={32} />
+            <Spacer width={48} height={32} />
             <Image src="/about/history2.png" alt="About Sharing Excess" />
           </FlexContainer>
 
@@ -317,7 +317,7 @@ export const About: FC = () => {
             secondaryAlign="center"
           >
             <Image src="/about/history3.png" alt="About Sharing Excess" />
-            <Spacer width={32} height={32} />
+            <Spacer width={48} height={32} />
             <FlexContainer
               direction="vertical"
               primaryAlign={isMobile ? 'center' : 'start'}
@@ -373,25 +373,90 @@ export const About: FC = () => {
         </section>
       )}
 
-      {section === 'partners' && (
-        <section id="About-partners">
+      {section === 'app' && (
+        <section id="About-app">
           <FlexContainer
             id="About-section-header"
             secondaryAlign="center"
             primaryAlign="center"
           >
-            <Image src="/about/partners.png" alt="Sharing Excess Team" />
+            <Image src="/about/boxes.png" alt="Sharing Excess Team" />
             <Text type="primary-header" color="white" shadow>
-              Our Partners
+              Food Rescue App
             </Text>
           </FlexContainer>
-
           <Spacer height={isMobile ? 24 : 48} />
 
-          <Text type="paragraph" color="black">
-            It&apos;s actually just Evan&apos; family and nobody else and he has
-            just managed to hide that this entire time... pretty cool :shrug:
-          </Text>
+          <FlexContainer
+            className="About-content-section"
+            direction={isMobile ? 'vertical-reverse' : 'horizontal'}
+            primaryAlign="start"
+            secondaryAlign="center"
+          >
+            <Image src="/about/app1.png" alt="About Sharing Excess" />
+            <Spacer width={48} height={32} />
+            <FlexContainer
+              direction="vertical"
+              primaryAlign={isMobile ? 'center' : 'start'}
+              secondaryAlign={isMobile ? 'center' : 'start'}
+            >
+              <Text type="section-header" color="green">
+                We&apos;re reinventing food rescue.
+              </Text>
+              <Spacer height={24} />
+              <Text type="paragraph" color="black">
+                As our food rescue operation expanded, we knew we needed to find
+                a tech driven solution to organize our logistics. Since January
+                2020, we&apos;ve managed all of our operations and impact
+                reporting through our own custom app, built in house by our
+                software engineering team. Best of all -{' '}
+                <strong>it&apos;s fully open source.</strong>
+              </Text>
+            </FlexContainer>
+          </FlexContainer>
+
+          <Spacer height={isMobile ? 64 : 112} />
+
+          <FlexContainer
+            className="About-content-section"
+            direction={isMobile ? 'vertical' : 'horizontal'}
+            primaryAlign="start"
+            secondaryAlign="center"
+          >
+            <FlexContainer
+              direction="vertical"
+              primaryAlign={isMobile ? 'center' : 'start'}
+              secondaryAlign={isMobile ? 'center' : 'start'}
+            >
+              <Text type="paragraph" color="black">
+                Our tech team is powered by students and open source
+                contributors, and we&apos;re working to share our tech with any
+                organization that can use it for good.
+              </Text>
+              <Spacer height={24} />
+              <Text type="paragraph" color="black">
+                All of our code is available for collaboration and contribution
+                on{' '}
+                <ExternalLink to="https://github.com/sharingexcess">
+                  <strong className="green underline">Github</strong>
+                </ExternalLink>
+                , and we are always on the hunt for developers who want use
+                their skills to help us fight food insecurity.
+              </Text>
+            </FlexContainer>
+            <Spacer width={48} height={32} />
+            <Image src="/about/app2.png" alt="About Sharing Excess" />
+          </FlexContainer>
+          <Spacer height={64} />
+          <video src="/about/app.mp4" id="About-app-video" controls />
+          <Spacer height={64} />
+          <FlexContainer fullWidth>
+            <ExternalLink to="https://github.com/sharingexcess">
+              <Button size="large" color="green">
+                Contribute to our Code
+              </Button>
+            </ExternalLink>
+          </FlexContainer>
         </section>
       )}
     </div>
