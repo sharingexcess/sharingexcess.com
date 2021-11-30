@@ -17,6 +17,10 @@ const pages: { title: string; path: string }[] = [
     path: '/news',
   },
   {
+    title: 'CAMPUS',
+    path: '/campus',
+  },
+  {
     title: 'CONTACT',
     path: '/contact',
   },

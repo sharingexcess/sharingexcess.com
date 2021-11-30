@@ -20,6 +20,10 @@
         "destination": "/donate.html"
       },
       {
+        "source": "/campus",
+        "destination": "/campus.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

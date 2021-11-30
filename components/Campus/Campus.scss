@@ -1,0 +1,40 @@
+#Campus {
+  @include page;
+
+  #Campus-chapters {
+    width: 100%;
+    flex-wrap: wrap;
+    .Campus-chapter {
+      flex: 1 1 25%;
+      padding: 16px;
+      .se-image {
+        width: min(100%, 160px);
+      }
+      .se-text {
+        width: 100%;
+        transition: all 0.2s ease;
+      }
+      @include hover {
+        .se-text {
+          color: var(--se-blue-primary);
+        }
+      }
+    }
+  }
+
+  #Campus-section-header {
+    position: relative;
+    width: 100%;
+    height: 48vh;
+    .se-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+      filter: brightness(0.5);
+    }
+  }
+}

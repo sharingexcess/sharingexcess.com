@@ -12,19 +12,27 @@ export const Footer: FC = () => {
       <Image src="/logos/green.png" alt="Sharing Excess Logo" />
       <nav id="Footer-links">
         <Button type="tertiary">
-          <Link href="/"> Home</Link>
+          <Link href="/">Home</Link>
         </Button>
 
         <Button type="tertiary">
-          <Link href="/about"> About</Link>
+          <Link href="/about">About</Link>
         </Button>
 
         <Button type="tertiary">
-          <Link href="/news"> News</Link>
+          <Link href="/news">News</Link>
         </Button>
 
         <Button type="tertiary">
-          <Link href="/contact"> Contact</Link>
+          <Link href="/campus">Campus</Link>
+        </Button>
+
+        <Button type="tertiary">
+          <Link href="/donate">Donate</Link>
+        </Button>
+
+        <Button type="tertiary">
+          <Link href="/contact">Contact</Link>
         </Button>
       </nav>
       <div id="Footer-legal">
