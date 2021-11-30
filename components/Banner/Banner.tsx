@@ -32,10 +32,13 @@ export const Banner: FC = () => {
       <div>
         <Text type="paragraph" color="black">
           We have a match campaign going on from now until the end of the year!
-          That means your donation to Sharing Excess is doubled.
+          That means your donation to Sharing Excess is <strong>doubled</strong>
+          .
         </Text>
         <Text type="paragraph" color="black">
-          Help us raise $50,000 to deliver 1.5 million meals this winter.{' '}
+          <strong>
+            Help us raise $50,000 to deliver 1.5 million meals this winter.
+          </strong>{' '}
           <ExternalLink to={DONATE_LINK}>
             Click here to donate now!
           </ExternalLink>

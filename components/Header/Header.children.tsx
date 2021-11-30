@@ -45,9 +45,8 @@ export const PageLinks: FC<PageLinksProps> = ({ color }) => {
     <ul>
       {pages.map(({ title, path }) =>
         path.includes('https') ? (
-          <ExternalLink to={path}>
+          <ExternalLink to={path} key={title}>
             <Button
-              key={title}
               type="tertiary"
               color={color}
               classList={[
