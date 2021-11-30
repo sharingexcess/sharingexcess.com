@@ -54,9 +54,11 @@ export const About: FC = () => {
           secondaryAlign={isMobile ? 'center' : 'start'}
         >
           <Text type="paragraph" color="black">
-            In communities around the country, food waste and hunger go hand in
-            hand. While 10 million children go hungry each and every day,{' '}
-            <strong>over 10 billion meals are thrown away</strong> annually.
+            In communities everywhere, food is going to waste while people
+            suffer from food insecurity. This is a disconnect created by the
+            logistical barriers between excess and scarcity. If solved, this
+            connection could ensure food security for all people living on our
+            planet.
           </Text>
           <Spacer height={24} />
           <Text type="paragraph" color="black">
@@ -82,20 +84,19 @@ export const About: FC = () => {
           secondaryAlign={isMobile ? 'center' : 'start'}
         >
           <Text type="paragraph" color="black">
-            Founded in Philadelphia in 2018, we work every day to fight food
-            insecurity by delivering surplus from wholesalers, grocers,
-            restaurants, and farmers to communities in need.
+            Founded in Philadelphia in 2018, Sharing Excess is scaling human
+            compassion to meet a global challenge that has existed long before
+            our mission was born. Our work addresses the crucial need for food
+            by delivering regular surplus from grocery stores, restaurants,
+            wholesalers, and farmers to communities in need.
           </Text>
           <Spacer height={24} />
           <Text type="paragraph" color="black">
-            By engaging the imagination of students and our own custom software
-            to source and distribute surplus food, we&apos;ve rescued and
-            distributed over{' '}
-            <strong>
-              <span className="green">5,000,000 lbs.</span> of food since 2018
-            </strong>
-            . Together with our 170+ local partners, Sharing Excess is building
-            a uniquely scalable solution to an unthinkably large scale problem.
+            By embracing the imagination of students, change-makers, innovators,
+            and entrepreneurs, we&apos;re changing a broken food system.
+            Together with our partners, clever logistics, and custom software,
+            our movement will eliminate the barriers between excess and
+            scarcity.
           </Text>
         </FlexContainer>
         <Spacer width={32} height={32} />

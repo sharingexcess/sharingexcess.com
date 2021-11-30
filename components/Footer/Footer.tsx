@@ -24,15 +24,7 @@ export const Footer: FC = () => {
         </Button>
 
         <Button type="tertiary">
-          <Link href="/campus"> Campus</Link>
-        </Button>
-
-        <Button type="tertiary">
           <Link href="/contact"> Contact</Link>
-        </Button>
-
-        <Button type="tertiary">
-          <Link href="/store"> Store</Link>
         </Button>
       </nav>
       <div id="Footer-legal">
