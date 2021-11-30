@@ -52,9 +52,26 @@ export const Header: FC = () => {
   return (
     <>
       <Head>
-        <title>Sharing Excess | Let&apos;s Free Food!</title>
+        <title>Sharing Excess | Solving Scarcity with Surplus</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <link rel="icon" type="image/png" href="/logos/green.png" />
+        <meta
+          name="description"
+          content="By partnering with grocery stores, restaurants, wholesalers, and farmers, Sharing Excess rescues and redistributes over 10,000 lbs. of food every day."
+        />
+
+        <meta property="og:image" content="/about/team.png" />
+        <meta property="og:video" content="/about/popup.mp4" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:type" content="website" />
+        <meta
+          property="og:site_name"
+          content="Sharing Excess | Solving Scarcity with Surplus"
+        />
+        <meta
+          property="og:description"
+          content="By partnering with grocery stores, restaurants, wholesalers, and farmers, Sharing Excess rescues and redistributes over 10,000 lbs. of food every day."
+        />
       </Head>
       <header
         id="Header"
