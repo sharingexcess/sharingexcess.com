@@ -27,6 +27,7 @@ body {
   color: var(--se-black);
   padding: var(--page-margin);
   overflow-y: auto;
+  overflow-x: hidden;
   border-radius: 0;
   font-family: var(--font-body), -apple-system, BlinkMacSystemFont, Segoe UI,
     Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,

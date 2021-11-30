@@ -4,6 +4,7 @@ import { PageHeader } from 'components'
 import { Text, Spacer } from '@sharingexcess/designsystem'
 import validator from 'validator'
 import { useIsMobile } from 'hooks'
+import Head from 'next/head'
 
 // For our contact form, we use a free service called FormSpree
 // Here's the link to our form:
@@ -64,6 +65,9 @@ export const Contact: FC = () => {
 
   return (
     <main id="Contact">
+      <Head>
+        <title>Contact Us | Sharing Excess</title>
+      </Head>
       <PageHeader
         label="GET IN TOUCH"
         title="We simply can NOT wait to hear from you!"

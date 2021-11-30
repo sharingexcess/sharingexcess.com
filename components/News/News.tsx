@@ -13,12 +13,16 @@ import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
 import { DONATE_LINK } from 'utils/constants'
 import Link from 'next/link'
+import Head from 'next/head'
 
 export const News: FC = () => {
   const isMobile = useIsMobile()
 
   return (
     <div className="News">
+      <Head>
+        <title>In the News | Sharing Excess</title>
+      </Head>
       <PageHeader
         label="IN THE NEWS"
         title="We've grown from a student startup, to a national movement."
