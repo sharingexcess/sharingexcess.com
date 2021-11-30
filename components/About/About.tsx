@@ -128,6 +128,15 @@ export const About: FC = () => {
         >
           Our Story
         </Button>
+        <Button
+          type={section === 'app' ? 'primary' : 'secondary'}
+          color="green"
+          size="large"
+          handler={() => setSection('app')}
+          fullWidth={isMobile}
+        >
+          Our Food Rescue App
+        </Button>
       </FlexContainer>
 
       <Spacer height={isMobile ? 48 : 64} />
