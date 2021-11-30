@@ -71,8 +71,27 @@
         .se-image {
           width: 100%;
           border-radius: 50%;
-          border: 4px solid var(--se-white);
+          border: 6px solid var(--se-white);
+          object-fit: cover;
           box-shadow: var(--se-shadow-medium);
+          &.yellow {
+            border-color: rgba(255, 209, 81, 1);
+          }
+          &.orange {
+            border-color: rgba(247, 155, 42, 1);
+          }
+          &.blue {
+            border-color: rgba(151, 207, 195, 1);
+          }
+          &.green1 {
+            border-color: rgba(148, 202, 145, 1);
+          }
+          &.green2 {
+            border-color: rgba(63, 154, 41, 1);
+          }
+          &.green3 {
+            border-color: rgba(50, 119, 34, 1);
+          }
         }
       }
     }

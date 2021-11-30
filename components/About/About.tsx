@@ -12,10 +12,11 @@ import { useIsMobile } from 'hooks'
 import { PageHeader } from 'components'
 import { volunteering } from 'content'
 import { useRouter } from 'next/router'
+import { PASTEL_COLORS } from 'utils/constants'
 
 export const About: FC = () => {
   const isMobile = useIsMobile()
-  const [section, setSection] = useState('history')
+  const [section, setSection] = useState('team')
   const router = useRouter()
 
   useEffect(() => {
@@ -89,7 +90,7 @@ export const About: FC = () => {
             to source and distribute surplus food, we&apos;ve rescued and
             distributed over{' '}
             <strong>
-              <span className="green">4,000,000 lbs.</span> of food since 2018
+              <span className="green">5,000,000 lbs.</span> of food since 2018
             </strong>
             . Together with our 170+ local partners, Sharing Excess is building
             a uniquely scalable solution to an unthinkably large scale problem.
@@ -107,15 +108,6 @@ export const About: FC = () => {
         direction={isMobile ? 'vertical' : 'horizontal'}
       >
         <Button
-          type={section === 'history' ? 'primary' : 'secondary'}
-          color="green"
-          size="large"
-          handler={() => setSection('history')}
-          fullWidth={isMobile}
-        >
-          Our History
-        </Button>
-        <Button
           type={section === 'team' ? 'primary' : 'secondary'}
           color="green"
           size="large"
@@ -123,6 +115,15 @@ export const About: FC = () => {
           fullWidth={isMobile}
         >
           Meet the Team
+        </Button>
+        <Button
+          type={section === 'history' ? 'primary' : 'secondary'}
+          color="green"
+          size="large"
+          handler={() => setSection('history')}
+          fullWidth={isMobile}
+        >
+          Our History
         </Button>
         <Button
           type={section === 'partners' ? 'primary' : 'secondary'}
@@ -164,9 +165,13 @@ export const About: FC = () => {
           <Spacer height={isMobile ? 24 : 48} />
 
           <div className="About-team-members">
-            {team.map(i => (
+            {team.map((i, j) => (
               <div key={i.name} className="About-team-person">
-                <Image src={i.image} alt={i.name} />
+                <Image
+                  src={i.image}
+                  alt={i.name}
+                  classList={[PASTEL_COLORS[j % 5]]}
+                />
                 <Spacer height={12} />
                 <Text type="subheader" color="green" align="center">
                   {i.name}
@@ -234,9 +239,46 @@ export const About: FC = () => {
           <Spacer height={isMobile ? 24 : 48} />
 
           <Text type="paragraph" color="black">
-            Since we got started in 2018, we&apos;ve grown from a simple
-            donation of meal swipes to a team of more than 50 employees and
+            Sharing Excess was formally established on March 29th, 2018,
+            originally started as a movement of college students at Drexel
+            University addressing food insecurity on campus and in the
+            surrounding community of West Philadelphia. Founder, Evan Ehlers,
+            created Sharing Excess after realizing he had fifty meals left in
+            his college dining account with only two days left to use them.
+            Rather than letting the meals go to waste, he decided to swipe them
+            all out, pack them in his car, and drive around Center City
+            Philadelphia, giving them out to anyone that needed one. This day
+            changed his life forever, and he fell in love with the idea of
+            putting excess food to good use– and felt that if he could get
+            others to join, together they could create impactful change in their
+            communities. Originally formed as a meal swipe donation program,
+            Sharing Excess quickly became involved in “food rescue” after a
+            local grocery store called to see if the young organization would be
+            interested in picking up produce that was about to be discarded.
+            Team members delivered the rescued food to a nearby shelter and
+            began tracking their impact on spreadsheets. What started with one
+            grocery store, quickly evolved into a network of hundreds of
+            grocers, restaurants, farmers, and wholesalers over the following
+            three years. This network has contributed millions of pounds of food
+            excess to communities with the help of Sharing Excess and its
             volunteers.
+          </Text>
+          <Spacer height={16} />
+          <Text type="paragraph" color="black">
+            In 2020, Sharing Excess dramatically scaled up its operations to
+            address an unprecedented amount of food insecurity caused by the
+            global pandemic. The organization grew their operations by 300%,
+            opened their first distribution facility in West Philadelphia, and
+            delivered their millionth pound of food. Today, Sharing Excess
+            delivers an average of 100,000 pounds of food each week and is using
+            it's in house technology to help other food rescue organizations do
+            the same.
+          </Text>
+          <Spacer height={16} />
+          <Text type="paragraph" color="black">
+            The ultimate vision of Sharing Excess is to use every available
+            resource that is currently wasted or underutilized to cover basic
+            needs for all living people. Food is just the beginning.
           </Text>
         </section>
       )}

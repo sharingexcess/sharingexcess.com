@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
 import { useScrollPosition } from 'hooks/useScrollPosition'
 import { hotjar } from 'react-hotjar'
+import { DONATE_LINK } from 'utils/constants'
 
 const BACKGROUND_THRESHOLD = 200
 
@@ -66,13 +67,15 @@ export const Header: FC = () => {
           </a>
         </Link>
         {!isCondensed && <PageLinks color={background ? 'black' : 'white'} />}
-        <Button
-          type="primary"
-          id="Header-donate"
-          color={background ? 'green' : 'white'}
-        >
-          <Link href="/donate">Donate</Link>
-        </Button>
+        <ExternalLink to={DONATE_LINK}>
+          <Button
+            type="primary"
+            id="Header-donate"
+            color={background ? 'green' : 'white'}
+          >
+            Donate
+          </Button>
+        </ExternalLink>
         <ExternalLink to="https://sharingexcess.web.app">
           <Button
             type="secondary"

@@ -31,7 +31,7 @@ export const Banner: FC = () => {
       <Spacer width={32} />
       <div>
         <Text type="paragraph" color="black">
-          We have a match campaign going on from now until th end of the year!
+          We have a match campaign going on from now until the end of the year!
           That means your donation to Sharing Excess is doubled.
         </Text>
         <Text type="paragraph" color="black">

@@ -35,6 +35,11 @@ export const team: { name: string; title: string; image: string }[] = [
     image: '/team/cara_depiano.png',
   },
   {
+    name: 'Andre Powell',
+    title: 'Wholesale Food Sourcing',
+    image: 'team/andre_powell.jpg',
+  },
+  {
     name: 'Lucy Doren',
     title: 'Distrobution Coordinator',
     image: '/team/lucy_doren.png',

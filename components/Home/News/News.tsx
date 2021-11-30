@@ -77,7 +77,7 @@ export const News: FC = () => {
       </section>
       <Spacer height={isMobile ? 16 : 64} />
       <Button type="primary" size="large" color="white">
-        <Link href="/news">Read More News Stories</Link>
+        <Link href="/news">Read All News Stories</Link>
       </Button>
     </div>
   )

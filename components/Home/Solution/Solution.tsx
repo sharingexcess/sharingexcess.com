@@ -37,7 +37,7 @@ export const Solution: FC = () => {
           size="medium"
           color={isMobile ? 'white' : 'green'}
         >
-          <Link href="/about">Learn About Our Programs</Link>
+          <Link href="/about">Learn More About Our Work</Link>
         </Button>
       </Card>
     </div>

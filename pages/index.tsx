@@ -7,7 +7,7 @@ import {
   Donate,
   Problem,
 } from 'components/Home'
-import { Header, Footer, Banner } from 'components'
+import { Header, Footer } from 'components'
 import type { NextPage } from 'next'
 
 const Home: NextPage = () => {
@@ -22,7 +22,6 @@ const Home: NextPage = () => {
       <Volunteer />
       <Donate />
       <Footer />
-      <Banner />
     </div>
   )
 }

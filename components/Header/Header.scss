@@ -34,6 +34,10 @@
       }
     }
 
+    .se-button .se-image {
+      filter: invert(1);
+    }
+
     @include mobile {
       padding: 16px;
     }
@@ -56,6 +60,18 @@
 
   > ul .se-button {
     margin-right: 32px;
+  }
+
+  > ul a {
+    position: relative;
+    height: 18px;
+    .se-button {
+      height: 18px;
+      vertical-align: bottom;
+      .se-image {
+        height: 18px;
+      }
+    }
   }
 
   #Header-donate {
@@ -113,6 +129,16 @@
         display: block;
         margin: 16px 0;
         font-size: 24px;
+      }
+    }
+
+    > ul a {
+      position: relative;
+      .se-button {
+        .se-image {
+          height: 18px;
+          filter: invert(1);
+        }
       }
     }
   }

@@ -2,11 +2,11 @@
   @include page;
   @include flex-left;
   padding-top: 32px;
-  padding-bottom: 32px;
+  padding-bottom: 132px;
 
   @include mobile {
     padding-top: 32px;
-    padding-bottom: 32px;
+    padding-bottom: 192px;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
