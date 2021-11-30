@@ -36,12 +36,22 @@ export const team: { name: string; title: string; image: string }[] = [
   },
   {
     name: 'Andre Powell',
-    title: 'Wholesale Food Sourcing',
+    title: 'Distribution Associate',
     image: 'team/andre_powell.jpg',
   },
   {
+    name: 'Harry Welsh',
+    title: 'Distribution Associate',
+    image: '/team/harry_welsh.png',
+  },
+  {
+    name: 'Matt Leger',
+    title: 'Distribution Associate',
+    image: '/team/matt_leger.jpg',
+  },
+  {
     name: 'Lucy Doren',
-    title: 'Distrobution Coordinator',
+    title: 'Distribution Coordinator',
     image: '/team/lucy_doren.png',
   },
   {
