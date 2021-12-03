@@ -17,7 +17,12 @@ export const team: { name: string; title: string; image: string }[] = [
   {
     name: 'Sarah DiPasquale',
     title: 'Director of Food Distribution',
-    image: '/team/sarah_dipasquale.png',
+    image: '/team/sarah_dipasquale.jpg',
+  },
+  {
+    name: 'Hannah Newlands',
+    title: 'Volunteer Coordinator',
+    image: '/team/hannah_newlands.png',
   },
   {
     name: 'Ryan McHenry',
@@ -75,14 +80,24 @@ export const team: { name: string; title: string; image: string }[] = [
     image: '/team/valentina_angelkova.png',
   },
   {
+    name: 'Elsa Panczner',
+    title: 'Graphic Designer',
+    image: '/team/elsa_panczner.jpg',
+  },
+  {
     name: 'Grace Carter',
     title: 'Social Media Manager',
-    image: '/team/grace_carter.png',
+    image: '/team/grace_carter.jpg',
+  },
+  {
+    name: 'Jackie Welby',
+    title: 'Data Analyst',
+    image: '/team/jackie_welby.png',
   },
   {
     name: 'Sam Nguyen',
     title: 'Software Engineer',
-    image: '/team/sam_nguyen.png',
+    image: '/team/sam_nguyen.jpg',
   },
   {
     name: 'Luke Shin',
