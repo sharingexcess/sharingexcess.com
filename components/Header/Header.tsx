@@ -52,7 +52,7 @@ export const Header: FC = () => {
   return (
     <>
       <Head>
-        <title>Sharing Excess | Solving Scarcity with Surplus</title>
+        <title>Sharing Excess | Let&apos;s Free Food!</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <link rel="icon" type="image/png" href="/logos/green.png" />
         <meta
@@ -66,7 +66,7 @@ export const Header: FC = () => {
         <meta property="og:type" content="website" />
         <meta
           property="og:site_name"
-          content="Sharing Excess | Solving Scarcity with Surplus"
+          content="Sharing Excess | Let's Free Food!"
         />
         <meta
           property="og:description"
