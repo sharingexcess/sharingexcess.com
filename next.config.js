@@ -8,10 +8,6 @@ module.exports = {
     if (process.env.NODE_ENV === 'development') {
       config.resolve.alias = {
         ...config.resolve.alias,
-        '@sharingexcess/designsystem': path.resolve('../designsystem/src'),
-        '@sharingexcess/designsystem/build/index.scss': path.resolve(
-          '../designsystem/src'
-        ),
       }
       config.module.rules.push({
         test: /\.(ts|tsx)$/,
