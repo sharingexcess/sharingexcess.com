@@ -81,7 +81,7 @@ export const team: { name: string; title: string; image: string }[] = [
   },
   {
     name: 'Elsa Panczner',
-    title: 'Graphic Designer',
+    title: 'Content and Video Creator',
     image: '/team/elsa_panczner.jpg',
   },
   {
@@ -101,7 +101,7 @@ export const team: { name: string; title: string; image: string }[] = [
   },
   {
     name: 'Luke Shin',
-    title: 'Software Engineer',
+    title: 'Project Manager',
     image: '/team/luke_shin.png',
   },
   {
