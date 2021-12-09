@@ -110,6 +110,7 @@
     padding: 36px 32px;
     text-align: right;
     box-shadow: var(--se-shadow-large);
+    overflow-y: auto;
 
     @include mobile {
       padding: 28px 16px;
@@ -128,8 +129,8 @@
       @include flex-vertical-right;
       .se-button {
         display: block;
-        margin: 16px 0;
-        font-size: 24px;
+        margin: 12px 0;
+        font-size: 16px;
       }
     }
 
