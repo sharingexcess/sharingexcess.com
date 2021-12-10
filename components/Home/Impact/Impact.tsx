@@ -3,6 +3,7 @@ import React, { FC, useEffect, useState } from 'react'
 import TrackVisibility from 'react-on-screen'
 import Link from 'next/link'
 import { useIsMobile } from 'hooks'
+import { getAnalytics, logEvent } from 'firebase/analytics'
 
 const content = [
   {
@@ -80,7 +81,10 @@ const ImpactContentChunk: FC<{
 
 export const Impact: FC = () => {
   const isMobile = useIsMobile()
-
+  function logAnalyticsEvent() {
+    const analytics = getAnalytics()
+    logEvent(analytics, 'Home page Impact button')
+  }
   return (
     <div id="Impact">
       <Text
@@ -102,7 +106,13 @@ export const Impact: FC = () => {
         ))}
       </section>
       <Spacer height={isMobile ? 32 : 64} />
-      <Button type="primary" size="large" color="white" fullWidth={isMobile}>
+      <Button
+        type="primary"
+        size="large"
+        color="white"
+        fullWidth={isMobile}
+        handler={logAnalyticsEvent}
+      >
         <Link href="/about">Read More About Our Impact</Link>
       </Button>
     </div>

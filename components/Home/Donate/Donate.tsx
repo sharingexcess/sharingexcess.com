@@ -14,6 +14,7 @@ import {
   faUtensils,
 } from '@fortawesome/free-solid-svg-icons'
 import { DONATE_LINK } from 'utils/constants'
+import { getAnalytics, logEvent } from 'firebase/analytics'
 
 const foodIcons = [
   faAppleAlt,
@@ -58,6 +59,11 @@ export const Donate: FC = () => {
     }
   }
 
+  function logAnalyticsEvent() {
+    const analytics = getAnalytics()
+    logEvent(analytics, 'Home Page Donate Button')
+  }
+  console.log('Works')
   return (
     <div id="Donate">
       <Text type="small-header" color="white" shadow>
@@ -127,7 +133,13 @@ export const Donate: FC = () => {
       </section>
       <Spacer height={16} />
       <ExternalLink fullWidth to={DONATE_LINK}>
-        <Button id="Donate-button" type="primary" size="large" color="white">
+        <Button
+          id="Donate-button"
+          type="primary"
+          size="large"
+          color="white"
+          handler={logAnalyticsEvent}
+        >
           Donate <span className="green">${dollars}</span> to Rescue{' '}
           <span className="green">{dollars * 16}</span> Meals
         </Button>
