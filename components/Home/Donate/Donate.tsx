@@ -14,6 +14,7 @@ import {
   faUtensils,
 } from '@fortawesome/free-solid-svg-icons'
 import { DONATE_LINK } from 'utils/constants'
+import { logEvent } from 'firebase/analytics'
 
 const foodIcons = [
   faAppleAlt,

@@ -2,9 +2,15 @@ import { Button, Spacer, Text, ExternalLink } from '@sharingexcess/designsystem'
 import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
 import { DONATE_LINK } from 'utils/constants'
+import { getAnalytics, logEvent } from 'firebase/analytics'
 
 export const Splash: FC = () => {
   const isMobile = useIsMobile()
+
+  function logAnalyticsEvent() {
+    const analytics = getAnalytics()
+    logEvent(analytics, 'Splash Page Donate Button Click')
+  }
 
   return (
     <div id="Splash">
@@ -54,7 +60,12 @@ export const Splash: FC = () => {
         </Text>
         <Spacer height={32} />
         <ExternalLink to={DONATE_LINK}>
-          <Button size="large" color="green" type="primary">
+          <Button
+            size="large"
+            color="green"
+            type="primary"
+            handler={logAnalyticsEvent}
+          >
             Donate $20 to Rescue 320 Meals
           </Button>
         </ExternalLink>
