@@ -15,11 +15,17 @@ import { volunteering } from 'content'
 import { useRouter } from 'next/router'
 import { DONATE_LINK, PASTEL_COLORS } from 'utils/constants'
 import Link from 'next/link'
+import { getAnalytics, logEvent } from 'firebase/analytics'
 
 export const About: FC = () => {
   const isMobile = useIsMobile()
   const [section, setSection] = useState('team')
   const router = useRouter()
+
+  function logAnalyticsEvent(description: string) {
+    const analytics = getAnalytics()
+    logEvent(analytics, description)
+  }
 
   useEffect(() => {
     if (router?.query?.section && typeof router.query.section === 'string') {
@@ -114,7 +120,10 @@ export const About: FC = () => {
           type={section === 'team' ? 'primary' : 'secondary'}
           color="green"
           size="large"
-          handler={() => setSection('team')}
+          handler={() => {
+            setSection('team')
+            logAnalyticsEvent('About page meet the team button')
+          }}
           fullWidth={isMobile}
         >
           Meet the Team
@@ -123,7 +132,10 @@ export const About: FC = () => {
           type={section === 'history' ? 'primary' : 'secondary'}
           color="green"
           size="large"
-          handler={() => setSection('history')}
+          handler={() => {
+            setSection('history')
+            logAnalyticsEvent('About page Our Story')
+          }}
           fullWidth={isMobile}
         >
           Our Story
@@ -132,7 +144,10 @@ export const About: FC = () => {
           type={section === 'app' ? 'primary' : 'secondary'}
           color="green"
           size="large"
-          handler={() => setSection('app')}
+          handler={() => {
+            setSection('app')
+            logAnalyticsEvent('About page Food Rescue App')
+          }}
           fullWidth={isMobile}
         >
           Food Rescue App
@@ -215,7 +230,12 @@ export const About: FC = () => {
                   {c.body}
                 </Text>
                 <Spacer height={16} />
-                <Button type="primary" size="medium" color="green">
+                <Button
+                  type="primary"
+                  size="medium"
+                  color="green"
+                  handler={() => logAnalyticsEvent(`About Page ${c.button}`)}
+                >
                   <Link href={c.link}>{c.button}</Link>
                 </Button>
               </div>
@@ -365,7 +385,13 @@ export const About: FC = () => {
           <Spacer height={isMobile ? 32 : 64} />
           <FlexContainer fullWidth>
             <ExternalLink to={DONATE_LINK}>
-              <Button size="large" color="green">
+              <Button
+                size="large"
+                color="green"
+                handler={() =>
+                  logAnalyticsEvent('About Page Support Our Next Chaper')
+                }
+              >
                 Support Our Next Chapter
               </Button>
             </ExternalLink>
@@ -452,7 +478,13 @@ export const About: FC = () => {
           <Spacer height={64} />
           <FlexContainer fullWidth>
             <ExternalLink to="https://github.com/sharingexcess">
-              <Button size="large" color="green">
+              <Button
+                size="large"
+                color="green"
+                handler={() =>
+                  logAnalyticsEvent('About Page Contribute to our code')
+                }
+              >
                 Contribute to our Code
               </Button>
             </ExternalLink>
