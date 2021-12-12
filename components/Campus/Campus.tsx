@@ -11,6 +11,7 @@ import {
 import Head from 'next/head'
 import Link from 'next/link'
 import { useIsMobile } from 'hooks'
+import { getAnalytics, logEvent } from 'firebase/analytics'
 
 const chapters = [
   {
@@ -49,6 +50,11 @@ const chapters = [
     link: 'https://neumann.edu',
   },
 ]
+
+function logAnalyticsEvent() {
+  const analytics = getAnalytics()
+  logEvent(analytics, 'Reach out to start a chapter')
+}
 
 export const Campus: FC = () => {
   const isMobile = useIsMobile()
@@ -128,6 +134,7 @@ export const Campus: FC = () => {
         <Spacer height={32} />
         <Button type="primary" color="green" size="large">
           <Link href="/contact">Reach Out to Start a Chapter</Link>
+          handler={logAnalyticsEvent}
         </Button>
       </FlexContainer>
     </main>
