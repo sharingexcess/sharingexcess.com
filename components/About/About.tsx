@@ -10,7 +10,7 @@ import {
 } from '@sharingexcess/designsystem'
 import { team } from 'content/team'
 import { useIsMobile } from 'hooks'
-import { PageHeader } from 'components'
+import { PageHeader, Timeline } from 'components'
 import { volunteering } from 'content'
 import { useRouter } from 'next/router'
 import { DONATE_LINK, PASTEL_COLORS } from 'utils/constants'
@@ -137,9 +137,20 @@ export const About: FC = () => {
         >
           Food Rescue App
         </Button>
+        <Button
+          type={section === 'timeline' ? 'primary' : 'secondary'}
+          color="green"
+          size="large"
+          handler={() => setSection('timeline')}
+          fullWidth={isMobile}
+        >
+          Timeline
+        </Button>
       </FlexContainer>
 
       <Spacer height={isMobile ? 48 : 64} />
+
+      {section === 'timeline' && <Timeline />}
 
       {section === 'team' && (
         <section id="About-team">
