@@ -6,7 +6,7 @@ import {
   Text,
 } from '@sharingexcess/designsystem'
 import React, { FC, useEffect, useState } from 'react'
-import { DONATE_LINK } from 'utils/constants'
+import { HOLIDAY_RAFFLE } from 'utils/constants'
 
 export const Banner: FC = () => {
   const [isVisible, setIsVisible] = useState(false)
@@ -27,20 +27,20 @@ export const Banner: FC = () => {
       >
         X
       </Button>
-      <Image src="/icons/party.png" id="Banner-icon" alt="Banner Image" />
+      <Image src="/icons/present.png" id="Banner-icon" alt="Banner Image" />
       <Spacer width={32} />
       <div>
         <Text type="paragraph" color="black">
-          We have a match campaign going on from now until the end of the year!
-          That means your donation to Sharing Excess is <strong>doubled</strong>
-          .
+          We have a Holiday Fundraiser going on from now until Monday, December
+          21st!{' '}
+          <strong>
+            We are raffling off over $8,000 worth of incredible prizes.{' '}
+          </strong>
         </Text>
         <Text type="paragraph" color="black">
-          <strong>
-            Help us raise $50,000 to deliver 1.5 million meals this winter.
-          </strong>{' '}
-          <ExternalLink to={DONATE_LINK}>
-            Click here to donate now!
+          Tickets are just $5.{' '}
+          <ExternalLink to={HOLIDAY_RAFFLE}>
+            Check out the baskets and enter now!
           </ExternalLink>
         </Text>
       </div>
