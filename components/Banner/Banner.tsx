@@ -32,7 +32,7 @@ export const Banner: FC = () => {
       <div>
         <Text type="paragraph" color="black">
           We have a Holiday Fundraiser going on from now until Monday, December
-          21st!{' '}
+          20th!{' '}
           <strong>
             We are raffling off over $8,000 worth of incredible prizes.{' '}
           </strong>
