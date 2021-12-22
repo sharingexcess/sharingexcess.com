@@ -2,7 +2,6 @@ import { Image, Text, ExternalLink, Button } from '@sharingexcess/designsystem'
 import React, { FC } from 'react'
 import Link from 'next/link'
 import { useIsMobile } from 'hooks'
-import { Banner } from 'components'
 
 export const Footer: FC = () => {
   const isMobile = useIsMobile()
@@ -56,7 +55,6 @@ export const Footer: FC = () => {
           </ExternalLink>
         </div>
       </div>
-      <Banner />
     </div>
   )
 }
