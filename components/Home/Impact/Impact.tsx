@@ -7,7 +7,7 @@ import { useIsMobile } from 'hooks'
 const content = [
   {
     image: '/icons/food.png',
-    header: 5502387,
+    header: 5625244,
     subheader: 'Pounds of Food Rescued since 2018',
     body: 'Partnering with grocery stores, restaurants, wholesalers, and farmers, Sharing Excess has rescued and delivered food to over 180 nonprofits and food banks.',
   },
@@ -20,7 +20,7 @@ const content = [
   },
   {
     image: '/icons/cloud.png',
-    header: 20138736,
+    header: 20588392,
     subheader: 'Pounds of CO2 Diverted from Landfills',
     body: 'By keeping food waste out of landfills, Sharing Excess has diverted over 18 million pounds of carbon dioxide from the atmosphere.',
   },
