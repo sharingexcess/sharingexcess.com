@@ -79,15 +79,24 @@
         @include flex-left;
         white-space: nowrap;
         font-size: 14px;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
         .News-article-publisher {
           color: var(--se-blue-primary);
-          font-size: 14px;
           font-weight: 700;
+          white-space: nowrap;
+          font-size: 14px;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .News-article-date {
+          white-space: nowrap;
           font-size: 14px;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
       }
 

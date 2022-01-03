@@ -53,7 +53,6 @@ export const Contact: FC = () => {
 
   function validateEmail() {
     if (typeof formData.email === 'string') {
-      console.log(validator.isEmail(formData.email))
       return validator.isEmail(formData.email) ? 'valid' : 'invalid'
     } else return undefined
   }

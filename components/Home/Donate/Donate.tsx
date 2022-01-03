@@ -63,7 +63,7 @@ export const Donate: FC = () => {
     const analytics = getAnalytics()
     logEvent(analytics, 'Button Click - Home Page Donate')
   }
-  console.log('Works')
+
   return (
     <div id="Donate">
       <Text type="small-header" color="white" shadow>
