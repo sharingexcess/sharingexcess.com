@@ -3,9 +3,14 @@ import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
 import Link from 'next/link'
 import { DONATE_LINK } from 'utils/constants'
+import { getAnalytics, logEvent } from 'firebase/analytics'
 
 export const Problem: FC = () => {
   const isMobile = useIsMobile()
+  function logAnalyticsEvent() {
+    const analytics = getAnalytics()
+    logEvent(analytics, 'Home page Help fix this broken quation button')
+  }
 
   return (
     <div id="Problem">
@@ -47,7 +52,12 @@ export const Problem: FC = () => {
       </section>
       <Spacer height={isMobile ? 64 : 96} />
       <ExternalLink to={DONATE_LINK}>
-        <Button type="primary" size="large" color="black">
+        <Button
+          type="primary"
+          size="large"
+          color="black"
+          handler={logAnalyticsEvent}
+        >
           Help Fix This Broken Equation
         </Button>
       </ExternalLink>

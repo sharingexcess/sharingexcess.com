@@ -2,9 +2,14 @@ import React, { FC } from 'react'
 import { Button, Image, Spacer, Text, Card } from '@sharingexcess/designsystem'
 import { useIsMobile } from 'hooks'
 import Link from 'next/link'
+import { getAnalytics, logEvent } from 'firebase/analytics'
 
 export const Solution: FC = () => {
   const isMobile = useIsMobile()
+  function logAnalyticsEvent() {
+    const analytics = getAnalytics()
+    logEvent(analytics, 'Home page Learn more button')
+  }
 
   return (
     <div id="Solution">
@@ -36,6 +41,7 @@ export const Solution: FC = () => {
           type="primary"
           size="medium"
           color={isMobile ? 'white' : 'green'}
+          handler={logAnalyticsEvent}
         >
           <Link href="/about">Learn More About Our Work</Link>
         </Button>

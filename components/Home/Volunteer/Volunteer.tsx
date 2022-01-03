@@ -3,9 +3,15 @@ import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
 import { volunteering } from 'content'
 import Link from 'next/link'
+import { getAnalytics, logEvent } from 'firebase/analytics'
 
 export const Volunteer: FC = () => {
   const isMobile = useIsMobile()
+
+  function logAnalyticsEvent(description: string) {
+    const analytics = getAnalytics()
+    logEvent(analytics, 'Home page ' + description)
+  }
   return (
     <div id="Volunteer">
       <Text type="small-header" color="green">
@@ -25,23 +31,30 @@ export const Volunteer: FC = () => {
       </Text>
       <Spacer height={isMobile ? 48 : 64} />
       <section id="Volunteer-content">
-        {volunteering.map(c => (
-          <div key={c.header}>
-            <Image src={c.image} alt={c.header} />
-            <Spacer height={24} />
-            <Text type="secondary-header" color="black" align="center">
-              {c.header}
-            </Text>
-            <Spacer height={8} />
-            <Text type="small" color="grey" align="center">
-              {c.body}
-            </Text>
-            <Spacer height={8} />
-            <Button type="primary" size="medium" color="green">
-              <Link href={c.link}>{c.button}</Link>
-            </Button>
-          </div>
-        ))}
+        {volunteering.map(c => {
+          return (
+            <div key={c.header}>
+              <Image src={c.image} alt={c.header} />
+              <Spacer height={24} />
+              <Text type="secondary-header" color="black" align="center">
+                {c.header}
+              </Text>
+              <Spacer height={8} />
+              <Text type="small" color="grey" align="center">
+                {c.body}
+              </Text>
+              <Spacer height={8} />
+              <Button
+                type="primary"
+                size="medium"
+                color="green"
+                handler={() => logAnalyticsEvent(c.button)}
+              >
+                <Link href={c.link}>{c.button}</Link>
+              </Button>
+            </div>
+          )
+        })}
       </section>
     </div>
   )

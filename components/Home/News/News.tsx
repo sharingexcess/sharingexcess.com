@@ -10,10 +10,14 @@ import { articles } from 'content'
 import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
 import Link from 'next/link'
+import { getAnalytics, logEvent } from 'firebase/analytics'
 
 export const News: FC = () => {
   const isMobile = useIsMobile()
-
+  function logAnalyticsEvent() {
+    const analytics = getAnalytics()
+    logEvent(analytics, 'Home page News button')
+  }
   return (
     <div id="News">
       <Text type="small-header" color="green" shadow>
@@ -76,7 +80,12 @@ export const News: FC = () => {
         <Spacer className="News-content-spacer" />
       </section>
       <Spacer height={isMobile ? 16 : 64} />
-      <Button type="primary" size="large" color="white">
+      <Button
+        type="primary"
+        size="large"
+        color="white"
+        handler={logAnalyticsEvent}
+      >
         <Link href="/news">Read All News Stories</Link>
       </Button>
     </div>
