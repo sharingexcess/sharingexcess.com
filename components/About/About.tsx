@@ -122,7 +122,7 @@ export const About: FC = () => {
           size="large"
           handler={() => {
             setSection('team')
-            logAnalyticsEvent('About page meet the team button')
+            logAnalyticsEvent('Button Click - About/Team')
           }}
           fullWidth={isMobile}
         >
@@ -134,7 +134,7 @@ export const About: FC = () => {
           size="large"
           handler={() => {
             setSection('history')
-            logAnalyticsEvent('About page Our Story')
+            logAnalyticsEvent('Button Click - About/History')
           }}
           fullWidth={isMobile}
         >
@@ -146,7 +146,7 @@ export const About: FC = () => {
           size="large"
           handler={() => {
             setSection('app')
-            logAnalyticsEvent('About page Food Rescue App')
+            logAnalyticsEvent('Button Click - About/App')
           }}
           fullWidth={isMobile}
         >
@@ -234,7 +234,9 @@ export const About: FC = () => {
                   type="primary"
                   size="medium"
                   color="green"
-                  handler={() => logAnalyticsEvent(`About Page ${c.button}`)}
+                  handler={() =>
+                    logAnalyticsEvent(`Button Click - About Page ${c.button}`)
+                  }
                 >
                   <Link href={c.link}>{c.button}</Link>
                 </Button>
@@ -389,7 +391,9 @@ export const About: FC = () => {
                 size="large"
                 color="green"
                 handler={() =>
-                  logAnalyticsEvent('About Page Support Our Next Chaper')
+                  logAnalyticsEvent(
+                    'Button Click - About/Support Our Next Chapter'
+                  )
                 }
               >
                 Support Our Next Chapter
@@ -482,7 +486,9 @@ export const About: FC = () => {
                 size="large"
                 color="green"
                 handler={() =>
-                  logAnalyticsEvent('About Page Contribute to our code')
+                  logAnalyticsEvent(
+                    'Button Click - About/Contribute To Our Code'
+                  )
                 }
               >
                 Contribute to our Code

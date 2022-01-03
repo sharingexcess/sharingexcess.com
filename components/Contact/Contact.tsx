@@ -5,6 +5,7 @@ import { Text, Spacer } from '@sharingexcess/designsystem'
 import validator from 'validator'
 import { useIsMobile } from 'hooks'
 import Head from 'next/head'
+import { getAnalytics, logEvent } from 'firebase/analytics'
 
 // For our contact form, we use a free service called FormSpree
 // Here's the link to our form:
@@ -61,6 +62,11 @@ export const Contact: FC = () => {
     return (
       formData.name && formData.email && formData.reason && formData.message
     )
+  }
+
+  function logAnalyticsEvent() {
+    const analytics = getAnalytics()
+    logEvent(analytics, 'Button Click - Submit Contact Form')
   }
 
   return (
@@ -169,6 +175,7 @@ export const Contact: FC = () => {
           type="submit"
           className="se-button type-primary size-medium color-green"
           disabled={state.submitting || !isFormComplete()}
+          onClick={logAnalyticsEvent}
         >
           Submit!
         </button>

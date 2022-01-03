@@ -1,7 +1,6 @@
 import { Button, ExternalLink, Spacer, Text } from '@sharingexcess/designsystem'
 import { useIsMobile } from 'hooks'
 import React, { FC } from 'react'
-import Link from 'next/link'
 import { DONATE_LINK } from 'utils/constants'
 import { getAnalytics, logEvent } from 'firebase/analytics'
 
@@ -9,7 +8,7 @@ export const Problem: FC = () => {
   const isMobile = useIsMobile()
   function logAnalyticsEvent() {
     const analytics = getAnalytics()
-    logEvent(analytics, 'Home page Help fix this broken quation button')
+    logEvent(analytics, 'Button Click - Home Page Problem')
   }
 
   return (

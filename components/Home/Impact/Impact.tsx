@@ -83,7 +83,7 @@ export const Impact: FC = () => {
   const isMobile = useIsMobile()
   function logAnalyticsEvent() {
     const analytics = getAnalytics()
-    logEvent(analytics, 'Home page Impact button')
+    logEvent(analytics, 'Button Click - Home page Impact')
   }
   return (
     <div id="Impact">

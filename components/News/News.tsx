@@ -21,7 +21,7 @@ export const News: FC = () => {
 
   function logAnalyticsEvent(description: string) {
     const analytics = getAnalytics()
-    logEvent(analytics, description)
+    logEvent(analytics, 'Button Click - ' + description)
   }
 
   return (

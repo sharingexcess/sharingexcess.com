@@ -61,7 +61,7 @@ export const Donate: FC = () => {
 
   function logAnalyticsEvent() {
     const analytics = getAnalytics()
-    logEvent(analytics, 'Home Page Donate Button')
+    logEvent(analytics, 'Button Click - Home Page Donate')
   }
   console.log('Works')
   return (
