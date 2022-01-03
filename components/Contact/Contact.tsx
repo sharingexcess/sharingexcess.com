@@ -63,9 +63,10 @@ export const Contact: FC = () => {
       formData.name && formData.email && formData.reason && formData.message
     )
   }
+
   function logAnalyticsEvent() {
     const analytics = getAnalytics()
-    logEvent(analytics, 'Contact form button')
+    logEvent(analytics, 'Button Click - Submit Contact Form')
   }
 
   return (
@@ -174,7 +175,7 @@ export const Contact: FC = () => {
           type="submit"
           className="se-button type-primary size-medium color-green"
           disabled={state.submitting || !isFormComplete()}
-          handler={logAnalyticsEvent}
+          onClick={logAnalyticsEvent}
         >
           Submit!
         </button>

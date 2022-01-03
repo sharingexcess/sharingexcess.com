@@ -53,7 +53,7 @@ const chapters = [
 
 function logAnalyticsEvent() {
   const analytics = getAnalytics()
-  logEvent(analytics, 'Reach out to start a chapter')
+  logEvent(analytics, 'Button Click - Start a Chapter')
 }
 
 export const Campus: FC = () => {
@@ -132,9 +132,13 @@ export const Campus: FC = () => {
           on campus! Gather your group and reach out to get started.
         </Text>
         <Spacer height={32} />
-        <Button type="primary" color="green" size="large">
-          <Link href="/contact">Reach Out to Start a Chapter</Link>
+        <Button
+          type="primary"
+          color="green"
+          size="large"
           handler={logAnalyticsEvent}
+        >
+          <Link href="/contact">Reach Out to Start a Chapter</Link>
         </Button>
       </FlexContainer>
     </main>
