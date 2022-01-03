@@ -14,9 +14,15 @@ import React, { FC } from 'react'
 import { DONATE_LINK } from 'utils/constants'
 import Link from 'next/link'
 import Head from 'next/head'
+import { getAnalytics, logEvent } from 'firebase/analytics'
 
 export const News: FC = () => {
   const isMobile = useIsMobile()
+
+  function logAnalyticsEvent(description: string) {
+    const analytics = getAnalytics()
+    logEvent(analytics, description)
+  }
 
   return (
     <div className="News">
@@ -56,6 +62,9 @@ export const News: FC = () => {
                     classList={['News-article-publisher']}
                     type="tertiary"
                     color="blue"
+                    handler={() =>
+                      logAnalyticsEvent(`News ${c.publisher} hyperlink`)
+                    }
                   >
                     {c.publisher}
                   </Button>
@@ -75,7 +84,11 @@ export const News: FC = () => {
               </Text>
               <Spacer height={24} />
               <ExternalLink to={c.url}>
-                <Button type="primary" fullWidth={isMobile}>
+                <Button
+                  type="primary"
+                  fullWidth={isMobile}
+                  handler={() => logAnalyticsEvent(`News ${c.header}`)}
+                >
                   {c.button || 'Read More'}
                 </Button>
               </ExternalLink>
@@ -101,12 +114,22 @@ export const News: FC = () => {
         <Spacer height={48} />
         <FlexContainer direction={isMobile ? 'vertical' : 'horizontal'}>
           <ExternalLink to={DONATE_LINK}>
-            <Button type="primary" color="green" size="large">
+            <Button
+              type="primary"
+              color="green"
+              size="large"
+              handler={() => logAnalyticsEvent('News Make a Donation')}
+            >
               Make a Donation
             </Button>
           </ExternalLink>
           <Spacer width={16} height={16} />
-          <Button type="primary" color="white" size="large">
+          <Button
+            type="primary"
+            color="white"
+            size="large"
+            handler={() => logAnalyticsEvent('News Get Involved')}
+          >
             <Link href="/about">Get Involved</Link>
           </Button>
         </FlexContainer>
