@@ -16,7 +16,7 @@ export const News: FC = () => {
   const isMobile = useIsMobile()
   function logAnalyticsEvent() {
     const analytics = getAnalytics()
-    logEvent(analytics, 'Home page News button')
+    logEvent(analytics, 'Button Click - Home Page News')
   }
   return (
     <div id="News">

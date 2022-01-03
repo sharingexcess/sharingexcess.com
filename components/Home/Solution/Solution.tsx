@@ -8,7 +8,7 @@ export const Solution: FC = () => {
   const isMobile = useIsMobile()
   function logAnalyticsEvent() {
     const analytics = getAnalytics()
-    logEvent(analytics, 'Home page Learn more button')
+    logEvent(analytics, 'Button Click - Home Page Our Work')
   }
 
   return (

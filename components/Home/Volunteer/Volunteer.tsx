@@ -10,7 +10,7 @@ export const Volunteer: FC = () => {
 
   function logAnalyticsEvent(description: string) {
     const analytics = getAnalytics()
-    logEvent(analytics, 'Home page ' + description)
+    logEvent(analytics, 'Button Click - Home page ' + description)
   }
   return (
     <div id="Volunteer">

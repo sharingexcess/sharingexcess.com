@@ -9,7 +9,7 @@ export const Splash: FC = () => {
 
   function logAnalyticsEvent() {
     const analytics = getAnalytics()
-    logEvent(analytics, 'Splash Page Donate Button Click')
+    logEvent(analytics, 'Button Click - Splash Page Donate')
   }
 
   return (
