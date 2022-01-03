@@ -6,7 +6,7 @@ import 'styles/globals.scss'
 import * as Sentry from '@sentry/react'
 import { Integrations } from '@sentry/tracing'
 import { useEffect } from 'react'
-import { getAnalytics, logEvent } from 'firebase/analytics'
+import { getAnalytics } from 'firebase/analytics'
 import { initializeApp, getApps } from 'firebase/app'
 
 const firebaseConfig = {

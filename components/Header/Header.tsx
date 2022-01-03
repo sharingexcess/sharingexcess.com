@@ -26,6 +26,14 @@ export const Header: FC = () => {
   }, [])
 
   useEffect(() => {
+    if (menu) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+  }, [menu])
+
+  useEffect(() => {
     // handle scroll up to top of page, switch to transparent header
     if (scroll < BACKGROUND_THRESHOLD) {
       setBackground(false)
