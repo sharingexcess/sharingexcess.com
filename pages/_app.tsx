@@ -8,6 +8,7 @@ import { Integrations } from '@sentry/tracing'
 import { useEffect } from 'react'
 import { getAnalytics } from 'firebase/analytics'
 import { initializeApp, getApps } from 'firebase/app'
+import { version } from '../package.json'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyCtfJwIfZEuejWShXm3qSL3s1hcDsk7RDo',
@@ -24,6 +25,7 @@ Sentry.init({
   integrations: [new Integrations.BrowserTracing()],
   tracesSampleRate: 1.0,
   environment: process.env.SENTRY_ENV || 'development',
+  release: version,
 })
 
 // eslint-disable-next-line
