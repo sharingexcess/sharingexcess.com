@@ -8,20 +8,20 @@ import { getAnalytics, logEvent } from 'firebase/analytics'
 const content = [
   {
     image: '/icons/food.png',
-    header: 7014623,
+    header: 7300832,
     subheader: 'Pounds of Food Rescued since 2018',
     body: 'Partnering with grocery stores, restaurants, wholesalers, and farmers, Sharing Excess has rescued and delivered food to over 180 nonprofits and food banks.',
   },
   {
     image: '/icons/money.png',
-    header: 13062470,
+    header: 13589470,
     prefix: '$',
     subheader: 'Total Retail Value of Rescued Food',
     body: 'With an average retail value of $2.86 per pound, Sharing Excess has returned over $9 million of valuable, fresh food to the local economy and community.',
   },
   {
     image: '/icons/cloud.png',
-    header: 25673521,
+    header: 26721046,
     subheader: 'Pounds of CO2 Diverted from Landfills',
     body: 'By keeping food waste out of landfills, Sharing Excess has diverted over 18 million pounds of carbon dioxide from the atmosphere.',
   },
