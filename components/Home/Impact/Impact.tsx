@@ -8,7 +8,7 @@ import { getAnalytics, logEvent } from 'firebase/analytics'
 const content = [
   {
     image: '/icons/food.png',
-    header: 7919656,
+    header: 7919657,
     subheader: 'Pounds of Food Rescued since 2018',
     body: 'Partnering with grocery stores, restaurants, wholesalers, and farmers, Sharing Excess has rescued and delivered food to over 180 nonprofits and food banks.',
   },
