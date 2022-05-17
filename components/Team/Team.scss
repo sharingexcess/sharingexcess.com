@@ -1,0 +1,48 @@
+#Team {
+  @include page;
+
+  #Team-text {
+    max-width: 582px;
+    margin: auto;
+  }
+
+  #Team-small-header {
+    text-transform: uppercase;
+  }
+
+  .About-team-members {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(192px, 1fr));
+    grid-gap: 68px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    @include mobile {
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    .About-team-person {
+      text-align: center;
+      width: 100%;
+      .subheader {
+        font-weight: 700;
+      }
+      .se-image {
+        width: 100%;
+        min-height: 192px;
+        border-radius: 50%;
+        /* border: 6px solid var(--se-white); */
+        object-fit: cover;
+        /*  box-shadow: var(--se-shadow-medium); */
+
+        @include mobile {
+          min-height: 150px;
+        }
+      }
+    }
+
+    #About-team-person-name {
+      text-decoration: underline;
+    }
+  }
+}
