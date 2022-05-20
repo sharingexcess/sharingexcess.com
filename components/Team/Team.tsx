@@ -33,8 +33,9 @@ export const Team: FC = () => {
       </FlexContainer>
 
       <div className="About-team-members">
-        {/* could slice for separation
-        Question: how can i take sections of the team array? */}
+        {/* 
+        add field to team that has category
+        then higher order function sort by category */}
 
         {team.map((i, j) => (
           <div key={i.name} className="About-team-person">
