@@ -3,6 +3,16 @@ import { PageHeader } from 'components'
 import { useIsMobile } from 'hooks'
 import { team } from 'content/team'
 import React, { FC } from 'react'
+import { testimonials } from 'content/testimonials'
+import { Card } from 'designsystem'
+
+const departments = [
+  'leadership',
+  'distribution',
+  'operations',
+  'community',
+  'technology',
+]
 
 export const Team: FC = () => {
   const isMobile = useIsMobile()
@@ -15,7 +25,7 @@ export const Team: FC = () => {
       />
 
       <Spacer height={isMobile ? 96 : 48} />
-      <FlexContainer direction="vertical" id="Team-text">
+      <FlexContainer direction="vertical" className="Team-header-text">
         <Text type="secondary-header" color="green">
           Who We Are
         </Text>
@@ -26,71 +36,94 @@ export const Team: FC = () => {
           in full-time, part-time, co-op, internship, and volunteer positions.
         </Text>
         <Spacer height={98} />
-        <Text type="small-header" color="green" id="Team-small-header">
-          leadership
-        </Text>
-        <Spacer height={48} />
       </FlexContainer>
 
-      <div className="About-team-members">
-        {/* 
-        add field to team that has category
-        then higher order function sort by category */}
+      <FlexContainer direction="vertical">
+        {departments.map(department => {
+          return (
+            <FlexContainer direction="vertical">
+              <Text type="small-header" color="green" id="Team-small-header">
+                {department}
+              </Text>
+              <Spacer height={48} />
 
-        {team.map((i, j) => (
-          <div key={i.name} className="About-team-person">
-            <Image src={i.image} alt={i.name} />
-            <Spacer height={12} />
+              <div className="About-team-members">
+                {team
+                  .filter(teamMember => teamMember.department === department)
+                  .map(filteredTeamMember => (
+                    <div
+                      key={filteredTeamMember.name}
+                      className="About-team-person"
+                    >
+                      <Image
+                        src={filteredTeamMember.image}
+                        alt={filteredTeamMember.name}
+                      />
+                      <Spacer height={12} />
 
-            <Text
-              type="subheader"
-              color="blue"
-              align="center"
-              id="About-team-person-name"
-            >
-              <a href={i.url} target="_blank">
-                {i.name}
-              </a>
-            </Text>
+                      <Text
+                        type="subheader"
+                        color="blue"
+                        align="center"
+                        id="Team-person-name"
+                      >
+                        <a href={filteredTeamMember.url} target="_blank">
+                          {filteredTeamMember.name}
+                        </a>
+                      </Text>
 
-            <Text type="small" color="black" align="center">
-              {i.title}
-            </Text>
-          </div>
-        ))}
-      </div>
-
-      <FlexContainer direction="vertical" id="Team-text">
-        <Spacer height={98} />
-        <Text type="small-header" color="green" id="Team-small-header">
-          distribution
-        </Text>
+                      <Text type="small" color="black" align="center">
+                        {filteredTeamMember.title}
+                      </Text>
+                    </div>
+                  ))}
+              </div>
+              <Spacer height={176} />
+            </FlexContainer>
+          )
+        })}
       </FlexContainer>
 
-      <FlexContainer direction="vertical" id="Team-text">
-        <Spacer height={98} />
-        <Text type="small-header" color="green" id="Team-small-header">
-          operations
+      <FlexContainer direction="vertical" className="Team-header-text">
+        <Text type="secondary-header" color="black" align="center">
+          Sharing Excess hires students.
         </Text>
       </FlexContainer>
+      <Spacer height={62} />
 
-      <FlexContainer direction="vertical" id="Team-text">
-        <Spacer height={98} />
-        <Text type="small-header" color="green" id="Team-small-header">
-          technology
+      <FlexContainer
+        direction="horizontal"
+        className="Team-testimonials-section"
+      >
+        <Image
+          src="/team/testimonials-bg.svg"
+          alt="Background color"
+          id="Team-testimonials-background-img"
+        />
+        <Text type="small-header" color="black">
+          Powered by students.
         </Text>
-      </FlexContainer>
+        {
+          <section id="Team-testimonial">
+            {testimonials.map(student => (
+              <Card classList={['testimonial-card']}>
+                <Image src={student.image} alt={student.name}></Image>
+                <Spacer height={12} />
+                <Text type="subheader" color="green" align="center">
+                  {student.name}
+                </Text>
+                <Text type="paragraph" color="black" align="center">
+                  {student.title}
+                </Text>
 
-      <FlexContainer direction="vertical" id="Team-text">
-        <Spacer height={178} />
-        <Text type="secondary-header" color="green">
-          Experiential Learning Program
-        </Text>
-      </FlexContainer>
-      <FlexContainer direction="vertical" id="Team-text">
-        <Text type="secondary-header" color="black">
-          Student Stories
-        </Text>
+                <Spacer height={32} />
+                <Text type="paragraph" color="black" align="left">
+                  {student.quote}
+                </Text>
+              </Card>
+            ))}
+          </section>
+        }
       </FlexContainer>
     </div>
   )

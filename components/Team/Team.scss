@@ -1,39 +1,36 @@
 #Team {
   @include page;
 
-  #Team-text {
-    max-width: 582px;
+  .Team-header-text {
+    max-width: 592px;
     margin: auto;
   }
 
-  #Team-small-header {
-    text-transform: uppercase;
-  }
-
   .About-team-members {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(192px, 1fr));
-    grid-gap: 68px;
-    justify-content: space-between;
+    display: flex;
+    justify-content: center;
     flex-wrap: wrap;
+    gap: 64px;
 
     @include mobile {
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 32px;
     }
 
     .About-team-person {
       text-align: center;
-      width: 100%;
+      flex: 0 0 20%;
       .subheader {
         font-weight: 700;
       }
       .se-image {
         width: 100%;
-        min-height: 192px;
+
+        /*took out min-height for desktop responsiveness*/
+        /* min-height: 192px; */
         border-radius: 50%;
-        /* border: 6px solid var(--se-white); */
         object-fit: cover;
-        /*  box-shadow: var(--se-shadow-medium); */
 
         @include mobile {
           min-height: 150px;
@@ -41,8 +38,39 @@
       }
     }
 
-    #About-team-person-name {
+    #Team-person-name {
       text-decoration: underline;
+    }
+  }
+
+  .Team-testimonials-section {
+    position: relative;
+    #Team-testimonial {
+      @include flex-left;
+      align-items: flex-start;
+      width: 100vw;
+      margin-left: calc(-1 * max(96px, calc(50vw - 500px)));
+
+      .testimonial-card {
+        @include flex-vertical-left;
+        flex: 1 0 323px;
+        margin-right: 32px;
+        align-items: center;
+
+        .se-image {
+          width: 40%;
+          border-radius: 50%;
+          object-fit: cover;
+        }
+      }
+    }
+
+    #Team-testimonials-background-img {
+      position: absolute;
+      width: 100vw;
+      height: auto;
+      /* object-fit: cover; */
+      /* margin-left: calc(-1 * max(96px, calc(50vw - 500px))); */
     }
   }
 }

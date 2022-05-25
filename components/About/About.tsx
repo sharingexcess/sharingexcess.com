@@ -8,13 +8,9 @@ import {
   FlexContainer,
   ExternalLink,
 } from '@sharingexcess/designsystem'
-import { team } from 'content/team'
 import { useIsMobile } from 'hooks'
 import { PageHeader } from 'components'
-import { volunteering } from 'content'
 import { useRouter } from 'next/router'
-import { DONATE_LINK, PASTEL_COLORS } from 'utils/constants'
-import Link from 'next/link'
 import { getAnalytics, logEvent } from 'firebase/analytics'
 
 export const About: FC = () => {
@@ -46,21 +42,68 @@ export const About: FC = () => {
 
       <Spacer height={isMobile ? 48 : 64} />
 
+      <FlexContainer direction="vertical" id="About-mission-section">
+        <Text type="small-header" color="black" id="About-small-header">
+          Our Mission
+        </Text>
+
+        <Spacer height={48} />
+
+        <FlexContainer direction="vertical" secondaryAlign="start">
+          <Text type="secondary-header" color="green">
+            Using surplus as a <br></br> solution to scarcity.
+          </Text>
+          <Spacer height={16} />
+          <Text type="paragraph" color="black">
+            Sharing Excess uses surplus as a solution to scarcity. While over 40
+            million people in the US face food insecurity, nearly 40% of the
+            nation's food supply is going to waste. Our mission is to bridge the
+            gap between excess and scarcity by partnering with grocery stores,
+            restaurants, wholesalers, and farmers to deliver surplus food to a
+            network of nonprofits, food banks, and community organizations to
+            alleviate local food insecurity.
+          </Text>
+          <Spacer height={126} />
+          <Text
+            type="secondary-header"
+            color="green"
+            id="About-secondary-header"
+          >
+            Sharing Excess captures food waste at every step of the supply
+            chain.
+          </Text>
+
+          <Spacer height={46} />
+
+          <Image
+            src="/about/SE-Diagram-1.jpg"
+            alt="Diagram"
+            id="diagram-image"
+          />
+        </FlexContainer>
+      </FlexContainer>
+
+      <Spacer height={82} />
+
       <FlexContainer
         className="About-content-section"
         direction={isMobile ? 'vertical-reverse' : 'horizontal'}
         primaryAlign="start"
         secondaryAlign="center"
       >
-        <Image src="/about/popup.gif" alt="About Sharing Excess" />
-        <Spacer width={48} height={32} />
+        <Image
+          src="/about/popup.gif"
+          alt="About Sharing Excess"
+          classList={['About-content-section-img']}
+        />
+        <Spacer width={126} />
         <FlexContainer
           direction="horizontal"
           primaryAlign={isMobile ? 'center' : 'start'}
           secondaryAlign={isMobile ? 'center' : 'start'}
         >
           <FlexContainer direction="vertical" secondaryAlign="start">
-            <Text type="primary-header" color="green">
+            <Text type="secondary-header" color="green">
               Our Story
             </Text>
             <Spacer height={16} />
@@ -78,22 +121,32 @@ export const About: FC = () => {
         </FlexContainer>
       </FlexContainer>
 
+      <Spacer height={96} />
+
       <FlexContainer
         className="About-content-section"
         direction={isMobile ? 'vertical-reverse' : 'horizontal'}
         primaryAlign="start"
         secondaryAlign="center"
       >
+        <Image
+          src="/about/backgroundcolor-1.svg"
+          alt="Background Color"
+          classList={['About-background-wave-img']}
+        />
         <FlexContainer
           direction="horizontal"
           primaryAlign={isMobile ? 'center' : 'start'}
           secondaryAlign={isMobile ? 'center' : 'start'}
         >
           <FlexContainer direction="vertical" secondaryAlign="start">
-            <Text type="primary-header" color="green">
-              Meet the Team
+            <Text
+              type="secondary-header"
+              color="green"
+              id="About-secondary-header"
+            >
+              Who We Are
             </Text>
-            {/*    for the background color add an id and look at header styling for absolute positioning and z index */}
             <Spacer height={16} />
             <Text type="paragraph" color="black">
               But as vast a problem as food waste is, the solution often boils
@@ -107,9 +160,15 @@ export const About: FC = () => {
             </Button>
           </FlexContainer>
         </FlexContainer>
-        <Image src="/about/popup.gif" alt="About Sharing Excess" />
-        <Spacer width={30} height={32} />
+        <Spacer width={126} />
+        <Image
+          src="/about/popup.gif"
+          alt="About Sharing Excess"
+          classList={['About-content-section-img']}
+        />
       </FlexContainer>
+
+      <Spacer height={96} />
 
       <FlexContainer
         className="About-content-section"
@@ -117,16 +176,24 @@ export const About: FC = () => {
         primaryAlign="start"
         secondaryAlign="center"
       >
-        <Image src="/about/popup.gif" alt="About Sharing Excess" />
-        <Spacer width={30} height={32} />
+        <Image
+          src="/about/popup.gif"
+          alt="About Sharing Excess"
+          classList={['About-content-section-img']}
+        />
+        <Spacer width={126} />
         <FlexContainer
           direction="horizontal"
           primaryAlign={isMobile ? 'center' : 'start'}
           secondaryAlign={isMobile ? 'center' : 'start'}
         >
           <FlexContainer direction="vertical" secondaryAlign="start">
-            <Text type="primary-header" color="green">
-              Impact
+            <Text
+              type="secondary-header"
+              color="green"
+              id="About-secondary-header"
+            >
+              Our Impact
             </Text>
             <Spacer height={16} />
             <Text type="paragraph" color="black">
@@ -143,22 +210,33 @@ export const About: FC = () => {
         </FlexContainer>
       </FlexContainer>
 
+      <Spacer height={isMobile ? 8 : 96} />
+
       <FlexContainer
         className="About-content-section"
         direction={isMobile ? 'vertical-reverse' : 'horizontal'}
         primaryAlign="start"
         secondaryAlign="center"
       >
+        <Image
+          src="/about/partners-background.svg"
+          alt="Background Color"
+          classList={['About-background-wave-img']}
+        />
+
         <FlexContainer
           direction="horizontal"
           primaryAlign={isMobile ? 'center' : 'start'}
           secondaryAlign={isMobile ? 'center' : 'start'}
         >
           <FlexContainer direction="vertical" secondaryAlign="start">
-            <Text type="primary-header" color="green">
+            <Text
+              type="secondary-header"
+              color="green"
+              id="About-secondary-header"
+            >
               Partners
             </Text>
-            {/*    for the background color add an id and look at header styling for absolute positioning and z index */}
             <Spacer height={16} />
             <Text type="paragraph" color="black">
               But as vast a problem as food waste is, the solution often boils
@@ -168,15 +246,55 @@ export const About: FC = () => {
             </Text>
             <Spacer height={38} />
             <Button type="primary" color="green" size="medium">
-              Meet the Team
+              Learn More
             </Button>
           </FlexContainer>
         </FlexContainer>
-        <Image src="/about/popup.gif" alt="About Sharing Excess" />
-        <Spacer width={30} height={32} />
+        <Spacer width={126} />
+        <Image
+          src="/about/popup.gif"
+          alt="About Sharing Excess"
+          classList={['About-content-section-img']}
+        />
       </FlexContainer>
 
-      <Spacer height={isMobile ? 64 : 112} />
+      <Spacer height={96} />
+
+      <FlexContainer
+        className="About-content-section"
+        direction={isMobile ? 'vertical-reverse' : 'horizontal'}
+        primaryAlign="start"
+        secondaryAlign="center"
+      >
+        <Image
+          src="/about/popup.gif"
+          alt="About Sharing Excess"
+          classList={['About-content-section-img']}
+        />
+        <Spacer width={126} />
+        <FlexContainer
+          direction="horizontal"
+          primaryAlign={isMobile ? 'center' : 'start'}
+          secondaryAlign={isMobile ? 'center' : 'start'}
+        >
+          <FlexContainer direction="vertical" secondaryAlign="start">
+            <Text type="secondary-header" color="green">
+              Keep up with SE!
+            </Text>
+            <Spacer height={16} />
+            <Text type="paragraph" color="black">
+              But as vast a problem as food waste is, the solution often boils
+              down to simple last mile logistics and delivery.{' '}
+              <span className="green">Sharing Excess</span> is meeting this
+              challenge with the power of people, technology, and compassion.
+            </Text>
+            <Spacer height={38} />
+            <Button type="primary" color="green" size="medium">
+              Visit Our Blog
+            </Button>
+          </FlexContainer>
+        </FlexContainer>
+      </FlexContainer>
     </div>
   )
 }

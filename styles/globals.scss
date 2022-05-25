@@ -1,5 +1,6 @@
 @import '@fortawesome/fontawesome-svg-core/styles.css';
 @import '@sharingexcess/designsystem/build/index.scss';
+@import './design_system_overrides.scss';
 
 :root {
   --se-min-page-width: 300px;
