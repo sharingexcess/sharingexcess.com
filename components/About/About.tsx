@@ -42,10 +42,10 @@ export const About: FC = () => {
 
       <Spacer height={isMobile ? 48 : 64} />
 
-      <FlexContainer direction="vertical" id="About-mission-section">
-        <Text type="small-header" color="black" id="About-small-header">
+      <FlexContainer direction="horizontal" id="About-mission-section">
+        {/* <Text type="small-header" color="black" id="About-small-header">
           Our Mission
-        </Text>
+        </Text> */}
 
         <Spacer height={48} />
 
@@ -63,7 +63,7 @@ export const About: FC = () => {
             network of nonprofits, food banks, and community organizations to
             alleviate local food insecurity.
           </Text>
-          <Spacer height={126} />
+          {/*  <Spacer height={126} />
           <Text
             type="secondary-header"
             color="green"
@@ -71,23 +71,19 @@ export const About: FC = () => {
           >
             Sharing Excess captures food waste at every step of the supply
             chain.
-          </Text>
+          </Text> */}
 
           <Spacer height={46} />
-
-          <Image
-            src="/about/SE-Diagram-1.jpg"
-            alt="Diagram"
-            id="diagram-image"
-          />
         </FlexContainer>
+        <Image src="/about/SE-Diagram-1.jpg" alt="Diagram" id="diagram-image" />
       </FlexContainer>
 
-      <Spacer height={82} />
+      <Spacer height={96} />
 
+      {/* two versions of flex container w isMobile */}
       <FlexContainer
         className="About-content-section"
-        direction={isMobile ? 'vertical-reverse' : 'horizontal'}
+        direction={isMobile ? 'vertical' : 'horizontal'}
         primaryAlign="start"
         secondaryAlign="center"
       >

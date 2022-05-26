@@ -1,3 +1,8 @@
 #Partners {
   @include page;
+
+  .Partners-header-text {
+    max-width: 592px;
+    margin: auto;
+  }
 }
