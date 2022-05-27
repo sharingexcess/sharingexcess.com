@@ -9,11 +9,13 @@
   .About-content-section {
     padding: 128px 0;
     position: relative;
+    overflow-y: visible;
 
     .About-background-wave-img {
       position: absolute;
-      width: 100vw;
-      height: auto;
+      min-width: 100vw;
+      height: 100%;
+      object-fit: fill;
       margin-left: calc(-1 * max(96px, calc(50vw - 500px)));
 
       @include mobile {

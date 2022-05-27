@@ -5,6 +5,15 @@ import { team } from 'content/team'
 import React, { FC } from 'react'
 import { testimonials } from 'content/testimonials'
 import { Card } from 'designsystem'
+import {
+  CarouselProvider,
+  Slider,
+  Slide,
+  ButtonBack,
+  ButtonNext,
+  DotGroup,
+} from 'pure-react-carousel'
+import 'pure-react-carousel/dist/react-carousel.es.css'
 
 const departments = [
   'leadership',
@@ -47,14 +56,11 @@ export const Team: FC = () => {
               </Text>
               <Spacer height={48} />
 
-              <div className="About-team-members">
+              <div className="Team-members">
                 {team
                   .filter(teamMember => teamMember.department === department)
                   .map(filteredTeamMember => (
-                    <div
-                      key={filteredTeamMember.name}
-                      className="About-team-person"
-                    >
+                    <div key={filteredTeamMember.name} className="Team-person">
                       <Image
                         src={filteredTeamMember.image}
                         alt={filteredTeamMember.name}
@@ -105,23 +111,38 @@ export const Team: FC = () => {
         </Text>
         {
           <section id="Team-testimonial">
-            {testimonials.map(student => (
-              <Card classList={['testimonial-card']}>
-                <Image src={student.image} alt={student.name}></Image>
-                <Spacer height={12} />
-                <Text type="subheader" color="green" align="center">
-                  {student.name}
-                </Text>
-                <Text type="paragraph" color="black" align="center">
-                  {student.title}
-                </Text>
+            <CarouselProvider
+              naturalSlideWidth={100}
+              naturalSlideHeight={125}
+              totalSlides={testimonials.length}
+              visibleSlides={1}
+            >
+              <Slider>
+                {testimonials.map((student, i) => (
+                  <Slide index={i} className="testimonial-card">
+                    <Card>
+                      <Image src={student.image} alt={student.name}></Image>
+                      <Spacer height={12} />
+                      <Text type="subheader" color="green" align="center">
+                        {student.name}
+                      </Text>
+                      <Text type="paragraph" color="black" align="center">
+                        {student.title}
+                      </Text>
 
-                <Spacer height={32} />
-                <Text type="paragraph" color="black" align="left">
-                  {student.quote}
-                </Text>
-              </Card>
-            ))}
+                      <Spacer height={32} />
+                      <Text type="paragraph" color="black" align="left">
+                        {student.quote}
+                      </Text>
+                    </Card>
+                  </Slide>
+                ))}
+              </Slider>
+
+              {/* <ButtonBack>Back</ButtonBack>
+              <ButtonNext>Next</ButtonNext> */}
+              <DotGroup />
+            </CarouselProvider>
           </section>
         }
       </FlexContainer>

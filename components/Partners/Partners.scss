@@ -1,8 +1,41 @@
 #Partners {
   @include page;
 
-  .Partners-header-text {
+  .Partners-header-and-text {
     max-width: 592px;
     margin: auto;
+  }
+
+  /*  fix this */
+  #Partners-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 98px;
+    width: 100%;
+    justify-items: center;
+    @include mobile {
+      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    }
+
+    .Partners-logo {
+      max-height: 90px;
+      @include mobile {
+        max-width: 20vw;
+      }
+    }
+  }
+
+  .Partners-background-wave-img {
+    position: absolute;
+    width: 100%;
+    height: auto;
+    margin-left: calc(-1 * max(96px, calc(50vw - 500px)));
+
+    @include mobile {
+      height: 600px;
+      width: 100vw;
+      object-fit: cover;
+      margin: auto;
+    }
   }
 }
