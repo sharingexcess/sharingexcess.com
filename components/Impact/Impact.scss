@@ -1,3 +1,27 @@
 #Impact {
-  // add your component styles here
+  @include page;
+  background: white;
+
+  #stat-container {
+    display: grid;
+    /* grid-template-columns: 33% 33% 33%; */
+    grid-template-columns: minmax(0, 33%) minmax(0, 33%) minmax(0, 33%);
+    gap: 30px;
+
+    .stat-container-col {
+      max-width: 320px;
+
+      .stat-img {
+        max-width: 90%;
+        height: auto;
+        object-fit: cover;
+      }
+    }
+  }
+
+  #cumulative-impact {
+    max-width: 50vw;
+    height: auto;
+    margin: auto;
+  }
 }

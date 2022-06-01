@@ -12,6 +12,7 @@ import { useIsMobile } from 'hooks'
 import { PageHeader } from 'components'
 import { useRouter } from 'next/router'
 import { getAnalytics, logEvent } from 'firebase/analytics'
+import Link from 'next/link'
 
 export const About: FC = () => {
   const isMobile = useIsMobile()
@@ -54,7 +55,7 @@ export const About: FC = () => {
         </Text>
         <Spacer height={38} />
         <Button type="primary" color="green" size="medium">
-          Read More on Our Blog
+          <Link href="/"> Read More on Our Blog</Link>
         </Button>
       </FlexContainer>
     ) : (
@@ -66,7 +67,7 @@ export const About: FC = () => {
       >
         <Image
           src="/about/history2.png"
-          alt="About Sharing Excess"
+          alt="Team members smiling"
           classList={['About-content-section-img']}
         />
         <Spacer width={126} />
@@ -88,7 +89,7 @@ export const About: FC = () => {
             </Text>
             <Spacer height={38} />
             <Button type="primary" color="green" size="medium">
-              Read More on Our Blog
+              <Link href="/">Read More on Our Blog</Link>
             </Button>
           </FlexContainer>
         </FlexContainer>
@@ -166,14 +167,14 @@ export const About: FC = () => {
             </Text>
             <Spacer height={38} />
             <Button type="primary" color="green" size="medium">
-              Meet the Team
+              <Link href="/team"> Meet the Team </Link>
             </Button>
           </FlexContainer>
         </FlexContainer>
         <Spacer width={126} />
         <Image
           src="/about/who-we-are.jpg"
-          alt="About Sharing Excess"
+          alt="Group photo on a sunny day"
           classList={['About-content-section-img']}
         />
       </FlexContainer>
@@ -186,7 +187,7 @@ export const About: FC = () => {
       >
         <Image
           src="/about/impact-preview.jpg"
-          alt="About Sharing Excess"
+          alt="Palettes of produce"
           classList={['About-content-section-img']}
         />
         <Spacer width={126} />
@@ -212,7 +213,7 @@ export const About: FC = () => {
             </Text>
             <Spacer height={38} />
             <Button type="primary" color="green" size="medium">
-              Read More
+              <Link href="/impact"> Read More</Link>
             </Button>
           </FlexContainer>
         </FlexContainer>
@@ -252,14 +253,14 @@ export const About: FC = () => {
             </Text>
             <Spacer height={38} />
             <Button type="primary" color="green" size="medium">
-              Learn More
+              <Link href="/partners">Learn More</Link>
             </Button>
           </FlexContainer>
         </FlexContainer>
         <Spacer width={126} />
         <Image
           src="/about/partners-preview.jpg"
-          alt="About Sharing Excess"
+          alt="Sharing Excess receives a ten thousand dollar check from Giant"
           classList={['About-content-section-img']}
         />
       </FlexContainer>
@@ -272,7 +273,7 @@ export const About: FC = () => {
       >
         <Image
           src="/about/blog-img.jpg"
-          alt="About Sharing Excess"
+          alt="Volunteers with Free Food signs"
           classList={['About-content-section-img']}
         />
         <Spacer width={126} />
@@ -294,7 +295,7 @@ export const About: FC = () => {
             </Text>
             <Spacer height={38} />
             <Button type="primary" color="green" size="medium">
-              Visit Our Blog
+              <Link href="/">Visit Our Blog</Link>
             </Button>
           </FlexContainer>
         </FlexContainer>

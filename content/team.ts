@@ -148,7 +148,7 @@ export const team: {
   },
   {
     name: 'Jill Tracy',
-    title: 'Digital Designer',
+    title: 'UI/UX Designer',
     image: '/team/Jill.png',
     url: 'https://www.linkedin.com/in/jilliantracy/',
     department: 'technology',

@@ -105,6 +105,7 @@ export const Partners: FC = () => {
         </Button>
       </FlexContainer>
 
+      <Spacer height={120} />
       <FlexContainer
         direction="vertical"
         primaryAlign="center"
