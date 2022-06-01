@@ -65,7 +65,7 @@ export const About: FC = () => {
         secondaryAlign="center"
       >
         <Image
-          src="/about/popup.gif"
+          src="/about/history2.png"
           alt="About Sharing Excess"
           classList={['About-content-section-img']}
         />
@@ -132,7 +132,7 @@ export const About: FC = () => {
       </FlexContainer>
       <Spacer height={96} />
       <ContentSection title="Our Story" img="/about/popup.gif" />
-      <Spacer height={96} />
+      {/* <Spacer height={96} /> */}
       <FlexContainer
         className="About-content-section"
         direction={isMobile ? 'vertical-reverse' : 'horizontal'}
@@ -172,12 +172,12 @@ export const About: FC = () => {
         </FlexContainer>
         <Spacer width={126} />
         <Image
-          src="/about/popup.gif"
+          src="/about/who-we-are.jpg"
           alt="About Sharing Excess"
           classList={['About-content-section-img']}
         />
       </FlexContainer>
-      <Spacer height={96} />
+      {/* <Spacer height={96} /> */}
       <FlexContainer
         className="About-content-section"
         direction={isMobile ? 'vertical-reverse' : 'horizontal'}
@@ -185,7 +185,7 @@ export const About: FC = () => {
         secondaryAlign="center"
       >
         <Image
-          src="/about/popup.gif"
+          src="/about/impact-preview.jpg"
           alt="About Sharing Excess"
           classList={['About-content-section-img']}
         />
@@ -217,7 +217,7 @@ export const About: FC = () => {
           </FlexContainer>
         </FlexContainer>
       </FlexContainer>
-      <Spacer height={isMobile ? 8 : 96} />
+      {/* <Spacer height={isMobile ? 8 : 96} /> */}
       <FlexContainer
         className="About-content-section"
         direction={isMobile ? 'vertical-reverse' : 'horizontal'}
@@ -258,12 +258,12 @@ export const About: FC = () => {
         </FlexContainer>
         <Spacer width={126} />
         <Image
-          src="/about/popup.gif"
+          src="/about/partners-preview.jpg"
           alt="About Sharing Excess"
           classList={['About-content-section-img']}
         />
       </FlexContainer>
-      <Spacer height={96} />
+      {/* <Spacer height={96} /> */}
       <FlexContainer
         className="About-content-section"
         direction={isMobile ? 'vertical-reverse' : 'horizontal'}
@@ -271,7 +271,7 @@ export const About: FC = () => {
         secondaryAlign="center"
       >
         <Image
-          src="/about/popup.gif"
+          src="/about/blog-img.jpg"
           alt="About Sharing Excess"
           classList={['About-content-section-img']}
         />
