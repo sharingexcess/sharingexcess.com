@@ -45,19 +45,60 @@
     }
   }
 
-  .Team-testimonials-section {
+  .Team-testimonials {
     position: relative;
+
+    .se-spacer {
+      flex-shrink: 0;
+    }
+
     #Team-testimonial {
       width: 50%;
+      position: relative;
+      flex-shrink: 0;
+
+      #Team-testimonials-back {
+        position: absolute;
+        top: 50%;
+        left: -32px;
+        transform: translateY(-50%);
+        background: none;
+        opacity: 0.5;
+        transition: opacity 0.1s ease;
+        z-index: 10;
+
+        @include hover {
+          opacity: 1;
+        }
+      }
+
+      #Team-testimonials-next {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        background: none;
+        opacity: 0.5;
+        transition: opacity 0.1s ease;
+        z-index: 10;
+
+        @include hover {
+          opacity: 1;
+        }
+      }
 
       .testimonial-card {
-        flex: 1 0 323px;
-        align-items: center;
+        flex: 1 0 min(20vw, 320px);
+        .Team-testimonials-card {
+          width: calc(100% - 64px);
+          margin-left: 32px;
+          align-items: center;
 
-        .se-image {
-          width: 40%;
-          border-radius: 50%;
-          object-fit: cover;
+          .se-image {
+            width: 40%;
+            border-radius: 50%;
+            object-fit: cover;
+          }
         }
       }
     }

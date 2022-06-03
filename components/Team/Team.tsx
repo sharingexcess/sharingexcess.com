@@ -1,10 +1,15 @@
-import { FlexContainer, Spacer, Text, Image } from '@sharingexcess/designsystem'
+import {
+  FlexContainer,
+  Spacer,
+  Text,
+  Image,
+  Card,
+} from '@sharingexcess/designsystem'
 import { PageHeader } from 'components'
 import { useIsMobile } from 'hooks'
 import { team } from 'content/team'
 import React, { FC } from 'react'
 import { testimonials } from 'content/testimonials'
-import { Card } from 'designsystem'
 import {
   CarouselProvider,
   Slider,
@@ -48,46 +53,48 @@ export const Team: FC = () => {
       </FlexContainer>
 
       <FlexContainer direction="vertical">
-        {departments.map(department => {
-          return (
-            <FlexContainer direction="vertical">
-              <Text type="small-header" color="green" id="Team-small-header">
-                {department}
-              </Text>
-              <Spacer height={48} />
+        {departments.map(department => (
+          <FlexContainer direction="vertical" key={department}>
+            <Text type="small-header" color="green" id="Team-small-header">
+              {department}
+            </Text>
+            <Spacer height={48} />
 
-              <div className="Team-members">
-                {team
-                  .filter(teamMember => teamMember.department === department)
-                  .map(filteredTeamMember => (
-                    <div key={filteredTeamMember.name} className="Team-person">
-                      <Image
-                        src={filteredTeamMember.image}
-                        alt={filteredTeamMember.name}
-                      />
-                      <Spacer height={12} />
+            <div className="Team-members">
+              {team
+                .filter(teamMember => teamMember.department === department)
+                .map(filteredTeamMember => (
+                  <div key={filteredTeamMember.name} className="Team-person">
+                    <Image
+                      src={filteredTeamMember.image}
+                      alt={filteredTeamMember.name}
+                    />
+                    <Spacer height={12} />
 
-                      <Text
-                        type="subheader"
-                        color="blue"
-                        align="center"
-                        id="Team-person-name"
+                    <Text
+                      type="subheader"
+                      color="blue"
+                      align="center"
+                      id="Team-person-name"
+                    >
+                      <a
+                        href={filteredTeamMember.url}
+                        target="_blank"
+                        rel="noreferrer"
                       >
-                        <a href={filteredTeamMember.url} target="_blank">
-                          {filteredTeamMember.name}
-                        </a>
-                      </Text>
+                        {filteredTeamMember.name}
+                      </a>
+                    </Text>
 
-                      <Text type="small" color="black" align="center">
-                        {filteredTeamMember.title}
-                      </Text>
-                    </div>
-                  ))}
-              </div>
-              <Spacer height={176} />
-            </FlexContainer>
-          )
-        })}
+                    <Text type="small" color="black" align="center">
+                      {filteredTeamMember.title}
+                    </Text>
+                  </div>
+                ))}
+            </div>
+            <Spacer height={176} />
+          </FlexContainer>
+        ))}
       </FlexContainer>
 
       <FlexContainer direction="vertical" className="Team-header-text">
@@ -97,18 +104,27 @@ export const Team: FC = () => {
       </FlexContainer>
       <Spacer height={62} />
 
-      <FlexContainer
-        direction="horizontal"
-        className="Team-testimonials-section"
-      >
+      <FlexContainer direction="horizontal" className="Team-testimonials">
         <Image
           src="/team/testimonials-bg.svg"
           alt="Background color"
           id="Team-testimonials-background-img"
         />
-        <Text type="small-header" color="black">
-          Powered by students.
-        </Text>
+        <FlexContainer direction="vertical" secondaryAlign="start">
+          <Text type="small-header" color="black">
+            Powered by students.
+          </Text>
+          <Text color="black">
+            At Sharing Excess, we offer students the opportunity to work 20
+            hours per week for six months making real world impact - saving
+            thousands of pounds of food from being wasted while simultaneously
+            helping reduce food insecurity. Through our program, we aim to teach
+            these students the importance of equity and how they can leverage
+            their resources to improve access to basic needs for those who may
+            not have it.
+          </Text>
+        </FlexContainer>
+        <Spacer width={64} />
         {
           <section id="Team-testimonial">
             <CarouselProvider
@@ -117,30 +133,31 @@ export const Team: FC = () => {
               totalSlides={testimonials.length}
               visibleSlides={1}
             >
+              <ButtonBack id="Team-testimonials-back">&lt;</ButtonBack>
               <Slider>
                 {testimonials.map((student, i) => (
-                  <Slide index={i} className="testimonial-card">
-                    <Card>
-                      <Image src={student.image} alt={student.name}></Image>
-                      <Spacer height={12} />
-                      <Text type="subheader" color="green" align="center">
-                        {student.name}
-                      </Text>
-                      <Text type="paragraph" color="black" align="center">
-                        {student.title}
-                      </Text>
+                  <Slide index={i} className="testimonial-card" key={i}>
+                    <div className="Team-testimonials-card">
+                      <Card>
+                        <Image src={student.image} alt={student.name}></Image>
+                        <Spacer height={12} />
+                        <Text type="subheader" color="green" align="center">
+                          {student.name}
+                        </Text>
+                        <Text type="paragraph" color="black" align="center">
+                          {student.title}
+                        </Text>
 
-                      <Spacer height={32} />
-                      <Text type="paragraph" color="black" align="left">
-                        {student.quote}
-                      </Text>
-                    </Card>
+                        <Spacer height={32} />
+                        <Text type="paragraph" color="black" align="left">
+                          {student.quote}
+                        </Text>
+                      </Card>
+                    </div>
                   </Slide>
                 ))}
               </Slider>
-
-              {/* <ButtonBack>Back</ButtonBack>
-              <ButtonNext>Next</ButtonNext> */}
+              <ButtonNext id="Team-testimonials-next">&gt;</ButtonNext>
               <DotGroup />
             </CarouselProvider>
           </section>

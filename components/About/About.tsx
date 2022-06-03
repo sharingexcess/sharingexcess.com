@@ -167,7 +167,7 @@ export const About: FC = () => {
             </Text>
             <Spacer height={38} />
             <Button type="primary" color="green" size="medium">
-              <Link href="/team"> Meet the Team </Link>
+              <Link href="/team">Meet the Team</Link>
             </Button>
           </FlexContainer>
         </FlexContainer>

@@ -1,6 +1,11 @@
-import { Button, Spacer } from '@sharingexcess/designsystem'
+import {
+  Button,
+  Spacer,
+  FlexContainer,
+  Image,
+  Text,
+} from '@sharingexcess/designsystem'
 import { PageHeader } from 'components/PageHeader/PageHeader'
-import { FlexContainer, Image, Text } from 'designsystem'
 import { useIsMobile } from 'hooks'
 import Head from 'next/head'
 import React, { FC } from 'react'
