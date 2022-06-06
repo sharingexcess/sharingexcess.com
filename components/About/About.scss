@@ -7,7 +7,6 @@
   }
 
   .About-content-section {
-    padding: 128px 0;
     position: relative;
     overflow-y: visible;
 
@@ -68,8 +67,16 @@
     margin: auto;
     #diagram-image {
       align-self: center;
-      width: 50%;
+      width: 100%;
       margin: auto;
     }
+
+    #About-mission-header {
+      font-weight: 900;
+    }
+  }
+
+  #About-content-section-button-mobile {
+    margin: auto;
   }
 }

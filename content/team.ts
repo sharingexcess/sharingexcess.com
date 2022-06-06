@@ -54,13 +54,13 @@ export const team: {
     url: 'https://www.linkedin.com/in/sonalimehta876/',
     department: 'leadership',
   },
-  {
+  /*  {
     name: 'Hannah Newlands',
     title: 'Director of Volunteers',
     image: '/team/Hannah.png',
     url: 'https://www.linkedin.com/in/hannahnewlands/',
     department: 'leadership',
-  },
+  }, */
 
   {
     name: 'Lucy Doren',
