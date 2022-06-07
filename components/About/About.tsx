@@ -36,6 +36,7 @@ export const About: FC = () => {
     img,
     alt,
     paragraph,
+    buttonLink,
     buttonText,
   }: Record<any, any>) {
     return isMobile ? (
@@ -55,9 +56,11 @@ export const About: FC = () => {
           {paragraph}
         </Text>
         <Spacer height={26} />
-        <Button type="primary" color="green" size="medium">
-          <Link href="/">{buttonText}</Link>
-        </Button>
+        <Link href={buttonLink} passHref>
+          <Button type="primary" color="green" size="medium">
+            {buttonText}
+          </Button>
+        </Link>
       </FlexContainer>
     ) : (
       <FlexContainer
@@ -67,11 +70,12 @@ export const About: FC = () => {
         secondaryAlign="center"
       >
         <Image src={img} alt={alt} classList={['About-content-section-img']} />
-        <Spacer width={126} />
+        {/* <Spacer width={126} /> */}
         <FlexContainer
           direction="horizontal"
           primaryAlign="start"
           secondaryAlign="start"
+          id="About-section-text--left"
         >
           <FlexContainer direction="vertical" secondaryAlign="start">
             <Text type="secondary-header" color="green">
@@ -82,9 +86,11 @@ export const About: FC = () => {
               {paragraph}
             </Text>
             <Spacer height={38} />
-            <Button type="primary" color="green" size="medium">
-              <Link href="/">{buttonText}</Link>
-            </Button>
+            <Link href={buttonLink} passHref>
+              <Button type="primary" color="green" size="medium">
+                {buttonText}
+              </Button>
+            </Link>
           </FlexContainer>
         </FlexContainer>
       </FlexContainer>
@@ -97,6 +103,7 @@ export const About: FC = () => {
     alt,
     paragraph,
     buttonText,
+    buttonLink,
     bgImg,
   }: Record<any, any>) {
     return isMobile ? (
@@ -122,9 +129,15 @@ export const About: FC = () => {
           {paragraph}
         </Text>
         <Spacer height={26} />
-        <Button type="primary" color="green" size="medium">
+        {/* <Button type="primary" color="green" size="medium">
           <Link href="/">{buttonText}</Link>
-        </Button>
+        </Button> */}
+
+        <Link href={buttonLink} passHref>
+          <Button type="primary" color="green" size="medium">
+            {buttonText}
+          </Button>
+        </Link>
       </FlexContainer>
     ) : (
       <FlexContainer
@@ -143,7 +156,11 @@ export const About: FC = () => {
           primaryAlign="start"
           secondaryAlign="start"
         >
-          <FlexContainer direction="vertical" secondaryAlign="start">
+          <FlexContainer
+            direction="vertical"
+            secondaryAlign="start"
+            id="About-section-text--right"
+          >
             <Text type="secondary-header" color="green">
               {title}
             </Text>
@@ -152,11 +169,13 @@ export const About: FC = () => {
               {paragraph}
             </Text>
             <Spacer height={38} />
-            <Button type="primary" color="green" size="medium">
-              <Link href="/">{buttonText}</Link>
-            </Button>
+            <Link href={buttonLink} passHref>
+              <Button type="primary" color="green" size="medium">
+                {buttonText}
+              </Button>
+            </Link>
           </FlexContainer>
-          <Spacer width={126} />
+          {/* <Spacer width={126} /> */}
           <Image
             src={img}
             alt={alt}
@@ -217,15 +236,14 @@ export const About: FC = () => {
 
       <ContentSectionLeft
         title="Our Story"
-        img="/about/history2.png"
+        img="/about/history2-crop.png"
         alt="Team members smiling"
         paragraph="But as vast a problem as food waste is, the solution often boils
         down to simple last mile logistics and delivery. Sharing Excess is meeting this
         challenge with the power of people, technology, and compassion."
+        buttonLink="/"
         buttonText="Read More on our Blog"
       />
-
-      <Spacer height={isMobile ? 56 : 128} />
 
       <ContentSectionRight
         title="Who We Are"
@@ -235,10 +253,9 @@ export const About: FC = () => {
       down to simple last mile logistics and delivery. Sharing Excess is meeting this
       challenge with the power of people, technology, and compassion."
         buttonText="Meet the Team"
+        buttonLink="/team"
         bgImg="/about/backgroundcolor-1.svg"
       />
-
-      <Spacer height={isMobile ? 56 : 128} />
 
       <ContentSectionLeft
         title="Our Impact"
@@ -247,10 +264,9 @@ export const About: FC = () => {
         paragraph="But as vast a problem as food waste is, the solution often boils
         down to simple last mile logistics and delivery. Sharing Excess is meeting this
         challenge with the power of people, technology, and compassion."
+        buttonLink="/impact"
         buttonText="Read More"
       />
-
-      <Spacer height={isMobile ? 56 : 128} />
 
       <ContentSectionRight
         title="Partners"
@@ -259,11 +275,10 @@ export const About: FC = () => {
         paragraph="But as vast a problem as food waste is, the solution often boils
       down to simple last mile logistics and delivery. Sharing Excess is meeting this
       challenge with the power of people, technology, and compassion."
+        buttonLink="/partners"
         buttonText="Learn More"
         bgImg="/about/backgroundcolor-2.svg"
       />
-
-      <Spacer height={isMobile ? 56 : 128} />
 
       <ContentSectionLeft
         title="Keep Up with SE!"
@@ -272,6 +287,7 @@ export const About: FC = () => {
         paragraph="But as vast a problem as food waste is, the solution often boils
       down to simple last mile logistics and delivery. Sharing Excess is meeting this
       challenge with the power of people, technology, and compassion."
+        buttonLink="/"
         buttonText="Visit Our Blog"
       />
     </div>

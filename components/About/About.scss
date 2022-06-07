@@ -9,6 +9,7 @@
   .About-content-section {
     position: relative;
     overflow-y: visible;
+    margin-bottom: 18%;
 
     .About-background-wave-img {
       position: absolute;
@@ -31,7 +32,7 @@
     }
 
     .About-content-section-img {
-      height: 32vh;
+      height: 35vh;
       max-width: 50%;
       object-fit: cover;
       @include mobile {
@@ -40,6 +41,14 @@
         object-fit: cover;
         height: unset;
       }
+    }
+
+    #About-section-text--left {
+      margin-left: 10%;
+    }
+
+    #About-section-text--right {
+      margin-right: 10%;
     }
 
     .underline {
