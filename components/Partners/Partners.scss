@@ -6,21 +6,29 @@
     margin: auto;
   }
 
-  /*  fix this */
   #Partners-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 98px;
-    width: 100%;
-    justify-items: center;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 64px;
+
     @include mobile {
-      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+      gap: 32px;
     }
 
     .Partners-logo {
-      max-height: 90px;
-      @include mobile {
-        max-width: 20vw;
+      text-align: center;
+      flex: 0 0 20%;
+
+      .Partners-logo-img {
+        width: 100%;
+        flex-shrink: 0;
+        object-fit: cover;
+
+        @include mobile {
+          min-width: 120px;
+          width: 40vw;
+        }
       }
     }
   }

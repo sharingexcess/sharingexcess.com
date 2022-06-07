@@ -92,7 +92,6 @@ export const Team: FC = () => {
                   </div>
                 ))}
             </div>
-            <Spacer height={176} />
           </FlexContainer>
         ))}
       </FlexContainer>

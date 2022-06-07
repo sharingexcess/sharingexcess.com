@@ -56,7 +56,7 @@ export const About: FC = () => {
           {paragraph}
         </Text>
         <Spacer height={26} />
-        <Link href={buttonLink} passHref>
+        <Link href={buttonLink}>
           <Button type="primary" color="green" size="medium">
             {buttonText}
           </Button>
@@ -86,7 +86,7 @@ export const About: FC = () => {
               {paragraph}
             </Text>
             <Spacer height={38} />
-            <Link href={buttonLink} passHref>
+            <Link href={buttonLink}>
               <Button type="primary" color="green" size="medium">
                 {buttonText}
               </Button>
@@ -133,7 +133,7 @@ export const About: FC = () => {
           <Link href="/">{buttonText}</Link>
         </Button> */}
 
-        <Link href={buttonLink} passHref>
+        <Link href={buttonLink}>
           <Button type="primary" color="green" size="medium">
             {buttonText}
           </Button>
@@ -169,7 +169,8 @@ export const About: FC = () => {
               {paragraph}
             </Text>
             <Spacer height={38} />
-            <Link href={buttonLink} passHref>
+            <Link href={buttonLink}>
+              {/* <button>hi</button> */}
               <Button type="primary" color="green" size="medium">
                 {buttonText}
               </Button>

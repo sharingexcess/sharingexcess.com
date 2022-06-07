@@ -41,43 +41,91 @@ export const Partners: FC = () => {
 
       <div id="Partners-grid">
         <div className="Partners-logo">
-          <Image src="/partners/example-partner.jpg" alt="Giant logo" />
+          <Image
+            src="/partners/example-partner.jpg"
+            alt="Giant logo"
+            classList={['Partners-logo-img']}
+          />
         </div>
 
         <div className="Partners-logo">
-          <Image src="/partners/example-partner.jpg" alt="Giant logo" />
+          <Image
+            src="/partners/example-partner.jpg"
+            alt="Giant logo"
+            classList={['Partners-logo-img']}
+          />
         </div>
 
         <div className="Partners-logo">
-          <Image src="/partners/example-partner.jpg" alt="Giant logo" />
+          <Image
+            src="/partners/example-partner.jpg"
+            alt="Giant logo"
+            classList={['Partners-logo-img']}
+          />
         </div>
 
         <div className="Partners-logo">
-          <Image src="/partners/example-partner.jpg" alt="Giant logo" />
+          <Image
+            src="/partners/example-partner.jpg"
+            alt="Giant logo"
+            classList={['Partners-logo-img']}
+          />
         </div>
         <div className="Partners-logo">
-          <Image src="/partners/example-partner.jpg" alt="Giant logo" />
+          <Image
+            src="/partners/example-partner.jpg"
+            alt="Giant logo"
+            classList={['Partners-logo-img']}
+          />
         </div>
         <div className="Partners-logo">
-          <Image src="/partners/example-partner.jpg" alt="Giant logo" />
+          <Image
+            src="/partners/example-partner.jpg"
+            alt="Giant logo"
+            classList={['Partners-logo-img']}
+          />
         </div>
         <div className="Partners-logo">
-          <Image src="/partners/example-partner.jpg" alt="Giant logo" />
+          <Image
+            src="/partners/example-partner.jpg"
+            alt="Giant logo"
+            classList={['Partners-logo-img']}
+          />
         </div>
         <div className="Partners-logo">
-          <Image src="/partners/example-partner.jpg" alt="Giant logo" />
+          <Image
+            src="/partners/example-partner.jpg"
+            alt="Giant logo"
+            classList={['Partners-logo-img']}
+          />
         </div>
         <div className="Partners-logo">
-          <Image src="/partners/example-partner.jpg" alt="Giant logo" />
+          <Image
+            src="/partners/example-partner.jpg"
+            alt="Giant logo"
+            classList={['Partners-logo-img']}
+          />
         </div>
         <div className="Partners-logo">
-          <Image src="/partners/example-partner.jpg" alt="Giant logo" />
+          <Image
+            src="/partners/example-partner.jpg"
+            alt="Giant logo"
+            classList={['Partners-logo-img']}
+          />
         </div>
         <div className="Partners-logo">
-          <Image src="/partners/example-partner.jpg" alt="Giant logo" />
+          <Image
+            src="/partners/example-partner.jpg"
+            alt="Giant logo"
+            classList={['Partners-logo-img']}
+          />
         </div>
         <div className="Partners-logo">
-          <Image src="/partners/example-partner.jpg" alt="Giant logo" />
+          <Image
+            src="/partners/example-partner.jpg"
+            alt="Giant logo"
+            classList={['Partners-logo-img']}
+          />
         </div>
       </div>
 
