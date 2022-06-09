@@ -246,6 +246,8 @@ export const About: FC = () => {
         buttonText="Read More on our Blog"
       />
 
+      {<Spacer height={isMobile ? 72 : 128} />}
+
       <ContentSectionRight
         title="Who We Are"
         img="/about/who-we-are.jpg"
@@ -258,6 +260,8 @@ export const About: FC = () => {
         bgImg="/about/backgroundcolor-1.svg"
       />
 
+      {<Spacer height={isMobile ? 72 : 128} />}
+
       <ContentSectionLeft
         title="Our Impact"
         img="/about/impact-preview.jpg"
@@ -268,6 +272,8 @@ export const About: FC = () => {
         buttonLink="/impact"
         buttonText="Read More"
       />
+
+      {<Spacer height={isMobile ? 72 : 128} />}
 
       <ContentSectionRight
         title="Partners"
@@ -280,6 +286,8 @@ export const About: FC = () => {
         buttonText="Learn More"
         bgImg="/about/backgroundcolor-2.svg"
       />
+
+      {<Spacer height={isMobile ? 72 : 128} />}
 
       <ContentSectionLeft
         title="Keep Up with SE!"

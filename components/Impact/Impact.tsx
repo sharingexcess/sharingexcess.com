@@ -22,8 +22,13 @@ export const Impact: FC = () => {
         label="impact"
         title={`Driven by results.`}
       />
-      <Spacer height={isMobile ? 48 : 64} />
-      <div id="stat-container">
+      <Spacer height={isMobile ? 32 : 64} />
+      <FlexContainer
+        direction={isMobile ? 'vertical' : 'horizontal'}
+        primaryAlign="center"
+        secondaryAlign={isMobile ? 'center' : 'start'}
+        id="stat-container"
+      >
         <FlexContainer
           direction="vertical"
           primaryAlign="start"
@@ -104,15 +109,15 @@ export const Impact: FC = () => {
             aptent taciti sociosqu ad litora.
           </Text>
         </FlexContainer>
-      </div>
-      <Spacer height={124} />
+      </FlexContainer>
+      <Spacer height={isMobile ? 16 : 124} />
       <Image
         src="/impact/cumulative-impact.png"
         alt="Diagram"
-        id="cumulative-impact"
+        id="cumulative-impact-img"
       />
 
-      <Spacer height={124} />
+      <Spacer height={isMobile ? 16 : 124} />
       <FlexContainer direction="vertical" id="Impact-annual-report-section">
         <Text type="small-header" align="center">
           Annual Report
@@ -129,13 +134,13 @@ export const Impact: FC = () => {
         </Button>
       </FlexContainer>
 
-      <Spacer height={124} />
+      <Spacer height={isMobile ? 64 : 124} />
       <FlexContainer direction="vertical" id="Impact-metric-section">
         <Text type="primary-header" align="center">
           $1 = 16 meals served
         </Text>
         <Spacer height={22} />
-        <Text type="paragraph" align="center">
+        <Text type="paragraph" align={isMobile ? 'left' : 'center'}>
           Every dollar donated contributes to this metric. One dollar goes to 20
           pounds of food delivered, $57.20 in food value, and 73.2 pounds of
           greenhouse gases reduced.

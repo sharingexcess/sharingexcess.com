@@ -38,18 +38,19 @@ export const Team: FC = () => {
         title={`Collaborating and volunteering.`}
       />
 
-      <Spacer height={isMobile ? 96 : 48} />
+      <Spacer height={isMobile ? 28 : 48} />
+
       <FlexContainer direction="vertical" className="Team-header-text">
         <Text type="secondary-header" color="green">
           Who We Are
         </Text>
-        <Spacer height={32} />
-        <Text type="paragraph" color="black" align="center">
+        <Spacer height={isMobile ? 18 : 32} />
+        <Text type="paragraph" color="black" align="left">
           Sharing Excess is a lean startup team, proudly powered by passionate
           college students and recent grads. The crew consists of folks working
           in full-time, part-time, co-op, internship, and volunteer positions.
         </Text>
-        <Spacer height={98} />
+        <Spacer height={isMobile ? 48 : 98} />
       </FlexContainer>
 
       <FlexContainer direction="vertical">

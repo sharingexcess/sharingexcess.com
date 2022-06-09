@@ -19,12 +19,13 @@ export const Partners: FC = () => {
         title={`Accessing surplus to capture and distribute.`}
       />
 
-      <Spacer height={isMobile ? 96 : 48} />
+      <Spacer height={isMobile ? 28 : 48} />
+
       <FlexContainer direction="vertical" className="Partners-header-and-text">
         <Text type="secondary-header" color="green" align="center">
           Working With The Community
         </Text>
-        <Spacer height={32} />
+        <Spacer height={isMobile ? 24 : 32} />
         <Text
           type="paragraph"
           color="black"
@@ -36,7 +37,7 @@ export const Partners: FC = () => {
           fringilla accumsan, risus sem sollicitudin lacus, ut interdum tellus
           elit sed risus.
         </Text>
-        <Spacer height={98} />
+        <Spacer height={isMobile ? 48 : 98} />
       </FlexContainer>
 
       <div id="Partners-grid">
@@ -129,7 +130,7 @@ export const Partners: FC = () => {
         </div>
       </div>
 
-      <Spacer height={120} />
+      <Spacer height={isMobile ? 64 : 120} />
 
       <FlexContainer direction="vertical" className="Partners-header-and-text">
         <Text type="secondary-header" color="green" align="center">
@@ -153,7 +154,7 @@ export const Partners: FC = () => {
         </Button>
       </FlexContainer>
 
-      <Spacer height={120} />
+      <Spacer height={isMobile ? 64 : 120} />
       <FlexContainer
         direction="vertical"
         primaryAlign="center"
@@ -176,8 +177,7 @@ export const Partners: FC = () => {
           <Text type="paragraph" color="black" align="center">
             These incredible collaborations tell a story. consectetur adipiscing
             elit. Etiam eu turpis molestie, dictum est a, mattis tellus.
-            consectetur adipiscing elit. Etiam eu turpis molestie, dictum est a,
-            mattis tellus.{' '}
+            consectetur adipiscing elit.
           </Text>
         </FlexContainer>
       </FlexContainer>
