@@ -38,7 +38,7 @@ export const Team: FC = () => {
         title={`Collaborating and volunteering.`}
       />
 
-      <Spacer height={isMobile ? 28 : 48} />
+      <Spacer height={isMobile ? 48 : 48} />
 
       <FlexContainer direction="vertical" className="Team-header-text">
         <Text type="secondary-header" color="green">

@@ -198,7 +198,7 @@ export const About: FC = () => {
         title={`Sharing Excess is using surplus\nto fight scarcity.`}
       />
 
-      <Spacer height={isMobile ? 28 : 64} />
+      <Spacer height={isMobile ? 48 : 64} />
 
       <FlexContainer
         direction={isMobile ? 'vertical' : 'horizontal'}
@@ -233,7 +233,7 @@ export const About: FC = () => {
         </FlexContainer>
       </FlexContainer>
 
-      <Spacer height={isMobile ? 64 : 96} />
+      <Spacer height={isMobile ? 96 : 96} />
 
       <ContentSectionLeft
         title="Our Story"
@@ -246,7 +246,7 @@ export const About: FC = () => {
         buttonText="Read More on our Blog"
       />
 
-      {<Spacer height={isMobile ? 72 : 128} />}
+      {<Spacer height={isMobile ? 96 : 128} />}
 
       <ContentSectionRight
         title="Who We Are"
@@ -260,7 +260,7 @@ export const About: FC = () => {
         bgImg="/about/backgroundcolor-1.svg"
       />
 
-      {<Spacer height={isMobile ? 72 : 128} />}
+      {<Spacer height={isMobile ? 96 : 128} />}
 
       <ContentSectionLeft
         title="Our Impact"
@@ -273,7 +273,7 @@ export const About: FC = () => {
         buttonText="Read More"
       />
 
-      {<Spacer height={isMobile ? 72 : 128} />}
+      {<Spacer height={isMobile ? 96 : 128} />}
 
       <ContentSectionRight
         title="Partners"
@@ -287,7 +287,7 @@ export const About: FC = () => {
         bgImg="/about/backgroundcolor-2.svg"
       />
 
-      {<Spacer height={isMobile ? 72 : 128} />}
+      {<Spacer height={isMobile ? 96 : 128} />}
 
       <ContentSectionLeft
         title="Keep Up with SE!"

@@ -136,6 +136,12 @@ export const Impact: FC = () => {
 
       <Spacer height={isMobile ? 64 : 124} />
       <FlexContainer direction="vertical" id="Impact-metric-section">
+        <Image
+          src="/partners/partners-bg.svg"
+          alt="Background Color"
+          classList={['Impact-background-wave-img']}
+        />
+
         <Text type="primary-header" align="center">
           $1 = 16 meals served
         </Text>

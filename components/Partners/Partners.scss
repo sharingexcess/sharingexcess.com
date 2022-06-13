@@ -38,6 +38,7 @@
     width: 100%;
     height: auto;
     margin-left: calc(-1 * max(96px, calc(50vw - 500px)));
+    z-index: -10;
 
     @include mobile {
       height: 600px;

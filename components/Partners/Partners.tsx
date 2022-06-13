@@ -19,7 +19,7 @@ export const Partners: FC = () => {
         title={`Accessing surplus to capture and distribute.`}
       />
 
-      <Spacer height={isMobile ? 28 : 48} />
+      <Spacer height={isMobile ? 48 : 48} />
 
       <FlexContainer direction="vertical" className="Partners-header-and-text">
         <Text type="secondary-header" color="green" align="center">
@@ -154,17 +154,17 @@ export const Partners: FC = () => {
         </Button>
       </FlexContainer>
 
-      <Spacer height={isMobile ? 64 : 120} />
+      <Spacer height={isMobile ? 72 : 120} />
       <FlexContainer
         direction="vertical"
         primaryAlign="center"
         secondaryAlign="center"
       >
-        {/* <Image
+        <Image
           src="/partners/partners-bg.svg"
           alt="Background Color"
           classList={['Partners-background-wave-img']}
-        /> */}
+        />
 
         <FlexContainer
           direction="vertical"
