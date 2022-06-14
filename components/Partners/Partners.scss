@@ -1,0 +1,50 @@
+#Partners {
+  @include page;
+
+  .Partners-header-and-text {
+    max-width: 592px;
+    margin: auto;
+  }
+
+  #Partners-grid {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 64px;
+
+    @include mobile {
+      gap: 32px;
+    }
+
+    .Partners-logo {
+      text-align: center;
+      flex: 0 0 20%;
+
+      .Partners-logo-img {
+        width: 100%;
+        flex-shrink: 0;
+        object-fit: cover;
+
+        @include mobile {
+          min-width: 120px;
+          width: 40vw;
+        }
+      }
+    }
+  }
+
+  .Partners-background-wave-img {
+    position: absolute;
+    width: 100%;
+    height: auto;
+    margin-left: calc(-1 * max(96px, calc(50vw - 500px)));
+    z-index: -10;
+
+    @include mobile {
+      height: 600px;
+      width: 100vw;
+      object-fit: cover;
+      margin: auto;
+    }
+  }
+}

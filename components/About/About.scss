@@ -2,16 +2,37 @@
   @include page;
 
   .paragraph {
-    font-size: 18px;
+    font-size: 16px;
     line-height: 1.6;
   }
 
   .About-content-section {
+    position: relative;
+    overflow-y: visible;
+    /*  margin-bottom: 18%; */
+
+    .About-background-wave-img {
+      position: absolute;
+      min-width: 100vw;
+      height: 100%;
+      object-fit: fill;
+      margin-left: calc(-1 * max(96px, calc(50vw - 500px)));
+
+      @include mobile {
+        /* height: 150vw; */
+        height: 600px;
+        width: 100vw;
+        object-fit: cover;
+        margin: auto;
+      }
+    }
+
     .se-spacer {
       flex-shrink: 0;
     }
-    .se-image {
-      height: 32vh;
+
+    .About-content-section-img {
+      height: 35vh;
       max-width: 50%;
       object-fit: cover;
       @include mobile {
@@ -22,9 +43,12 @@
       }
     }
 
-    .green {
-      color: var(--se-green-primary);
-      font-weight: 700;
+    #About-section-text--left {
+      margin-left: 10%;
+    }
+
+    #About-section-text--right {
+      margin-right: 10%;
     }
 
     .underline {
@@ -39,120 +63,29 @@
     }
   }
 
-  #About-section-header {
-    position: relative;
-    width: 100%;
-    height: 48vh;
-    .se-image {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 0;
-      height: 100%;
-      width: 100%;
-      object-fit: cover;
-      filter: brightness(0.5);
+  #About-small-header {
+    text-transform: uppercase;
+    font-weight: 800;
+    @include desktop {
+      font-size: 22px;
     }
   }
 
-  #About-team {
-    position: relative;
-    width: 100%;
-
-    .About-team-members {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(192px, 1fr));
-      grid-gap: 32px;
-      justify-content: space-between;
-      flex-wrap: wrap;
-
-      @include mobile {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      }
-
-      .About-team-person {
-        text-align: center;
-        width: 100%;
-        .subheader {
-          font-weight: 700;
-        }
-        .se-image {
-          width: 100%;
-          min-height: 192px;
-          border-radius: 50%;
-          border: 6px solid var(--se-white);
-          object-fit: cover;
-          box-shadow: var(--se-shadow-medium);
-
-          @include mobile {
-            min-height: 150px;
-          }
-
-          &.yellow {
-            border-color: rgba(255, 209, 81, 1);
-            background: rgba(255, 209, 81, 1);
-          }
-          &.orange {
-            border-color: rgba(247, 155, 42, 1);
-            background: rgba(247, 155, 42, 1);
-          }
-          &.blue {
-            border-color: rgba(151, 207, 195, 1);
-            background: rgba(151, 207, 195, 1);
-          }
-          &.green1 {
-            border-color: rgba(148, 202, 145, 1);
-            background: rgba(148, 202, 145, 1);
-          }
-          &.green2 {
-            border-color: rgba(63, 154, 41, 1);
-            background: rgba(63, 154, 41, 1);
-          }
-          &.green3 {
-            border-color: rgba(50, 119, 34, 1);
-            background: rgba(50, 119, 34, 1);
-          }
-        }
-      }
+  #About-mission-section {
+    /* max-width: 520px; */
+    margin: auto;
+    #diagram-image {
+      align-self: center;
+      width: 100%;
+      margin: auto;
     }
 
-    #About-team-volunteer {
-      @include flex-center;
-      width: 100%;
-      justify-content: space-around;
-      align-items: flex-start;
-      > div {
-        @include flex-vertical-center;
-        margin: 0 8px;
-        .se-text {
-          width: 100%;
-        }
-        .se-image {
-          width: clamp(96px, 24vw, 320px);
-          height: clamp(96px, 24vw, 320px);
-          object-fit: cover;
-          border-radius: 50%;
-          box-shadow: var(--se-shadow-medium);
-        }
-        .se-button {
-          padding: 8px 16px;
-        }
-      }
-
-      @include mobile {
-        @include flex-vertical-center;
-        > div {
-          margin: 0 0 32px 0;
-          .se-image {
-            width: 72vw;
-            height: 72vw;
-          }
-        }
-      }
+    #About-mission-header {
+      font-weight: 900;
     }
   }
 
-  #About-app-video {
-    width: 100%;
+  #About-content-section-button-mobile {
+    margin: auto;
   }
 }

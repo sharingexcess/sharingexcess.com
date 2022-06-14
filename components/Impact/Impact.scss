@@ -1,0 +1,65 @@
+#Impact {
+  @include page;
+  background: white;
+
+  #stat-container {
+    gap: 10%;
+
+    .stat-container-col {
+      @include mobile {
+        padding-bottom: 4.5rem;
+      }
+
+      .stat-img {
+        max-width: 100%;
+        height: auto;
+        object-fit: cover;
+      }
+    }
+  }
+
+  #cumulative-impact-img {
+    max-width: 100%;
+    height: auto;
+    margin: auto;
+    filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+
+    @include mobile {
+      padding-bottom: 3rem;
+    }
+  }
+
+  #Impact-annual-report-section {
+    max-width: 350px;
+    margin: auto;
+  }
+
+  #Impact-metric-section {
+    /* max-width: 580px; */
+    max-width: 70%;
+    margin: auto;
+
+    @include mobile {
+      max-width: 90%;
+    }
+
+    #Impact-metric-section-img {
+      max-width: 100%;
+      margin: auto;
+    }
+  }
+
+  .Impact-background-wave-img {
+    position: absolute;
+    width: 100%;
+    height: auto;
+    margin-left: calc(-1 * max(96px, calc(50vw - 500px)));
+
+    @include mobile {
+      height: 600px;
+      width: 100vw;
+      object-fit: cover;
+      margin: auto;
+    }
+  }
+}

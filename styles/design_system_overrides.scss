@@ -1,0 +1,11 @@
+.se-text {
+  &.small-header {
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 8%;
+  }
+
+  &.secondary-header {
+    font-weight: 800;
+  }
+}
