@@ -1,9 +1,26 @@
 #Team {
   @include page;
 
+  #Team-intro {
+    .se-image {
+      width: 50%;
+      @include mobile {
+        width: 100%;
+        margin-bottom: 24px;
+      }
+    }
+    .se-spacer {
+      flex-shrink: 0;
+    }
+  }
+
   .Team-header-text {
     max-width: 592px;
     margin: auto;
+  }
+
+  .Team-small-header {
+    font-size: 24px;
   }
 
   .Team-members {
@@ -44,6 +61,12 @@
   .Team-testimonials {
     position: relative;
 
+    li {
+      text-align: left;
+      margin-right: 16px;
+      margin-bottom: 8px;
+    }
+
     .se-spacer {
       flex-shrink: 0;
     }
@@ -52,6 +75,10 @@
       width: 50%;
       position: relative;
       flex-shrink: 0;
+      text-align: center;
+      @include mobile {
+        width: 80%;
+      }
 
       #Team-testimonials-back {
         position: absolute;
@@ -59,27 +86,44 @@
         left: -32px;
         transform: translateY(-50%);
         background: none;
-        opacity: 0.5;
+        opacity: 0.8;
         transition: opacity 0.1s ease;
         z-index: 10;
-
-        @include hover {
-          opacity: 1;
-        }
+        height: 24px;
+        width: 24px;
+        border-radius: 50%;
+        border: none;
+        background: var(--se-green-primary);
+        color: var(--se-white);
       }
 
       #Team-testimonials-next {
         position: absolute;
         top: 50%;
-        right: 0;
+        right: -32px;
         transform: translateY(-50%);
         background: none;
-        opacity: 0.5;
         transition: opacity 0.1s ease;
         z-index: 10;
+        height: 24px;
+        width: 24px;
+        border-radius: 50%;
+        border: none;
+        background: var(--se-green-primary);
+        color: var(--se-white);
+      }
 
-        @include hover {
-          opacity: 1;
+      .carousel__dot {
+        height: 8px;
+        width: 8px;
+        margin: 0 4px;
+        border-radius: 50%;
+        border: none;
+        background: var(--se-green-light);
+        padding: 0;
+
+        &.carousel__dot--selected {
+          background: var(--se-green-primary);
         }
       }
 

@@ -10,6 +10,7 @@
     "formspree",
     "hotjar",
     "SEDS",
+    "sharingexcess",
     "sharingexcessdotcom"
   ],
   "cSpell.ignoreWords": ["fontawesome", "fortawesome", "xeqnjkaq"] // Tell VSCode to use Prettier as default file formatter

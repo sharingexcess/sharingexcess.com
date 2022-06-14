@@ -13,7 +13,6 @@ import { PageHeader } from 'components'
 import { useRouter } from 'next/router'
 import { getAnalytics, logEvent } from 'firebase/analytics'
 import Link from 'next/link'
-import { areCookiesEnabled } from '@firebase/util'
 
 export const About: FC = () => {
   const isMobile = useIsMobile()
@@ -46,7 +45,7 @@ export const About: FC = () => {
         primaryAlign="start"
         secondaryAlign="center"
       >
-        <Text type="secondary-header" color="green">
+        <Text type="secondary-header" color="black">
           {title}
         </Text>
         <Spacer height={18} />
@@ -56,11 +55,11 @@ export const About: FC = () => {
           {paragraph}
         </Text>
         <Spacer height={26} />
-        <Link href={buttonLink}>
+        <a href={buttonLink}>
           <Button type="primary" color="green" size="medium">
             {buttonText}
           </Button>
-        </Link>
+        </a>
       </FlexContainer>
     ) : (
       <FlexContainer
@@ -70,7 +69,6 @@ export const About: FC = () => {
         secondaryAlign="center"
       >
         <Image src={img} alt={alt} classList={['About-content-section-img']} />
-        {/* <Spacer width={126} /> */}
         <FlexContainer
           direction="horizontal"
           primaryAlign="start"
@@ -78,7 +76,7 @@ export const About: FC = () => {
           id="About-section-text--left"
         >
           <FlexContainer direction="vertical" secondaryAlign="start">
-            <Text type="secondary-header" color="green">
+            <Text type="secondary-header" color="black">
               {title}
             </Text>
             <Spacer height={16} />
@@ -86,11 +84,11 @@ export const About: FC = () => {
               {paragraph}
             </Text>
             <Spacer height={38} />
-            <Link href={buttonLink}>
+            <a href={buttonLink}>
               <Button type="primary" color="green" size="medium">
                 {buttonText}
               </Button>
-            </Link>
+            </a>
           </FlexContainer>
         </FlexContainer>
       </FlexContainer>
@@ -119,7 +117,7 @@ export const About: FC = () => {
           classList={['About-background-wave-img']}
         />
 
-        <Text type="secondary-header" color="green">
+        <Text type="secondary-header" color="black">
           {title}
         </Text>
         <Spacer height={18} />
@@ -129,15 +127,12 @@ export const About: FC = () => {
           {paragraph}
         </Text>
         <Spacer height={26} />
-        {/* <Button type="primary" color="green" size="medium">
-          <Link href="/">{buttonText}</Link>
-        </Button> */}
 
-        <Link href={buttonLink}>
+        <a href={buttonLink}>
           <Button type="primary" color="green" size="medium">
             {buttonText}
           </Button>
-        </Link>
+        </a>
       </FlexContainer>
     ) : (
       <FlexContainer
@@ -161,7 +156,7 @@ export const About: FC = () => {
             secondaryAlign="start"
             id="About-section-text--right"
           >
-            <Text type="secondary-header" color="green">
+            <Text type="secondary-header" color="black">
               {title}
             </Text>
             <Spacer height={16} />
@@ -169,14 +164,12 @@ export const About: FC = () => {
               {paragraph}
             </Text>
             <Spacer height={38} />
-            <Link href={buttonLink}>
-              {/* <button>hi</button> */}
+            <a href={buttonLink}>
               <Button type="primary" color="green" size="medium">
                 {buttonText}
               </Button>
-            </Link>
+            </a>
           </FlexContainer>
-          {/* <Spacer width={126} /> */}
           <Image
             src={img}
             alt={alt}
@@ -195,108 +188,102 @@ export const About: FC = () => {
       <PageHeader
         image={isMobile ? '/headers/about_mobile.jpeg' : '/headers/about.jpeg'}
         label="ABOUT US"
-        title={`Sharing Excess is using surplus\nto fight scarcity.`}
+        title={`Rescuing and redistrubuting food sustainably, and equitably.`}
       />
 
       <Spacer height={isMobile ? 48 : 64} />
 
       <FlexContainer
-        direction={isMobile ? 'vertical' : 'horizontal'}
+        direction={isMobile ? 'vertical-reverse' : 'horizontal'}
         id="About-mission-section"
       >
-        <FlexContainer direction="vertical" secondaryAlign="center">
-          <Text type="secondary-header" color="green" id="About-mission-header">
-            Using surplus as a solution to scarcity.
+        <FlexContainer direction="vertical" secondaryAlign="start">
+          <Text type="secondary-header" color="black" id="About-mission-header">
+            Sharing Excess connects food businesses with nonprofits in need.
           </Text>
-          <Spacer height={isMobile ? 24 : 16} />
+          <Spacer height={isMobile ? 24 : 24} />
           <Text type="paragraph" color="black">
-            Sharing Excess uses surplus as a solution to scarcity. While over 40
-            million people in the US face food insecurity, nearly 40% of the
-            nation&apos;s food supply is going to waste. Our mission is to
-            bridge the gap between excess and scarcity by partnering with
-            grocery stores, restaurants, wholesalers, and farmers to deliver
-            surplus food to a network of nonprofits, food banks, and community
-            organizations to alleviate local food insecurity.
+            40% of all food produced in the US goes to waste every year, while
+            over 40 million people face food insecurity.
+            <Spacer height={16} />
+            Our mission is to bridge the gap between excess and scarcity by
+            partnering with grocery stores, restaurants, wholesalers, and
+            farmers to deliver surplus food to a network of nonprofits, food
+            banks, and community organizations to alleviate local food
+            insecurity.
           </Text>
+          <Spacer height={32} />
+          <ExternalLink to="https://www.usda.gov/foodwaste/faqs">
+            <Button type="primary" color="green">
+              Read More about Food Waste
+            </Button>
+          </ExternalLink>
           <Spacer height={isMobile ? 32 : 46} />
         </FlexContainer>
+        {isMobile && <Spacer height={48} />}
         <FlexContainer direction="vertical">
           <Image
             src="/about/SE-Diagram-1.jpg"
             alt="Diagram"
             id="diagram-image"
           />
-          <Spacer height={16} />
-          <Text type="small" color="black">
-            Image caption
-          </Text>
         </FlexContainer>
       </FlexContainer>
 
-      <Spacer height={isMobile ? 96 : 96} />
+      <Spacer height={isMobile ? 48 : 96} />
 
       <ContentSectionLeft
         title="Our Story"
-        img="/about/history2-crop.png"
+        img="/about/history2-crop.jpeg"
         alt="Team members smiling"
-        paragraph="But as vast a problem as food waste is, the solution often boils
-        down to simple last mile logistics and delivery. Sharing Excess is meeting this
-        challenge with the power of people, technology, and compassion."
-        buttonLink="/"
+        paragraph="Starting from humble roots as a boot-strapped student startup, Sharing Excess has grown into a sustainable and growing nonprofit with over 200 community partners."
+        buttonLink="https://blog.sharingexcess.com"
         buttonText="Read More on our Blog"
       />
 
-      {<Spacer height={isMobile ? 96 : 128} />}
+      {<Spacer height={isMobile ? 96 : 192} />}
 
       <ContentSectionRight
         title="Who We Are"
         img="/about/who-we-are.jpg"
         alt="Group photo on a sunny day"
-        paragraph="But as vast a problem as food waste is, the solution often boils
-      down to simple last mile logistics and delivery. Sharing Excess is meeting this
-      challenge with the power of people, technology, and compassion."
+        paragraph="Sharing Excess is powered by a lean and mean team of volunteers, students, and change makers - and we're growing! Click below to meet our team and learn about joining."
         buttonText="Meet the Team"
-        buttonLink="/team"
+        buttonLink="/about/team"
         bgImg="/about/backgroundcolor-1.svg"
       />
 
-      {<Spacer height={isMobile ? 96 : 128} />}
+      {<Spacer height={isMobile ? 96 : 192} />}
 
       <ContentSectionLeft
-        title="Our Impact"
+        title="Making an Impact"
         img="/about/impact-preview.jpg"
         alt="Palettes of produce"
-        paragraph="But as vast a problem as food waste is, the solution often boils
-        down to simple last mile logistics and delivery. Sharing Excess is meeting this
-        challenge with the power of people, technology, and compassion."
+        paragraph="What started as a few extra meal swipes has grown to over 500,000 lbs. of food rescued every month. Learn more about how we're changing the food waste equation."
         buttonLink="/impact"
-        buttonText="Read More"
+        buttonText="Dig In to Our Impact Data"
       />
 
-      {<Spacer height={isMobile ? 96 : 128} />}
+      {<Spacer height={isMobile ? 96 : 192} />}
 
       <ContentSectionRight
-        title="Partners"
+        title="Working with the Community"
         img="/about/partners-preview.jpg"
         alt="Sharing Excess receives a ten thousand dollar donation check from Giant"
-        paragraph="But as vast a problem as food waste is, the solution often boils
-      down to simple last mile logistics and delivery. Sharing Excess is meeting this
-      challenge with the power of people, technology, and compassion."
-        buttonLink="/partners"
-        buttonText="Learn More"
+        paragraph="Nothing we do would be possible without the support of our local partners and donors. Learn more about how your organization can help fight food waste."
+        buttonLink="/about/partners"
+        buttonText="Check Out Our Partners"
         bgImg="/about/backgroundcolor-2.svg"
       />
 
-      {<Spacer height={isMobile ? 96 : 128} />}
+      {<Spacer height={isMobile ? 96 : 192} />}
 
       <ContentSectionLeft
         title="Keep Up with SE!"
         img="/about/blog-img.jpg"
         alt="Volunteers with Free Food signs"
-        paragraph="But as vast a problem as food waste is, the solution often boils
-      down to simple last mile logistics and delivery. Sharing Excess is meeting this
-      challenge with the power of people, technology, and compassion."
-        buttonLink="/"
+        paragraph="At Sharing Excess, we're constantly growing, expanding, and partnering in new and exiting ways. Follow our blog to stay up to date with all that's new at SE."
+        buttonLink="htt[s://blog.sharingexcess.com"
         buttonText="Visit Our Blog"
       />
     </div>

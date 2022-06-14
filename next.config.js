@@ -2,7 +2,7 @@
 const path = require('path') // eslint-disable-line
 
 module.exports = {
-  assetPrefix: './',
+  // assetPrefix: './',
   reactStrictMode: false,
   webpack: (config, { defaultLoaders }) => {
     if (process.env.NODE_ENV === 'development') {

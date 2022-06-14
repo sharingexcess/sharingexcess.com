@@ -14,31 +14,42 @@ export const Partners: FC = () => {
   return (
     <div id="Partners">
       <PageHeader
-        image={isMobile ? '/headers/about_mobile.jpeg' : '/headers/team.png'}
-        label="partners"
-        title={`Accessing surplus to capture and distribute.`}
+        image="/about/partners-preview.jpg"
+        label="our partners"
+        title="Working with the community to serve the community."
       />
 
-      <Spacer height={isMobile ? 48 : 48} />
-
-      <FlexContainer direction="vertical" className="Partners-header-and-text">
-        <Text type="secondary-header" color="green" align="center">
-          Working With The Community
-        </Text>
-        <Spacer height={isMobile ? 24 : 32} />
-        <Text
-          type="paragraph"
-          color="black"
-          align={isMobile ? 'left' : 'center'}
-        >
-          We’ve worked with over 200 partners, and we’ve highlighted some
-          collaborations below. consectetur adipiscing elit. Etiam eu turpis
-          molestie, dictum est a, mattis tellus. Sed dignissim, metus nec
-          fringilla accumsan, risus sem sollicitudin lacus, ut interdum tellus
-          elit sed risus.
-        </Text>
-        <Spacer height={isMobile ? 48 : 98} />
+      <Spacer height={isMobile ? 48 : 96} />
+      <FlexContainer
+        className="Partners-header-and-text"
+        direction={isMobile ? 'vertical' : 'horizontal'}
+      >
+        <Image src="/about/partners_red_bull.jpg" alt="Partnerships" />
+        <Spacer width={64} height={32} />
+        <FlexContainer direction="vertical">
+          <Text
+            type="secondary-header"
+            color="green"
+            align={isMobile ? 'center' : 'left'}
+          >
+            Connecting for-profit, non-profit, and everyone in between.
+          </Text>
+          <Spacer height={isMobile ? 24 : 32} />
+          <Text
+            type="paragraph"
+            color="black"
+            align={isMobile ? 'center' : 'left'}
+          >
+            Our mission is to change the food waste equation, and that's only
+            possible when we all work together to rescue and redistribute
+            surplus food. We're working to provide the missing link between
+            businesses, foundations, individual donors, and the communities most
+            in need.
+          </Text>
+        </FlexContainer>
       </FlexContainer>
+
+      <Spacer height={isMobile ? 48 : 98} />
 
       <div id="Partners-grid">
         <div className="Partners-logo">
@@ -132,53 +143,40 @@ export const Partners: FC = () => {
 
       <Spacer height={isMobile ? 64 : 120} />
 
-      <FlexContainer direction="vertical" className="Partners-header-and-text">
-        <Text type="secondary-header" color="green" align="center">
-          Partner With Us
-        </Text>
-        <Spacer height={32} />
-        <Text
-          type="paragraph"
-          color="black"
-          align={isMobile ? 'left' : 'center'}
-        >
-          We’ve worked with over 200 partners, and we’ve highlighted some
-          collaborations below. consectetur adipiscing elit. Etiam eu turpis
-          molestie, dictum est a, mattis tellus. Sed dignissim, metus nec
-          fringilla accumsan, risus sem sollicitudin lacus, ut interdum tellus
-          elit sed risus.
-        </Text>
-        <Spacer height={32} />
-        <Button type="primary" color="green">
-          Start A Partnership
-        </Button>
-      </FlexContainer>
-
-      <Spacer height={isMobile ? 72 : 120} />
       <FlexContainer
-        direction="vertical"
-        primaryAlign="center"
-        secondaryAlign="center"
+        className="Partners-header-and-text"
+        direction={isMobile ? 'vertical' : 'horizontal'}
       >
-        <Image
-          src="/partners/partners-bg.svg"
-          alt="Background Color"
-          classList={['Partners-background-wave-img']}
-        />
-
+        <Image src="/about/partners_ymca.jpg" alt="Partnerships" />
+        <Spacer width={64} height={32} />
         <FlexContainer
           direction="vertical"
-          className="Partners-header-and-text"
+          secondaryAlign={isMobile ? 'center' : 'start'}
         >
-          <Text type="secondary-header" color="black" align="center">
-            Collaborations
+          <Text
+            type="secondary-header"
+            color="green"
+            align={isMobile ? 'center' : 'left'}
+          >
+            Partner With Us
+          </Text>
+          <Spacer height={isMobile ? 24 : 32} />
+          <Text
+            type="paragraph"
+            color="black"
+            align={isMobile ? 'center' : 'left'}
+          >
+            Whether your organization can provide food, funding, volunteers, or
+            support, we'd love to start a conversation. Sharing Excess works
+            with over 200 local partners to help redistribute surplus food, and
+            we can't wait to hear how you'd like to get involved.
           </Text>
           <Spacer height={32} />
-          <Text type="paragraph" color="black" align="center">
-            These incredible collaborations tell a story. consectetur adipiscing
-            elit. Etiam eu turpis molestie, dictum est a, mattis tellus.
-            consectetur adipiscing elit.
-          </Text>
+          <a href="/contact">
+            <Button type="primary" color="green">
+              Start A Partnership
+            </Button>
+          </a>
         </FlexContainer>
       </FlexContainer>
     </div>
