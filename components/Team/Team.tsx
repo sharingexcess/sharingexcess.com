@@ -6,7 +6,7 @@ import {
   Card,
   Button,
 } from '@sharingexcess/designsystem'
-import { PageHeader } from 'components'
+import { PageHeader, WaveBackground } from 'components'
 import { useIsMobile, useWidth } from 'hooks'
 import { team } from 'content/team'
 import React, { FC } from 'react'
@@ -121,8 +121,14 @@ export const Team: FC = () => {
 
       <FlexContainer
         direction={isMobile ? 'vertical' : 'horizontal'}
-        className="Team-testimonials"
+        id="Team-testimonials"
       >
+        {/* <WaveBackground
+          containerId="Team-testimonials"
+          flipped={false}
+          id="Team-testimonials-wave"
+        />
+ */}
         <FlexContainer
           direction="vertical"
           secondaryAlign={isMobile ? 'center' : 'start'}

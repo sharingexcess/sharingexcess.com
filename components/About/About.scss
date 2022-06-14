@@ -10,7 +10,7 @@
     position: relative;
     overflow-y: visible;
 
-    .About-background-wave-img {
+    /* .About-background-wave-img {
       position: absolute;
       min-width: 100vw;
       min-height: 120%;
@@ -21,68 +21,67 @@
         height: 120%;
         object-fit: cover;
         margin: auto;
-      }
-    }
-
-    .se-spacer {
-      flex-shrink: 0;
-    }
-
-    .About-content-section-img {
-      height: 35vh;
-      max-width: 50%;
-      object-fit: cover;
-      @include mobile {
-        width: 100%;
-        max-width: 100%;
-        object-fit: cover;
-        height: unset;
-      }
-    }
-
-    #About-section-text--left {
-      margin-left: 10%;
-    }
-
-    #About-section-text--right {
-      margin-right: 10%;
-    }
-
-    .underline {
-      text-decoration: underline;
-    }
+      } */
   }
 
-  #About-section-buttons {
-    .se-button {
-      margin: 8px 16px;
-      flex-grow: 1;
-    }
+  .se-spacer {
+    flex-shrink: 0;
   }
 
-  #About-small-header {
-    text-transform: uppercase;
-    font-weight: 800;
-    @include desktop {
-      font-size: 22px;
-    }
-  }
-
-  #About-mission-section {
-    /* max-width: 520px; */
-    margin: auto;
-    #diagram-image {
-      align-self: center;
+  .About-content-section-img {
+    height: 35vh;
+    max-width: 50%;
+    object-fit: cover;
+    @include mobile {
       width: 100%;
-      margin: auto;
-    }
-
-    #About-mission-header {
-      font-weight: 900;
+      max-width: 100%;
+      object-fit: cover;
+      height: unset;
     }
   }
 
-  #About-content-section-button-mobile {
+  #About-section-text--left {
+    margin-left: 10%;
+  }
+
+  #About-section-text--right {
+    margin-right: 10%;
+  }
+
+  .underline {
+    text-decoration: underline;
+  }
+}
+
+#About-section-buttons {
+  .se-button {
+    margin: 8px 16px;
+    flex-grow: 1;
+  }
+}
+
+#About-small-header {
+  text-transform: uppercase;
+  font-weight: 800;
+  @include desktop {
+    font-size: 22px;
+  }
+}
+
+#About-mission-section {
+  /* max-width: 520px; */
+  margin: auto;
+  #diagram-image {
+    align-self: center;
+    width: 100%;
     margin: auto;
   }
+
+  #About-mission-header {
+    font-weight: 900;
+  }
+}
+
+#About-content-section-button-mobile {
+  margin: auto;
 }

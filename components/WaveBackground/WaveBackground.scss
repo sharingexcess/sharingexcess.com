@@ -1,0 +1,14 @@
+#WaveBackground-img {
+  position: absolute;
+  min-width: 100vw;
+  min-height: 120%;
+  margin-left: calc(-1 * max(96px, calc(50vw - 500px)));
+
+  @include mobile {
+    min-height: 190%;
+    margin-top: calc(-1.8 * max(96px, calc(50vw - 500px)));
+    margin-left: auto;
+    width: 100%;
+    object-fit: cover;
+  }
+}

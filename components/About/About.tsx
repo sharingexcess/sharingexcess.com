@@ -10,6 +10,7 @@ import {
 } from '@sharingexcess/designsystem'
 import { useIsMobile } from 'hooks'
 import { PageHeader } from 'components'
+import { WaveBackground } from 'components'
 import { useRouter } from 'next/router'
 import { getAnalytics, logEvent } from 'firebase/analytics'
 import Link from 'next/link'
@@ -44,6 +45,7 @@ export const About: FC = () => {
         direction="vertical"
         primaryAlign="start"
         secondaryAlign="center"
+        id="About-content-section-left"
       >
         <Text type="secondary-header" color="black">
           {title}
@@ -102,7 +104,7 @@ export const About: FC = () => {
     paragraph,
     buttonText,
     buttonLink,
-    bgImg,
+    flipped,
   }: Record<any, any>) {
     return isMobile ? (
       <FlexContainer
@@ -110,29 +112,39 @@ export const About: FC = () => {
         direction="vertical"
         primaryAlign="start"
         secondaryAlign="center"
+        id="About-content-section-mobile"
       >
-        <Image
-          src={bgImg}
-          alt="Background Color"
-          classList={['About-background-wave-img']}
+        <WaveBackground
+          containerId="About-content-section-mobile"
+          flipped={flipped}
         />
 
-        <Text type="secondary-header" color="black">
-          {title}
-        </Text>
-        <Spacer height={18} />
-        <Image src={img} alt={alt} classList={['About-content-section-img']} />
-        <Spacer height={24} />
-        <Text type="paragraph" color="black">
-          {paragraph}
-        </Text>
-        <Spacer height={26} />
+        <FlexContainer
+          direction="vertical"
+          primaryAlign="start"
+          secondaryAlign="center"
+        >
+          <Text type="secondary-header" color="black">
+            {title}
+          </Text>
+          <Spacer height={18} />
+          <Image
+            src={img}
+            alt={alt}
+            classList={['About-content-section-img']}
+          />
+          <Spacer height={24} />
+          <Text type="paragraph" color="black">
+            {paragraph}
+          </Text>
+          <Spacer height={26} />
 
-        <a href={buttonLink}>
-          <Button type="primary" color="green" size="medium">
-            {buttonText}
-          </Button>
-        </a>
+          <a href={buttonLink}>
+            <Button type="primary" color="green" size="medium">
+              {buttonText}
+            </Button>
+          </a>
+        </FlexContainer>
       </FlexContainer>
     ) : (
       <FlexContainer
@@ -140,12 +152,13 @@ export const About: FC = () => {
         direction="horizontal"
         primaryAlign="start"
         secondaryAlign="center"
+        id="About-content-section-desktop"
       >
-        <Image
-          src={bgImg}
-          alt="Background Color"
-          classList={['About-background-wave-img']}
+        <WaveBackground
+          containerId="About-content-section-desktop"
+          flipped={flipped}
         />
+
         <FlexContainer
           direction="horizontal"
           primaryAlign="start"
@@ -197,7 +210,10 @@ export const About: FC = () => {
         direction={isMobile ? 'vertical-reverse' : 'horizontal'}
         id="About-mission-section"
       >
-        <FlexContainer direction="vertical" secondaryAlign="start">
+        <FlexContainer
+          direction="vertical"
+          secondaryAlign={isMobile ? 'center' : 'start'}
+        >
           <Text type="secondary-header" color="black" id="About-mission-header">
             Sharing Excess connects food businesses with nonprofits in need.
           </Text>
@@ -241,7 +257,7 @@ export const About: FC = () => {
         buttonText="Read More on our Blog"
       />
 
-      {<Spacer height={isMobile ? 96 : 192} />}
+      {<Spacer height={isMobile ? 144 : 192} />}
 
       <ContentSectionRight
         title="Who We Are"
@@ -250,10 +266,10 @@ export const About: FC = () => {
         paragraph="Sharing Excess is powered by a lean and mean team of volunteers, students, and change makers - and we're growing! Click below to meet our team and learn about joining."
         buttonText="Meet the Team"
         buttonLink="/about/team"
-        bgImg="/about/backgroundcolor-1.svg"
+        flipped={false}
       />
 
-      {<Spacer height={isMobile ? 96 : 192} />}
+      {<Spacer height={isMobile ? 112 : 192} />}
 
       <ContentSectionLeft
         title="Making an Impact"
@@ -264,7 +280,7 @@ export const About: FC = () => {
         buttonText="Dig In to Our Impact Data"
       />
 
-      {<Spacer height={isMobile ? 96 : 192} />}
+      {<Spacer height={isMobile ? 144 : 192} />}
 
       <ContentSectionRight
         title="Working with the Community"
@@ -273,16 +289,16 @@ export const About: FC = () => {
         paragraph="Nothing we do would be possible without the support of our local partners and donors. Learn more about how your organization can help fight food waste."
         buttonLink="/about/partners"
         buttonText="Check Out Our Partners"
-        bgImg="/about/backgroundcolor-2.svg"
+        flipped={true}
       />
 
-      {<Spacer height={isMobile ? 96 : 192} />}
+      {<Spacer height={isMobile ? 112 : 192} />}
 
       <ContentSectionLeft
         title="Keep Up with SE!"
         img="/about/blog-img.jpg"
         alt="Volunteers with Free Food signs"
-        paragraph="At Sharing Excess, we're constantly growing, expanding, and partnering in new and exiting ways. Follow our blog to stay up to date with all that's new at SE."
+        paragraph="At Sharing Excess, we're constantly growing, expanding, and partnering in new and exciting ways. Follow our blog to stay up to date with all that's new at SE."
         buttonLink="htt[s://blog.sharingexcess.com"
         buttonText="Visit Our Blog"
       />
