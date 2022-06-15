@@ -2,90 +2,80 @@
   @include page;
 
   .paragraph {
-    font-size: 16px;
+    font-size: clamp(16px, 1.5vw, 16px);
     line-height: 1.6;
+  }
+
+  .secondary-header {
+    font-size: clamp(30px, 3vw, 36px);
   }
 
   .About-content-section {
     position: relative;
     overflow-y: visible;
-    /*  margin-bottom: 18%; */
 
-    .About-background-wave-img {
-      position: absolute;
-      min-width: 100vw;
-      height: 100%;
-      object-fit: fill;
-      margin-left: calc(-1 * max(96px, calc(50vw - 500px)));
-
-      @include mobile {
-        /* height: 150vw; */
-        height: 600px;
-        width: 100vw;
-        object-fit: cover;
-        margin: auto;
-      }
-    }
-
-    .se-spacer {
-      flex-shrink: 0;
-    }
-
-    .About-content-section-img {
-      height: 35vh;
-      max-width: 50%;
-      object-fit: cover;
-      @include mobile {
-        width: 100%;
-        max-width: 100%;
-        object-fit: cover;
-        height: unset;
-      }
-    }
-
-    #About-section-text--left {
-      margin-left: 10%;
-    }
-
-    #About-section-text--right {
-      margin-right: 10%;
-    }
-
-    .underline {
-      text-decoration: underline;
+    .About-content-section-header {
+      align-self: flex-start;
     }
   }
 
-  #About-section-buttons {
-    .se-button {
-      margin: 8px 16px;
-      flex-grow: 1;
-    }
+  .se-spacer {
+    flex-shrink: 0;
   }
 
-  #About-small-header {
-    text-transform: uppercase;
-    font-weight: 800;
-    @include desktop {
-      font-size: 22px;
-    }
-  }
-
-  #About-mission-section {
-    /* max-width: 520px; */
-    margin: auto;
-    #diagram-image {
-      align-self: center;
+  .About-content-section-img {
+    height: 35vh;
+    max-width: 50%;
+    object-fit: cover;
+    @include mobile {
       width: 100%;
-      margin: auto;
-    }
-
-    #About-mission-header {
-      font-weight: 900;
+      max-width: 100%;
+      object-fit: cover;
+      height: unset;
     }
   }
 
-  #About-content-section-button-mobile {
+  #About-section-text--left {
+    margin-left: 10%;
+  }
+
+  #About-section-text--right {
+    margin-right: 10%;
+  }
+
+  .underline {
+    text-decoration: underline;
+  }
+}
+
+#About-section-buttons {
+  .se-button {
+    margin: 8px 16px;
+    flex-grow: 1;
+  }
+}
+
+#About-small-header {
+  text-transform: uppercase;
+  font-weight: 800;
+  @include desktop {
+    font-size: 22px;
+  }
+}
+
+#About-mission-section {
+  margin: auto;
+  #diagram-image {
+    align-self: center;
+    width: 100%;
     margin: auto;
   }
+
+  #About-mission-header {
+    font-weight: 900;
+  }
+}
+
+#About-content-section-button-mobile {
+  margin: auto;
 }

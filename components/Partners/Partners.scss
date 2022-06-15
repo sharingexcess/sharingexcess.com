@@ -2,18 +2,27 @@
   @include page;
 
   .Partners-header-and-text {
-    max-width: 592px;
-    margin: auto;
+    .se-image {
+      width: 50%;
+      @include mobile {
+        width: 100%;
+      }
+    }
+    .se-spacer {
+      flex-shrink: 0;
+    }
   }
 
   #Partners-grid {
-    display: flex;
+    display: grid;
     justify-content: center;
-    flex-wrap: wrap;
+    grid-template-columns: repeat(auto-fit, minmax(192px, 1fr));
     gap: 64px;
+    padding: 64px 0;
 
     @include mobile {
       gap: 32px;
+      grid-template-columns: 1fr 1fr;
     }
 
     .Partners-logo {

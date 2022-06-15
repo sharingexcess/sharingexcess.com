@@ -54,13 +54,6 @@ export const team: {
     url: 'https://www.linkedin.com/in/sonalimehta876/',
     department: 'leadership',
   },
-  /*  {
-    name: 'Hannah Newlands',
-    title: 'Director of Volunteers',
-    image: '/team/Hannah.png',
-    url: 'https://www.linkedin.com/in/hannahnewlands/',
-    department: 'leadership',
-  }, */
 
   {
     name: 'Lucy Doren',
@@ -113,23 +106,23 @@ export const team: {
   },
   {
     name: 'Harry Welsh',
-    title: 'Grant Writer',
+    title: 'Fundraising Associate',
     image: '/team/Harry.png',
     url: 'https://www.linkedin.com/in/harry-welsh-0ba18a204/',
     department: 'operations',
   },
   {
-    name: 'Inara Pirani',
-    title: 'Admin Assistant',
-    image: '/team/Inara.png',
-    url: 'https://www.linkedin.com/in/inarapirani/',
+    name: 'Atara Saunders',
+    title: 'Fundraising Associate',
+    image: '/team/Atara.png',
+    url: 'https://www.linkedin.com/in/atara-saunders/',
     department: 'operations',
   },
   {
-    name: 'Atara Saunders',
-    title: 'Fundraising Developer',
-    image: '/team/Atara.png',
-    url: 'https://www.linkedin.com/in/atara-saunders/',
+    name: 'Inara Pirani',
+    title: 'Administrative Assistant',
+    image: '/team/Inara.png',
+    url: 'https://www.linkedin.com/in/inarapirani/',
     department: 'operations',
   },
   {
@@ -155,18 +148,18 @@ export const team: {
   },
 
   {
-    name: 'Jaara Ndaw',
-    title: 'Community Coordinator',
-    image: '/team/Jaara.png',
-    url: 'https://www.linkedin.com/in/jaara-ndaw-47322617b/',
-    department: 'community',
-  },
-
-  {
     name: 'Nourhan Ibrahim',
     title: 'Development Manager',
     image: '/team/Nourhan.png',
     url: 'https://www.linkedin.com/in/nourhan-s-ibrahim-61861a11b/',
+    department: 'community',
+  },
+
+  {
+    name: 'Jaara Ndaw',
+    title: 'Community Coordinator',
+    image: '/team/Jaara.png',
+    url: 'https://www.linkedin.com/in/jaara-ndaw-47322617b/',
     department: 'community',
   },
 ]

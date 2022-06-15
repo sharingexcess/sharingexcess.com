@@ -4,9 +4,10 @@ import {
   Text,
   Image,
   Card,
+  Button,
 } from '@sharingexcess/designsystem'
-import { PageHeader } from 'components'
-import { useIsMobile } from 'hooks'
+import { PageHeader, WaveBackground } from 'components'
+import { useIsMobile, useWidth } from 'hooks'
 import { team } from 'content/team'
 import React, { FC } from 'react'
 import { testimonials } from 'content/testimonials'
@@ -30,33 +31,52 @@ const departments = [
 
 export const Team: FC = () => {
   const isMobile = useIsMobile()
+  const width = useWidth()
   return (
     <div id="Team">
       <PageHeader
         image={isMobile ? '/headers/about_mobile.jpeg' : '/headers/team.png'}
         label="meet the team"
-        title={`Collaborating and volunteering.`}
+        title={`Working together to make an impact in our community.`}
       />
 
-      <Spacer height={isMobile ? 48 : 48} />
-
-      <FlexContainer direction="vertical" className="Team-header-text">
-        <Text type="secondary-header" color="green">
-          Who We Are
-        </Text>
-        <Spacer height={isMobile ? 18 : 32} />
-        <Text type="paragraph" color="black" align="left">
-          Sharing Excess is a lean startup team, proudly powered by passionate
-          college students and recent grads. The crew consists of folks working
-          in full-time, part-time, co-op, internship, and volunteer positions.
-        </Text>
-        <Spacer height={isMobile ? 48 : 98} />
+      <Spacer height={isMobile ? 48 : 96} />
+      <FlexContainer
+        id="Team-intro"
+        direction={isMobile ? 'vertical' : 'horizontal'}
+      >
+        <Image src="/about/who-we-are.jpg" alt="Team" />
+        <Spacer width={48} />
+        <FlexContainer
+          direction="vertical"
+          secondaryAlign="start"
+          className="Team-header-text"
+        >
+          <Text type="secondary-header" color="green">
+            Who We Are
+          </Text>
+          <Spacer height={isMobile ? 18 : 32} />
+          <Text type="paragraph" color="black" align="left">
+            Sharing Excess is a lean nonprofit startup team, proudly powered by
+            passionate college students and recent grads.
+            <Spacer height={16} />
+            Our crew consists of folks working in full-time, part-time, co-op,
+            internship, and volunteer positions. And hey, we're always looking
+            for new folks to come on board ;)
+          </Text>
+        </FlexContainer>
       </FlexContainer>
+
+      <Spacer height={isMobile ? 96 : 128} />
 
       <FlexContainer direction="vertical">
         {departments.map(department => (
           <FlexContainer direction="vertical" key={department}>
-            <Text type="small-header" color="green" id="Team-small-header">
+            <Text
+              type="small-header"
+              color="green"
+              classList={['Team-small-header']}
+            >
               {department}
             </Text>
             <Spacer height={48} />
@@ -97,39 +117,65 @@ export const Team: FC = () => {
         ))}
       </FlexContainer>
 
-      <FlexContainer direction="vertical" className="Team-header-text">
-        <Text type="secondary-header" color="black" align="center">
-          Sharing Excess hires students.
-        </Text>
-      </FlexContainer>
-      <Spacer height={62} />
+      <Spacer height={64} />
 
-      <FlexContainer direction="horizontal" className="Team-testimonials">
-        <Image
-          src="/team/testimonials-bg.svg"
-          alt="Background color"
-          id="Team-testimonials-background-img"
+      <FlexContainer
+        direction={isMobile ? 'vertical' : 'horizontal'}
+        id="Team-testimonials"
+      >
+        {/* <WaveBackground
+          containerId="Team-testimonials"
+          flipped={false}
+          id="Team-testimonials-wave"
         />
-        <FlexContainer direction="vertical" secondaryAlign="start">
-          <Text type="small-header" color="black">
-            Powered by students.
+ */}
+        <FlexContainer
+          direction="vertical"
+          secondaryAlign={isMobile ? 'center' : 'start'}
+        >
+          <Text
+            type="secondary-header"
+            color="black"
+            align={isMobile ? 'center' : 'left'}
+          >
+            Get Involved @ SE
           </Text>
-          <Text color="black">
-            At Sharing Excess, we offer students the opportunity to work 20
-            hours per week for six months making real world impact - saving
-            thousands of pounds of food from being wasted while simultaneously
-            helping reduce food insecurity. Through our program, we aim to teach
-            these students the importance of equity and how they can leverage
-            their resources to improve access to basic needs for those who may
-            not have it.
+          <Spacer height={16} />
+          <Text color="black" align={isMobile ? 'center' : 'left'}>
+            We're <b>currently hiring</b> across all departments, with flexible
+            options to fit the needs of students and professionals that can help
+            us grow and expand.
           </Text>
+          <Spacer height={8} />
+          <FlexContainer primaryAlign={isMobile ? 'center' : 'start'}>
+            <ul>
+              <li>Full Time</li>
+              <li>Part Time</li>
+              <li>Board Members</li>
+            </ul>
+            <ul>
+              <li>Internships</li>
+              <li>Co-ops</li>
+              <li>Volunteers</li>
+            </ul>
+          </FlexContainer>
+          <Text color="black" align={isMobile ? 'center' : 'left'}>
+            Join a young and energetic team working to change the food waste
+            equation in our local communities.
+          </Text>
+          <Spacer height={24} />
+          <a href="/contact">
+            <Button color="green">Reach Out to Learn More</Button>
+          </a>
         </FlexContainer>
-        <Spacer width={64} />
+        <Spacer width={64} height={64} />
         {
           <section id="Team-testimonial">
             <CarouselProvider
               naturalSlideWidth={100}
-              naturalSlideHeight={125}
+              naturalSlideHeight={
+                isMobile ? 120 : Math.min(100000 / (width || 1000), 72)
+              }
               totalSlides={testimonials.length}
               visibleSlides={1}
             >
@@ -144,13 +190,13 @@ export const Team: FC = () => {
                         <Text type="subheader" color="green" align="center">
                           {student.name}
                         </Text>
-                        <Text type="paragraph" color="black" align="center">
+                        <Text type="small" color="black" align="center">
                           {student.title}
                         </Text>
 
-                        <Spacer height={32} />
-                        <Text type="paragraph" color="black" align="left">
-                          {student.quote}
+                        <Spacer height={16} />
+                        <Text type="small" color="black" align="center">
+                          "<i>{student.quote}</i>""
                         </Text>
                       </Card>
                     </div>

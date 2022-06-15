@@ -8,7 +8,7 @@ export const testimonials: {
     name: 'Sonali Mehta',
     title: 'Data Analytics',
     quote:
-      'Working here at Sharing Excess has been a privilege and a gratifying experience. Not only can I learn and absorb, but I can also give back in a way that I couldn’t have done anywhere else.',
+      'Working here at Sharing Excess has been a privilege. Not only can I learn and absorb, but I can also give back in a way that I couldn’t have done anywhere else.',
     image: '/team/Sonali.png',
   },
   {
@@ -20,23 +20,23 @@ export const testimonials: {
   },
   {
     name: 'Harry Welsh',
-    title: 'Distribution',
+    title: 'Distribution Coordinator',
     quote:
-      'I have gained from being given meaningful responsibilities working in an exciting start-up environment. As a person, I have gained lifelong friends and a much deeper sense of community.',
+      "I've gained lifelong friends and a much deeper sense of community here in Philly. I'm thankful to have meaningful responsibilities in an exciting start-up environment.",
     image: '/team/Harry.png',
   },
   {
     name: 'Bahiyah Watson',
     title: 'Donation Coordination',
     quote:
-      'Working at Sharing Excess helped me learn leadership, communication, and above all else, team work. I loved working with everyone and learning skill development during my time here.',
+      'Working at Sharing Excess helped me learn leadership, communication, and above all else, teamwork. I loved working with everyone during my time here.',
     image: '/team/Bahiyah.png',
   },
   {
     name: 'Armando Parra',
     title: 'Software Developer',
     quote:
-      'I have been using everyday to learn more about my field of study and to use what I’ve learned to fight food insecurity. All of this is possible because of the Sharing Excess experiential learning program.',
+      'I learn more about my field of study every single day, and get to use what I learn to fight food insecurity. All of this is possible because of the Sharing Excess co-op program.',
     image: '/team/Armando.png',
   },
 ]
