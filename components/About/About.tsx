@@ -47,10 +47,14 @@ export const About: FC = () => {
         secondaryAlign="center"
         id="About-content-section-left"
       >
-        <Text type="secondary-header" color="black">
+        <Text
+          type="secondary-header"
+          color="black"
+          classList={['About-content-section-header']}
+        >
           {title}
         </Text>
-        <Spacer height={18} />
+        <Spacer height={24} />
         <Image src={img} alt={alt} classList={['About-content-section-img']} />
         <Spacer height={24} />
         <Text type="paragraph" color="black">
@@ -124,10 +128,14 @@ export const About: FC = () => {
           primaryAlign="start"
           secondaryAlign="center"
         >
-          <Text type="secondary-header" color="black">
+          <Text
+            type="secondary-header"
+            color="black"
+            classList={['About-content-section-header']}
+          >
             {title}
           </Text>
-          <Spacer height={18} />
+          <Spacer height={24} />
           <Image
             src={img}
             alt={alt}
@@ -269,7 +277,7 @@ export const About: FC = () => {
         flipped={false}
       />
 
-      {<Spacer height={isMobile ? 112 : 192} />}
+      {<Spacer height={isMobile ? 144 : 192} />}
 
       <ContentSectionLeft
         title="Making an Impact"
@@ -292,7 +300,7 @@ export const About: FC = () => {
         flipped={true}
       />
 
-      {<Spacer height={isMobile ? 112 : 192} />}
+      {<Spacer height={isMobile ? 144 : 192} />}
 
       <ContentSectionLeft
         title="Keep Up with SE!"

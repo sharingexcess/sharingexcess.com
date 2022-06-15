@@ -27,19 +27,11 @@ export const Partners: FC = () => {
         <Image src="/about/partners_red_bull.jpg" alt="Partnerships" />
         <Spacer width={64} height={32} />
         <FlexContainer direction="vertical">
-          <Text
-            type="secondary-header"
-            color="green"
-            align={isMobile ? 'center' : 'left'}
-          >
+          <Text type="secondary-header" color="green" align={'left'}>
             Connecting for-profit, non-profit, and everyone in between.
           </Text>
           <Spacer height={isMobile ? 24 : 32} />
-          <Text
-            type="paragraph"
-            color="black"
-            align={isMobile ? 'center' : 'left'}
-          >
+          <Text type="paragraph" color="black" align={'left'}>
             Our mission is to change the food waste equation, and that's only
             possible when we all work together to rescue and redistribute
             surplus food. We're working to provide the missing link between

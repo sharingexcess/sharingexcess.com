@@ -6,6 +6,7 @@ import {
   Text,
 } from '@sharingexcess/designsystem'
 import { PageHeader } from 'components/PageHeader/PageHeader'
+import { WaveBackground } from 'components/WaveBackground/WaveBackground'
 import { useIsMobile } from 'hooks'
 import Head from 'next/head'
 import React, { FC } from 'react'
@@ -136,11 +137,7 @@ export const Impact: FC = () => {
 
       <Spacer height={isMobile ? 64 : 124} />
       <FlexContainer direction="vertical" id="Impact-metric-section">
-        <Image
-          src="/partners/partners-bg.svg"
-          alt="Background Color"
-          classList={['Impact-background-wave-img']}
-        />
+        {/* {<WaveBackground containerId="Impact-metric-section" flipped={false} />} */}
 
         <Text type="primary-header" align="center">
           $1 = 16 meals served

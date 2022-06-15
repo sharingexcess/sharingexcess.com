@@ -2,26 +2,21 @@
   @include page;
 
   .paragraph {
-    font-size: clamp(12px, 1.5vw, 16px);
+    font-size: clamp(16px, 1.5vw, 16px);
     line-height: 1.6;
+  }
+
+  .secondary-header {
+    font-size: clamp(30px, 3vw, 36px);
   }
 
   .About-content-section {
     position: relative;
     overflow-y: visible;
 
-    /* .About-background-wave-img {
-      position: absolute;
-      min-width: 100vw;
-      min-height: 120%;
-      margin-left: calc(-1 * max(96px, calc(50vw - 500px)));
-
-      @include mobile {
-        display: none;
-        height: 120%;
-        object-fit: cover;
-        margin: auto;
-      } */
+    .About-content-section-header {
+      align-self: flex-start;
+    }
   }
 
   .se-spacer {
@@ -69,7 +64,6 @@
 }
 
 #About-mission-section {
-  /* max-width: 520px; */
   margin: auto;
   #diagram-image {
     align-self: center;

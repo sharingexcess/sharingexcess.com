@@ -3,6 +3,7 @@
   min-width: 100vw;
   min-height: 120%;
   margin-left: calc(-1 * max(96px, calc(50vw - 500px)));
+  z-index: -10;
 
   @include mobile {
     min-height: 190%;
