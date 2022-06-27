@@ -14,7 +14,7 @@ import React, { FC } from 'react'
 export const Impact: FC = () => {
   const isMobile = useIsMobile()
   return (
-    <div id="Impact">
+    <div id="Impact-page">
       <Head>
         <title>Impact | Sharing Excess</title>
       </Head>

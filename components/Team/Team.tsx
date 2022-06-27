@@ -20,6 +20,7 @@ import {
   DotGroup,
 } from 'pure-react-carousel'
 import 'pure-react-carousel/dist/react-carousel.es.css'
+import Head from 'next/head'
 
 const departments = [
   'leadership',
@@ -34,6 +35,9 @@ export const Team: FC = () => {
   const width = useWidth()
   return (
     <div id="Team">
+      <Head>
+        <title>Team | Sharing Excess</title>
+      </Head>
       <PageHeader
         image={isMobile ? '/headers/about_mobile.jpeg' : '/headers/team.png'}
         label="meet the team"

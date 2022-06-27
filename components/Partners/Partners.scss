@@ -18,7 +18,7 @@
     justify-content: center;
     grid-template-columns: repeat(auto-fit, minmax(192px, 1fr));
     gap: 64px;
-    padding: 64px 0;
+    align-items: center;
 
     @include mobile {
       gap: 32px;
