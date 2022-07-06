@@ -6,13 +6,18 @@ import {
   Button,
 } from '@sharingexcess/designsystem'
 import { PageHeader } from 'components'
+import { partners } from 'content/partners'
 import { useIsMobile } from 'hooks'
+import Head from 'next/head'
 import React, { FC } from 'react'
 
 export const Partners: FC = () => {
   const isMobile = useIsMobile()
   return (
     <div id="Partners">
+      <Head>
+        <title>Partners | Sharing Excess</title>
+      </Head>
       <PageHeader
         image="/about/partners-preview.jpg"
         label="our partners"
@@ -43,94 +48,21 @@ export const Partners: FC = () => {
 
       <Spacer height={isMobile ? 48 : 98} />
 
+      <Text type="small-header" align="center">
+        Featured partners
+      </Text>
+      <Spacer height={48} />
+
       <div id="Partners-grid">
-        <div className="Partners-logo">
-          <Image
-            src="/partners/example-partner.jpg"
-            alt="Giant logo"
-            classList={['Partners-logo-img']}
-          />
-        </div>
-
-        <div className="Partners-logo">
-          <Image
-            src="/partners/example-partner.jpg"
-            alt="Giant logo"
-            classList={['Partners-logo-img']}
-          />
-        </div>
-
-        <div className="Partners-logo">
-          <Image
-            src="/partners/example-partner.jpg"
-            alt="Giant logo"
-            classList={['Partners-logo-img']}
-          />
-        </div>
-
-        <div className="Partners-logo">
-          <Image
-            src="/partners/example-partner.jpg"
-            alt="Giant logo"
-            classList={['Partners-logo-img']}
-          />
-        </div>
-        <div className="Partners-logo">
-          <Image
-            src="/partners/example-partner.jpg"
-            alt="Giant logo"
-            classList={['Partners-logo-img']}
-          />
-        </div>
-        <div className="Partners-logo">
-          <Image
-            src="/partners/example-partner.jpg"
-            alt="Giant logo"
-            classList={['Partners-logo-img']}
-          />
-        </div>
-        <div className="Partners-logo">
-          <Image
-            src="/partners/example-partner.jpg"
-            alt="Giant logo"
-            classList={['Partners-logo-img']}
-          />
-        </div>
-        <div className="Partners-logo">
-          <Image
-            src="/partners/example-partner.jpg"
-            alt="Giant logo"
-            classList={['Partners-logo-img']}
-          />
-        </div>
-        <div className="Partners-logo">
-          <Image
-            src="/partners/example-partner.jpg"
-            alt="Giant logo"
-            classList={['Partners-logo-img']}
-          />
-        </div>
-        <div className="Partners-logo">
-          <Image
-            src="/partners/example-partner.jpg"
-            alt="Giant logo"
-            classList={['Partners-logo-img']}
-          />
-        </div>
-        <div className="Partners-logo">
-          <Image
-            src="/partners/example-partner.jpg"
-            alt="Giant logo"
-            classList={['Partners-logo-img']}
-          />
-        </div>
-        <div className="Partners-logo">
-          <Image
-            src="/partners/example-partner.jpg"
-            alt="Giant logo"
-            classList={['Partners-logo-img']}
-          />
-        </div>
+        {partners.map(partner => (
+          <div key={partner.alt} className="Partners-logo">
+            <Image
+              src={partner.image}
+              alt={partner.alt}
+              classList={['Partners-logo-img']}
+            />
+          </div>
+        ))}
       </div>
 
       <Spacer height={isMobile ? 64 : 120} />
