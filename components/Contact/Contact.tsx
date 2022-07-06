@@ -143,17 +143,13 @@ export const Contact: FC = () => {
             className={validateText(formData.reason)}
           >
             <option></option>
-            <option value="Volunteer as a Driver">Volunteer as a Driver</option>
-            <option value="Donate Food">Donate Food</option>
-            <option value="Join the Sharing Excess Crew">
-              Join the Sharing Excess Crew
-            </option>
+            <option value="Volunteer">Volunteer</option>
+            <option value="Partner with Us">Partner with Us</option>
+            <option value="Join the Team">Join the Team</option>
             <option value="Make a Financial Contribution">
               Make a Financial Contribution
             </option>
-            <option value="Start a Campus Chapter">
-              Start a Campus Chapter
-            </option>
+            <option value="Start a Chapter">Start a Chapter</option>
             <option value="other">Other</option>
           </select>
         </div>

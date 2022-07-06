@@ -26,7 +26,7 @@ const departments = [
   'leadership',
   'distribution',
   'operations',
-  'community',
+  'community engagement',
   'technology',
 ]
 
@@ -39,9 +39,9 @@ export const Team: FC = () => {
         <title>Team | Sharing Excess</title>
       </Head>
       <PageHeader
-        image={isMobile ? '/headers/about_mobile.jpeg' : '/headers/team.png'}
+        image="/headers/team.png"
         label="meet the team"
-        title={`Working together to make an impact in our community.`}
+        title={`Powered by people, passion, and the pursuit of free food.`}
       />
 
       <Spacer height={isMobile ? 48 : 96} />
@@ -49,7 +49,7 @@ export const Team: FC = () => {
         id="Team-intro"
         direction={isMobile ? 'vertical' : 'horizontal'}
       >
-        <Image src="/about/who-we-are.jpg" alt="Team" />
+        <Image src="/about/about_team.jpg" alt="Team" />
         <Spacer width={48} />
         <FlexContainer
           direction="vertical"
@@ -74,7 +74,7 @@ export const Team: FC = () => {
       <Spacer height={isMobile ? 96 : 128} />
 
       <FlexContainer direction="vertical">
-        {departments.map(department => (
+        {/* {departments.map(department => (
           <FlexContainer direction="vertical" key={department}>
             <Text
               type="small-header"
@@ -83,42 +83,42 @@ export const Team: FC = () => {
             >
               {department}
             </Text>
-            <Spacer height={48} />
+            <Spacer height={48} /> */}
 
-            <div className="Team-members">
-              {team
-                .filter(teamMember => teamMember.department === department)
-                .map(filteredTeamMember => (
-                  <div key={filteredTeamMember.name} className="Team-person">
-                    <Image
-                      src={filteredTeamMember.image}
-                      alt={filteredTeamMember.name}
-                    />
-                    <Spacer height={12} />
+        <div className="Team-members">
+          {team
+            // .filter(teamMember => teamMember.department === department)
+            .map(filteredTeamMember => (
+              <div key={filteredTeamMember.name} className="Team-person">
+                <Image
+                  src={filteredTeamMember.image}
+                  alt={filteredTeamMember.name}
+                />
+                <Spacer height={12} />
 
-                    <Text
-                      type="subheader"
-                      color="blue"
-                      align="center"
-                      id="Team-person-name"
-                    >
-                      <a
-                        href={filteredTeamMember.url}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {filteredTeamMember.name}
-                      </a>
-                    </Text>
+                <Text
+                  type="subheader"
+                  color="blue"
+                  align="center"
+                  id="Team-person-name"
+                >
+                  <a
+                    href={filteredTeamMember.url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {filteredTeamMember.name}
+                  </a>
+                </Text>
 
-                    <Text type="small" color="black" align="center">
-                      {filteredTeamMember.title}
-                    </Text>
-                  </div>
-                ))}
-            </div>
-          </FlexContainer>
-        ))}
+                <Text type="small" color="black" align="center">
+                  {filteredTeamMember.title}
+                </Text>
+              </div>
+            ))}
+        </div>
+        {/* </FlexContainer>
+        ))} */}
       </FlexContainer>
 
       <Spacer height={64} />
@@ -142,7 +142,7 @@ export const Team: FC = () => {
             color="black"
             align={isMobile ? 'center' : 'left'}
           >
-            Get Involved @ SE
+            Join Our Team
           </Text>
           <Spacer height={16} />
           <Text color="black" align={isMobile ? 'center' : 'left'}>
@@ -164,8 +164,8 @@ export const Team: FC = () => {
             </ul>
           </FlexContainer>
           <Text color="black" align={isMobile ? 'center' : 'left'}>
-            Join a young and energetic team working to change the food waste
-            equation in our local communities.
+            Interested in joining a passionate and innovative team working to
+            end food waste and food insecurity? Look no further.
           </Text>
           <Spacer height={24} />
           <a href="/contact">

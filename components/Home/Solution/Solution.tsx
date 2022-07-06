@@ -18,13 +18,7 @@ export const Solution: FC = () => {
       </section>
       <Card id="Solution-content">
         <Text type="primary-header" color="black" align="right">
-          We Rescue,
-        </Text>
-        <Text type="primary-header" color="black" align="right">
-          Deliver &
-        </Text>
-        <Text type="primary-header" color="black" align="right">
-          Distribute.
+          We improve access to excess.
         </Text>
         <Spacer height={16} />
         <Text

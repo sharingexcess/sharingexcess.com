@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC } from 'react'
 import Head from 'next/head'
 import {
   Image,
@@ -11,25 +11,9 @@ import {
 import { useIsMobile } from 'hooks'
 import { PageHeader } from 'components'
 import { WaveBackground } from 'components'
-import { useRouter } from 'next/router'
-import { getAnalytics, logEvent } from 'firebase/analytics'
-import Link from 'next/link'
 
 export const About: FC = () => {
   const isMobile = useIsMobile()
-  const [section, setSection] = useState('team')
-  const router = useRouter()
-
-  function logAnalyticsEvent(description: string) {
-    const analytics = getAnalytics()
-    logEvent(analytics, description)
-  }
-
-  useEffect(() => {
-    if (router?.query?.section && typeof router.query.section === 'string') {
-      setSection(router.query.section)
-    }
-  }, [router.query])
 
   function ContentSectionLeft({
     title,
@@ -38,6 +22,7 @@ export const About: FC = () => {
     paragraph,
     buttonLink,
     buttonText,
+    isExternal,
   }: Record<any, any>) {
     return isMobile ? (
       <FlexContainer
@@ -61,7 +46,11 @@ export const About: FC = () => {
           {paragraph}
         </Text>
         <Spacer height={26} />
-        <a href={buttonLink}>
+        <a
+          href={buttonLink}
+          target={isExternal ? '_blank' : undefined}
+          rel="noreferrer"
+        >
           <Button type="primary" color="green" size="medium">
             {buttonText}
           </Button>
@@ -90,7 +79,11 @@ export const About: FC = () => {
               {paragraph}
             </Text>
             <Spacer height={38} />
-            <a href={buttonLink}>
+            <a
+              href={buttonLink}
+              target={isExternal ? '_blank' : undefined}
+              rel="noreferrer"
+            >
               <Button type="primary" color="green" size="medium">
                 {buttonText}
               </Button>
@@ -207,9 +200,9 @@ export const About: FC = () => {
         <title>About | Sharing Excess</title>
       </Head>
       <PageHeader
-        image={isMobile ? '/headers/about_mobile.jpeg' : '/headers/about.jpeg'}
+        image={isMobile ? '/headers/about_mobile.png' : '/headers/about.png'}
         label="ABOUT US"
-        title={`Rescuing and redistrubuting food sustainably, and equitably.`}
+        title={`Scaling human compassion,\none city at a time.`}
       />
 
       <Spacer height={isMobile ? 48 : 64} />
@@ -223,12 +216,12 @@ export const About: FC = () => {
           secondaryAlign={isMobile ? 'center' : 'start'}
         >
           <Text type="secondary-header" color="black" id="About-mission-header">
-            Sharing Excess connects food businesses with nonprofits in need.
+            Sharing Excess delivers surplus food to communities in need.
           </Text>
           <Spacer height={isMobile ? 24 : 24} />
           <Text type="paragraph" color="black">
             40% of all food produced in the US goes to waste every year, while
-            over 40 million people face food insecurity.
+            over 40 million people experience food insecurity.
             <Spacer height={16} />
             Our mission is to bridge the gap between excess and scarcity by
             partnering with grocery stores, restaurants, wholesalers, and
@@ -239,7 +232,7 @@ export const About: FC = () => {
           <Spacer height={32} />
           <ExternalLink to="https://www.usda.gov/foodwaste/faqs">
             <Button type="primary" color="green">
-              Read More about Food Waste
+              Read More About The Problem
             </Button>
           </ExternalLink>
           <Spacer height={isMobile ? 32 : 46} />
@@ -258,11 +251,13 @@ export const About: FC = () => {
 
       <ContentSectionLeft
         title="Our Story"
-        img="/about/history2-crop.jpeg"
+        img="/about/about_story.png"
         alt="Team members smiling"
-        paragraph="Starting from humble roots as a boot-strapped student startup, Sharing Excess has grown into a sustainable and growing nonprofit with over 200 community partners."
-        buttonLink="https://blog.sharingexcess.com"
-        buttonText="Read More on our Blog"
+        paragraph="
+        What started as a grassroots effort on a college campus in 2018 has grown to a national movement that has fed hundreds of thousands of people."
+        buttonLink="https://www.phillymag.com/be-well-philly/2021/02/23/sharingexcess/"
+        buttonText="Read More About Our Story"
+        isExternal
       />
 
       {<Spacer height={isMobile ? 144 : 192} />}
@@ -271,7 +266,7 @@ export const About: FC = () => {
         title="Who We Are"
         img="/about/who-we-are.jpg"
         alt="Group photo on a sunny day"
-        paragraph="Sharing Excess is powered by a lean and mean team of volunteers, students, and change makers - and we're growing! Click below to meet our team and learn about joining."
+        paragraph="Sharing Excess was brought to life by a team of change makers, innovators, and problem solvers who believe food should be shared, not wasted - and we’re growing! Click below to meet our team, and learn more about joining."
         buttonText="Meet the Team"
         buttonLink="/about/team"
         flipped={false}
@@ -280,21 +275,21 @@ export const About: FC = () => {
       {<Spacer height={isMobile ? 144 : 192} />}
 
       <ContentSectionLeft
-        title="Making an Impact"
+        title="Our Impact"
         img="/about/impact-preview.jpg"
         alt="Palettes of produce"
         paragraph="What started as a few extra meal swipes has grown to over 500,000 lbs. of food rescued every month. Learn more about how we're changing the food waste equation."
         buttonLink="/impact"
-        buttonText="Dig In to Our Impact Data"
+        buttonText="Learn More"
       />
 
       {<Spacer height={isMobile ? 144 : 192} />}
 
       <ContentSectionRight
-        title="Working with the Community"
-        img="/about/partners-preview.jpg"
+        title="Our Partners"
+        img="/about/about_community.png"
         alt="Sharing Excess receives a ten thousand dollar donation check from Giant"
-        paragraph="Nothing we do would be possible without the support of our local partners and donors. Learn more about how your organization can help fight food waste."
+        paragraph="Together with businesses, foundations, and organizations we make the magic of Sharing Excess come to life. Learn more about how you can partner with us."
         buttonLink="/about/partners"
         buttonText="Check Out Our Partners"
         flipped={true}
@@ -304,10 +299,11 @@ export const About: FC = () => {
 
       <ContentSectionLeft
         title="Keep Up with SE!"
-        img="/about/blog-img.jpg"
+        img="/about/about_blog.jpg"
         alt="Volunteers with Free Food signs"
         paragraph="At Sharing Excess, we're constantly growing, expanding, and partnering in new and exciting ways. Follow our blog to stay up to date with all that's new at SE."
-        buttonLink="htt[s://blog.sharingexcess.com"
+        buttonLink="https://medium.com/sharing-excess"
+        isExternal
         buttonText="Visit Our Blog"
       />
     </div>

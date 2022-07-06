@@ -20,6 +20,13 @@ export const team: {
     department: 'leadership',
   },
   {
+    name: 'Nourhan Ibrahim',
+    title: 'Director of Development',
+    image: '/team/Nourhan.png',
+    url: 'https://www.linkedin.com/in/nourhan-s-ibrahim-61861a11b/',
+    department: 'leadership',
+  },
+  {
     name: 'Alex Havertine',
     title: 'Director of Food Sourcing',
     image: '/team/Alex.png',
@@ -31,13 +38,6 @@ export const team: {
     title: 'Director of Food Distribution',
     image: '/team/Sarah.png',
     url: 'https://www.linkedin.com/in/sarah-dipasquale-350931129/',
-    department: 'leadership',
-  },
-  {
-    name: 'Cara DePiano',
-    title: 'Director of Campus',
-    image: '/team/Cara.png',
-    url: 'https://www.linkedin.com/in/cara-d-476aa711a/',
     department: 'leadership',
   },
   {
@@ -53,6 +53,20 @@ export const team: {
     image: '/team/Sonali.png',
     url: 'https://www.linkedin.com/in/sonalimehta876/',
     department: 'leadership',
+  },
+  {
+    name: 'Rachael Ihim',
+    title: 'Marketing Coordinator',
+    image: '/team/Rachael.png',
+    url: 'https://www.linkedin.com/in/racheal-ihim-92467618a/',
+    department: 'operations',
+  },
+  {
+    name: 'Cara DePiano',
+    title: 'Community Engagement Coordinator',
+    image: '/team/Cara.png',
+    url: 'https://www.linkedin.com/in/cara-d-476aa711a/',
+    department: 'community engagement',
   },
 
   {
@@ -77,36 +91,43 @@ export const team: {
     department: 'distribution',
   },
   {
+    name: 'Braden Walper',
+    title: 'Food Sourcing Coordinator',
+    image: '/team/Braden.png',
+    url: 'https://www.linkedin.com/in/braden-walper-5b70b41a7/',
+    department: 'distribution',
+  },
+  {
     name: 'Andre Powell',
-    title: 'Food Sourcing',
+    title: 'Food Sourcing Associate',
     image: '/team/Andre.png',
     url: 'https://www.linkedin.com/company/sharing-excess',
     department: 'distribution',
   },
   {
     name: 'Elle Palmer',
-    title: 'Food Sourcing',
+    title: 'Food Sourcing Associate',
     image: '/team/Elle.png',
     url: 'https://www.linkedin.com/company/sharing-excess/mycompany/',
     department: 'distribution',
   },
   {
     name: 'Matt Leger',
-    title: 'Food Sourcing',
+    title: 'Food Sourcing Associate',
     image: '/team/Matt.png',
     url: 'https://www.linkedin.com/in/matt-leger-116b51174/',
     department: 'distribution',
   },
   {
     name: 'Collin Young',
-    title: 'Produce Market Coordinator',
+    title: 'Wholesale Rescue Coordinator',
     image: '/team/Collin.png',
     url: 'https://www.linkedin.com/in/collin-young-07aa041ab/',
     department: 'distribution',
   },
   {
     name: 'Harry Welsh',
-    title: 'Fundraising Associate',
+    title: 'Warehouse Manager',
     image: '/team/Harry.png',
     url: 'https://www.linkedin.com/in/harry-welsh-0ba18a204/',
     department: 'operations',
@@ -124,6 +145,13 @@ export const team: {
     image: '/team/Inara.png',
     url: 'https://www.linkedin.com/in/inarapirani/',
     department: 'operations',
+  },
+  {
+    name: 'Jaara Ndaw',
+    title: 'Community Engagement Coordinator',
+    image: '/team/Jaara.png',
+    url: 'https://www.linkedin.com/in/jaara-ndaw-47322617b/',
+    department: 'community engagement',
   },
   {
     name: 'Armando Parra',
@@ -145,21 +173,5 @@ export const team: {
     image: '/team/Jill.png',
     url: 'https://www.linkedin.com/in/jilliantracy/',
     department: 'technology',
-  },
-
-  {
-    name: 'Nourhan Ibrahim',
-    title: 'Development Manager',
-    image: '/team/Nourhan.png',
-    url: 'https://www.linkedin.com/in/nourhan-s-ibrahim-61861a11b/',
-    department: 'community',
-  },
-
-  {
-    name: 'Jaara Ndaw',
-    title: 'Community Coordinator',
-    image: '/team/Jaara.png',
-    url: 'https://www.linkedin.com/in/jaara-ndaw-47322617b/',
-    department: 'community',
   },
 ]

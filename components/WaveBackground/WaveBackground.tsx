@@ -20,46 +20,36 @@ export function WaveBackground({ containerId, flipped }: Record<any, any>) {
       const height = container.clientHeight
       const ratio = height / width
 
-      console.log('ratio', ratio)
-
       if (ratio < THRESHOLD_1) {
         if (flipped) {
           setSrc('/wave/wave-sm-flipped.svg')
         } else {
           setSrc('/wave/wave-sm.svg')
         }
-        console.log('one!')
       } else if (ratio < THRESHOLD_2) {
         if (flipped) {
           setSrc('/wave/wave-med-flipped.svg')
         } else {
           setSrc('/wave/wave-med.svg')
         }
-
-        console.log('two!')
       } else if (ratio < THRESHOLD_3) {
         if (flipped) {
           setSrc('/wave/wave-lg-flipped.svg')
         } else {
           setSrc('/wave/wave-lg.svg')
         }
-
-        console.log('three!')
       } else if (ratio < THRESHOLD_4) {
         if (flipped) {
           setSrc('wave/wave-mobile-flipped.svg')
         } else {
           setSrc('/wave/wave-mobile.svg')
         }
-
-        console.log('four!')
       } else {
         if (flipped) {
           setSrc('wave/wave-med-flipped.svg')
         } else {
           setSrc('/wave/wave-med.svg')
         }
-        console.log('else!')
       }
     }
   }, [width])

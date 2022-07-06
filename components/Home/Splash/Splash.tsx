@@ -55,8 +55,8 @@ export const Splash: FC = () => {
           shadow
         >
           By partnering with grocery stores, restaurants, wholesalers, and
-          farmers, Sharing Excess rescues and redistributes over 10,000 lbs. of
-          food every day.
+          farmers, Sharing Excess rescues and redistributes over 120,000 lbs. of
+          food every week.
         </Text>
         <Spacer height={32} />
         <ExternalLink to={DONATE_LINK}>
@@ -66,7 +66,7 @@ export const Splash: FC = () => {
             type="primary"
             handler={logAnalyticsEvent}
           >
-            Donate $20 to Rescue 320 Meals
+            Donate Now
           </Button>
         </ExternalLink>
       </div>
