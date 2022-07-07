@@ -14,44 +14,46 @@ export function WaveBackground({ containerId, flipped }: Record<any, any>) {
   const [src, setSrc] = useState<string | undefined>()
 
   useEffect(() => {
-    if (width) {
-      const container = document.getElementById(containerId)
-      if (!container) return
-      const height = container.clientHeight
-      const ratio = height / width
+    setTimeout(() => {
+      if (width) {
+        const container = document.getElementById(containerId)
+        if (!container) return
+        const height = container.clientHeight
+        const ratio = height / width
 
-      if (ratio < THRESHOLD_1) {
-        if (flipped) {
-          setSrc('/wave/wave-sm-flipped.svg')
+        if (ratio < THRESHOLD_1) {
+          if (flipped) {
+            setSrc('/wave/wave-sm-flipped.svg')
+          } else {
+            setSrc('/wave/wave-sm.svg')
+          }
+        } else if (ratio < THRESHOLD_2) {
+          if (flipped) {
+            setSrc('/wave/wave-med-flipped.svg')
+          } else {
+            setSrc('/wave/wave-med.svg')
+          }
+        } else if (ratio < THRESHOLD_3) {
+          if (flipped) {
+            setSrc('/wave/wave-lg-flipped.svg')
+          } else {
+            setSrc('/wave/wave-lg.svg')
+          }
+        } else if (ratio < THRESHOLD_4) {
+          if (flipped) {
+            setSrc('wave/wave-mobile-flipped.svg')
+          } else {
+            setSrc('/wave/wave-mobile.svg')
+          }
         } else {
-          setSrc('/wave/wave-sm.svg')
-        }
-      } else if (ratio < THRESHOLD_2) {
-        if (flipped) {
-          setSrc('/wave/wave-med-flipped.svg')
-        } else {
-          setSrc('/wave/wave-med.svg')
-        }
-      } else if (ratio < THRESHOLD_3) {
-        if (flipped) {
-          setSrc('/wave/wave-lg-flipped.svg')
-        } else {
-          setSrc('/wave/wave-lg.svg')
-        }
-      } else if (ratio < THRESHOLD_4) {
-        if (flipped) {
-          setSrc('wave/wave-mobile-flipped.svg')
-        } else {
-          setSrc('/wave/wave-mobile.svg')
-        }
-      } else {
-        if (flipped) {
-          setSrc('wave/wave-med-flipped.svg')
-        } else {
-          setSrc('/wave/wave-med.svg')
+          if (flipped) {
+            setSrc('wave/wave-med-flipped.svg')
+          } else {
+            setSrc('/wave/wave-med.svg')
+          }
         }
       }
-    }
+    }, 0)
   }, [width])
 
   return src ? (

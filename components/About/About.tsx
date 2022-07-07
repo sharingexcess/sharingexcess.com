@@ -239,11 +239,7 @@ export const About: FC = () => {
         </FlexContainer>
         {isMobile && <Spacer height={48} />}
         <FlexContainer direction="vertical">
-          <Image
-            src="/about/SE-Diagram-1.jpg"
-            alt="Diagram"
-            id="diagram-image"
-          />
+          <Image src="/about/diagram.png" alt="Diagram" id="diagram-image" />
         </FlexContainer>
       </FlexContainer>
 
@@ -260,7 +256,7 @@ export const About: FC = () => {
         isExternal
       />
 
-      {<Spacer height={isMobile ? 144 : 192} />}
+      {<Spacer height={isMobile ? 192 : 256} />}
 
       <ContentSectionRight
         title="Who We Are"
@@ -272,7 +268,7 @@ export const About: FC = () => {
         flipped={false}
       />
 
-      {<Spacer height={isMobile ? 144 : 192} />}
+      {<Spacer height={isMobile ? 192 : 256} />}
 
       <ContentSectionLeft
         title="Our Impact"
@@ -283,7 +279,7 @@ export const About: FC = () => {
         buttonText="Learn More"
       />
 
-      {<Spacer height={isMobile ? 144 : 192} />}
+      {<Spacer height={isMobile ? 192 : 256} />}
 
       <ContentSectionRight
         title="Our Partners"
@@ -295,7 +291,7 @@ export const About: FC = () => {
         flipped={true}
       />
 
-      {<Spacer height={isMobile ? 144 : 192} />}
+      {<Spacer height={isMobile ? 192 : 256} />}
 
       <ContentSectionLeft
         title="Keep Up with SE!"
