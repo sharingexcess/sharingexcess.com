@@ -17,7 +17,7 @@ export const Header: FC = () => {
   const scroll = useScrollPosition()
   const [prevScroll, setPrevScroll] = useState(scroll)
   const [background, setBackground] = useState(false)
-  const isCondensed = width && width < 1000
+  const isCondensed = width && width < 1200
   const [menu, setMenu] = useState(false)
   const [position, setPosition] = useState(0)
 

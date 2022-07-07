@@ -1,8 +1,10 @@
-import React, { FC, useEffect } from 'react'
-import Script from 'next/script'
+import React, { FC } from 'react'
 import { PageHeader } from 'components/PageHeader/PageHeader'
+import { useIsMobile } from 'hooks'
 
 export const Volunteer: FC = () => {
+  const isMobile = useIsMobile()
+
   return (
     <div id="Volunteer">
       <PageHeader
@@ -10,14 +12,14 @@ export const Volunteer: FC = () => {
         label="Volunteer"
         title="Come help us change the food waste equation."
       />
-      <Script
-        type="text/javascript"
-        src="https://cdn.cervistech.com/acts/javascript/resize.js"
-      />
       <iframe
         id="frame"
         name="frame"
-        src="https://sharingexcess.cervistech.com//acts/webreg/eventwebreglist.php?org_id=0385"
+        src={
+          isMobile
+            ? 'https://sharingexcess.cervistech.com/acts/console.php?console_type=event&console_id=0385&cat_id=&filter_choice=&cal_choice=&res_choice=&res_code=&source='
+            : 'https://sharingexcess.cervistech.com//acts/webreg/eventwebreglist.php?org_id=0385'
+        }
       ></iframe>
     </div>
   )

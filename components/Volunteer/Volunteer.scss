@@ -4,5 +4,10 @@
     min-height: 70vh;
     border: none;
     margin: auto;
+
+    // @include mobile {
+    //   width: calc(100% + 32px);
+    //   margin-left: -16px;
+    // }
   }
 }

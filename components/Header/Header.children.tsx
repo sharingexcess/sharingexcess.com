@@ -21,6 +21,10 @@ const pages: { title: string; path: string }[] = [
     path: '/campus',
   },
   {
+    title: 'VOLUNTEER',
+    path: '/volunteer',
+  },
+  {
     title: 'STORE',
     path: 'https://shop.sharingexcess.com/collections/all',
   },
