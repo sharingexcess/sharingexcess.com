@@ -275,7 +275,7 @@ export const About: FC = () => {
         img="/about/impact-preview.jpg"
         alt="Palettes of produce"
         paragraph="What started as a few extra meal swipes has grown to over 500,000 lbs. of food rescued every month. Learn more about how we're changing the food waste equation."
-        buttonLink="/impact"
+        buttonLink="/about/impact"
         buttonText="Learn More"
       />
 
