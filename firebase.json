@@ -32,12 +32,12 @@
         "destination": "/about/team.html"
       },
       {
-        "source": "/about/partners",
-        "destination": "/about/partners.html"
-      },
-      {
         "source": "/about/impact",
         "destination": "/about/impact.html"
+      },
+      {
+        "source": "/about/partners",
+        "destination": "/about/partners.html"
       },
       {
         "source": "**",

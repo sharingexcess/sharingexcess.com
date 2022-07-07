@@ -24,6 +24,22 @@
         "destination": "/campus.html"
       },
       {
+        "source": "/volunteer",
+        "destination": "/volunteer.html"
+      },
+      {
+        "source": "/about/team",
+        "destination": "/about/team.html"
+      },
+      {
+        "source": "/about/impact",
+        "destination": "/about/impact.html"
+      },
+      {
+        "source": "/about/partners",
+        "destination": "/about/partners.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
