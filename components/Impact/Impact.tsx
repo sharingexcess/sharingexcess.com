@@ -111,7 +111,7 @@ export const Impact: FC = () => {
       <Spacer height={isMobile ? 16 : 124} />
       <iframe src="https://fortress.maptive.com/ver4/fd5a838add7600ab10fc995f76cce2ce" />
 
-      <Spacer height={isMobile ? 16 : 124} />
+      <Spacer height={isMobile ? 16 : 196} />
       <FlexContainer
         direction={isMobile ? 'vertical' : 'horizontal'}
         id="Impact-annual-report-section"
