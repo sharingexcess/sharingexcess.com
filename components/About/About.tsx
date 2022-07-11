@@ -200,7 +200,7 @@ export const About: FC = () => {
         <title>About | Sharing Excess</title>
       </Head>
       <PageHeader
-        image={isMobile ? '/headers/about_mobile.png' : '/headers/about.png'}
+        image={isMobile ? '/headers/about_mobile.png' : '/headers/about.jpg'}
         label="ABOUT US"
         title={`Scaling human compassion,\none city at a time.`}
       />
