@@ -10,6 +10,11 @@
     width: 100vw;
     margin-left: calc(-1 * max(96px, calc(50vw - 500px)));
     overflow-x: auto;
+    padding-bottom: 24px;
+    ::-webkit-scrollbar {
+      opacity: 0;
+      display: none;
+    }
 
     @include mobile {
       margin-left: -16px;
