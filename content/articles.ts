@@ -8,6 +8,15 @@ export const articles: {
   button?: string
 }[] = [
   {
+    image: '/articles/pbswhyy.png',
+    header: 'Food Sharing Program Prevents Waste and Sparks a Movement',
+    publisher: 'PBS WHYY',
+    date: 'July 5, 2022',
+    url: 'https://www.youtube.com/watch?v=Y83xU2gnIcA',
+    body: 'Sharing Excess came to be when a Drexel student gave away 50 meals left in his dining account to people in need. He inspired others to join his efforts, which grew to include excess “food rescue” from a network of grocers, restaurants, farmers, and wholesalers. Today the nonprofit delivers an average of 100,000 pounds of food each week. The ultimate vision of Sharing Excess is to use every available resource that is wasted or underutilized to cover basic needs for all.',
+    button: 'Watch Now',
+  },
+  {
     image: '/articles/phillymag.png',
     header:
       'This Student-Run Food Rescue Program Delivers 100,000 Pounds of Food to Philadelphians Per Week',
