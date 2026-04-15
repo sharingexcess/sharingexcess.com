@@ -1,0 +1,27 @@
+# Dependencies & caches
+node_modules
+.astro
+.cache
+*.tsbuildinfo
+
+# Git & IDE
+.git
+.gitignore
+.idea
+.DS_Store
+
+# Build output (rebuilt in image)
+dist
+
+# Env (use Railway variables / dashboard)
+.env
+.env.*
+
+# Local / migration artifacts not needed for `astro build`
+sharingexcess.webflow
+webflow-export
+playwright-report
+test-results
+
+# Docs (not required for build)
+*.md

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile",
+    "buildCommand": null,
+    "watchPatterns": [
+      "package.json",
+      "bun.lock",
+      "astro.config.mjs",
+      "tailwind.config.mjs",
+      "tsconfig.json",
+      "src/**",
+      "public/**"
+    ]
+  },
+  "deploy": {
+    "runtime": "V2",
+    "startCommand": null,
+    "numReplicas": 1,
+    "healthcheckPath": null,
+    "healthcheckTimeout": null,
+    "cronSchedule": null,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 3,
+    "overlapSeconds": 0,
+    "drainingSeconds": 10,
+    "sleepApplication": true
+  }
+}

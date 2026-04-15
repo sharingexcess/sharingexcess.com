@@ -7,13 +7,15 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "start": "serve dist -l tcp://0.0.0.0:4321",
     "sync:webflow": "rsync -a --delete sharingexcess.webflow/css sharingexcess.webflow/js sharingexcess.webflow/images sharingexcess.webflow/documents sharingexcess.webflow/videos public/",
     "generate": "bun scripts/migration/generate-webflow-astro.ts",
     "verify": "bun run build && bun scripts/migration/verify-build.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "playwright": "^1.59.1"
+    "playwright": "^1.59.1",
+    "serve": "14"
   },
   "peerDependencies": {
     "typescript": "^6.0.2"
