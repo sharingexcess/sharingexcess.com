@@ -1,0 +1,8 @@
+---
+import WebflowHtml from "../layouts/WebflowHtml.astro";
+import headHtml from "../webflow-fragments/donate-food.html.head.html?raw";
+import bodyHtml from "../webflow-fragments/donate-food.html.body.html?raw";
+
+const htmlAttrs = {"data-wf-page":"6900e274eb613ffa883cb934","data-wf-site":"67d1d2d9c708819c5185d49c","lang":"en"} as Record<string, string>;
+---
+<WebflowHtml htmlAttrs={htmlAttrs} headHtml={headHtml} bodyHtml={bodyHtml} />

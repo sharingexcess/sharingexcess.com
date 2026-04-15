@@ -1,0 +1,20 @@
+---
+import "../styles/tailwind.css";
+
+interface Props {
+  htmlAttrs: Record<string, string>;
+  headHtml: string;
+  bodyHtml: string;
+}
+
+const { htmlAttrs, headHtml, bodyHtml } = Astro.props;
+---
+<!DOCTYPE html>
+<html {...htmlAttrs}>
+  <head>
+    <Fragment set:html={headHtml} />
+  </head>
+  <body>
+    <Fragment set:html={bodyHtml} />
+  </body>
+</html>

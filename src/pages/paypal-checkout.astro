@@ -1,0 +1,8 @@
+---
+import WebflowHtml from "../layouts/WebflowHtml.astro";
+import headHtml from "../webflow-fragments/paypal-checkout.html.head.html?raw";
+import bodyHtml from "../webflow-fragments/paypal-checkout.html.body.html?raw";
+
+const htmlAttrs = {"data-wf-page":"67d31125561f921c0ca3ed16","data-wf-site":"67d1d2d9c708819c5185d49c","lang":"en"} as Record<string, string>;
+---
+<WebflowHtml htmlAttrs={htmlAttrs} headHtml={headHtml} bodyHtml={bodyHtml} />

@@ -1,0 +1,2 @@
+/* Tailwind utilities only — Webflow CSS provides base styles (preflight off). */
+@tailwind utilities;

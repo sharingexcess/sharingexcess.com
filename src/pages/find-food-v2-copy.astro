@@ -1,0 +1,8 @@
+---
+import WebflowHtml from "../layouts/WebflowHtml.astro";
+import headHtml from "../webflow-fragments/find-food-v2-copy.html.head.html?raw";
+import bodyHtml from "../webflow-fragments/find-food-v2-copy.html.body.html?raw";
+
+const htmlAttrs = {"data-wf-page":"69dd2edffa5852cf081c6ead","data-wf-site":"67d1d2d9c708819c5185d49c","lang":"en"} as Record<string, string>;
+---
+<WebflowHtml htmlAttrs={htmlAttrs} headHtml={headHtml} bodyHtml={bodyHtml} />

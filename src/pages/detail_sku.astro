@@ -1,0 +1,8 @@
+---
+import WebflowHtml from "../layouts/WebflowHtml.astro";
+import headHtml from "../webflow-fragments/detail_sku.html.head.html?raw";
+import bodyHtml from "../webflow-fragments/detail_sku.html.body.html?raw";
+
+const htmlAttrs = {"data-wf-page":"67d31124561f921c0ca3ec83","data-wf-site":"67d1d2d9c708819c5185d49c","lang":"en"} as Record<string, string>;
+---
+<WebflowHtml htmlAttrs={htmlAttrs} headHtml={headHtml} bodyHtml={bodyHtml} />
