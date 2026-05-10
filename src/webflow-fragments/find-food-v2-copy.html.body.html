@@ -194,7 +194,8 @@ footer p{font-size:12px;color:#bbb}
         <!--  LIVE COUNTER  -->
         <div class="live">
           <div class="live-label"><span class="live-dot"></span>Live from our Food Rescue App</div>
-          <div class="live-num" id="liveNum">208,706,796</div>
+          <!-- Initial lbs display / animation target (updated 5/9/25) -->
+          <div class="live-num" id="liveNum">234,772,717</div>
           <div class="live-sub">pounds of surplus food redistributed since 2018</div>
         </div>
         <!--  THE SCALE  -->
@@ -399,8 +400,8 @@ footer p{font-size:12px;color:#bbb}
           <p>Sharing Excess is a registered 501(c)(3) nonprofit. EIN: 86-2161466. Donations are tax-deductible.</p>
         </footer>
         <script>
-// Live counter
-const target = 208706796;
+// Live counter — target lbs (updated 5/9/25); same value used if live total is unavailable
+const target = 234772717;
 const el = document.getElementById('liveNum');
 let cur = target - 600000;
 const step = Math.ceil((target - cur) / 80);
@@ -833,7 +834,7 @@ for (let i = 0; i < 96; i++) {
         window.se_impact_data = {
           count: 137204,
           total_weight: 174782089,
-          donated_weight: 168821794,
+          donated_weight: 234772717, // fallback lbs when live API unavailable (updated 5/9/25)
           composted_weight: 5960295,
           retail_value: 309042035.62,
           fair_market_value: 221098347.45,

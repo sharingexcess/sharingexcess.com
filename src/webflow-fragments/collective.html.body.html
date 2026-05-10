@@ -178,7 +178,7 @@ function fitMapToMarkers() {
 map.on('load', () => {
   map.addSource('org-clusters', {
     type: 'geojson',
-    data: 'https://surplus-api.sharingexcess.com/public/analytics/geojson',
+    data: window.__SE_SURPLUS_API_ORIGIN + '/public/analytics/geojson',
     cluster: true,
     clusterMaxZoom: 25,
     clusterRadius: 20
@@ -676,7 +676,7 @@ map.on('idle', () => {
         window.se_impact_data = {
           count: 137204,
           total_weight: 174782089,
-          donated_weight: 168821794,
+          donated_weight: 234772717, // fallback lbs when live API unavailable (updated 5/9/25)
           composted_weight: 5960295,
           retail_value: 309042035.62,
           fair_market_value: 221098347.45,

@@ -244,7 +244,7 @@ function fitMapToMarkers() {
 map.on('load', () => {
 map.addSource('org-clusters', {
   type: 'geojson',
-  data: 'https://surplus-api.sharingexcess.com/public/analytics/geojson',
+  data: window.__SE_SURPLUS_API_ORIGIN + '/public/analytics/geojson',
   cluster: true,
   clusterMaxZoom: 25,
   clusterRadius: 20
@@ -320,18 +320,19 @@ document.getElementById('loading-logo').style.display = 'none';
         <p class="color-white-64 font-size-xs width-100 text-align-center italitcs margin-top-sm">Over 2,000 distribution locations across 36 states</p>
       </div>
       <div class="_50-50-child flex column align-items-center">
+        <!-- Impact lbs: initial display before live data (updated 5/9/25) -->
         <div class="impact-counter margin-bottom-md">
           <div class="impact-counter-digit">2</div>
-          <div class="impact-counter-digit">0</div>
-          <div class="impact-counter-digit">8</div>
+          <div class="impact-counter-digit">3</div>
+          <div class="impact-counter-digit">4</div>
           <div class="impact-counter-separator">,</div>
           <div class="impact-counter-digit">7</div>
-          <div class="impact-counter-digit">0</div>
-          <div class="impact-counter-digit">6</div>
+          <div class="impact-counter-digit">7</div>
+          <div class="impact-counter-digit">2</div>
           <div class="impact-counter-separator">,</div>
           <div class="impact-counter-digit">7</div>
-          <div class="impact-counter-digit">9</div>
-          <div class="impact-counter-digit">6</div>
+          <div class="impact-counter-digit">1</div>
+          <div class="impact-counter-digit">7</div>
         </div>
         <h4 class="width-100 text-align-center color-white margin-bottom-xs mobile-font-size-md">pounds of food distributed so far</h4>
         <p class="font-size-2xs margin-bottom-lg color-white-64 width-100 text-align-center">(live data from <a href="https://app.sharingexcess.com" target="_blank">app.sharingexcess.com</a>)</p>
@@ -764,7 +765,7 @@ function renderLiveImpactData(has_recursed = false) {
       window.se_impact_data = {
         count: 137204,
         total_weight: 174782089,
-        donated_weight: 168821794,
+        donated_weight: 234772717, // fallback lbs when live API unavailable (updated 5/9/25)
         composted_weight: 5960295,
         retail_value: 309042035.62,
         fair_market_value: 221098347.45,
