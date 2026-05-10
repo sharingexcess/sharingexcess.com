@@ -219,22 +219,38 @@ mapboxgl.accessToken = ACCESS_TOKEN;
 const map = new mapboxgl.Map({
 container: 'impact-map',
 style: 'mapbox://styles/mapbox/dark-v11',
-center: [-98.5795, 39.8283], // Longitude, Latitude for center of USA
-zoom: 3.5, // Good zoom level for displaying the full USA
+center: [-98.5795, 39.8283],
+zoom: 3.5,
 maxZoom: 9
 });
 map.addControl(new mapboxgl.NavigationControl());
+
+function fitMapToMarkers() {
+  const source = map.getSource('org-clusters');
+  if (!source || !source._data) return;
+  const geojson = source._data;
+  if (!geojson.features || geojson.features.length === 0) return;
+  const bounds = new mapboxgl.LngLatBounds();
+  geojson.features.forEach(f => {
+    if (f.geometry && f.geometry.coordinates) {
+      bounds.extend(f.geometry.coordinates);
+    }
+  });
+  if (!bounds.isEmpty()) {
+    map.fitBounds(bounds, { padding: 40, maxZoom: 9 });
+  }
+}
+
 map.on('load', () => {
-// fetch('https://services.sharingexcess.com/impact/publicGeoJson').then(response => response.json()).then(data => {
-//   const locationCount = data.features.length;
-//   document.getElementById('location-count').innerHTML = `Helping ${locationCount} Organizations`;
-// });
 map.addSource('org-clusters', {
   type: 'geojson',
   data: 'https://surplus-api.sharingexcess.com/public/analytics/geojson',
   cluster: true,
   clusterMaxZoom: 25,
   clusterRadius: 20
+});
+map.getSource('org-clusters').on('data', (e) => {
+  if (e.isSourceLoaded) fitMapToMarkers();
 });
 map.addLayer({
   id: 'clusters',

@@ -90,36 +90,198 @@
       </div>
     </div>
   </div>
-  <div class="section background-black">
-    <div class="content-container">
-      <div class="_50-50-container margin-bottom-2xl mobile-margin-top--2xl">
-        <div class="_50-50-child"><img src="/images/map_1.avif" loading="lazy" sizes="(max-width: 1682px) 100vw, 1682px" srcset="/images/map_1map.avif 500w, /images/map_1map.avif 800w, /images/map_1.avif 1682w" alt="" class="_50-50-image mobile-display-none"></div>
-        <div class="_50-50-child flex column align-items-center">
-          <div class="impact-counter margin-bottom-md">
-            <div class="impact-counter-digit">2</div>
-            <div class="impact-counter-digit">0</div>
-            <div class="impact-counter-digit">8</div>
-            <div class="impact-counter-separator">,</div>
-            <div class="impact-counter-digit">7</div>
-            <div class="impact-counter-digit">0</div>
-            <div class="impact-counter-digit">6</div>
-            <div class="impact-counter-separator">,</div>
-            <div class="impact-counter-digit">7</div>
-            <div class="impact-counter-digit">9</div>
-            <div class="impact-counter-digit">6</div>
-          </div>
-          <h4 class="width-100 text-align-center color-white margin-bottom-xs mobile-font-size-md">pounds of food distributed so far</h4>
-          <p class="font-size-2xs margin-bottom-lg color-white-64 width-100 text-align-center">(live data from <a href="https://app.sharingexcess.com" target="_blank">app.sharingexcess.com</a>)</p><img src="/images/map_1.avif" loading="lazy" sizes="(max-width: 1682px) 100vw, 1682px" srcset="/images/map_1map.avif 500w, /images/map_1map.avif 800w, /images/map_1.avif 1682w" alt="" class="_50-50-image desktop-display-none margin-bottom-2xl margin-top-lg">
-          <p class="paragraph color-white text-align-center margin-bottom-xl">Since 2018, Sharing Excess has distributed enough surplus to food to feed over <strong>10 million people</strong> across the country. Thanks to our <a href="https://app.sharingexcess.com" target="_blank">Food Rescue App</a> , we know exactly where every pound of food came from - and where it went. Because food shouldn't go to waste. And impact shouldn't be a mystery.</p>
-          <div class="button-container">
-            <a data-mixpanel-component="button_home_page_our_mission_learn_more" href="https://docs.sharingexcess.com/docs/impact-measurement" target="_blank" class="button w-inline-block"><img src="/images/chart-icon.svg" loading="lazy" alt="" class="icon-lg">
-              <div>How We Measure Impact</div>
-            </a>
-          </div>
+<div class="section background-black mobile-flex-basis-100">
+  <div class="content-container mobile-display-block">
+    <div class="_50-50-container">
+      <div class="_50-50-child static-height">
+        <div class="interactive-map w-embed w-script">
+          
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <title>Mapbox Green Clusters with Logo</title>
+            <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+            <link href="https://api.mapbox.com/mapbox-gl-js/v3.11.0/mapbox-gl.css" rel="stylesheet">
+            <script src="https://api.mapbox.com/mapbox-gl-js/v3.11.0/mapbox-gl.js"></script>
+            <style>
+body, html { margin: 0; padding: 0; }
+#impact-map {
+position: absolute;
+top: 0;
+bottom: 0;
+left: 0;
+right: 0;
+width: 100%;
+height: 100vh; /* explicitly setting height to viewport height */
+border-radius: 7px;
+overflow: hidden;
+}
+#loading-logo {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+z-index: 10;
+display: flex;
+justify-content: center;
+align-items: center;
+border-radius: 10px;
+box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+.impact-popup .mapboxgl-popup-content{
+background:#008236;
+color:#fff;
+border-radius:4px;
+padding:8px 12px;
+box-shadow:0 2px 6px rgba(0,0,0,.3);
+font-size:13px;
+}
+.impact-popup .mapboxgl-popup-tip{
+border-top-color:#008236;
+}
+</style>
+          </head>
+          <body>
+            <div id="impact-map"></div>
+            <!-- <div id="location-count" style="position:absolute; top:10px; left:50%; transform:translateX(-50%); color:white; background-color:#008236; padding:6px 12px; border-radius:4px; font-family:'Poppins', sans-serif; z-index:10;">Loading locations...</div>  -->
+            <div id="loading-logo">
+              <img src="/images/logo.png" alt="Loading Logo" width="80">
+            </div>
+            <script>
+const ACCESS_TOKEN = 'pk.eyJ1Ijoic2Fya2FyaWNodGVyIiwiYSI6ImNtOXU5cDkwNjA3dGgycXB5Zmt1NGpreWEifQ.prxEqERsrMZSwXxahDnkbg';
+mapboxgl.accessToken = ACCESS_TOKEN;
+const map = new mapboxgl.Map({
+container: 'impact-map',
+style: 'mapbox://styles/mapbox/dark-v11',
+center: [-98.5795, 39.8283],
+zoom: 3.5,
+maxZoom: 9
+});
+map.addControl(new mapboxgl.NavigationControl());
+
+function fitMapToMarkers() {
+  const source = map.getSource('org-clusters');
+  if (!source || !source._data) return;
+  const geojson = source._data;
+  if (!geojson.features || geojson.features.length === 0) return;
+  const bounds = new mapboxgl.LngLatBounds();
+  geojson.features.forEach(f => {
+    if (f.geometry && f.geometry.coordinates) {
+      bounds.extend(f.geometry.coordinates);
+    }
+  });
+  if (!bounds.isEmpty()) {
+    map.fitBounds(bounds, { padding: 40, maxZoom: 9 });
+  }
+}
+
+map.on('load', () => {
+map.addSource('org-clusters', {
+  type: 'geojson',
+  data: 'https://surplus-api.sharingexcess.com/public/analytics/geojson',
+  cluster: true,
+  clusterMaxZoom: 25,
+  clusterRadius: 20
+});
+map.getSource('org-clusters').on('data', (e) => {
+  if (e.isSourceLoaded) fitMapToMarkers();
+});
+map.addLayer({
+  id: 'clusters',
+  type: 'circle',
+  source: 'org-clusters',
+  filter: ['has', 'point_count'],
+  paint: {
+    'circle-color': '#008236',
+    'circle-opacity': 0.7,
+    'circle-radius': [
+      'step', ['get', 'point_count'],
+      15, 100,
+      25, 750,
+      35
+    ]
+  }
+});
+map.addLayer({
+  id: 'cluster-count',
+  type: 'symbol',
+  source: 'org-clusters',
+  filter: ['has', 'point_count'],
+  layout: {
+    'text-field': '{point_count}',
+    'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+    'text-size': 12
+  },
+  paint: {
+    'text-color': '#ffffff'
+  }
+});
+map.addLayer({
+  id: 'unclustered-point',
+  type: 'circle',
+  source: 'org-clusters',
+  filter: ['!', ['has', 'point_count']],
+  paint: {
+    'circle-color': '#008236',
+    'circle-radius': 6,
+    'circle-stroke-width': 2,
+    'circle-stroke-color': '#ffffff'
+  }
+});
+map.on('click', 'clusters', (e) => {
+  const features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+  const clusterId = features[0].properties.cluster_id;
+  map.getSource('org-clusters').getClusterExpansionZoom(clusterId, (err, zoom) => {
+    if (err) return;
+    map.easeTo({
+      center: features[0].geometry.coordinates,
+      zoom: zoom
+    });
+  });
+});
+map.on('mouseenter', 'clusters', () => map.getCanvas().style.cursor = 'pointer');
+map.on('mouseleave', 'clusters', () => map.getCanvas().style.cursor = '');
+map.on('mouseenter', 'unclustered-point', () => map.getCanvas().style.cursor = 'pointer');
+map.on('mouseleave', 'unclustered-point', () => map.getCanvas().style.cursor = '');
+});
+map.on('idle', () => {
+document.getElementById('loading-logo').style.display = 'none';
+});
+</script>
+          </body>
+          </html>
+        </div>
+        <p class="color-white-64 font-size-xs width-100 text-align-center italitcs margin-top-sm">Over 2,000 distribution locations across 36 states</p>
+      </div>
+      <div class="_50-50-child flex column align-items-center">
+        <div class="impact-counter margin-bottom-md">
+          <div class="impact-counter-digit">2</div>
+          <div class="impact-counter-digit">0</div>
+          <div class="impact-counter-digit">8</div>
+          <div class="impact-counter-separator">,</div>
+          <div class="impact-counter-digit">7</div>
+          <div class="impact-counter-digit">0</div>
+          <div class="impact-counter-digit">6</div>
+          <div class="impact-counter-separator">,</div>
+          <div class="impact-counter-digit">7</div>
+          <div class="impact-counter-digit">9</div>
+          <div class="impact-counter-digit">6</div>
+        </div>
+        <h4 class="width-100 text-align-center color-white margin-bottom-xs mobile-font-size-md">pounds of food distributed so far</h4>
+        <p class="font-size-2xs margin-bottom-lg color-white-64 width-100 text-align-center">(live data from <a href="https://app.sharingexcess.com" target="_blank">app.sharingexcess.com</a>)</p>
+        <p class="paragraph color-white text-align-center margin-bottom-xl">Since 2018, Sharing Excess has distributed enough surplus to feed over <strong>10 million people</strong> across the country. Thanks to our <a href="https://app.sharingexcess.com" target="_blank">Food Rescue App</a> , we know exactly where every pound of food came from - and where it went. Because food shouldn't go to waste. And impact shouldn't be a mystery.</p>
+        <div class="button-container">
+          <a data-mixpanel-component="button_home_page_our_mission_learn_more" href="/about/impact.html" class="button w-inline-block"><img src="/images/chart-icon.svg" loading="lazy" alt="" class="icon-lg">
+            <div>Impact&#160;Data</div>
+          </a>
+          <a data-mixpanel-component="button_home_page_our_mission_learn_more" href="https://docs.sharingexcess.com/docs/impact-measurement" target="_blank" class="button secondary-white w-inline-block"><img src="/images/chart-icon.svg" loading="lazy" alt="" class="icon-lg">
+            <div>How&#160;We Measure</div>
+          </a>
         </div>
       </div>
     </div>
   </div>
+</div>
   <section class="section background-green">
     <div class="center-block padding-x-xl">
       <h4 class="eyebrow color-green-secondary">IMPACT HIGHLIGHTS</h4>
@@ -602,15 +764,3 @@
   }
   window.addEventListener("load", () => renderLiveImpactData());
 </script>
-  <!--  Mapbox-GL-JS CSS & JS  – only one copy per site  -->
-  <link href="https://api.mapbox.com/mapbox-gl-js/v3.1.0/mapbox-gl.css" rel="stylesheet">
-  <script src="https://api.mapbox.com/mapbox-gl-js/v3.1.0/mapbox-gl.js"></script>
-  <style>
-  /* let the map fill its wrapper */
-  #impact-map {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-  }
-</style>
