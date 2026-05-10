@@ -215,7 +215,7 @@
     console.log("getting impact data");
     const start = performance.now();
     window.se_impact_data = null;
-    fetch("https://api.sharingexcess.com/public/analytics/metrics")
+    fetch("https://surplus-api.sharingexcess.com/public/analytics/metrics")
       .then((res) => (res.ok ? res.json() : res.text()))
       .then((data) => {
         window.se_impact_data = data;
@@ -503,7 +503,7 @@ map.on('load', () => {
   // });
   map.addSource('org-clusters', {
     type: 'geojson',
-    data: 'https://api.sharingexcess.com/public/analytics/geojson',
+    data: 'https://surplus-api.sharingexcess.com/public/analytics/geojson',
     cluster: true,
     clusterMaxZoom: 25,
     clusterRadius: 20
