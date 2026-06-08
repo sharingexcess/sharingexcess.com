@@ -86,7 +86,38 @@
       <div class="center-block">
         <h1>Our Leadership</h1>
       </div>
-      <div class="photo-card-container-2 team">
+      <style>
+        /* Team page card grids — column count varies by section */
+        .team-grid {
+          display: grid;
+          grid-column-gap: 24px;
+          grid-row-gap: 24px;
+          width: 100%;
+          padding-top: 32px;
+          padding-bottom: 32px;
+        }
+        .team-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .team-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+        .team-grid .photo-card-2 { min-width: 0; }
+        @media screen and (max-width: 991px) {
+          .team-grid.cols-3 { grid-template-columns: repeat(2, 1fr); }
+          .team-grid.cols-4 { grid-template-columns: repeat(3, 1fr); }
+        }
+        /* Grey placeholder for team members without a photo yet */
+        .team-member-photo-placeholder {
+          z-index: -2;
+          background-color: #9ca3af;
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          inset: 0% 0 0 0%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .team-member-photo-placeholder img { width: 72px; height: 72px; opacity: .85; }
+      </style>
+      <div class="team-grid cols-3">
         <a data-mixpanel-component-id="evan_ehlers" data-mixpanel-component="team_page_photo_card" href="https://www.linkedin.com/in/evan-ehlers-9b4446a8/" target="_blank" class="photo-card-2 w-inline-block">
           <h3 class="h3-2">Evan Ehlers</h3>
           <p class="caption white">Founder, CEO</p><img src="/images/evan_1.avif" loading="lazy" width="Auto" alt="" class="photo-card-background-2">
@@ -117,6 +148,15 @@
           <h3 class="h3-2"><strong>Diane Wilde Olcott</strong></h3>
           <p class="caption white">Chief People Officer<br></p>
         </a>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="content-container">
+      <div class="center-block">
+        <h2>Our Team</h2>
+      </div>
+      <div class="team-grid cols-4">
         <a data-mixpanel-component-id="kim_sears" data-mixpanel-component="team_page_photo_card" href="https://www.linkedin.com/in/kim-sears-42440812/" target="_blank" class="photo-card-2 w-inline-block">
           <h3 class="h3-2">Kim Sears</h3><img src="/images/53795074016_9247995bee_c_1.avif" loading="lazy" width="Auto" alt="" class="photo-card-background-2">
           <div id="kim_sears" data-mixpanel-component="card_photo_our_team_page" class="photo-card-gradient"></div>
@@ -127,8 +167,8 @@
           <h3 class="h3-2">Miranda Potmesil</h3>
           <p class="caption white">Director, New York Program</p>
         </a>
-        <a data-mixpanel-component-id="miranda_potmesil" data-mixpanel-component="team_page_photo_card" href="https://www.linkedin.com/in/chadtechner/" target="_blank" class="photo-card-2 w-inline-block"><img src="/images/1680280764724.jpg" loading="lazy" alt="" class="photo-card-background-2">
-          <div id="miranda_potmesil" data-mixpanel-component="card_photo_our_team_page" class="photo-card-gradient"></div>
+        <a data-mixpanel-component-id="chad_techner" data-mixpanel-component="team_page_photo_card" href="https://www.linkedin.com/in/chadtechner/" target="_blank" class="photo-card-2 w-inline-block"><img src="/images/1680280764724.jpg" loading="lazy" alt="" class="photo-card-background-2">
+          <div id="chad_techner" data-mixpanel-component="card_photo_our_team_page" class="photo-card-gradient"></div>
           <h3 class="h3-2">Chad Techner</h3>
           <p class="caption white">Director, Detroit Program</p>
         </a>
@@ -137,6 +177,198 @@
           <h3 class="h3-2"><strong>Anne Swanson</strong></h3>
           <p class="caption white">VP of Strategy and Growth<br></p>
         </a>
+        <div id="drew_garza" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="drew_garza" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Drew Garza</h3>
+          <p class="caption white">HR Generalist</p>
+        </div>
+        <div id="shondria_britt_canela" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="shondria_britt_canela" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Shondria Britt Canela</h3>
+          <p class="caption white">Payroll and Benefits Administrator</p>
+        </div>
+        <div id="stephen_roche" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="stephen_roche" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Stephen Roche</h3>
+          <p class="caption white">Marketing Director</p>
+        </div>
+        <div id="david_pulsifer" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="david_pulsifer" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">David Pulsifer</h3>
+          <p class="caption white">Finance Manager</p>
+        </div>
+        <div id="zoe_longley" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="zoe_longley" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Zoe Longley</h3>
+          <p class="caption white">Community Engagement Manager</p>
+        </div>
+        <div id="olivia_molina" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="olivia_molina" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Olivia Molina</h3>
+          <p class="caption white">Volunteer Manager</p>
+        </div>
+        <div id="braden_walper" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="braden_walper" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Braden Walper</h3>
+          <p class="caption white">Retail Rescue Ops Manager</p>
+        </div>
+        <div id="michael_metevia" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="michael_metevia" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Michael Metevia</h3>
+          <p class="caption white">Ops Manager - Detroit</p>
+        </div>
+        <div id="leah_owens" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="leah_owens" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Leah Owens</h3>
+          <p class="caption white">Inventory Coordinator - Detroit</p>
+        </div>
+        <div id="kedric_gabriel" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="kedric_gabriel" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Kedric Gabriel</h3>
+          <p class="caption white">Warehouse Lead - Detroit</p>
+        </div>
+        <div id="gabriel_spratt" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="gabriel_spratt" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Gabriel Spratt</h3>
+          <p class="caption white">Operations Manager - New York</p>
+        </div>
+        <div id="christopher_baizan" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="christopher_baizan" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Christopher Baizan</h3>
+          <p class="caption white">Warehouse Lead - New York</p>
+        </div>
+        <div id="edwin_puntiel" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="edwin_puntiel" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Edwin Puntiel</h3>
+          <p class="caption white">Inventory Coordinator - NY</p>
+        </div>
+        <div id="gabrielle_smiley" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="gabrielle_smiley" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Gabrielle Smiley</h3>
+          <p class="caption white">Program Coordinator - NY</p>
+        </div>
+        <div id="christian_leach" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="christian_leach" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Christian Leach</h3>
+          <p class="caption white">Warehouse Lead - Philadelphia</p>
+        </div>
+        <div id="brandon_burns" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="brandon_burns" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Brandon Burns</h3>
+          <p class="caption white">Inventory Coordinator - Philadelphia</p>
+        </div>
+        <div id="olivia_chapman" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="olivia_chapman" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Olivia Chapman</h3>
+          <p class="caption white">Program Coordinator - Philadelphia</p>
+        </div>
+        <div id="austin_bloomberg" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="austin_bloomberg" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Austin Bloomberg</h3>
+          <p class="caption white">Operations Manager - Chicago</p>
+        </div>
+        <div id="abby_zolner" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="abby_zolner" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Abby Zolner</h3>
+          <p class="caption white">Warehouse Lead - Chicago</p>
+        </div>
+        <div id="mike_meyer" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="mike_meyer" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Mike Meyer</h3>
+          <p class="caption white">Head of Food System Advocacy</p>
+        </div>
+        <div id="marsha_hazen" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="marsha_hazen" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Marsha Hazen</h3>
+          <p class="caption white">Direct Link Coordinator</p>
+        </div>
+        <div id="leo_paz" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="leo_paz" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Leo Paz</h3>
+          <p class="caption white">Food Sourcing Manager</p>
+        </div>
+        <div id="mackenzie_lennox" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="mackenzie_lennox" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Mackenzie Lennox</h3>
+          <p class="caption white">Direct Link Coordinator</p>
+        </div>
+        <div id="deshawn_wright" data-mixpanel-component="team_page_member_card" data-mixpanel-component-id="deshawn_wright" class="photo-card-2">
+          <!-- PLACEHOLDER: to add a photo, replace the div below with:
+               <img src="/images/FILENAME" loading="lazy" alt="" class="photo-card-background-2"> -->
+          <div class="team-member-photo-placeholder"><img src="/images/user-icon.svg" loading="lazy" width="72" height="72" alt=""></div>
+          <div class="photo-card-gradient"></div>
+          <h3 class="h3-2">Deshawn Wright</h3>
+          <p class="caption white">Operations Manager - Philadelphia</p>
+        </div>
       </div>
     </div>
   </div>
@@ -146,7 +378,7 @@
         <h2>Our Board</h2>
         <p class="para black center _10-margin"></p>
       </div>
-      <div class="photo-card-container-2 team">
+      <div class="team-grid cols-4">
         <a data-mixpanel-component-id="terri_wiggins" data-mixpanel-component="team_page_photo_card_board" href="https://www.linkedin.com/in/terriwiggins/" target="_blank" class="photo-card-2 w-inline-block"><img src="/images/Terri-2_1.avif" loading="lazy" width="Auto" alt="" class="photo-card-background-2">
           <div id="terri_wiggins" data-mixpanel-component="card_photo_our_team_page_board" data-mixpanel-component-id="terri_wiggins" class="photo-card-gradient"></div>
           <h3 class="h3-2">Terri Wiggins</h3>
