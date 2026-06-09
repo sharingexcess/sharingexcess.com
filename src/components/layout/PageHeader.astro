@@ -1,0 +1,20 @@
+---
+interface Props {
+  title: string;
+  image: string;
+  imageAlt?: string;
+}
+
+const { title, image, imageAlt = "" } = Astro.props;
+---
+
+<div id="Header" class="section page-header">
+  <h1 class="color-white text-align-center mobile-font-size-2xl">{title}</h1>
+  <img
+    src={image}
+    loading="eager"
+    width="70"
+    alt={imageAlt}
+    class="header-photo-background"
+  />
+</div>
