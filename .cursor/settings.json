@@ -2,6 +2,9 @@
   "plugins": {
     "webflow": {
       "enabled": true
+    },
+    "sentry": {
+      "enabled": true
     }
   }
 }
