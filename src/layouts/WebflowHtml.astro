@@ -20,10 +20,35 @@ const { htmlAttrs, headHtml, bodyHtml } = Astro.props;
           : "https://surplus-api.staging.sharingexcess.com";
       })();
     </script>
+    <script
+      src="https://js.sentry-cdn.com/d73e9e40eaf6f191cb6758409bebcaa4.min.js"
+      crossorigin="anonymous"></script>
+    <script is:inline>
+      Sentry.onLoad(function () {
+        var isProduction =
+          window.location.hostname === "sharingexcess.com" ||
+          window.location.hostname === "www.sharingexcess.com";
+        Sentry.init({
+          env: isProduction ? "production" : "staging",
+          autoSessionTracking: true,
+          tracesSampleRate: 1.0,
+          replaysSessionSampleRate: isProduction ? 0.1 : 1.0,
+          replaysOnErrorSampleRate: 1.0,
+          ignoreErrors: [
+            "Script error.",
+            "ResizeObserver loop",
+            /webkit\.messageHandlers/,
+          ],
+          denyUrls: [/extensions\//i, /^chrome:\/\//i],
+        });
+      });
+    </script>
     <Fragment set:html={headHtml} />
   </head>
   <body>
     <Fragment set:html={bodyHtml} />
+    <script defer src="/js/cookie-consent.js"></script>
+    <script defer src="/js/impact-data.js"></script>
     <script defer src="/js/header-scroll.js"></script>
   </body>
 </html>

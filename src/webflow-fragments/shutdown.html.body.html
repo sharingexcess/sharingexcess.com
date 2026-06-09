@@ -394,6 +394,11 @@
              setTimeout(initPhiladelphiaMap, 100);
              return;
          }
+         if (typeof mapboxgl === 'undefined') {
+             console.warn('Mapbox GL not loaded; skipping map.');
+             return;
+         }
+         try {
          // Set your Mapbox access token
          mapboxgl.accessToken = 'pk.eyJ1Ijoic2Fya2FyaWNodGVyIiwiYSI6ImNtZmNzNGp0ZTAxZWsya3B3NGFjeWxhMDAifQ._1ZjMM4WDoABNcjVna4wSw';
          // Initialize map
@@ -408,6 +413,9 @@
              console.log(`Philadelphia map loaded, adding ${locations.length} markers...`);
              addMarkers(map, locations);
          });
+         } catch (error) {
+             console.warn('Failed to initialize map:', error);
+         }
      }
      // Start initialization when DOM is ready
      if (document.readyState === 'loading') {
@@ -620,6 +628,11 @@
              setTimeout(initNewYorkMap, 100);
              return;
          }
+         if (typeof mapboxgl === 'undefined') {
+             console.warn('Mapbox GL not loaded; skipping map.');
+             return;
+         }
+         try {
          // Set your Mapbox access token
          mapboxgl.accessToken = 'pk.eyJ1Ijoic2Fya2FyaWNodGVyIiwiYSI6ImNtZmNzNGp0ZTAxZWsya3B3NGFjeWxhMDAifQ._1ZjMM4WDoABNcjVna4wSw';
          // Initialize map
@@ -634,6 +647,9 @@
              console.log(`New York map loaded, adding ${locations.length} markers...`);
              addMarkers(map, locations);
          });
+         } catch (error) {
+             console.warn('Failed to initialize map:', error);
+         }
      }
      // Start initialization when DOM is ready
      if (document.readyState === 'loading') {
@@ -834,6 +850,11 @@
              setTimeout(initChicagoMap, 100);
              return;
          }
+         if (typeof mapboxgl === 'undefined') {
+             console.warn('Mapbox GL not loaded; skipping map.');
+             return;
+         }
+         try {
          // Set your Mapbox access token
          mapboxgl.accessToken = 'pk.eyJ1Ijoic2Fya2FyaWNodGVyIiwiYSI6ImNtZmNzNGp0ZTAxZWsya3B3NGFjeWxhMDAifQ._1ZjMM4WDoABNcjVna4wSw';
          // Initialize map
@@ -848,6 +869,9 @@
              console.log(`Chicago map loaded, adding ${locations.length} markers...`);
              addMarkers(map, locations);
          });
+         } catch (error) {
+             console.warn('Failed to initialize map:', error);
+         }
      }
      // Start initialization when DOM is ready
      if (document.readyState === 'loading') {
@@ -1109,6 +1133,11 @@
              setTimeout(initDetroitMap, 100);
              return;
          }
+         if (typeof mapboxgl === 'undefined') {
+             console.warn('Mapbox GL not loaded; skipping map.');
+             return;
+         }
+         try {
          // Set your Mapbox access token
          mapboxgl.accessToken = 'pk.eyJ1Ijoic2Fya2FyaWNodGVyIiwiYSI6ImNtZmNzNGp0ZTAxZWsya3B3NGFjeWxhMDAifQ._1ZjMM4WDoABNcjVna4wSw';
          // Initialize map
@@ -1123,6 +1152,9 @@
              console.log(`Detroit map loaded, adding ${locations.length} markers...`);
              addMarkers(map, locations);
          });
+         } catch (error) {
+             console.warn('Failed to initialize map:', error);
+         }
      }
      // Start initialization when DOM is ready
      if (document.readyState === 'loading') {

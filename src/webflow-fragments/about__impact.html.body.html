@@ -148,6 +148,15 @@ border-top-color:#008236;
               <img src="/images/logo.png" alt="Loading Logo" width="80">
             </div>
             <script>
+(function () {
+var mapContainer = document.getElementById('impact-map');
+var loadingLogo = document.getElementById('loading-logo');
+if (typeof mapboxgl === 'undefined' || !mapContainer) {
+  if (loadingLogo) loadingLogo.style.display = 'none';
+  console.warn('Map unavailable: Mapbox GL not loaded or container missing.');
+  return;
+}
+try {
 const ACCESS_TOKEN = 'pk.eyJ1Ijoic2Fya2FyaWNodGVyIiwiYSI6ImNtOXU5cDkwNjA3dGgycXB5Zmt1NGpreWEifQ.prxEqERsrMZSwXxahDnkbg';
 mapboxgl.accessToken = ACCESS_TOKEN;
 const map = new mapboxgl.Map({
@@ -247,6 +256,11 @@ map.on('mouseleave', 'unclustered-point', () => map.getCanvas().style.cursor = '
 map.on('idle', () => {
 document.getElementById('loading-logo').style.display = 'none';
 });
+} catch (error) {
+  if (loadingLogo) loadingLogo.style.display = 'none';
+  console.warn('Failed to initialize map:', error);
+}
+})();
 </script>
           </body>
           </html>

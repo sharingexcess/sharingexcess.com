@@ -150,6 +150,20 @@ function fragNameFromPage(pageRel: string): string {
   return pageRel.replace(/\//g, "__");
 }
 
+/** Scripts loaded site-wide from WebflowHtml.astro / public/js — strip on Webflow regen. */
+function stripCentralizedScripts(html: string): string {
+  return html
+    .replace(/\s*<script id="cookie-consent">[\s\S]*?<\/script>/g, "")
+    .replace(
+      /\s*<script type="text\/javascript" id="getImpactData">[\s\S]*?<\/script>/g,
+      "",
+    )
+    .replace(
+      /\s*<script src="https:\/\/js\.sentry-cdn\.com\/d73e9e40eaf6f191cb6758409bebcaa4\.min\.js" crossorigin="anonymous">[\s\S]*?<\/script>\s*<script>[\s\S]*?Sentry\.onLoad[\s\S]*?<\/script>/g,
+      "",
+    );
+}
+
 function pagePathToAstroPath(pageRel: string): string {
   const base = pageRel.replace(/\.html$/i, "");
   if (base === "index") return join(PAGES, "index.astro");
@@ -176,7 +190,7 @@ async function main() {
     let bodyInner = "";
     if (htmlEl) {
       rewriteDocument(document, pageRel);
-      headInner = document.head?.innerHTML ?? "";
+      headInner = stripCentralizedScripts(document.head?.innerHTML ?? "");
       bodyInner = document.body?.innerHTML ?? "";
     }
 
