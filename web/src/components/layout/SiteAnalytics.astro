@@ -1,0 +1,31 @@
+---
+/** Analytics and error monitoring — port full GTM/Mixpanel from legacy when pages migrate. */
+---
+
+<script is:inline>
+  window.__SE_SURPLUS_API_ORIGIN = (function () {
+    var host = location.hostname;
+    return host === "sharingexcess.com" || host === "www.sharingexcess.com"
+      ? "https://surplus-api.sharingexcess.com"
+      : "https://surplus-api.staging.sharingexcess.com";
+  })();
+</script>
+<script
+  src="https://js.sentry-cdn.com/d73e9e40eaf6f191cb6758409bebcaa4.min.js"
+  crossorigin="anonymous"></script>
+<script is:inline>
+  Sentry.onLoad(function () {
+    var isProduction =
+      window.location.hostname === "sharingexcess.com" ||
+      window.location.hostname === "www.sharingexcess.com";
+    Sentry.init({
+      env: isProduction ? "production" : "staging",
+      autoSessionTracking: true,
+      tracesSampleRate: 1.0,
+      replaysSessionSampleRate: isProduction ? 0.1 : 1.0,
+      replaysOnErrorSampleRate: 1.0,
+      ignoreErrors: ["Script error.", "ResizeObserver loop", /webkit\.messageHandlers/],
+      denyUrls: [/extensions\//i, /^chrome:\/\//i],
+    });
+  });
+</script>

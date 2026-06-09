@@ -1,0 +1,36 @@
+{
+  "name": "@sharingexcess/web",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev --port 4322",
+    "build": "astro build",
+    "preview": "astro preview",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build -o storybook-static"
+  },
+  "dependencies": {
+    "@astrojs/react": "^4.2.1",
+    "@tailwindcss/vite": "^4.1.8",
+    "astro": "6.4.4",
+    "clsx": "^2.1.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tailwind-merge": "^3.3.0",
+    "tailwindcss": "^4.1.8"
+  },
+  "overrides": {
+    "vite": "^7.3.2"
+  },
+  "devDependencies": {
+    "@storybook-astro/framework": "^1.4.0",
+    "@storybook/addon-a11y": "^10.4.3",
+    "@storybook/addon-docs": "^10.4.3",
+    "@storybook/builder-vite": "^10.4.3",
+    "@storybook/react": "^10.4.3",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "storybook": "^10.4.3",
+    "typescript": "^6.0.2"
+  }
+}

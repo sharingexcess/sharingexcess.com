@@ -7,7 +7,7 @@ import { readdir } from "node:fs/promises";
 import { join } from "node:path";
 
 const ROOT = join(import.meta.dirname, "../..");
-const DIST = join(ROOT, "dist");
+const DIST = join(ROOT, "legacy/dist");
 
 async function listHtml(dir: string, base = ""): Promise<string[]> {
   const out: string[] = [];

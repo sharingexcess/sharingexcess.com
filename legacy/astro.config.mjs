@@ -8,6 +8,7 @@ const site =
 
 export default {
   site,
+  publicDir: "../public",
   output: "static",
   integrations: [
     tailwind({

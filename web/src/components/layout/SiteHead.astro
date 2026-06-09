@@ -1,0 +1,38 @@
+---
+import SiteAnalytics from "./SiteAnalytics.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  ogType?: "website" | "article";
+}
+
+const { title, description, canonical, ogType = "website" } = Astro.props;
+
+const resolvedCanonical =
+  canonical ?? new URL(Astro.url.pathname, Astro.site ?? "https://www.sharingexcess.com").href;
+
+const ogImage =
+  "https://cdn.prod.website-files.com/67d1d2d9c708819c5185d49c/687a640339afb6f59498f646_open_graph.png";
+---
+
+<meta charset="utf-8" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={resolvedCanonical} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:type" content={ogType} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<SiteAnalytics />

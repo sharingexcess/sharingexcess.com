@@ -9,8 +9,8 @@ import { dirname, join, posix, relative } from "node:path";
 const REPO = join(import.meta.dirname, "../..");
 /** Webflow “Export code” folder (ZIP extracted here). */
 const EXPORT = join(REPO, "sharingexcess.webflow");
-const FRAG = join(REPO, "src/webflow-fragments");
-const PAGES = join(REPO, "src/pages");
+const FRAG = join(REPO, "legacy/src/webflow-fragments");
+const PAGES = join(REPO, "legacy/src/pages");
 
 function isExternalHref(href: string): boolean {
   const t = href.trim();
@@ -207,7 +207,7 @@ async function main() {
     await mkdir(dirname(astroOut), { recursive: true });
 
     // Compute import paths robustly
-    const relToLayouts = relative(dirname(astroOut), join(REPO, "src/layouts/WebflowHtml.astro")).replace(
+    const relToLayouts = relative(dirname(astroOut), join(REPO, "legacy/src/layouts/WebflowHtml.astro")).replace(
       /\\/g,
       "/",
     );

@@ -1,0 +1,27 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import HeroSection from "@/sections/HeroSection";
+import TextImageSection from "@/sections/TextImageSection";
+---
+
+<PageLayout
+  title="About Sharing Excess | Innovative Food Rescue Nonprofit"
+  description="Learn how Sharing Excess rescues surplus food and delivers it to communities in need."
+>
+  <HeroSection
+    theme="dark"
+    title="About Sharing Excess"
+    subtitle="We connect surplus food from businesses to nonprofits serving communities facing food insecurity."
+    ctaLabel="Get involved"
+    ctaHref="/get-involved"
+  />
+  <TextImageSection
+    theme="light"
+    title="Food rescue at scale"
+    body="Sharing Excess coordinates volunteers, logistics, and partnerships to move fresh food quickly from where it is surplus to where it is needed."
+    imageSrc="/images/financials.jpg"
+    imageAlt="Sharing Excess team distributing food"
+    imagePosition="right"
+    imageStyle="square"
+  />
+</PageLayout>

@@ -1,21 +1,22 @@
-# Static Astro site: build with Bun, serve dist with a tiny static server (Railway sets PORT).
+# Static Astro site: build legacy app with Bun, serve dist with a tiny static server (Railway sets PORT).
+# At cutover: change build step to `cd web && bun run build` and COPY web/dist.
 FROM oven/bun:slim AS builder
 
 WORKDIR /app
 
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+COPY legacy/package.json legacy/bun.lock ./legacy/
+RUN cd legacy && bun install --frozen-lockfile
 
-COPY . .
-RUN bun run build
+COPY legacy/ ./legacy/
+COPY public/ ./public/
+RUN cd legacy && bun run build
 
 FROM oven/bun:slim
 
 WORKDIR /app
-# Runtime only — not the full app node_modules (keeps image small)
 RUN bun add serve@14.2.6
 
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/legacy/dist ./dist
 
 ENV NODE_ENV=production
 ENV PORT=3000

@@ -1,0 +1,27 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import HeroSection from "@/sections/HeroSection";
+import StatsCardSection from "@/sections/StatsCardSection";
+---
+
+<PageLayout
+  title="Sharing Excess | National Food Rescue Nonprofit"
+  description="Sharing Excess rescues surplus food and delivers it to communities facing food insecurity."
+>
+  <HeroSection
+    theme="dark"
+    title="Rescue food. Feed communities."
+    subtitle="The new Sharing Excess site is under construction. Explore the design system in Storybook."
+    ctaLabel="About us"
+    ctaHref="/about"
+  />
+  <StatsCardSection
+    theme="light"
+    title="Our impact"
+    stats={[
+      { value: "1.2M+", label: "Pounds rescued" },
+      { value: "80+", label: "Partner organizations" },
+      { value: "5K+", label: "Volunteers" },
+    ]}
+  />
+</PageLayout>

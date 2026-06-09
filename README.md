@@ -1,37 +1,40 @@
 # sharingexcess.com
 
-Static site migrated from Webflow (export ZIP + Astro). [Bun](https://bun.com) is the package manager.
+Static site on [Bun](https://bun.com) + Astro. The repo has two apps:
+
+- **`legacy/`** — current Webflow-migration site (production build target)
+- **`web/`** — greenfield rewrite (Astro + React + Tailwind v4)
 
 ## Setup
 
 ```bash
-bun install
+bun install --cwd legacy
+bun install --cwd web
 ```
 
 ## Develop
 
 ```bash
-bun run dev
+bun run dev          # legacy site → http://localhost:4321
+bun run dev:web      # new site    → http://localhost:4322
+bun run storybook    # design system → http://localhost:6006
 ```
 
 ## Build and preview
 
 ```bash
-bun run build
+bun run build        # production (legacy)
+bun run build:web    # new site
 bun run preview
 ```
 
 ## Webflow export
 
-Extract the Webflow code ZIP so the site lives at **`sharingexcess.webflow/`** at the repo root (same layout as Webflow’s export: `css/`, `js/`, `images/`, HTML files, etc.). If `unzip` fails on odd filenames on macOS, use:
+Extract the Webflow code ZIP to **`sharingexcess.webflow/`** at the repo root, then:
 
 ```bash
-mkdir -p sharingexcess.webflow && bsdtar -xf sharingexcess.webflow.zip -C sharingexcess.webflow
+bun run sync:webflow
+bun run generate
 ```
 
-Sync static assets into Astro’s `public/` and regenerate pages:
-
-```bash
-rsync -a --delete sharingexcess.webflow/css sharingexcess.webflow/js sharingexcess.webflow/images sharingexcess.webflow/documents sharingexcess.webflow/videos public/
-bun scripts/migration/generate-webflow-astro.ts
-```
+See [AGENTS.md](AGENTS.md) for cutover steps when the rewrite is ready.

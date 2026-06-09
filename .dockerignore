@@ -12,6 +12,11 @@ node_modules
 
 # Build output (rebuilt in image)
 dist
+legacy/dist
+web/dist
+web/storybook-static
+web/node_modules
+legacy/node_modules
 
 # Env (use Railway variables / dashboard)
 .env

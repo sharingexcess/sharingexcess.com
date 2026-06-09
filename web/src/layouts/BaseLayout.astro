@@ -1,0 +1,23 @@
+---
+import SiteHead from "@/components/layout/SiteHead.astro";
+import "@/styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  ogType?: "website" | "article";
+}
+
+const { title, description, canonical, ogType } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <SiteHead title={title} description={description} canonical={canonical} ogType={ogType} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

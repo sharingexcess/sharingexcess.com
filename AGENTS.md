@@ -2,23 +2,31 @@
 
 ## Cursor Cloud specific instructions
 
-This is a static Astro site (sharingexcess.com) migrated from Webflow. Bun is the sole runtime and package manager — no Node.js, npm, or pnpm.
+Monorepo-style layout: **`legacy/`** (current production site) and **`web/`** (greenfield rewrite). Bun is the sole runtime and package manager.
 
 ### Key commands
 
-See `README.md` and `package.json` scripts for full reference. Quick summary:
-
 | Task | Command |
 |------|---------|
-| Install deps | `bun install` |
-| Dev server | `bun run dev` (port 4321) |
-| Build | `bun run build` |
+| Install legacy deps | `bun install --cwd legacy` |
+| Install web deps | `bun install --cwd web` |
+| Dev (legacy — production target) | `bun run dev` (port 4321) |
+| Dev (new site) | `bun run dev:web` (port 4322) |
+| Design system (Storybook) | `bun run storybook` (port 6006) |
+| Build production | `bun run build` → builds `legacy/` |
+| Build new site | `bun run build:web` |
 | Preview built site | `bun run preview` |
+
+### Cutover (when migration is complete)
+
+1. Change root `package.json` `"build"` to `bun run --cwd web build`
+2. Update `Dockerfile` to `cd web && bun run build` and `COPY web/dist`
+3. Smoke-test all URLs in `scripts/migration/output/urls.json`
+4. Delete `legacy/`, `sharingexcess.webflow/`, and legacy CSS in `public/css/`
 
 ### Notes
 
-- There are no lint scripts, test suites, or CI checks in this repo. Validation is done via `bun run build` (Astro static build).
-- The dev server (`bun run dev`) supports HMR. Pass `--host 0.0.0.0` to expose on all interfaces if needed.
-- No external services (databases, APIs, auth) are required — this is a pure static site.
-- `astro check` (type checking) can take several minutes; prefer `bun run build` for quick validation.
-- The `[WARN] [content] Content config not loaded` warning at dev server startup is benign and can be ignored.
+- Production deploy builds **`legacy/`** until cutover.
+- `web/` uses Tailwind v4 (`@tailwindcss/vite`) + React; `legacy/` stays on Tailwind v3 + Webflow CSS.
+- Validation: `bun run build` (legacy) or `bun run build:web` (new site).
+- Extract legacy copy for migration: `bun scripts/rewrite/extract-fragment-content.ts about.html.body.html`
