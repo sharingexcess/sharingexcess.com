@@ -5,7 +5,7 @@ description: "Learn how food rescue organizations recover surplus food and redir
 pubDate: 2025-06-09
 headerImage: /images/financials.jpg
 author:
-  name: Zach Daugherty
+  name: Zachary D.
   bio: "Zach is the founder and lead editor at Untapped Editorial. In addition to his writing, he has volunteered with food banks, community meal programs, and shelters, assisting with food distribution and outreach efforts."
   url: https://untappededitorial.com
 ---
