@@ -1,4 +1,5 @@
 ---
+import { AppProviders } from "@/components/providers/AppProviders";
 import SiteHead from "@/components/layout/SiteHead.astro";
 import "@/styles/global.css";
 
@@ -18,6 +19,8 @@ const { title, description, canonical, ogType } = Astro.props;
     <SiteHead title={title} description={description} canonical={canonical} ogType={ogType} />
   </head>
   <body>
-    <slot />
+    <AppProviders client:load>
+      <slot />
+    </AppProviders>
   </body>
 </html>

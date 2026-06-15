@@ -1,0 +1,33 @@
+---
+description: Button variant rules — secondary light/dark tokens; ghost on photo backgrounds only
+globs: web/src/components/ui/Button.tsx,web/src/components/ui/TextSection.tsx,web/src/sections/HeroSection.tsx
+alwaysApply: false
+---
+
+# Button variants
+
+## Primary and secondary — light and dark tokens
+
+Primary and secondary buttons use `colorScheme="light" | "dark"` for surface-appropriate styles:
+
+- **Primary light** — green fill (`#00843d`), white text, bright-kelly hover
+- **Primary dark** — white fill, dark-green text (`#003619`), bright-kelly hover
+- **Secondary light** — green border + text (`#00843d`) on light backgrounds
+- **Secondary dark** — white border + text on dark/colored backgrounds
+
+Both CTAs in `TextSection` follow `buttonScheme`: on dark surfaces, primary uses `primary` + `dark`; secondary stays `secondary` + `dark`. Never swap secondary for ghost on dark sections.
+
+```tsx
+// ✅ GOOD — dark section CTAs
+<Button variant="primary" colorScheme="dark" href={primaryCtaHref} />
+<Button variant="secondary" colorScheme="dark" href={secondaryCtaHref} />
+
+// ❌ BAD — ghost is not a dark-surface secondary substitute
+<Button variant="ghost" href={secondaryCtaHref} />
+```
+
+## Ghost — photo backgrounds only
+
+`variant="ghost"` is the liquid-glass home-hero secondary (Figma node 1010:1302). Use it only over full-bleed photography with a gradient overlay — e.g. `HeroHomeContent` in `HeroSection` (`full-width` and `rounded` layouts).
+
+Do not use ghost on solid dark section backgrounds; use `secondary` + `colorScheme="dark"` instead.

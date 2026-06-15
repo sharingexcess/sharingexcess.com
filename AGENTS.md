@@ -8,6 +8,7 @@ Monorepo-style layout: **`legacy/`** (current production site) and **`web/`** (g
 
 | Task | Command |
 |------|---------|
+| Install all deps | `bun run setup` |
 | Install legacy deps | `bun install --cwd legacy` |
 | Install web deps | `bun install --cwd web` |
 | Dev (legacy — production target) | `bun run dev` (port 4321) |
@@ -26,6 +27,7 @@ Monorepo-style layout: **`legacy/`** (current production site) and **`web/`** (g
 
 ### Notes
 
+- **Storybook copy:** When converting Figma components, keep the design's Lorem Ipsum placeholder text in `*.stories.tsx`. Do not substitute AI-generated marketing copy or invented stats — real copy goes in Astro pages only.
 - Production deploy builds **`legacy/`** until cutover.
 - `web/` uses Tailwind v4 (`@tailwindcss/vite`) + React; `legacy/` stays on Tailwind v3 + Webflow CSS.
 - Validation: `bun run build` (legacy) or `bun run build:web` (new site).

@@ -9,8 +9,14 @@ export interface StatProps {
 export function Stat({ value, label, className }: StatProps) {
   return (
     <div className={cn("rounded-xl bg-black/10 p-6 text-center", className)}>
-      <p className="text-3xl font-bold">{value}</p>
-      <p className="mt-2 text-sm opacity-80">{label}</p>
+      {/* Metric Number style */}
+      <p className="font-display text-[72px] font-bold leading-[1.06] tracking-[-2.88px] text-kale">
+        {value}
+      </p>
+      {/* Paragraph MD */}
+      <p className="mt-2 text-base leading-[1.4] text-kale opacity-80">
+        {label}
+      </p>
     </div>
   );
 }

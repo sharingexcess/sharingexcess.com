@@ -7,16 +7,22 @@ export interface HeadingProps {
   className?: string;
 }
 
+// Maps to Foundations/Typography documented styles (Poppins Medium).
+// cqw clamps target 1512px Figma artboard — parent needs `@container` (see SectionShell).
 const levelClasses = {
-  1: "text-4xl font-bold tracking-tight md:text-5xl",
-  2: "text-3xl font-bold tracking-tight",
-  3: "text-2xl font-semibold",
-  4: "text-xl font-semibold",
+  1: "text-[clamp(64px,7.94cqw,120px)] font-medium leading-none tracking-[-0.05em]", // Hero H1
+  2: "text-[clamp(48px,6.35cqw,96px)] font-medium leading-[1.06] tracking-[-0.04em]", // Section H1
+  3: "text-[clamp(40px,4.76cqw,72px)] font-medium leading-[1.06] tracking-[-0.04em]", // Section H2
+  4: "text-[32px] font-medium leading-[1.1]", // sub-label
 };
 
 export function Heading({ children, level = 2, className }: HeadingProps) {
   const Tag = `h${level}` as keyof JSX.IntrinsicElements;
-  return <Tag className={cn(levelClasses[level], className)}>{children}</Tag>;
+  return (
+    <Tag className={cn("text-kale", levelClasses[level], className)}>
+      {children}
+    </Tag>
+  );
 }
 
 export default Heading;

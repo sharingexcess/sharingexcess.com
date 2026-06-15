@@ -1,0 +1,16 @@
+{
+  "SectionLightBg": "#ffffff",
+  "SectionLightText": "#003619",
+  "SectionLightEmphasis": "#00843d",
+  "SectionLightSurface": "#f7f6f6",
+  "SectionLightAccent": "#00bc57",
+  "SectionLightBtn": "#00843d",
+  "SectionLightBtnLabel": "#ffffff",
+  "SectionDarkBg": "#003619",
+  "SectionDarkText": "#ffffff",
+  "SectionDarkEmphasis": "#00bc57",
+  "SectionDarkSurface": "#004d20",
+  "SectionDarkAccent": "#00bc57",
+  "SectionDarkBtn": "#ffffff",
+  "SectionDarkBtnLabel": "#003619"
+}

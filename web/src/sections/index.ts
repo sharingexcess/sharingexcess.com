@@ -1,5 +1,10 @@
-export { SectionShell } from "./SectionShell";
 export { HeroSection } from "./HeroSection";
 export { TextImageSection } from "./TextImageSection";
+export type { ThreeImageItem } from "./TextImageSection";
 export { StatsCardSection } from "./StatsCardSection";
 export { FormSection } from "./FormSection";
+export { LogosBannerSection } from "./LogosBannerSection";
+export type { LogoItem } from "./LogosBannerSection";
+export { SocialMediaSection } from "./SocialMediaSection";
+export type { SocialMediaItem, SocialMediaAspect } from "./SocialMediaSection";
+export { TextOnlySection } from "./TextOnlySection";

@@ -4,6 +4,9 @@ node_modules
 # output
 out
 dist
+web/src/styles/tokens.css
+web/src/styles/tokens-semantic.css
+web/src/styles/tokens-semantic-dark.css
 legacy/dist
 web/dist
 web/storybook-static

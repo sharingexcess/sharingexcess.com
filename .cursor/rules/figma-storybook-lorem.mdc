@@ -1,0 +1,34 @@
+---
+description: Keep Figma Lorem Ipsum copy in Storybook stories; never substitute AI marketing text
+globs: web/**/*.stories.tsx
+alwaysApply: false
+---
+
+# Figma → Storybook copy
+
+When converting Figma components to Storybook, **preserve the Lorem Ipsum placeholder text from the design**. Do not replace it with AI-generated marketing copy, brand messaging, or invented stats.
+
+## Use Figma copy as-is
+
+- Headings, body, eyebrows, CTAs, stat labels, and nav items should match Figma (typically Lorem ipsum variants).
+- Keep emphasis markers from Figma, e.g. `*Lorem ipsum* dolor sit amet.`
+- Image `alt` text in stories: use `""` for decorative images or a short Lorem fragment — not descriptive AI captions.
+
+## Do not invent
+
+```tsx
+// ❌ BAD — AI-generated placeholders
+title: "Rescuing food, feeding communities."
+body: "Sharing Excess partners with grocery stores..."
+label: "lbs rescued"
+imageAlt: "Food rescue at Trader Joe's loading dock"
+
+// ✅ GOOD — Figma Lorem Ipsum
+title: "Lorem ipsum dolor sit amet *conspectus*."
+body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis."
+label: "Lorem ipsum"
+primaryCta: "Primary CTA"
+imageAlt: ""
+```
+
+Real site copy belongs in Astro pages (`web/src/pages/`), not in `*.stories.tsx`.

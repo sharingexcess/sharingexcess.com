@@ -13,9 +13,11 @@ export const brandColors = [
 export type BrandColor = (typeof brandColors)[number];
 
 export const formSectionVariants = [
+  "brand-green",
+  "brand-green-glass",
+  "kale-glass",
   "dark-green",
-  "light-green",
   "white",
-  "tangerine",
   "banana",
+  "tangerine",
 ] as const;

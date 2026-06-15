@@ -8,9 +8,10 @@ Static site on [Bun](https://bun.com) + Astro. The repo has two apps:
 ## Setup
 
 ```bash
-bun install --cwd legacy
-bun install --cwd web
+bun run setup
 ```
+
+Or install each app separately: `bun install --cwd legacy` and `bun install --cwd web`.
 
 ## Develop
 
