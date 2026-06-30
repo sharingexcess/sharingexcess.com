@@ -1,0 +1,109 @@
+---
+import SiteHead from "../../components/layout/SiteHead.astro";
+import SiteHeader from "../../components/layout/SiteHeader.astro";
+import PageHeader from "../../components/layout/PageHeader.astro";
+import SiteFooter from "../../components/layout/SiteFooter.astro";
+import "../../styles/tailwind.css";
+
+const pageTitle = "Start a Birthday Fundraiser | Sharing Excess";
+const description =
+  "Turn your birthday into something bigger. Start a Sharing Excess birthday fundraiser, customize your page, and help rescue surplus food with every dollar donated.";
+const canonical = new URL("/get-involved/birthday-fundraiser", Astro.site).href;
+const heroImage = "/images/birthday-fundraiser.jpg";
+const bannerImage = "/images/birthday-fundraiser-banner.jpg";
+---
+
+<!doctype html>
+<html data-wf-site="67d1d2d9c708819c5185d49c" lang="en">
+  <head>
+    <script is:inline>
+      window.__SE_SURPLUS_API_ORIGIN = (function () {
+        var host = location.hostname;
+        return host === "sharingexcess.com" || host === "www.sharingexcess.com"
+          ? "https://surplus-api.sharingexcess.com"
+          : "https://surplus-api.staging.sharingexcess.com";
+      })();
+    </script>
+    <script
+      src="https://js.sentry-cdn.com/d73e9e40eaf6f191cb6758409bebcaa4.min.js"
+      crossorigin="anonymous"></script>
+    <script is:inline>
+      Sentry.onLoad(function () {
+        var isProduction =
+          window.location.hostname === "sharingexcess.com" ||
+          window.location.hostname === "www.sharingexcess.com";
+        Sentry.init({
+          env: isProduction ? "production" : "staging",
+          autoSessionTracking: true,
+          tracesSampleRate: 1.0,
+          replaysSessionSampleRate: isProduction ? 0.1 : 1.0,
+          replaysOnErrorSampleRate: 1.0,
+          ignoreErrors: ["Script error.", "ResizeObserver loop", /webkit\.messageHandlers/],
+          denyUrls: [/extensions\//i, /^chrome:\/\//i],
+        });
+      });
+    </script>
+    <SiteHead title={pageTitle} description={description} canonical={canonical} />
+  </head>
+  <body>
+    <SiteHeader />
+
+    <PageHeader
+      title="Start a birthday fundraiser"
+      image={bannerImage}
+      imageAlt="Hands holding a fresh peach"
+    />
+
+    <div class="section">
+      <div class="content-container">
+        <div class="_50-50-container">
+          <div class="_50-50-child">
+            <img
+              src={heroImage}
+              loading="lazy"
+              alt="Sharing Excess volunteer holding fresh tomatoes"
+              class="_50-50-image"
+            />
+          </div>
+          <div class="_50-50-child">
+            <h2 class="margin-bottom-lg">Turn your birthday into something bigger!</h2>
+            <h4 class="eyebrow color-green-primary margin-bottom-sm">1. Get Started</h4>
+            <p class="font-size-sm margin-bottom-lg">
+              In the weeks leading up to your birthday, start a fundraising campaign with Sharing
+              Excess. In just a few clicks we can make an impact together where every dollar
+              donated rescues 15 lbs of surplus food.
+            </p>
+            <h4 class="eyebrow color-green-primary margin-bottom-sm">2. Customize</h4>
+            <p class="font-size-sm margin-bottom-lg">
+              We start you off with some sample language but customize to your heart's content with
+              photos, a message, and a fundraising goal. Don't have a photo? Feel free to download
+              one of ours below!
+            </p>
+            <h4 class="eyebrow color-green-primary margin-bottom-sm">3. Share</h4>
+            <p class="font-size-sm margin-bottom-lg">
+              Direct your friends and family to your custom fundraising page in lieu of, or in
+              addition to, birthday gifts. All fundraisers that raise over $100 will receive a small
+              gift and note from our team!
+            </p>
+            <a
+              data-mixpanel-component="button_birthday_fundraiser_page_start_a_fundraiser"
+              href="https://sharingexcess.donorsupport.co/-/XBLDNAYJ"
+              class="button w-button">Start a Fundraiser</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <SiteFooter />
+
+    <script
+      src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=67d1d2d9c708819c5185d49c"
+      type="text/javascript"
+      integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+      crossorigin="anonymous"></script>
+    <script src="/js/webflow.js" type="text/javascript"></script>
+    <script defer src="/js/cookie-consent.js"></script>
+    <script defer src="/js/header-scroll.js"></script>
+  </body>
+</html>
