@@ -11,6 +11,6 @@ export {
 export { TextSection } from "./TextSection";
 export { TextInput } from "./TextInput";
 export { Container } from "./Container";
-export { Sticker } from "./Sticker";
+export { Sticker, type StickerName } from "./Sticker";
 export { Reveal } from "./Reveal";
 export { AnimatedHeroHeading } from "./AnimatedHeroHeading";

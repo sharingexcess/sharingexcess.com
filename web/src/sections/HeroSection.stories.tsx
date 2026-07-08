@@ -35,6 +35,11 @@ const meta = {
     isCard: { control: "boolean" },
     headingSize: { control: "radio", options: ["h1", "h2"] },
     bodySize: { control: "radio", options: ["xl", "lg", "md"] },
+    sticker: { control: "boolean" },
+    stickerName: {
+      control: "select",
+      options: ["free-food", "waste-less", "sunrise", "lemon"],
+    },
   },
 } satisfies Meta<typeof HeroSection>;
 
@@ -48,7 +53,8 @@ export const HomeFullWidth: Story = {
   args: {
     layout: "full-width",
     title: homeTitle,
-    body: undefined,
+    body: subpageBody,
+    bodySize: "xl",
     eyebrow: undefined,
     imageSrc: "/images/oranges.jpg",
     imageAlt: "",
@@ -59,9 +65,7 @@ export const HomeFullWidth: Story = {
     layout: { control: false },
     isCard: { control: false },
     eyebrow: { control: false },
-    body: { control: false },
     headingSize: { control: false },
-    bodySize: { control: false },
   },
 };
 
@@ -94,11 +98,15 @@ export const StackLeft: Story = {
     layout: "stack-left",
     title: subpageTitle,
     body: undefined,
-    eyebrow: "Section Eyebrow",
+    eyebrow: undefined,
+    imageCaption: "Lorem ipsum dolor sit amet.",
     showButtons: false,
+    sticker: false,
+    stickerName: "free-food",
   },
   argTypes: {
     layout: { control: false },
+    eyebrow: { control: false },
   },
 };
 
@@ -109,6 +117,8 @@ export const StackCentered: Story = {
     body: subpageBody,
     eyebrow: undefined,
     showButtons: false,
+    sticker: false,
+    stickerName: "free-food",
   },
   argTypes: {
     layout: { control: false },

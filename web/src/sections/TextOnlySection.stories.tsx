@@ -9,6 +9,7 @@ const meta = {
   decorators: [withSectionControls],
   args: {
     ...sectionControlArgs,
+    isCard: false,
     eyebrow: "Section Eyebrow",
     title: "Lorem ipsum dolor sit *conspectus*.",
     body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis.",
@@ -19,6 +20,7 @@ const meta = {
   },
   argTypes: {
     ...sectionControlArgTypes,
+    isCard: { control: "boolean" },
     align: { control: "radio", options: ["left", "center"] },
     layout: { control: "radio", options: ["vertical", "horizontal"] },
     headingSize: { control: "radio", options: ["h1", "h2"] },
@@ -38,5 +40,18 @@ export const CenterAligned: Story = {
     align: "center",
     layout: "vertical",
     eyebrow: "Section Eyebrow",
+  },
+};
+
+export const CenterAlignedCard: Story = {
+  name: "Center aligned — card",
+  args: {
+    theme: "dark",
+    align: "center",
+    layout: "vertical",
+    isCard: true,
+    eyebrow: "Section Eyebrow",
+    primaryCta: undefined,
+    secondaryCta: undefined,
   },
 };

@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import { useFitText } from "@/lib/useFitText";
 import {
   figmaQuickSpring,
   motion,
@@ -170,6 +171,8 @@ export function StatCard(props: StatCardProps) {
 
   const color = colorVariants[variant];
   const reduceMotion = useReducedMotion();
+  const { containerRef: valueContainerRef, textRef: valueRef, fontSizePx } =
+    useFitText(value);
 
   const hoverRotate = isImage
     ? imageTiltDegrees[tilt!]
@@ -183,7 +186,7 @@ export function StatCard(props: StatCardProps) {
 
   return (
     <motion.div
-      className={cn("group w-full @container cursor-pointer", className)}
+      className={cn("group w-full cursor-pointer", className)}
       whileHover={
         reduceMotion
           ? undefined
@@ -192,8 +195,8 @@ export function StatCard(props: StatCardProps) {
     >
       <motion.div
         className={cn(
-          "relative h-[432px] w-full overflow-hidden rounded-[var(--radius-md)] bg-[var(--section-surface)] p-[42px]",
-          "flex flex-col",
+          "@container relative h-[432px] w-full overflow-hidden rounded-[var(--radius-md)] bg-[var(--section-surface)] p-[42px]",
+          "flex min-w-0 flex-col",
           isImage ? "gap-2" : "gap-[178px]",
         )}
         initial="rest"
@@ -257,15 +260,22 @@ export function StatCard(props: StatCardProps) {
           </motion.div>
         )}
 
-        <p
-          className={cn(
-            "relative z-10 font-display text-[clamp(3.5rem,28.8cqw,8rem)] font-bold leading-[1.06] tracking-[-0.04em] transition-colors duration-[600ms] shrink-0",
-            textClass,
-            hoverTextClass,
-          )}
+        <div
+          ref={valueContainerRef}
+          className="relative z-10 min-w-0 max-w-full"
         >
-          {value}
-        </p>
+          <p
+            ref={valueRef}
+            style={fontSizePx != null ? { fontSize: `${fontSizePx}px` } : undefined}
+            className={cn(
+              "inline-block w-fit max-w-full whitespace-nowrap font-display text-[clamp(3.5rem,28.8cqw,8rem)] font-bold leading-[1.06] tracking-[-0.04em] transition-colors duration-[600ms]",
+              textClass,
+              hoverTextClass,
+            )}
+          >
+            {value}
+          </p>
+        </div>
 
         <p
           className={cn(

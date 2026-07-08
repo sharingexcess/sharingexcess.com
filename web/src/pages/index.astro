@@ -1,27 +1,142 @@
 ---
 import PageLayout from "@/layouts/PageLayout.astro";
+import { getInstagramFeed, SOCIAL_MEDIA_FALLBACK_ITEMS } from "@/lib/instagram";
+import DonationSection from "@/sections/DonationSection";
 import HeroSection from "@/sections/HeroSection";
-import StatsCardSection from "@/sections/StatsCardSection";
+import LogosBannerSection from "@/sections/LogosBannerSection";
+import MapSection from "@/sections/MapSection";
+import SocialMediaSection from "@/sections/SocialMediaSection";
+import TextImageSection from "@/sections/TextImageSection";
+
+const instagramItems = await getInstagramFeed(4);
+const socialItems = instagramItems ?? SOCIAL_MEDIA_FALLBACK_ITEMS;
+
+const supporterLogos = [
+  { src: "/images/Mr-Beast_1.avif", alt: "MrBeast" },
+  { src: "/images/Trader-Joes.avif", alt: "Trader Joe's" },
+  { src: "/images/Pew-Logo.avif", alt: "The Pew Charitable Trusts" },
+  { src: "/images/robin-Hood_1.avif", alt: "Robin Hood" },
+  { src: "/images/Beast-Philanthropy_Logo_1.avif", alt: "Beast Philanthropy" },
+  { src: "/images/Tony-Robbins-Foundation.avif", alt: "Tony Robbins Foundation" },
+  { src: "/images/Hunts-Point-1_1.avif", alt: "Hunts Point Produce Market" },
+  { src: "/images/Misfits-Market.avif", alt: "Misfits Market" },
+  { src: "/images/PWPM-1.avif", alt: "Philadelphia Wholesale Produce Market" },
+  { src: "/images/independence-blue-cross-logo.png", alt: "Independence Blue Cross" },
+];
 ---
 
 <PageLayout
   title="Sharing Excess | National Food Rescue Nonprofit"
-  description="Sharing Excess rescues surplus food and delivers it to communities facing food insecurity."
+  description="Sharing Excess rescues and distributes more than 2,000,000 lbs. of food every week in partnership with grocers, wholesalers, and farmers."
 >
-  <HeroSection
-    theme="dark"
-    title="Rescue food. Feed communities."
-    body="The new Sharing Excess site is under construction. Explore the design system in Storybook."
-    primaryCta="About us"
-    primaryCtaHref="/about"
+  <HeroSection client:visible
+    layout="full-width"
+    title={"Rescuing Food,\nFeeding Communities"}
+    body="Sharing Excess rescues and distributes more than 2,000,000 lbs. of food every week in partnership with grocers, wholesalers, and farmers."
+    imageSrc="/videos/banner_web_poster.0000000.jpg"
+    imageAlt=""
+    primaryCta="Support Our Mission"
+    primaryCtaHref="/?form=donate"
+    secondaryCta="Donate Surplus Food"
+    secondaryCtaHref="/get-involved/partner"
   />
-  <StatsCardSection
+
+  <TextImageSection client:visible
     theme="light"
-    title="Our impact"
-    stats={[
-      { value: "1.2M+", label: "Pounds rescued" },
-      { value: "80+", label: "Partner organizations" },
-      { value: "5K+", label: "Volunteers" },
+    eyebrow="Our mission"
+    title="We bridge the gap between *food waste and food scarcity*"
+    body="In the United States, nearly 40% of food goes to waste while 47 million Americans go hungry. We believe food should be shared– not wasted. With innovative technology and a nationwide network, Sharing Excess rescues edible surplus from food businesses and redistributes it to local hunger relief organizations."
+    imageSrc="/images/53881302454_a77bd9b818_o-1-2.jpg"
+    imageAlt=""
+    imagePosition="right"
+    imageStyle="square"
+    primaryCta="Help us close the gap"
+    primaryCtaHref="/?form=donate"
+  />
+
+  <TextImageSection client:visible
+    theme="light"
+    layout="three-image-caption"
+    eyebrow="How we do it"
+    headingSize="h2"
+    title="We make it easy to donate fresh food"
+    body="Sharing Excess provides solutions for food businesses of any scale — helping capture surplus and redirect it to community hunger relief organizations."
+    images={[
+      {
+        src: "/images/53710116160_9b90d337d9_o-2.jpg",
+        alt: "",
+        title: "Retail Rescue",
+        body: "Designed for grocery stores, restaurants, cafés, and catering halls — any place with daily excess. Our drivers use refrigerated vans and box trucks, guided by our app, to pick up and deliver fresh food to local partners.",
+      },
+      {
+        src: "/images/Wholesale-Rescue_1.avif",
+        alt: "",
+        title: "Wholesale Rescue",
+        body: "We work on-site at major produce markets to glean, pack, and distribute large volumes of surplus food. Perfect for wholesalers who want to do good with what they can't sell — and avoid costly disposal fees.",
+      },
+      {
+        src: "/images/53795236350_d7a04bcabb_3k-1.jpg",
+        alt: "",
+        title: "Direct Link",
+        body: "For high-volume surplus from farms, manufacturers, and distribution centers, we activate our network of third-party transportation partners to deliver food across the country. It's bulk-scale food rescue, with zero friction.",
+      },
     ]}
+  />
+
+  <MapSection client:load
+    theme="dark"
+    headingSize="h2"
+    title="234M+ pounds of food distributed so far"
+    body="Since 2018, Sharing Excess has distributed enough surplus to feed over 10 million people across the country. Thanks to our Food Rescue App, we know exactly where every pound of food came from — and where it went. Because food shouldn't go to waste. And impact shouldn't be a mystery."
+    mapPosition="left"
+    mapContainerShape="circle"
+    mapVariant="impact-clusters"
+    mapCaption="Over 2,000 distribution locations across 36 states"
+    primaryCta="Impact Data"
+    primaryCtaHref="/about/impact"
+    secondaryCta="How We Measure"
+    secondaryCtaHref="https://docs.sharingexcess.com/docs/impact-measurement"
+  />
+
+  <DonationSection client:load
+    theme="dark"
+    archBottom
+    headingSize="h2"
+    formPosition="left"
+    title="733 million people globally lack consistent access to fresh and healthy food."
+    body="Our work to end hunger and food waste needs your support. You can help us deliver food directly to communities in need — creating access to nutrition, stability, and food security for millions of people."
+  />
+
+  <LogosBannerSection client:visible
+    theme="light"
+    archTop
+    eyebrow="Our Supporters"
+    body="From grocery stores, to wholesale markets, to charitable foundations, Sharing Excess is driven to partner across industries to supply fresh food to those in need."
+    bodySize="md"
+    primaryCta="Partner with us"
+    primaryCtaHref="/get-involved/partner"
+    logos={supporterLogos}
+  />
+
+  <TextImageSection client:visible
+    theme="light"
+    eyebrow="Support our mission"
+    title="Giving $1 can provide 12 meals."
+    body="All the food we rescue is donated — we just need to move it. That means your donation isn't spent on buying food or overhead. It goes directly towards transportation and logistics to feed people in need. We keep our costs low so every dollar makes a big impact."
+    imageSrc="/images/53678455800_533067698a_c_1.avif"
+    imageAlt=""
+    imagePosition="left"
+    imageStyle="square"
+    primaryCta="Donate Now"
+    primaryCtaHref="/?form=donate"
+  />
+
+  <SocialMediaSection
+    theme="light"
+    title="Keep up with us on Instagram 👋"
+    headingSize="h2"
+    items={socialItems}
+    showNavigation={false}
+    highlightedIndex={1}
   />
 </PageLayout>

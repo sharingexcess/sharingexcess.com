@@ -121,6 +121,12 @@
   --section-btn-label: var(--color-neutral-000);
 }
 
+/* Collapse the redundant top padding when two padded sections are adjacent.
+   arch-top sections are excluded because the arch animation depends on their padding. */
+[data-section]:not([data-arch-top]) + [data-section]:not([data-arch-top]) {
+  padding-top: 0;
+}
+
 /* Banana/tangerine card fills — uniform kale text (emphasis matches heading) */
 [data-card-color="banana"],
 [data-card-color="tangerine"] {
@@ -156,6 +162,16 @@
   --section-btn-primary-hover-label: var(--color-neutral-000);
 }
 
+:root {
+  --site-header-height: 5.25rem;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --site-header-height: 7rem;
+  }
+}
+
 body {
   font-family: "Poppins", var(--font-sans, sans-serif);
   color: var(--color-neutral-900);
@@ -164,25 +180,88 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-@keyframes logos-marquee {
-  from {
-    transform: translateX(-50%);
-  }
-  to {
-    transform: translateX(0);
-  }
+html {
+  scroll-padding-top: var(--site-header-height);
 }
 
-.logos-marquee-track {
-  animation: logos-marquee var(--logos-marquee-duration, 50s) linear infinite;
+.site-header-shell {
+  transition: transform 300ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-.logos-marquee-track:has(img:hover) {
-  animation-play-state: paused;
+.site-header-shell--hidden {
+  pointer-events: none;
+  transform: translateY(calc(-100% - 1rem));
+}
+
+@media (max-width: 1023px) {
+  .site-header-shell--hidden {
+    pointer-events: auto;
+    transform: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .site-header-shell {
+    transition: none;
+  }
+}
+
+.site-header-offset {
+  padding-top: calc(var(--site-header-height) + 3rem);
+}
+
+/* Nav dropdown featured card — explicit size so layout survives island hydration */
+.nav-dropdown-featured-shell {
+  display: block;
+  height: 240px;
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.logos-marquee-track {
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: no-preference) {
   .logos-marquee-track {
+    animation: logos-marquee var(--marquee-duration, 40s) linear infinite;
+  }
+
+  .logos-marquee-viewport:hover .logos-marquee-track {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes logos-marquee {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes sticker-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-sticker-spin {
+  animation: sticker-spin 24s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-sticker-spin {
     animation: none;
   }
+}
+
+/* Page transition overlay handles route changes — disable the default crossfade. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }

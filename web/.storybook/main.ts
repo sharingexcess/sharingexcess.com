@@ -5,7 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.stories.@(js|jsx|ts|tsx)"],
-  staticDirs: ["../public"],
+  staticDirs: ["../../public", "../public"],
   addons: ["@storybook/addon-docs", "@storybook/addon-a11y"],
   framework: {
     name: "@storybook-astro/framework",
@@ -17,6 +17,14 @@ const config: StorybookConfig = {
     const { mergeConfig } = await import("vite");
     return mergeConfig(config, {
       plugins: [tailwindcss()],
+      optimizeDeps: {
+        exclude: [
+          "astro:*",
+          "virtual:astro:*",
+          "astro/virtual-modules/transitions-router.js",
+          "astro/dist/transitions/router.js",
+        ],
+      },
       resolve: {
         alias: {
           "@": fileURLToPath(new URL("../src", import.meta.url)),

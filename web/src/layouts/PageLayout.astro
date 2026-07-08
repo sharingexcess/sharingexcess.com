@@ -1,6 +1,5 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
-import SiteHeader from "@/components/layout/SiteHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
 
 interface Props {
@@ -13,9 +12,8 @@ const { title, description, canonical } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description} canonical={canonical}>
-  <SiteHeader />
-  <main>
+  <main class="relative">
     <slot />
   </main>
-  <SiteFooter />
+  <SiteFooter client:load />
 </BaseLayout>

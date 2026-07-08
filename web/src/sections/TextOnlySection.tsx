@@ -1,7 +1,9 @@
 import { TextSection } from "@/components/ui/TextSection";
 import { cn } from "@/lib/cn";
 import type { SectionContentProps, SectionLayoutType } from "@/lib/types";
+import { SectionLayout } from "./SectionLayout";
 import { SectionShell } from "./SectionShell";
+import { sectionCardContentIsDark } from "./sectionCardConfig";
 
 export interface TextOnlySectionProps extends SectionContentProps {
   align?: "left" | "center";
@@ -14,6 +16,8 @@ export interface TextOnlySectionProps extends SectionContentProps {
 
 export function TextOnlySection({
   theme = "light",
+  isCard = false,
+  cardColor = "surface",
   eyebrow,
   title,
   headingSize = "h1",
@@ -30,8 +34,8 @@ export function TextOnlySection({
   className,
   id,
 }: TextOnlySectionProps) {
-  const isDark = theme === "dark";
   const isCentered = align === "center";
+  const isDark = sectionCardContentIsDark(isCard, cardColor, theme);
 
   const textBlock = (
     <TextSection
@@ -47,6 +51,8 @@ export function TextOnlySection({
       buttonScheme={isDark ? "dark" : "light"}
       layout={layout}
       align={align}
+      emphasis={!isCard}
+      isCard={isCard}
       className={cn(isCentered && "mx-auto max-w-3xl")}
     />
   );
@@ -69,8 +75,22 @@ export function TextOnlySection({
   }
 
   return (
-    <SectionShell theme={theme} className={className} id={id}>
-      <div className={cn(!isCentered && "max-w-[915px]")}>{textBlock}</div>
+    <SectionShell theme={isCard ? "light" : theme} className={className} id={id}>
+      <SectionLayout
+        layout={layout}
+        isCard={isCard}
+        cardColor={cardColor}
+        sectionTheme={theme}
+        centered={isCentered}
+        textSlotClassName={
+          isCentered
+            ? isCard
+              ? "w-full"
+              : "w-full max-w-3xl"
+            : cn("w-full", !isCard && "max-w-[915px]")
+        }
+        textSlot={textBlock}
+      />
     </SectionShell>
   );
 }

@@ -1,84 +1,74 @@
 import { cn } from "@/lib/cn";
 import {
+  fadeIn,
   motion,
+  roundImageBleedGlideVariants,
   roundImageGlideVariants,
   useReducedMotion,
 } from "@/lib/motion";
+import type { MotionValue } from "@/lib/motion";
 import type { ImagePosition } from "@/lib/types";
+import type { ReactNode } from "react";
 
 export interface RoundImageCircleProps {
-  src: string;
-  alt: string;
+  src?: string;
+  alt?: string;
+  children?: ReactNode;
   imagePosition?: ImagePosition;
-  /** Section-bleed desktop circle vs contained mobile circle */
-  variant?: "bleed" | "contained";
-  /** Driven by a section-level `useInView` — the circle itself is mostly off-screen */
+  /** contained = mobile circle; bleed variant is handled inline in RoundBleedLayout */
+  variant?: "contained";
   inView?: boolean;
+  /** Scale glide for photos; bleed glide (translate only) for maps; fade for mobile */
+  glideMode?: "scale" | "bleed" | "fade";
+  /** Drives the border-radius morph from circle → rounded square on scroll-away. */
+  morphBorderRadius?: MotionValue<string>;
   className?: string;
 }
 
 export function RoundImageCircle({
   src,
-  alt,
+  alt = "",
+  children,
   imagePosition = "right",
-  variant = "bleed",
   inView = false,
+  glideMode = "scale",
+  morphBorderRadius,
   className,
 }: RoundImageCircleProps) {
   const onLeft = imagePosition === "left";
   const reduceMotion = useReducedMotion();
-  const isBleed = variant === "bleed";
-  const glideOffset = isBleed ? undefined : "28%";
-  const variants = roundImageGlideVariants(onLeft, glideOffset);
+  const variants =
+    glideMode === "bleed" ? roundImageBleedGlideVariants(onLeft, "28%") :
+    glideMode === "fade"  ? fadeIn :
+                            roundImageGlideVariants(onLeft, "28%");
 
-  const image = <img src={src} alt={alt} className="size-full object-cover" />;
-
-  const maskClassName = cn("size-full overflow-hidden rounded-full", className);
+  const media =
+    children ??
+    (src ? <img src={src} alt={alt} className="size-full object-cover" /> : null);
 
   if (reduceMotion) {
-    if (isBleed) {
-      return (
-        <div
-          className={cn(
-            "pointer-events-none absolute top-1/2 aspect-square w-[107.8%] -translate-y-1/2",
-            onLeft ? "left-[-58.6%]" : "right-[-58.6%]",
-          )}
-        >
-          <div className={maskClassName}>{image}</div>
-        </div>
-      );
-    }
-
-    return <div className={cn("relative mx-auto aspect-square w-full max-w-[400px]", maskClassName)}>{image}</div>;
-  }
-
-  const motionMask = (
-    <motion.div
-      className={maskClassName}
-      variants={variants}
-      initial="hidden"
-      animate={inView ? "visible" : "hidden"}
-    >
-      {image}
-    </motion.div>
-  );
-
-  if (isBleed) {
     return (
-      <div
-        className={cn(
-          "pointer-events-none absolute top-1/2 aspect-square w-[107.8%] -translate-y-1/2",
-          onLeft ? "left-[-58.6%]" : "right-[-58.6%]",
-        )}
-      >
-        {motionMask}
+      <div className={cn("relative mx-auto aspect-square w-full max-w-[400px] overflow-hidden rounded-full", className)}>
+        {media}
       </div>
     );
   }
 
   return (
     <div className="relative mx-auto aspect-square w-full max-w-[400px]">
-      {motionMask}
+      <motion.div
+        className={cn(
+          "size-full overflow-hidden",
+          morphBorderRadius ? "" : "rounded-full",
+          className,
+        )}
+        style={morphBorderRadius ? { borderRadius: morphBorderRadius } : undefined}
+        variants={variants}
+        initial="hidden"
+        animate={inView ? "visible" : "hidden"}
+      >
+        {media}
+      </motion.div>
     </div>
   );
 }

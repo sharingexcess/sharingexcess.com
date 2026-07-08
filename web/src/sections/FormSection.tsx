@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/Button";
+import { ParallaxBackground } from "@/components/ui/ParallaxBackground";
 import { TextInput } from "@/components/ui/TextInput";
 import { TextSection } from "@/components/ui/TextSection";
 import { cn } from "@/lib/cn";
@@ -11,6 +12,46 @@ import {
   getFormCardDataAttributes,
 } from "./formSectionConfig";
 import { getSectionCardDataAttributes } from "./sectionCardConfig";
+import { useRef, type ReactNode } from "react";
+
+function FormPhotoBackgroundSection({
+  id,
+  className,
+  isCentered,
+  backgroundImageSrc,
+  backgroundImageAlt,
+  card,
+}: {
+  id?: string;
+  className?: string;
+  isCentered: boolean;
+  backgroundImageSrc: string;
+  backgroundImageAlt: string;
+  card: ReactNode;
+}) {
+  const scrollRef = useRef<HTMLElement>(null);
+
+  return (
+    <section
+      ref={scrollRef}
+      id={id}
+      className={cn(
+        "relative overflow-hidden px-6 py-12 lg:px-24 lg:py-[120px]",
+        isCentered && "flex flex-col items-center",
+        className,
+      )}
+    >
+      <ParallaxBackground
+        scrollRef={scrollRef}
+        src={backgroundImageSrc}
+        alt={backgroundImageAlt}
+      />
+      <div className={cn("relative mx-auto max-w-6xl", isCentered && "flex justify-center")}>
+        <div className={cn("w-full max-w-[776px]", isCentered && "mx-auto")}>{card}</div>
+      </div>
+    </section>
+  );
+}
 
 type ResolvedVariant =
   | "brand-green"
@@ -310,23 +351,14 @@ export function FormSection({
 
   if (backgroundImageSrc) {
     return (
-      <section
+      <FormPhotoBackgroundSection
         id={id}
-        className={cn(
-          "relative overflow-hidden px-6 py-12 lg:px-24 lg:py-[120px]",
-          isCentered && "flex flex-col items-center",
-          className,
-        )}
-      >
-        <img
-          src={backgroundImageSrc}
-          alt={backgroundImageAlt}
-          className="absolute inset-0 size-full object-cover"
-        />
-        <div className={cn("relative mx-auto max-w-6xl", isCentered && "flex justify-center")}>
-          <div className={cn("w-full max-w-[776px]", isCentered && "mx-auto")}>{card}</div>
-        </div>
-      </section>
+        className={className}
+        isCentered={isCentered}
+        backgroundImageSrc={backgroundImageSrc}
+        backgroundImageAlt={backgroundImageAlt}
+        card={card}
+      />
     );
   }
 

@@ -1,10 +1,39 @@
-type StickerName = "waste-less" | "sunrise" | "free-food" | "lemon";
+import { cn } from "@/lib/cn";
+
+export type StickerName = "waste-less" | "sunrise" | "free-food" | "lemon";
 
 const SVG_MAP: Record<StickerName, string> = {
   "waste-less": "/svg/Sticker-Waste-Less.svg",
-  "sunrise": "/svg/Sticker-Sunrise.svg",
+  sunrise: "/svg/Sticker-Sunrise.svg",
   "free-food": "/svg/Sticker-Free-Food.svg",
-  "lemon": "/svg/Sticker-Lemon.svg",
+  lemon: "/svg/Sticker-Lemon.svg",
+};
+
+const SPIN_STATIC_MAP: Partial<Record<StickerName, string>> = {
+  "free-food": "/svg/Sticker-Free-Food-static.svg",
+  "waste-less": "/svg/Sticker-Waste-Less-static.svg",
+};
+
+const SPIN_RING_MAP: Partial<Record<StickerName, string>> = {
+  "free-food": "/svg/Sticker-Free-Food-spin.svg",
+  "waste-less": "/svg/Sticker-Waste-Less-spin.svg",
+};
+
+/** Circular text stickers — ring spins while the center heart stays static. */
+const SPINNING_STICKERS = new Set<StickerName>(["free-food", "waste-less"]);
+
+const STICKER_DROP_SHADOW =
+  "drop-shadow-[0px_2px_6px_rgba(0,0,0,0.12)] drop-shadow-[0px_2.56px_3.2px_rgba(0,0,0,0.25)]";
+
+/** Hearts rendered above the spin layer — needed when the ring is a solid disc. */
+const SPIN_HEART_OVERLAY: Partial<
+  Record<StickerName, { d: string; fill: string; viewBox: string }>
+> = {
+  "free-food": {
+    viewBox: "0 0 250 251",
+    d: "M149.43 116.068C149.43 108.703 143.624 102.908 136.471 102.908C130.694 102.908 125.807 106.888 124.133 112.265C122.458 106.889 117.571 103.047 111.794 103.047C104.639 103.047 98.8391 108.677 98.8391 116.044C98.8391 119.762 100.32 122.388 102.704 125.199L124.145 147.303L145.561 125.199C147.947 122.388 149.43 119.783 149.43 116.068Z",
+    fill: "#00843D",
+  },
 };
 
 interface StickerProps {
@@ -12,17 +41,105 @@ interface StickerProps {
   size?: number;
   className?: string;
   alt?: string;
+  /** When true on circular stickers, the ring text rotates and the heart stays static. */
+  spin?: boolean;
+  /** Size to the parent box instead of the `size` pixel dimensions. */
+  fillContainer?: boolean;
 }
 
-export function Sticker({ name, size = 200, className, alt }: StickerProps) {
+function StickerHeartOverlay({ name }: { name: StickerName }) {
+  const heart = SPIN_HEART_OVERLAY[name];
+  if (!heart) return null;
+
+  return (
+    <svg
+      aria-hidden
+      viewBox={heart.viewBox}
+      className="pointer-events-none absolute inset-0 size-full"
+    >
+      <path d={heart.d} fill={heart.fill} />
+    </svg>
+  );
+}
+
+function SpinningSticker({
+  name,
+  size,
+  className,
+  alt,
+  fillContainer,
+}: {
+  name: StickerName;
+  size: number;
+  className?: string;
+  alt?: string;
+  fillContainer?: boolean;
+}) {
+  const staticSrc = SPIN_STATIC_MAP[name];
+  const spinSrc = SPIN_RING_MAP[name];
+  if (!staticSrc || !spinSrc) return null;
+
+  return (
+    <div
+      className={cn(
+        "relative shrink-0",
+        fillContainer ? "size-full" : undefined,
+        STICKER_DROP_SHADOW,
+        className,
+      )}
+      style={fillContainer ? undefined : { width: size, height: size }}
+    >
+      <img
+        src={staticSrc}
+        alt={alt ?? name}
+        className="absolute inset-0 block size-full"
+      />
+      <img
+        src={spinSrc}
+        alt=""
+        aria-hidden
+        className="absolute inset-0 block size-full animate-sticker-spin"
+      />
+      <StickerHeartOverlay name={name} />
+    </div>
+  );
+}
+
+export function Sticker({
+  name,
+  size = 200,
+  className,
+  alt,
+  spin = true,
+  fillContainer = false,
+}: StickerProps) {
+  const spinning = spin && SPINNING_STICKERS.has(name);
+  const dimensionProps = fillContainer
+    ? { className: cn("size-full", className) }
+    : {
+        width: size,
+        height: size,
+        className: cn("block", className),
+      };
+
+  if (spinning) {
+    return (
+      <SpinningSticker
+        name={name}
+        size={size}
+        className={className}
+        alt={alt}
+        fillContainer={fillContainer}
+      />
+    );
+  }
+
   return (
     <img
       src={SVG_MAP[name]}
       alt={alt ?? name}
-      width={size}
-      height={size}
-      className={className}
-      style={{ display: "block", filter: "drop-shadow(0px 2px 6px rgba(0,0,0,0.12))" }}
+      {...dimensionProps}
+      className={cn(dimensionProps.className, STICKER_DROP_SHADOW)}
     />
   );
 }

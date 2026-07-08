@@ -33,6 +33,16 @@ export const ImageRight: Story = {
   args: { imagePosition: "right", imageStyle: "square" },
 };
 
+export const ImageContain: Story = {
+  args: {
+    imagePosition: "right",
+    imageStyle: "square",
+    imageFit: "contain",
+    imageSrc: "/images/diagram_1.avif",
+    showButtons: false,
+  },
+};
+
 export const ImageLeft: Story = {
   args: { imagePosition: "left", imageStyle: "square" },
 };

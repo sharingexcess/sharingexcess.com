@@ -47,7 +47,7 @@ export function SectionLayout({
   const inner = isHorizontal ? (
     <div
       className={cn(
-        "grid grid-cols-1 items-start gap-8 lg:grid-cols-2 lg:gap-16",
+        "grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-16",
         reverse && "lg:[&>*:last-child]:order-first",
       )}
     >

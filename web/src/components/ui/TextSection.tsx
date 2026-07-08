@@ -1,5 +1,6 @@
 import { cn } from "@/lib/cn";
 import { parseEmphasis } from "@/lib/parseEmphasis";
+import { eyebrowClassName } from "@/lib/typography";
 import { AnimatedHeroHeading } from "@/components/ui/AnimatedHeroHeading";
 import { Button } from "./Button";
 
@@ -40,9 +41,6 @@ const bodyClasses = {
   lg: "text-sm leading-[1.4] lg:text-[18px]",
   md: "text-sm leading-[1.4] lg:text-base",
 };
-
-const eyebrowClass =
-  "font-display text-sm font-bold leading-[1.1] text-[var(--section-text,#003619)] lg:text-[32px]";
 
 export function TextSection({
   eyebrow,
@@ -101,7 +99,9 @@ export function TextSection({
   if (layout === "horizontal") {
     return (
       <div className={cn("flex flex-col gap-3", className)}>
-        {eyebrow && <p className={eyebrowClass}>{eyebrow}</p>}
+        {eyebrow && (
+          <p className={cn(eyebrowClassName, "text-[var(--section-text,#003619)]")}>{eyebrow}</p>
+        )}
         <div className="flex flex-col items-start gap-4 lg:flex-row lg:gap-8">
           <div className="w-full lg:flex-1">{headingEl}</div>
           <div className="flex w-full flex-col gap-4 lg:flex-1">
@@ -121,8 +121,10 @@ export function TextSection({
     <div
       className={cn("flex flex-col gap-4 lg:gap-8", isCentered && "items-center text-center", className)}
     >
-      <div className="flex flex-col gap-1.5 lg:gap-2">
-        {eyebrow && <p className={eyebrowClass}>{eyebrow}</p>}
+      <div className="flex flex-col gap-2 lg:gap-2.5">
+        {eyebrow && (
+          <p className={cn(eyebrowClassName, "text-[var(--section-text,#003619)]")}>{eyebrow}</p>
+        )}
         {headingEl}
         {body && (
           <p className={cn("mt-1 lg:mt-2", bodyClasses[bodySize], "text-[var(--section-text,#003619)]")}>

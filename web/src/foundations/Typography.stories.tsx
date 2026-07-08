@@ -56,11 +56,11 @@ const specimens: TypeSpecimen[] = [
     name: "Eyebrow",
     usage: "Label above section headings",
     family: "Malila",
-    size: "32px",
+    size: "24px",
     weight: "700 Bold",
     tracking: "0",
     sample: "Lorem ipsum",
-    style: { fontFamily: '"malila", sans-serif', fontSize: 32, fontWeight: 700, lineHeight: 1.1, letterSpacing: 0, color: "#003619" },
+    style: { fontFamily: '"malila", sans-serif', fontSize: 24, fontWeight: 700, lineHeight: 1.1, letterSpacing: 0, color: "#003619" },
   },
   {
     name: "Paragraph XL",

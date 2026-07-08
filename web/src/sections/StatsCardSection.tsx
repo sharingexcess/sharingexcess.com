@@ -78,7 +78,7 @@ export function StatsCardSection({
           ) : undefined
         }
         contentSlot={
-          <div className={`grid gap-6 ${gridClass}`}>
+          <div className={`grid gap-12 sm:gap-6 ${gridClass}`}>
             {stats.map((stat) => (
               <StatCard
                 key={stat.label}

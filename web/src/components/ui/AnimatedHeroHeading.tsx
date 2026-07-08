@@ -5,7 +5,8 @@ import {
   motion,
   useReducedMotion,
 } from "@/lib/motion";
-import type { JSX } from "react";
+import { useFitMultilineText } from "@/lib/useFitText";
+import type { CSSProperties, JSX, Ref } from "react";
 import { useEffect, useMemo, useState } from "react";
 
 type WordToken = { text: string; emphasized: boolean; key: string };
@@ -46,25 +47,39 @@ function WordContent({ token }: { token: WordToken }) {
   return token.text;
 }
 
-function AnimatedWords({ tokens }: { tokens: WordToken[] }) {
+function AnimatedWords({
+  tokens,
+  compact,
+}: {
+  tokens: WordToken[];
+  compact?: boolean;
+}) {
+  const wordGap = compact ? "0.15em" : "0.25em";
   return tokens.map((token, i) => (
     <motion.span
       key={token.key}
       variants={heroWordVariants}
       className="inline-block will-change-[transform,opacity]"
-      style={i < tokens.length - 1 ? { marginRight: "0.25em" } : undefined}
+      style={i < tokens.length - 1 ? { marginRight: wordGap } : undefined}
     >
       <WordContent token={token} />
     </motion.span>
   ));
 }
 
-function StaticWords({ tokens }: { tokens: WordToken[] }) {
+function StaticWords({
+  tokens,
+  compact,
+}: {
+  tokens: WordToken[];
+  compact?: boolean;
+}) {
+  const wordGap = compact ? "0.15em" : "0.25em";
   return tokens.map((token, i) => (
     <span
       key={token.key}
       className="inline-block"
-      style={i < tokens.length - 1 ? { marginRight: "0.25em" } : undefined}
+      style={i < tokens.length - 1 ? { marginRight: wordGap } : undefined}
     >
       <WordContent token={token} />
     </span>
@@ -75,14 +90,27 @@ function WordLine({
   tokens,
   multiline,
   animated,
+  fitLine,
 }: {
   tokens: WordToken[];
   multiline: boolean;
   animated: boolean;
+  fitLine?: boolean;
 }) {
   return (
-    <span className={cn(multiline && "block whitespace-nowrap")}>
-      {animated ? <AnimatedWords tokens={tokens} /> : <StaticWords tokens={tokens} />}
+    <span
+      data-fit-line={fitLine ? "" : undefined}
+      className={cn(
+        multiline && "block",
+        fitLine && "whitespace-nowrap",
+        multiline && !fitLine && "lg:whitespace-nowrap",
+      )}
+    >
+      {animated ? (
+        <AnimatedWords tokens={tokens} compact={fitLine} />
+      ) : (
+        <StaticWords tokens={tokens} compact={fitLine} />
+      )}
     </span>
   );
 }
@@ -96,6 +124,8 @@ export interface AnimatedHeroHeadingProps {
   multiline?: boolean;
   /** When false, *asterisk* spans render as plain text */
   emphasis?: boolean;
+  /** Scale font size down so each nowrap line fits the container (home hero) */
+  fitText?: boolean;
 }
 
 /** Word-by-word hero heading reveal — waits for fonts, respects reduced motion */
@@ -105,10 +135,18 @@ export function AnimatedHeroHeading({
   className,
   multiline = false,
   emphasis = true,
+  fitText = false,
 }: AnimatedHeroHeadingProps) {
   const reduceMotion = useReducedMotion();
   const [fontsReady, setFontsReady] = useState(Boolean(reduceMotion));
   const lines = useMemo(() => tokenizeTitle(title, emphasis), [title, emphasis]);
+  const shouldFitText = fitText && multiline;
+  const { containerRef, fontSizePx } = useFitMultilineText(
+    shouldFitText ? lines.length : 0,
+    { remeasureKey: fontsReady, maxSizePx: 36 },
+  );
+  const fitTextStyle =
+    fontSizePx != null ? ({ fontSize: `${fontSizePx}px` } as CSSProperties) : undefined;
 
   useEffect(() => {
     if (reduceMotion) {
@@ -126,12 +164,17 @@ export function AnimatedHeroHeading({
         className={className}
         lines={lines}
         multiline={multiline}
+        fitTextStyle={shouldFitText ? fitTextStyle : undefined}
+        fitContainerRef={shouldFitText ? containerRef : undefined}
+        fitLine={shouldFitText}
       />
     );
   }
 
-  return (
+  const heading = (
     <Tag
+      data-fit-heading={shouldFitText ? "" : undefined}
+      style={shouldFitText ? fitTextStyle : undefined}
       className={cn(className, !fontsReady && "invisible")}
       aria-label={title.replace(/\*/g, "")}
     >
@@ -147,10 +190,19 @@ export function AnimatedHeroHeading({
             tokens={tokens}
             multiline={multiline}
             animated
+            fitLine={shouldFitText}
           />
         ))}
       </motion.span>
     </Tag>
+  );
+
+  if (!shouldFitText) return heading;
+
+  return (
+    <div ref={containerRef} className="w-full min-w-0">
+      {heading}
+    </div>
   );
 }
 
@@ -159,14 +211,24 @@ function StaticHeroHeading({
   className,
   lines,
   multiline,
+  fitTextStyle,
+  fitContainerRef,
+  fitLine,
 }: {
   Tag: keyof JSX.IntrinsicElements;
   className?: string;
   lines: WordToken[][];
   multiline: boolean;
+  fitTextStyle?: CSSProperties;
+  fitContainerRef?: Ref<HTMLDivElement>;
+  fitLine?: boolean;
 }) {
-  return (
-    <Tag className={className}>
+  const heading = (
+    <Tag
+      data-fit-heading={fitLine ? "" : undefined}
+      style={fitTextStyle}
+      className={className}
+    >
       <span className={cn(multiline && "flex flex-col")}>
         {lines.map((tokens, lineIndex) => (
           <WordLine
@@ -174,10 +236,19 @@ function StaticHeroHeading({
             tokens={tokens}
             multiline={multiline}
             animated={false}
+            fitLine={fitLine}
           />
         ))}
       </span>
     </Tag>
+  );
+
+  if (!fitLine || !fitContainerRef) return heading;
+
+  return (
+    <div ref={fitContainerRef} className="w-full min-w-0">
+      {heading}
+    </div>
   );
 }
 

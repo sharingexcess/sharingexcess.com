@@ -11,6 +11,7 @@ const meta = {
       options: ["waste-less", "sunrise", "free-food", "lemon"],
     },
     size: { control: { type: "range", min: 80, max: 400, step: 8 } },
+    spin: { control: "boolean" },
   },
 } satisfies Meta<typeof Sticker>;
 
@@ -26,7 +27,12 @@ export const Sunrise: Story = {
 };
 
 export const FreeFood: Story = {
-  args: { name: "free-food", size: 200 },
+  args: { name: "free-food", size: 200, spin: true },
+};
+
+export const FreeFoodSpinning: Story = {
+  args: { name: "free-food", size: 250, spin: true },
+  parameters: { layout: "centered" },
 };
 
 export const Lemon: Story = {

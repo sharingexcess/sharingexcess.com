@@ -7,6 +7,8 @@ import {
   buttonSecondaryScaleSpring,
   buttonSecondaryTextInSpring,
   buttonSecondaryTextOutSpring,
+  buttonSimpleLabelHoverSpring,
+  buttonSimpleLabelScaleSpring,
   buttonTextInSpring,
   buttonTextOutSpring,
   motion,
@@ -17,14 +19,20 @@ import {
 
 export interface ButtonProps {
   children: React.ReactNode;
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "tertiary";
   size?: "lg" | "md" | "sm";
-  /** Light/dark surface tokens for primary and secondary — ghost is reserved for photo backgrounds (e.g. home hero) */
+  /** Light/dark surface tokens for primary, secondary, and tertiary — ghost is reserved for photo backgrounds (e.g. home hero) */
   colorScheme?: "light" | "dark";
+  /** Force hover visuals (e.g. open nav dropdown parent) */
+  active?: boolean;
+  /** Plain label hover — color + scale only, no sliding duplicate text */
+  simpleLabel?: boolean;
   href?: string;
   className?: string;
   type?: "button" | "submit";
   disabled?: boolean;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement>;
+  role?: React.AriaRole;
 }
 
 // Figma node 975:1133
@@ -32,9 +40,11 @@ export interface ButtonProps {
 // Primary dark:  white bg, #003619 text → bright-kelly on hover
 // Secondary light: #00843d border + text → kale on hover (no fill)
 // Secondary dark: white border + text → bright-kelly on hover (no fill)
+// Tertiary light: #00843d text only → kale on hover (no border/fill)
+// Tertiary dark: white text only → bright-kelly on hover (no border/fill)
 // Ghost (Home Secondary): Figma node 1010:1302 — liquid glass; photo backgrounds only
 
-const variantClasses: Record<Exclude<NonNullable<ButtonProps["variant"]>, "ghost">, string> = {
+const variantClasses: Record<Exclude<NonNullable<ButtonProps["variant"]>, "ghost" | "tertiary">, string> = {
   primary:   "border-0",
   secondary: "border bg-transparent",
 };
@@ -304,6 +314,11 @@ const disabledSecondaryClasses: Record<
 const disabledGhostClasses =
   "relative isolate overflow-hidden border-2 border-white/25 bg-transparent text-white/50";
 
+const disabledTertiaryClasses: Record<NonNullable<ButtonProps["colorScheme"]>, string> = {
+  light: "text-neutral-400",
+  dark: "text-white/50",
+};
+
 const secondaryShellVariants = (
   colorScheme: keyof typeof secondaryColorScheme,
 ): Variants => {
@@ -331,6 +346,60 @@ const secondaryShellVariants = (
   };
 };
 
+const tertiaryColorScheme = {
+  light: {
+    base: "text-[var(--section-btn,#00843d)]",
+    restColor: SECTION_BTN,
+    hoverColor: SECTION_BTN_HOVER,
+  },
+  dark: {
+    base: "text-white",
+    restColor: "#ffffff",
+    hoverColor: PRIMARY_HOVER_BG,
+  },
+} as const;
+
+/** CSS-only hover fallback when reduced motion is preferred */
+const tertiaryColorSchemeFallback = {
+  light:
+    "text-[var(--section-btn,#00843d)] hover:text-[var(--section-btn-hover,#003619)] transition-colors duration-200",
+  dark:
+    "text-white hover:text-[var(--section-btn-primary-hover-bg,#00bc57)] transition-colors duration-200",
+};
+
+const tertiaryActiveClasses = {
+  light: "text-[var(--section-btn-hover,#003619)]",
+  dark: "text-[var(--section-btn-primary-hover-bg,#00bc57)]",
+};
+
+const tertiaryShellVariants = (
+  colorScheme: keyof typeof tertiaryColorScheme,
+  snappy = false,
+): Variants => {
+  const { restColor, hoverColor } = tertiaryColorScheme[colorScheme];
+  const scaleSpring = snappy ? buttonSimpleLabelScaleSpring : buttonSecondaryScaleSpring;
+  const colorSpring = snappy ? buttonSimpleLabelHoverSpring : buttonSecondaryHoverSpring;
+
+  return {
+    rest: { scale: 1, color: restColor },
+    hover: {
+      scale: 1.04,
+      color: hoverColor,
+      transition: {
+        scale: scaleSpring,
+        color: colorSpring,
+      },
+    },
+  };
+};
+
+// Tertiary — text-only; no pill, no border, no fill. Font-size matches primary/secondary at each size.
+const tertiarySizeClasses: Record<NonNullable<ButtonProps["size"]>, string> = {
+  lg: "text-base leading-[0.82] lg:text-[20px]",
+  md: "text-[16px] leading-[0.82] lg:text-[20px]",
+  sm: "text-sm leading-[0.82] lg:text-[16px]",
+};
+
 // Figma node 975:1133 — fixed heights (LG 64, MD 48, SM 45) with horizontal padding only;
 // vertical centering via flex avoids extra height from Poppins font metrics vs Figma auto-layout.
 // Each size steps down one notch below lg for mobile touch-friendly proportions.
@@ -345,20 +414,28 @@ export function Button({
   variant = "primary",
   size = "lg",
   colorScheme = "light",
+  active,
+  simpleLabel,
   href,
   className,
   type = "button",
   disabled,
+  onClick,
+  role,
 }: ButtonProps) {
   const reduceMotion = useReducedMotion();
   const isGhost = variant === "ghost";
   const isPrimary = variant === "primary";
   const isSecondary = variant === "secondary";
+  const isTertiary = variant === "tertiary";
   const usePrimaryMotion = isPrimary && !reduceMotion && !disabled;
   const useSecondaryMotion = isSecondary && !reduceMotion && !disabled;
   const useGhostMotion = isGhost && !reduceMotion && !disabled;
-  const useMotionHover = usePrimaryMotion || useSecondaryMotion || useGhostMotion;
-  const useSlidingLabel = usePrimaryMotion || useSecondaryMotion || useGhostMotion;
+  const useTertiaryMotion = isTertiary && !reduceMotion && !disabled;
+  const useMotionHover = usePrimaryMotion || useSecondaryMotion || useGhostMotion || useTertiaryMotion;
+  const useSlidingLabel =
+    (usePrimaryMotion || useSecondaryMotion || useGhostMotion || useTertiaryMotion) &&
+    !simpleLabel;
 
   const primaryScheme = primaryColorScheme[colorScheme];
   const secondaryScheme = secondaryColorScheme[colorScheme];
@@ -371,12 +448,14 @@ export function Button({
             ? disabledGhostClasses
             : isPrimary
               ? disabledPrimaryClasses[colorScheme]
-              : disabledSecondaryClasses[colorScheme],
+              : isSecondary
+                ? disabledSecondaryClasses[colorScheme]
+                : disabledTertiaryClasses[colorScheme],
           "pointer-events-none cursor-not-allowed",
         )
       : cn(
           isGhost && (useGhostMotion ? ghostMotionClasses : ghostFallbackClasses),
-          !isGhost && variantClasses[variant as Exclude<typeof variant, "ghost">],
+          !isGhost && !isTertiary && variantClasses[variant as Exclude<typeof variant, "ghost" | "tertiary">],
           isPrimary &&
             (usePrimaryMotion
               ? cn(primaryScheme.base, "relative isolate overflow-hidden")
@@ -385,8 +464,16 @@ export function Button({
             (useSecondaryMotion
               ? secondaryScheme.base
               : secondaryColorSchemeFallback[colorScheme]),
+          isTertiary &&
+            (useTertiaryMotion
+              ? tertiaryColorScheme[colorScheme].base
+              : cn(
+                  tertiaryColorSchemeFallback[colorScheme],
+                  simpleLabel && "transition-colors duration-150",
+                  active && tertiaryActiveClasses[colorScheme],
+                )),
         ),
-    sizeClasses[size],
+    isTertiary ? tertiarySizeClasses[size] : sizeClasses[size],
     className,
   );
 
@@ -397,12 +484,12 @@ export function Button({
       {useSlidingLabel ? (
         <SlidingButtonLabel
           textOutTransition={
-            useSecondaryMotion
+            useSecondaryMotion || useTertiaryMotion
               ? buttonSecondaryTextOutSpring
               : buttonTextOutSpring
           }
           textInTransition={
-            useSecondaryMotion
+            useSecondaryMotion || useTertiaryMotion
               ? buttonSecondaryTextInSpring
               : buttonTextInSpring
           }
@@ -425,22 +512,24 @@ export function Button({
         ? primaryShellVariants(colorScheme)
         : useSecondaryMotion
           ? secondaryShellVariants(colorScheme)
-          : ghostShellVariants,
+          : useTertiaryMotion
+            ? tertiaryShellVariants(colorScheme, simpleLabel)
+            : ghostShellVariants,
       initial: "rest" as const,
       whileHover: "hover" as const,
-      animate: "rest" as const,
+      animate: (active ? "hover" : "rest") as const,
     };
 
     if (href) {
       return (
-        <motion.a href={href} {...motionProps}>
+        <motion.a href={href} role={role} onClick={onClick} {...motionProps}>
           {content}
         </motion.a>
       );
     }
 
     return (
-      <motion.button type={type} disabled={disabled} {...motionProps}>
+      <motion.button type={type} disabled={disabled} role={role} onClick={onClick} {...motionProps}>
         {content}
       </motion.button>
     );
@@ -449,14 +538,14 @@ export function Button({
   if (disabled) {
     if (href) {
       return (
-        <span aria-disabled="true" className={classes}>
+        <span aria-disabled="true" role={role} className={classes}>
           {content}
         </span>
       );
     }
 
     return (
-      <button type={type} className={classes} disabled>
+      <button type={type} className={classes} disabled role={role}>
         {content}
       </button>
     );
@@ -464,14 +553,14 @@ export function Button({
 
   if (href) {
     return (
-      <a href={href} className={classes}>
+      <a href={href} role={role} onClick={onClick} className={classes}>
         {content}
       </a>
     );
   }
 
   return (
-    <button type={type} className={classes}>
+    <button type={type} role={role} onClick={onClick} className={classes}>
       {content}
     </button>
   );

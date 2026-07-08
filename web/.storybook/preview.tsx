@@ -38,7 +38,7 @@ const preview: Preview = {
     (Story, context) => {
       const theme = context.globals.sectionTheme ?? "light";
       return (
-        <AppProviders smoothScroll={false}>
+        <AppProviders smoothScroll={false} scrollInteractions={false} showHeader={false}>
           <div data-theme={theme}>
             <Story />
           </div>

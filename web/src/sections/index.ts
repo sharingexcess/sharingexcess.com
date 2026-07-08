@@ -1,3 +1,4 @@
+export { SectionScrollHandoff } from "./SectionScrollHandoff";
 export { HeroSection } from "./HeroSection";
 export { TextImageSection } from "./TextImageSection";
 export type { ThreeImageItem } from "./TextImageSection";
@@ -8,3 +9,4 @@ export type { LogoItem } from "./LogosBannerSection";
 export { SocialMediaSection } from "./SocialMediaSection";
 export type { SocialMediaItem, SocialMediaAspect } from "./SocialMediaSection";
 export { TextOnlySection } from "./TextOnlySection";
+export { DonationSection } from "./DonationSection";

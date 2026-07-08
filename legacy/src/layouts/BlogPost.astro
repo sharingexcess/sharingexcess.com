@@ -45,24 +45,37 @@ const formattedUpdatedDate = updatedDate?.toLocaleDateString("en-US", {
           : "https://surplus-api.staging.sharingexcess.com";
       })();
     </script>
-    <script
-      src="https://js.sentry-cdn.com/d73e9e40eaf6f191cb6758409bebcaa4.min.js"
-      crossorigin="anonymous"></script>
     <script is:inline>
-      Sentry.onLoad(function () {
-        var isProduction =
-          window.location.hostname === "sharingexcess.com" ||
-          window.location.hostname === "www.sharingexcess.com";
-        Sentry.init({
-          env: isProduction ? "production" : "staging",
-          autoSessionTracking: true,
-          tracesSampleRate: 1.0,
-          replaysSessionSampleRate: isProduction ? 0.1 : 1.0,
-          replaysOnErrorSampleRate: 1.0,
-          ignoreErrors: ["Script error.", "ResizeObserver loop", /webkit\.messageHandlers/],
-          denyUrls: [/extensions\//i, /^chrome:\/\//i],
-        });
-      });
+      (function () {
+        var host = window.location.hostname;
+        var isLocalhost =
+          host === "localhost" ||
+          host === "127.0.0.1" ||
+          host === "[::1]" ||
+          host.endsWith(".localhost");
+        if (isLocalhost) return;
+
+        var script = document.createElement("script");
+        script.src =
+          "https://js.sentry-cdn.com/d73e9e40eaf6f191cb6758409bebcaa4.min.js";
+        script.crossOrigin = "anonymous";
+        script.onload = function () {
+          Sentry.onLoad(function () {
+            var isProduction =
+              host === "sharingexcess.com" || host === "www.sharingexcess.com";
+            Sentry.init({
+              env: isProduction ? "production" : "staging",
+              autoSessionTracking: true,
+              tracesSampleRate: 1.0,
+              replaysSessionSampleRate: isProduction ? 0.1 : 1.0,
+              replaysOnErrorSampleRate: 1.0,
+              ignoreErrors: ["Script error.", "ResizeObserver loop", /webkit\.messageHandlers/],
+              denyUrls: [/extensions\//i, /^chrome:\/\//i],
+            });
+          });
+        };
+        document.head.appendChild(script);
+      })();
     </script>
     <SiteHead title={pageTitle} description={description} canonical={canonical} ogType="article" />
   </head>

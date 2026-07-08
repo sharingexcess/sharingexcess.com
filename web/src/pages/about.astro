@@ -1,43 +1,136 @@
 ---
 import PageLayout from "@/layouts/PageLayout.astro";
-import { getInstagramFeed, SOCIAL_MEDIA_FALLBACK_ITEMS } from "@/lib/instagram";
 import HeroSection from "@/sections/HeroSection";
-import SocialMediaSection from "@/sections/SocialMediaSection";
+import LogosBannerSection from "@/sections/LogosBannerSection";
+import SectionScrollHandoff from "@/sections/SectionScrollHandoff";
 import TextImageSection from "@/sections/TextImageSection";
+import TextOnlySection from "@/sections/TextOnlySection";
 
-const instagramItems = await getInstagramFeed(4);
-const socialItems = instagramItems ?? SOCIAL_MEDIA_FALLBACK_ITEMS;
+const partnerLogos = [
+  { src: "/images/mrbeast-philanthropy-1400x825_1.avif", alt: "MrBeast Philanthropy" },
+  { src: "/images/Screen-Shot-2023-07-10-at-8.44.15-AM_1.avif", alt: "Partner logo" },
+  { src: "/images/trader-joes-logo_1.avif", alt: "Trader Joe's" },
+  { src: "/images/The_Giant_Company_logo.svg_1.avif", alt: "The Giant Company" },
+  { src: "/images/6052936_032620philabundance_1.avif", alt: "Philabundance" },
+  { src: "/images/SFP_1.avif", alt: "Sharing Food Philadelphia" },
+  { src: "/images/Warp-logo_1.avif", alt: "Warp" },
+  { src: "/images/2560px-Uber_logo_2018.svg_1.avif", alt: "Uber" },
+  { src: "/images/download-12.avif", alt: "Partner logo" },
+  { src: "/images/Screen-Shot-2023-07-10-at-8.52.47-AM_1.avif", alt: "Partner logo" },
+  { src: "/images/Misfits_Market_Logo_01-01-1_1.avif", alt: "Misfits Market" },
+  { src: "/images/Target_logo.avif", alt: "Target" },
+  { src: "/images/YMCA-Logo_1.avif", alt: "YMCA" },
+];
 ---
 
 <PageLayout
   title="About Sharing Excess | Innovative Food Rescue Nonprofit"
   description="Learn how Sharing Excess rescues surplus food and delivers it to communities in need."
 >
-  <HeroSection
-    layout="full-width"
-    title={"About Sharing\nExcess"}
-    imageSrc="/images/oranges.jpg"
+  <SectionScrollHandoff client:visible fadeFrom="light" fadeTo="light">
+    <HeroSection client:visible
+      layout="stack-centered"
+      theme="light"
+      transparentBg
+      flushBottom
+      eyebrow="About Us"
+      title="Using *surplus* as a solution to scarcity."
+      imageSrc="/images/about.png"
+      imageAlt=""
+      sticker={true}
+      stickerName="free-food"
+    />
+
+    <TextImageSection
+      theme="light"
+      transparentBg
+      eyebrow="Our vision"
+      title="A more sustainable and equitable food system."
+      body="We believe everyone deserves access to the basic resources they need to thrive — especially when those same resources are being thrown away by the billions. Food waste isn't just bad for the planet. It's a missed opportunity for humanity. That's why we're building smarter systems to make sharing surplus simple, scalable, and community-powered."
+      imageSrc="/images/diagram_1.avif"
+      imageAlt=""
+      imagePosition="right"
+      imageStyle="square"
+      imageFit="contain"
+    />
+  </SectionScrollHandoff>
+
+  <TextImageSection client:visible
+    layout="full-image"
+    eyebrow="The problem"
+    title="120 BILLION+ meals are wasted every year"
+    body="All the while, at least 47 million Americans experience food insecurity. If we rescued even 7% of the food that goes to waste every year in America, we could close the 9.1 billion meal gap that still exists."
+    imageSrc="/images/problem.jpg"
     imageAlt=""
-    primaryCta="Get involved"
-    primaryCtaHref="/get-involved"
-    secondaryCta="Contact us"
-    secondaryCtaHref="/contact"
   />
-  <TextImageSection
+
+  <TextImageSection client:visible
+    id="our-story"
     theme="light"
-    title="Food rescue at scale"
-    body="Sharing Excess coordinates volunteers, logistics, and partnerships to move fresh food quickly from where it is surplus to where it is needed."
-    imageSrc="/images/financials.jpg"
-    imageAlt="Sharing Excess team distributing food"
-    imagePosition="right"
-    imageStyle="square"
+    eyebrow="Our story"
+    title="From a student's meal swipes, to a national movement"
+    body="In 2016, Drexel student Evan Ehlers realized he had extra meal swipes he wouldn't use before the term ended. So he did something simple — he gave them away. Driving around Philadelphia, handing out meals to anyone who needed one, he saw a heartbreaking truth: there was no shortage of food, there was a shortage of access. That day changed his life — and sparked the idea for Sharing Excess. Today, we've redistributed over 100 million meals and we're growing fast, bringing our mission to new cities and communities across the country."
+    imageSrc="/images/Saturday-Morning-Group---Presentation-Deck---7823-6_1.avif"
+    imageAlt=""
+    imagePosition="left"
+    imageStyle="round"
+    primaryCta="Read More About Our Story"
+    primaryCtaHref="https://www.phillymag.com/be-well-philly/2021/02/23/sharingexcess/"
   />
-  <SocialMediaSection
+
+  <TextImageSection client:visible
     theme="light"
-    title="Keep up with us on Instagram 👋"
+    layout="stack-left"
+    eyebrow="What makes us different?"
     headingSize="h2"
-    items={socialItems}
-    showNavigation={false}
-    highlightedIndex={1}
+    title="We take on the hardest part of food rescue — and make it easy for businesses to donate."
+    body="At Sharing Excess, we focus on the logistical barriers that keep good food from reaching people. Our agile, tech-enabled model makes it easy for businesses to donate fresh food regularly — while we handle the transportation, coordination, delivery, and everything in between. We partner with food businesses and food banks alike, acting as the agile connector that keeps perfectly good food moving while it's still fresh. By cutting costs, tracking impact, and reducing waste, we make it a win for people, the planet, and our partners."
+    imageSrc="/images/54178994461_4d4abdca3b_k_1.avif"
+    imageAlt=""
+  />
+
+  <TextOnlySection client:visible
+    theme="light"
+    align="center"
+    headingSize="h2"
+    title="Our Partners"
+    body="Together with businesses, foundations, and organizations we make the magic of Sharing Excess come to life. Learn more about how you can partner with us."
+    primaryCta="Partner With Us"
+    primaryCtaHref="/get-involved/partner"
+  />
+
+  <LogosBannerSection client:visible theme="light" logos={partnerLogos} />
+
+  <TextImageSection client:visible
+    theme="light"
+    layout="three-image-caption"
+    eyebrow="Learn more"
+    headingSize="h2"
+    title="Get to know Sharing Excess"
+    body="Read more about the group of people making it all happen, the impact we've created, and the financials that power our growth."
+    images={[
+      {
+        src: "/images/Learn-More---The-Team_1.avif",
+        alt: "",
+        title: "Our Team",
+        body: "Meet the people behind the mission.",
+      },
+      {
+        src: "/images/Screen-Shot-2023-07-17-at-6.44.52-PM_1.avif",
+        alt: "",
+        title: "Our Impact",
+        body: "See the difference we're making across the country.",
+      },
+      {
+        src: "/images/Learn-More---Financials_1.avif",
+        alt: "",
+        title: "Our Financials",
+        body: "Transparency in how we operate and grow.",
+      },
+    ]}
+    primaryCta="Our Team"
+    primaryCtaHref="/about/team"
+    secondaryCta="Our Impact"
+    secondaryCtaHref="/about/impact"
   />
 </PageLayout>

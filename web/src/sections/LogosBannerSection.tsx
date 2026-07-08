@@ -1,6 +1,8 @@
+import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
-import type { SectionTheme } from "@/lib/types";
-import type { CSSProperties } from "react";
+import { eyebrowClassName } from "@/lib/typography";
+import type { SectionContentProps } from "@/lib/types";
+import { LogoMarquee } from "./LogoMarquee";
 import { SectionShell } from "./SectionShell";
 
 export interface LogoItem {
@@ -8,100 +10,88 @@ export interface LogoItem {
   alt: string;
 }
 
-export interface LogosBannerSectionProps {
-  theme?: SectionTheme;
-  /** Centered eyebrow-style heading above the logo row */
-  title: string;
+const bodyClasses = {
+  xl: "text-sm leading-[1.4] lg:text-[20px]",
+  lg: "text-sm leading-[1.4] lg:text-[18px]",
+  md: "text-sm leading-[1.4] lg:text-base",
+} as const;
+
+export interface LogosBannerSectionProps
+  extends Omit<
+    SectionContentProps,
+    | "imageSrc"
+    | "imageAlt"
+    | "isCard"
+    | "cardColor"
+    | "title"
+    | "headingSize"
+    | "secondaryCta"
+    | "secondaryCtaHref"
+  > {
   logos: LogoItem[];
   /** Monochrome partner lockups — matches surplus.sharingexcess.com */
   grayscale?: boolean;
   /** Full loop duration in seconds */
   duration?: number;
-  className?: string;
   id?: string;
-}
-
-function LogoMarquee({
-  logos,
-  grayscale,
-  duration,
-  className,
-}: {
-  logos: LogoItem[];
-  grayscale: boolean;
-  duration: number;
-  className?: string;
-}) {
-  const loop = [...logos, ...logos];
-
-  return (
-    <>
-      <div
-        className={cn(
-          "hidden flex-wrap items-center justify-center gap-x-14 gap-y-8 motion-reduce:flex",
-          grayscale && "grayscale",
-          className,
-        )}
-        aria-hidden
-      >
-        {logos.map((logo, index) => (
-          <img
-            key={`static-${logo.alt}-${index}`}
-            src={logo.src}
-            alt={logo.alt}
-            className="h-[54px] w-auto max-w-[256px] shrink-0 object-contain"
-          />
-        ))}
-      </div>
-
-      <div
-        className={cn("overflow-hidden motion-reduce:hidden", className)}
-        aria-label="Partner logos"
-      >
-        <div
-          className={cn(
-            "logos-marquee-track flex w-max items-center gap-14 py-2",
-            grayscale && "grayscale",
-          )}
-          style={{ "--logos-marquee-duration": `${duration}s` } as CSSProperties}
-        >
-          {loop.map((logo, index) => (
-            <img
-              key={`marquee-${logo.alt}-${index}`}
-              src={logo.src}
-              alt={logo.alt}
-              className="h-[54px] w-auto max-w-[256px] shrink-0 object-contain"
-            />
-          ))}
-        </div>
-      </div>
-    </>
-  );
+  /** Arch-shaped dark-to-light transition at the top of this section */
+  archTop?: boolean;
 }
 
 export function LogosBannerSection({
   theme = "light",
-  title,
+  eyebrow,
+  body,
+  bodySize = "lg",
+  primaryCta,
+  primaryCtaHref,
   logos,
   grayscale = true,
-  duration = 50,
+  duration = 40,
   className,
   id,
+  archTop,
 }: LogosBannerSectionProps) {
+  const buttonScheme = theme === "dark" ? "dark" : "light";
+  const hasIntroText = Boolean(eyebrow?.trim() || body?.trim());
+
   return (
     <SectionShell
       theme={theme}
-      className={cn("overflow-hidden py-16 lg:py-16", className)}
+      archTop={archTop}
+      className={cn("overflow-visible py-16 lg:py-16", className)}
       id={id}
     >
-      <div className="flex flex-col items-center gap-12">
-        <p className="text-center font-display text-[32px] font-bold leading-[1.1] text-[var(--section-text)]">
-          {title}
-        </p>
+      <div className="flex flex-col gap-12">
+        {hasIntroText && (
+          <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center lg:gap-6">
+            {eyebrow?.trim() && (
+              <p className={cn(eyebrowClassName, "text-[var(--section-text)]")}>{eyebrow}</p>
+            )}
+            {body?.trim() && (
+              <p className={cn(bodyClasses[bodySize], "text-[var(--section-text)]")}>
+                {body}
+              </p>
+            )}
+          </div>
+        )}
 
-        <div className="relative left-1/2 w-screen max-w-none -translate-x-1/2">
+        <div className="relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen max-w-none">
           <LogoMarquee logos={logos} grayscale={grayscale} duration={duration} />
         </div>
+
+        {primaryCta && (
+          <div className="flex justify-center">
+            <Button
+              variant="primary"
+              colorScheme={buttonScheme}
+              href={primaryCtaHref}
+              size="md"
+            >
+              {primaryCta}
+            </Button>
+          </div>
+        )}
       </div>
     </SectionShell>
   );

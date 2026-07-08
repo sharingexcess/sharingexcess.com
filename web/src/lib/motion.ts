@@ -16,7 +16,7 @@ export {
   useTransform,
 } from "framer-motion";
 
-export type { MotionProps, Transition, Variants } from "framer-motion";
+export type { MotionProps, MotionValue, Transition, Variants } from "framer-motion";
 
 /** Default easing — smooth deceleration */
 export const motionEase = [0.25, 0.1, 0.25, 1] as const;
@@ -39,6 +39,41 @@ export const statCardTiltSpring: Transition = {
   type: "spring",
   visualDuration: 0.28,
   bounce: 0.28,
+};
+
+/** Nav featured card hover tilt — subtle settle */
+export const navFeaturedTiltSpring: Transition = {
+  type: "spring",
+  visualDuration: 0.36,
+  bounce: 0.38,
+};
+
+/** Nav featured card arrow — bouncy scale on hover */
+export const navFeaturedArrowSpring: Transition = {
+  type: "spring",
+  visualDuration: 0.34,
+  bounce: 0.42,
+};
+
+/** Nav dropdown panel — smooth drop with light Phantom-style overshoot */
+export const navDropdownSpring: Transition = {
+  type: "spring",
+  visualDuration: 0.46,
+  bounce: 0.26,
+};
+
+/** Nav dropdown close — quicker settle, minimal bounce */
+export const navDropdownExitSpring: Transition = {
+  type: "spring",
+  visualDuration: 0.28,
+  bounce: 0.06,
+};
+
+/** Nav dropdown links — staggered spring settle */
+export const navDropdownLinkSpring: Transition = {
+  type: "spring",
+  visualDuration: 0.38,
+  bounce: 0.2,
 };
 
 /** Primary button color ripple — smooth sweep, zero bounce */
@@ -71,6 +106,18 @@ export const buttonSecondaryScaleSpring: Transition = {
 
 export const buttonSecondaryHoverSpring: Transition = {
   duration: 0.2,
+  ease: appleEase,
+};
+
+/** Nav menu items — snappier scale + color (no sliding label) */
+export const buttonSimpleLabelScaleSpring: Transition = {
+  type: "spring",
+  visualDuration: 0.14,
+  bounce: 0,
+};
+
+export const buttonSimpleLabelHoverSpring: Transition = {
+  duration: 0.12,
   ease: appleEase,
 };
 
@@ -136,8 +183,8 @@ export const heroWordSpring: Transition = {
  */
 export const roundImageGlideSpring: Transition = figmaQuickSpring;
 
-/** ~667px travel on 1630px circle (Figma img-right-round start → end) */
-export const roundImageGlideOffset = "41%";
+/** ~667px travel on 1630px circle — extra inset keeps arc edge off-screen during glide */
+export const roundImageGlideOffset = "48%";
 
 /** Figma 1068:6608 → 1068:6755 — image layer scales ~2399px → ~2835px inside the mask */
 export const roundImageGlideScaleStart = 0.846;
@@ -147,12 +194,30 @@ export const roundImageGlideVariants = (
   offset = roundImageGlideOffset,
 ): Variants => ({
   hidden: {
+    opacity: 0,
     x: fromLeft ? `-${offset}` : offset,
     scale: roundImageGlideScaleStart,
   },
   visible: {
+    opacity: 1,
     x: 0,
     scale: 1,
+    transition: roundImageGlideSpring,
+  },
+});
+
+/** Desktop bleed — translate + opacity only so the circle never scales past the frame. */
+export const roundImageBleedGlideVariants = (
+  fromLeft: boolean,
+  offset = roundImageGlideOffset,
+): Variants => ({
+  hidden: {
+    opacity: 0,
+    x: fromLeft ? `-${offset}` : offset,
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
     transition: roundImageGlideSpring,
   },
 });

@@ -30,12 +30,20 @@ export type FormSectionLayout =
 
 export type ImagePosition = "left" | "right";
 export type ImageStyle = "square" | "round";
+/** "cover" crops into a square frame (photos). "contain" preserves natural aspect ratio (diagrams, logos). */
+export type ImageFit = "cover" | "contain";
 
 export interface SectionProps {
   theme?: SectionTheme;
   id?: string;
   className?: string;
   children?: ReactNode;
+  /** Drop top padding when the previous section already provides the gap. */
+  flushTop?: boolean;
+  /** Drop bottom padding before a full-bleed section or same-theme follower. */
+  flushBottom?: boolean;
+  /** Let a parent handoff layer supply the section background (scroll fade). */
+  transparentBg?: boolean;
 }
 
 /** Card fill when `isCard` is true — options depend on section theme (see sectionCardConfig). */
@@ -63,7 +71,11 @@ export interface SectionContentProps {
   secondaryCtaHref?: string;
   imageSrc?: string;
   imageAlt?: string;
+  id?: string;
   className?: string;
+  flushTop?: boolean;
+  flushBottom?: boolean;
+  transparentBg?: boolean;
 }
 
 export type HeroLayout =
