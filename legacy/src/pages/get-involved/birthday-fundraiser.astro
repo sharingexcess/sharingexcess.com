@@ -11,6 +11,39 @@ const description =
 const canonical = new URL("/get-involved/birthday-fundraiser", Astro.site).href;
 const heroImage = "/images/birthday-fundraiser.jpg";
 const bannerImage = "/images/birthday-fundraiser-banner.jpg";
+
+const samplePhotos = [
+  {
+    src: "/images/birthday-fundraiser-samples/birthday-fundraiser-sample-1.jpg",
+    download: "sharing-excess-fundraiser-photo-hands-holding-peach.jpg",
+    alt: "Hands cupped together holding a fresh peach",
+  },
+  {
+    src: "/images/birthday-fundraiser-samples/birthday-fundraiser-sample-2.jpg",
+    download: "sharing-excess-fundraiser-photo-warehouse-logo.jpg",
+    alt: "Sharing Excess warehouse with stacked produce and SE logo on the wall",
+  },
+  {
+    src: "/images/birthday-fundraiser-samples/birthday-fundraiser-sample-3.jpg",
+    download: "sharing-excess-fundraiser-photo-warehouse-produce.jpg",
+    alt: "Sharing Excess warehouse filled with pallets of rescued produce",
+  },
+  {
+    src: "/images/birthday-fundraiser-samples/birthday-fundraiser-sample-4.jpg",
+    download: "sharing-excess-fundraiser-photo-free-food-sign.jpg",
+    alt: "Free food sign in front of rows of green reusable grocery bags",
+  },
+  {
+    src: "/images/birthday-fundraiser-samples/birthday-fundraiser-sample-5.jpg",
+    download: "sharing-excess-fundraiser-photo-tomatoes.jpg",
+    alt: "Sharing Excess volunteer in a hoodie holding fresh tomatoes on the vine",
+  },
+  {
+    src: "/images/birthday-fundraiser-samples/birthday-fundraiser-sample-6.jpg",
+    download: "sharing-excess-fundraiser-photo-dog-free-food.jpg",
+    alt: "Golden retriever wearing a Sharing Excess free food wristband",
+  },
+];
 ---
 
 <!doctype html>
@@ -51,7 +84,7 @@ const bannerImage = "/images/birthday-fundraiser-banner.jpg";
     <PageHeader
       title="Start a birthday fundraiser"
       image={bannerImage}
-      imageAlt="Hands holding a fresh peach"
+      imageAlt="Fresh produce stacked in a Sharing Excess warehouse with a donations sign"
     />
 
     <div class="section">
@@ -61,8 +94,8 @@ const bannerImage = "/images/birthday-fundraiser-banner.jpg";
             <img
               src={heroImage}
               loading="lazy"
-              alt="Sharing Excess volunteer holding fresh tomatoes"
-              class="_50-50-image"
+              alt="Volunteers sorting fresh apples at a community food distribution event"
+              class="_50-50-image green-decoration"
             />
           </div>
           <div class="_50-50-child">
@@ -95,6 +128,42 @@ const bannerImage = "/images/birthday-fundraiser-banner.jpg";
       </div>
     </div>
 
+    <div class="section">
+      <div class="content-container">
+        <div class="center-block margin-bottom-2xl">
+          <h2 class="text-align-center margin-bottom-lg">Sample Fundraiser Photos</h2>
+          <p class="font-size-sm text-align-center max-width-720 birthday-fundraiser-sample-caption">
+            Need a photo for your fundraising campaign? Here are some of our favorites!
+            <span class="birthday-fundraiser-mobile-caption" hidden>
+              Press and hold to save to your photo library.
+            </span>
+          </p>
+        </div>
+        <div class="birthday-fundraiser-photo-grid">
+          {
+            samplePhotos.map((photo) => (
+              <div class="birthday-fundraiser-photo">
+                <img
+                  src={photo.src}
+                  loading="lazy"
+                  alt={photo.alt}
+                  class="width-100 birthday-fundraiser-photo-image"
+                />
+                <a
+                  href={photo.src}
+                  download={photo.download}
+                  class="button sm secondary-white birthday-fundraiser-photo-download"
+                >
+                  <img loading="lazy" src="/images/download-icon.svg" alt="" class="icon-md" />
+                  Download
+                </a>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
     <SiteFooter />
 
     <script
@@ -105,5 +174,58 @@ const bannerImage = "/images/birthday-fundraiser-banner.jpg";
     <script src="/js/webflow.js" type="text/javascript"></script>
     <script defer src="/js/cookie-consent.js"></script>
     <script defer src="/js/header-scroll.js"></script>
+    <script is:inline>
+      (function () {
+        var ua = navigator.userAgent || "";
+        var isIOS =
+          /iPhone|iPad|iPod/i.test(ua) ||
+          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+        var isAndroid = /Android/i.test(ua);
+
+        if (isIOS || isAndroid) {
+          var caption = document.querySelector(".birthday-fundraiser-mobile-caption");
+          if (caption) caption.hidden = false;
+        }
+      })();
+    </script>
+
+    <style>
+      .birthday-fundraiser-photo-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space--lg);
+      }
+
+      @media screen and (min-width: 992px) {
+        .birthday-fundraiser-photo-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      .birthday-fundraiser-photo {
+        position: relative;
+        border-radius: var(--radius--lg);
+        overflow: hidden;
+      }
+
+      .birthday-fundraiser-photo-image {
+        aspect-ratio: 4 / 5;
+        object-fit: cover;
+        display: block;
+      }
+
+      .birthday-fundraiser-photo-download {
+        position: absolute;
+        bottom: var(--space--md);
+        right: var(--space--md);
+        z-index: 1;
+        white-space: nowrap;
+      }
+
+      .birthday-fundraiser-mobile-caption {
+        display: block;
+        margin-top: var(--space--sm);
+      }
+    </style>
   </body>
 </html>
