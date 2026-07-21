@@ -10,6 +10,12 @@
   z-index: 1;
 }
 
+.se-map .mapboxgl-ctrl-group,
+.se-map .mapboxgl-ctrl-logo,
+.se-map .mapboxgl-ctrl-attrib {
+  display: none !important;
+}
+
 .se-map-loading {
   position: absolute;
   inset: 0;

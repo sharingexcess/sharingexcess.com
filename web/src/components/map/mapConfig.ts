@@ -16,6 +16,17 @@ export const DEFAULT_MAP_CENTER: [number, number] = [-98.5795, 39.8283];
 export const DEFAULT_MAP_ZOOM = 3.5;
 export const DEFAULT_MAX_ZOOM = 9;
 
+/** Disable scroll, pinch, and keyboard zoom — map stays at the fitted viewport. */
+export const STATIC_MAP_INTERACTION = {
+  scrollZoom: false,
+  boxZoom: false,
+  doubleClickZoom: false,
+  touchZoomRotate: false,
+  dragRotate: false,
+  keyboard: false,
+  attributionControl: false,
+} as const;
+
 export const IMPACT_GEOJSON_PATH = "/public/analytics/geojson";
 
 /** Placeholder hub metrics — replace with live data on Astro pages. */

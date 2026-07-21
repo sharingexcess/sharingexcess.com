@@ -1,3 +1,4 @@
+import { NewsletterSignupForm } from "@/components/forms/NewsletterSignupForm";
 import { Button } from "@/components/ui/Button";
 import { ParallaxBackground } from "@/components/ui/ParallaxBackground";
 import { TextInput } from "@/components/ui/TextInput";
@@ -215,6 +216,8 @@ export interface FormSectionProps extends Pick<
   /** Vertical card only — centers the card on the page over the background image (Figma 1236:4213) */
   align?: "left" | "center";
   theme?: SectionTheme;
+  /** Built-in form preset — ignored when `children` is provided */
+  formKind?: "contact" | "newsletter";
   children?: React.ReactNode;
   id?: string;
 }
@@ -232,6 +235,7 @@ export function FormSection({
   backgroundImageAlt = "",
   align = "left",
   theme = "light",
+  formKind = "contact",
   children,
   className,
   id,
@@ -295,14 +299,24 @@ export function FormSection({
     />
   );
 
-  const formFields = children ?? (
-    <ContactFormFields
-      inputTheme={cardInputTheme}
-      submitLabel={submitLabel}
-      buttonVariant={isStandardLayout ? "primary" : activeStyles.buttonVariant}
-      buttonColorScheme={isStandardLayout ? (isDarkSection ? "dark" : "light") : cardButtonColorScheme}
-    />
-  );
+  const formFieldProps = {
+    inputTheme: cardInputTheme,
+    submitLabel,
+    buttonVariant: (isStandardLayout ? "primary" : activeStyles.buttonVariant) as "primary" | "secondary",
+    buttonColorScheme: (isStandardLayout
+      ? isDarkSection
+        ? "dark"
+        : "light"
+      : cardButtonColorScheme) as "light" | "dark",
+  };
+
+  const formFields =
+    children ??
+    (formKind === "newsletter" ? (
+      <NewsletterSignupForm {...formFieldProps} />
+    ) : (
+      <ContactFormFields {...formFieldProps} />
+    ));
 
   const cardInner =
     layout === "vertical-card" ? (

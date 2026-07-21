@@ -1,8 +1,10 @@
 import { TextSection } from "@/components/ui/TextSection";
-import { InteractiveMap } from "@/components/map/InteractiveMap";
+import { DeferredInteractiveMap } from "@/components/map/DeferredInteractiveMap";
 import type { MapVariant, MapHub, MapMacroRegion } from "@/components/map/types";
 import { cn } from "@/lib/cn";
+import { resolveLiveTotalLbsTitle, splitLiveTotalLbsTitle } from "@/lib/resolveLiveTotalLbsTitle";
 import type { ImagePosition, SectionContentProps } from "@/lib/types";
+import { useLiveDonatedWeight } from "@/lib/useLiveDonatedWeight";
 import { RoundBleedLayout } from "./RoundBleedLayout";
 import { SectionShell } from "./SectionShell";
 import { SectionLayout } from "./SectionLayout";
@@ -16,10 +18,12 @@ import {
   sectionCardContentIsDark,
 } from "./sectionCardConfig";
 
+export type MapLayout = "horizontal" | "stack-centered";
 export type MapContainerShape = "rounded" | "circle";
 
 export interface MapSectionProps extends Omit<SectionContentProps, "imageSrc" | "imageAlt"> {
-  body: string;
+  /** Vertical stack with centered text (like TextImage stack-centered) or side-by-side */
+  layout?: MapLayout;
   /** Which side the map appears on at lg+ — mirrors TextImage imagePosition */
   mapPosition?: ImagePosition;
   /** Map frame — rounded square (default) or circle with bleed layout like Round Image */
@@ -47,6 +51,7 @@ export function MapSection({
   primaryCtaHref,
   secondaryCta,
   secondaryCtaHref,
+  layout = "horizontal",
   mapPosition = "right",
   mapContainerShape = "rounded",
   mapVariant = "impact-clusters",
@@ -54,7 +59,18 @@ export function MapSection({
   hubs,
   regions,
   className,
+  id,
+  flushTop = false,
+  flushBottom = false,
+  transparentBg = false,
 }: MapSectionProps) {
+  const donatedWeightLbs = useLiveDonatedWeight();
+  const liveTitleSplit = splitLiveTotalLbsTitle(title, donatedWeightLbs);
+  const resolvedTitle = liveTitleSplit
+    ? liveTitleSplit.heading
+    : resolveLiveTotalLbsTitle(title, donatedWeightLbs);
+  const metric = liveTitleSplit?.metric;
+  const shellProps = { flushTop, flushBottom, transparentBg, id };
   const isDark = sectionCardContentIsDark(isCard, cardColor, theme);
   const isCircle = mapContainerShape === "circle";
   const mapRadius = isCard
@@ -64,7 +80,8 @@ export function MapSection({
   const textSection = (
     <TextSection
       eyebrow={eyebrow}
-      heading={title}
+      metric={metric}
+      heading={resolvedTitle}
       headingSize={headingSize}
       body={body}
       bodySize={bodySize}
@@ -78,15 +95,67 @@ export function MapSection({
     />
   );
 
-  const mapMedia = (
-    <InteractiveMap
-      className="size-full"
-      variant={mapVariant}
-      hubs={hubs}
-      regions={regions}
-      showLoadingLogo={mapVariant === "impact-clusters"}
-    />
+  const mapProps = {
+    variant: mapVariant,
+    hubs,
+    regions,
+    showLoadingLogo: mapVariant === "impact-clusters",
+  } as const;
+
+  const mapMedia = <DeferredInteractiveMap className="size-full" {...mapProps} />;
+
+  const fullWidthMap = (
+    <div className="flex flex-col gap-2">
+      <div
+        className={cn(
+          "relative aspect-video w-full overflow-hidden",
+          mapRadius,
+          !isCard && "lg:rounded-[var(--radius-xl)]",
+        )}
+      >
+        <DeferredInteractiveMap className="absolute inset-0" {...mapProps} />
+      </div>
+      {mapCaption && (
+        <p className="text-center text-xs italic opacity-64 text-[var(--section-text)]">
+          {mapCaption}
+        </p>
+      )}
+    </div>
   );
+
+  if (layout === "stack-centered") {
+    return (
+      <SectionShell theme={theme} className={className} {...shellProps}>
+        <SectionLayout
+          layout="vertical"
+          isCard={isCard}
+          cardColor={cardColor}
+          sectionTheme={theme}
+          centered
+          textSlotClassName="w-full max-w-3xl"
+          textSlot={
+            <TextSection
+              eyebrow={eyebrow}
+              metric={metric}
+              heading={resolvedTitle}
+              headingSize={headingSize}
+              body={body}
+              bodySize={bodySize}
+              primaryCta={primaryCta}
+              primaryCtaHref={primaryCtaHref}
+              secondaryCta={secondaryCta}
+              secondaryCtaHref={secondaryCtaHref}
+              buttonScheme={isDark ? "dark" : "light"}
+              emphasis={!isCard}
+              isCard={isCard}
+              align="center"
+            />
+          }
+          contentSlot={fullWidthMap}
+        />
+      </SectionShell>
+    );
+  }
 
   if (isCircle) {
     const roundBody = (
@@ -104,7 +173,7 @@ export function MapSection({
       const resolvedColor = coerceSectionCardColor(theme, cardColor);
       const interiorTheme = getSectionCardInteriorTheme(resolvedColor, theme);
       return (
-        <SectionShell theme="light" className={className} roundImageSection>
+        <SectionShell theme={theme} className={className} roundImageSection>
           <div
             data-section-card
             data-theme={interiorTheme}
@@ -137,13 +206,7 @@ export function MapSection({
           !isCard && "lg:rounded-[var(--radius-xl)]",
         )}
       >
-        <InteractiveMap
-          className="absolute inset-0"
-          variant={mapVariant}
-          hubs={hubs}
-          regions={regions}
-          showLoadingLogo={mapVariant === "impact-clusters"}
-        />
+        <DeferredInteractiveMap className="absolute inset-0" {...mapProps} />
       </div>
       {mapCaption && (
         <p className="text-center text-xs italic opacity-64 text-[var(--section-text)]">
@@ -154,7 +217,7 @@ export function MapSection({
   );
 
   return (
-    <SectionShell theme={isCard ? "light" : theme} className={className}>
+    <SectionShell theme={theme} className={className} {...shellProps}>
       <SectionLayout
         layout="horizontal"
         isCard={isCard}

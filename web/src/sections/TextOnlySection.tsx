@@ -75,7 +75,7 @@ export function TextOnlySection({
   }
 
   return (
-    <SectionShell theme={isCard ? "light" : theme} className={className} id={id}>
+    <SectionShell theme={theme} className={className} id={id}>
       <SectionLayout
         layout={layout}
         isCard={isCard}

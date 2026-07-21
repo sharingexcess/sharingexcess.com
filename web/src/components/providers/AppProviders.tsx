@@ -19,6 +19,8 @@ export interface AppProvidersProps {
   scrollInteractions?: boolean;
   /** Render the fixed site header (off in Storybook when previewing the header itself) */
   showHeader?: boolean;
+  /** Server-known home route — avoids header style flash before client effects run */
+  isHomePage?: boolean;
 }
 
 /** Headless global providers (Lenis + motion config) and optional site header. Mount once in BaseLayout. */
@@ -27,13 +29,14 @@ export function AppProviders({
   smoothScroll = true,
   scrollInteractions = true,
   showHeader = true,
+  isHomePage = false,
 }: AppProvidersProps) {
   return (
     <MotionProvider>
       <ScrollInteractionContext.Provider value={scrollInteractions}>
         <SmoothScrollProvider enabled={smoothScroll}>
           <PageTransitionCurtain />
-          {showHeader && <SiteHeader />}
+          {showHeader && <SiteHeader isHomePage={isHomePage} />}
           {children}
         </SmoothScrollProvider>
       </ScrollInteractionContext.Provider>

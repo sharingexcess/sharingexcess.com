@@ -29,7 +29,7 @@ export type FormSectionLayout =
   | "vertical";
 
 export type ImagePosition = "left" | "right";
-export type ImageStyle = "square" | "round";
+export type ImageStyle = "square" | "round" | "video";
 /** "cover" crops into a square frame (photos). "contain" preserves natural aspect ratio (diagrams, logos). */
 export type ImageFit = "cover" | "contain";
 
@@ -71,6 +71,8 @@ export interface SectionContentProps {
   secondaryCtaHref?: string;
   imageSrc?: string;
   imageAlt?: string;
+  /** Autoplaying background video for full-bleed home heroes; `imageSrc` serves as poster */
+  videoSrc?: string;
   id?: string;
   className?: string;
   flushTop?: boolean;
@@ -80,6 +82,8 @@ export interface SectionContentProps {
 
 export type HeroLayout =
   | "full-width"
+  /** Full-bleed home hero with embedded donation form */
+  | "full-width-donate"
   | "rounded"
   | "stack-left"
   | "stack-centered"

@@ -13,7 +13,7 @@ export function TextInput({ theme = "onWhite", className, ...props }: TextInputP
         "w-full rounded-full px-4 py-3 text-base leading-[1.4] placeholder:text-neutral-400 outline-none transition-colors",
         theme === "onWhite"
           ? "border border-neutral-250 bg-neutral-100 text-kale focus:border-se-green"
-          : "bg-white text-kale focus:ring-2 focus:ring-white/40",
+          : "border border-white/25 bg-white/10 text-white placeholder:text-white/50 focus:border-white/40 focus:ring-2 focus:ring-white/15",
         className,
       )}
       {...props}

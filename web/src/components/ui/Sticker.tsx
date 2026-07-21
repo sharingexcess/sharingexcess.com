@@ -25,6 +25,32 @@ const SPINNING_STICKERS = new Set<StickerName>(["free-food", "waste-less"]);
 const STICKER_DROP_SHADOW =
   "drop-shadow-[0px_2px_6px_rgba(0,0,0,0.12)] drop-shadow-[0px_2.56px_3.2px_rgba(0,0,0,0.25)]";
 
+/** Figma — 150px on 1320px content width */
+export const STICKER_SIZE_CLASS = "size-[clamp(100px,11.36vw,150px)]";
+
+/** Smaller sticker for stat card gutters */
+export const STICKER_SIZE_SM_CLASS = "size-[clamp(72px,8.5vw,112px)]";
+
+/** Overlap container top edge — hero image, section intro, etc. */
+export const STICKER_OVERLAP_TOP_CLASS =
+  "pointer-events-none absolute top-0 right-[clamp(40px,14.85%,196px)] z-10 -translate-y-1/2";
+
+/** Overlap the top-left corner of a stat card */
+export const STICKER_OVERLAP_CARD_TOP_LEFT_CLASS =
+  "pointer-events-none absolute top-3 left-4 z-20 -translate-x-1/2 -translate-y-1/2";
+
+/** Centered over a media frame */
+export const STICKER_OVERLAP_CENTER_CLASS =
+  "pointer-events-none absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2";
+
+/** Centered on the top edge of a media frame */
+export const STICKER_OVERLAP_TOP_CENTER_CLASS =
+  "pointer-events-none absolute left-1/2 top-3 z-20 -translate-x-1/2 -translate-y-1/2";
+
+/** Centered in the gutter between the 2nd and 3rd cards of a 3-up stat grid */
+export const STICKER_BETWEEN_STAT_CARDS_CLASS =
+  "pointer-events-none absolute z-20 left-1/2 top-[calc(864px+4.5rem)] -translate-x-1/2 -translate-y-1/2 sm:left-[calc(66.666667%+0.25rem)] sm:top-0";
+
 /** Hearts rendered above the spin layer — needed when the ring is a solid disc. */
 const SPIN_HEART_OVERLAY: Partial<
   Record<StickerName, { d: string; fill: string; viewBox: string }>

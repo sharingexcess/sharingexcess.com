@@ -70,7 +70,7 @@ const specimens: TypeSpecimen[] = [
     weight: "400 Regular",
     tracking: "0",
     sample: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis.",
-    style: { fontFamily: '"Poppins", sans-serif', fontSize: 20, fontWeight: 400, lineHeight: 1.4, letterSpacing: 0, color: "#003619" },
+    style: { fontFamily: '"Poppins", sans-serif', fontSize: 20, fontWeight: 400, lineHeight: 1.6, letterSpacing: 0, color: "#003619" },
   },
   {
     name: "Paragraph LG",

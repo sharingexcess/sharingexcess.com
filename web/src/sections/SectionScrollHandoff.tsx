@@ -15,6 +15,10 @@ export interface SectionScrollHandoffProps {
   fadeStart?: number;
   /** Wrapper scroll depth (0–1) where the crossfade completes */
   fadeEnd?: number;
+  /** Scroll depth in vh where the crossfade begins (overrides fadeStart) */
+  fadeStartVh?: number;
+  /** Scroll depth in vh where the crossfade completes (overrides fadeEnd) */
+  fadeEndVh?: number;
 }
 
 /**
@@ -28,6 +32,8 @@ export function SectionScrollHandoff({
   fadeTo = "light",
   fadeStart = 0.28,
   fadeEnd = 0.4,
+  fadeStartVh,
+  fadeEndVh,
 }: SectionScrollHandoffProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const lenis = useLenis();
@@ -46,11 +52,18 @@ export function SectionScrollHandoff({
 
       const rect = el.getBoundingClientRect();
       const scrollDepth = Math.max(0, -rect.top);
+      const vhPx = window.innerHeight / 100;
+      const startRatio =
+        fadeStartVh != null
+          ? (fadeStartVh * vhPx) / rect.height
+          : fadeStart;
+      const endRatio =
+        fadeEndVh != null ? (fadeEndVh * vhPx) / rect.height : fadeEnd;
       const progress = measureDepthFadeProgress(
         scrollDepth,
         rect.height,
-        fadeStart,
-        fadeEnd,
+        startRatio,
+        endRatio,
       );
       overlayOpacity.set(reduceMotion ? (progress >= 1 ? 1 : 0) : progress);
     };
@@ -73,7 +86,7 @@ export function SectionScrollHandoff({
       }
       window.removeEventListener("resize", update);
     };
-  }, [fadeEnd, fadeFrom, fadeStart, fadeTo, lenis, overlayOpacity, reduceMotion]);
+  }, [fadeEnd, fadeEndVh, fadeFrom, fadeStart, fadeStartVh, fadeTo, lenis, overlayOpacity, reduceMotion]);
 
   const baseIsDark = fadeFrom === "dark";
   const overlayIsLight = fadeFrom === "dark" && fadeTo === "light";

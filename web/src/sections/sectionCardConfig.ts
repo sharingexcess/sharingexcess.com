@@ -103,3 +103,6 @@ export const SECTION_CARD_SHELL_CLASS =
 /** Image corners inside a section card */
 export const SECTION_CARD_IMAGE_RADIUS_CLASS =
   "rounded-3xl lg:rounded-[var(--radius-md)]";
+
+/** Nested form/content corners inside a section card — same softer inset as images */
+export const SECTION_CARD_NESTED_RADIUS_CLASS = SECTION_CARD_IMAGE_RADIUS_CLASS;

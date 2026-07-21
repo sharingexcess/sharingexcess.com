@@ -23,6 +23,7 @@ import {
   getMapStyleForVariant,
   MAP_HUB_MARKER_COLOR,
   MAP_POINT_COLOR,
+  STATIC_MAP_INTERACTION,
 } from "./mapConfig";
 import type { InteractiveMapProps, MapHub, MapMacroRegion } from "./types";
 
@@ -286,34 +287,6 @@ function setupImpactClusterLayers(map: mapboxgl.Map, geojsonUrl: string): void {
     },
   });
 
-  map.on("click", CLUSTERS_LAYER_ID, (event) => {
-    const feature = event.features?.[0];
-    if (!feature || feature.geometry.type !== "Point") return;
-
-    const clusterId = feature.properties?.cluster_id;
-    if (clusterId == null) return;
-
-    const source = map.getSource(CLUSTER_SOURCE_ID) as mapboxgl.GeoJSONSource;
-    source.getClusterExpansionZoom(clusterId).then((zoom) => {
-      map.easeTo({
-        center: feature.geometry.coordinates as [number, number],
-        zoom,
-      });
-    });
-  });
-
-  const setPointer = (layerId: string, cursor: string) => {
-    map.on("mouseenter", layerId, () => {
-      map.getCanvas().style.cursor = cursor;
-    });
-    map.on("mouseleave", layerId, () => {
-      map.getCanvas().style.cursor = "";
-    });
-  };
-
-  setPointer(CLUSTERS_LAYER_ID, "pointer");
-  setPointer(UNCLUSTERED_LAYER_ID, "pointer");
-
   void fitBoundsFromGeoJson(map, geojsonUrl);
 }
 
@@ -326,7 +299,7 @@ export function InteractiveMap({
   hubs = DEFAULT_MAP_HUBS,
   regions = DEFAULT_MAP_MACRO_REGIONS,
   maxZoom = DEFAULT_MAX_ZOOM,
-  showNavigation = variant === "impact-clusters",
+  showNavigation = false,
 }: InteractiveMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -411,6 +384,7 @@ export function InteractiveMap({
       center,
       zoom,
       maxZoom: variant === "hub-markers" ? 8 : maxZoom,
+      ...STATIC_MAP_INTERACTION,
     });
 
     mapRef.current = map;

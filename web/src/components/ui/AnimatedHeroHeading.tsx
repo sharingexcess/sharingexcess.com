@@ -126,6 +126,8 @@ export interface AnimatedHeroHeadingProps {
   emphasis?: boolean;
   /** Scale font size down so each nowrap line fits the container (home hero) */
   fitText?: boolean;
+  /** Fires once the word-by-word reveal finishes */
+  onRevealComplete?: () => void;
 }
 
 /** Word-by-word hero heading reveal — waits for fonts, respects reduced motion */
@@ -136,6 +138,7 @@ export function AnimatedHeroHeading({
   multiline = false,
   emphasis = true,
   fitText = false,
+  onRevealComplete,
 }: AnimatedHeroHeadingProps) {
   const reduceMotion = useReducedMotion();
   const [fontsReady, setFontsReady] = useState(Boolean(reduceMotion));
@@ -151,11 +154,12 @@ export function AnimatedHeroHeading({
   useEffect(() => {
     if (reduceMotion) {
       setFontsReady(true);
+      onRevealComplete?.();
       return;
     }
 
     document.fonts.ready.then(() => setFontsReady(true));
-  }, [reduceMotion]);
+  }, [onRevealComplete, reduceMotion]);
 
   if (reduceMotion) {
     return (
@@ -182,6 +186,9 @@ export function AnimatedHeroHeading({
         variants={heroWordContainerVariants}
         initial="hidden"
         animate={fontsReady ? "visible" : "hidden"}
+        onAnimationComplete={(definition) => {
+          if (definition === "visible") onRevealComplete?.();
+        }}
         className={cn(multiline && "flex flex-col")}
       >
         {lines.map((tokens, lineIndex) => (

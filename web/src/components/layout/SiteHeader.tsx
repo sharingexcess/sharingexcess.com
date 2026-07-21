@@ -1,11 +1,17 @@
 import { cn } from "@/lib/cn";
+import { isHomePagePath } from "@/lib/isHomePagePath";
 import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 import { useHeaderOverHomeHero } from "@/lib/useHeaderOverHomeHero";
 import { useHideOnScroll } from "@/lib/useHideOnScroll";
 import { Button } from "@/components/ui/Button";
 import { MenuToggle } from "@/components/layout/MenuToggle";
 import { MobileNavPanel } from "@/components/layout/MobileNavPanel";
-import { NavDropdownPanel, NavDropdownTrigger, NAV_BUTTON_GLASS_STYLE, NAV_BUTTON_STYLE } from "@/components/layout/NavDropdown";
+import {
+  NavDropdownPanel,
+  NavDropdownTrigger,
+  NAV_BUTTON_GLASS_STYLE,
+  NAV_BUTTON_STYLE,
+} from "@/components/layout/NavDropdown";
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 
 export interface SiteHeaderNavLink {
@@ -65,46 +71,63 @@ export interface SiteHeaderProps {
   secondaryCtaHref?: string;
   ctaLabel?: string;
   ctaHref?: string;
+  /** Server-known home route — enables scroll-hide and hero sizing on first paint */
+  isHomePage?: boolean;
 }
 
 export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
   {
-    label: "About",
-    href: "/about",
-    children: PLACEHOLDER_NAV_DROPDOWN_LINKS,
-    featured: PLACEHOLDER_NAV_DROPDOWN_FEATURED,
+    label: "Find Food",
+    href: "/find-food",
   },
   {
     label: "Get Involved",
-    href: "/get-involved/volunteer",
-    children: PLACEHOLDER_NAV_DROPDOWN_LINKS,
-    featured: PLACEHOLDER_NAV_DROPDOWN_FEATURED,
+    href: "/get-involved",
+    children: [
+      { label: "For Food Businesses", href: "/get-involved/partners#food-business" },
+      { label: "For Community Organizations", href: "/get-involved/partners#community-orgs" },
+      { label: "For Foundations", href: "/get-involved/partners#foundations" },
+      { label: "Give Monthly", href: "/collective" },
+      { label: "Volunteer", href: "/get-involved/volunteer" },
+    ],
+    featured: {
+      imageSrc: "/images/peppers.jpg",
+      imageAlt: "",
+      text: "Get Involved",
+      href: "/get-involved",
+    },
   },
   {
-    label: "Find Food",
-    href: "/find-food",
-    children: PLACEHOLDER_NAV_DROPDOWN_LINKS,
-    featured: PLACEHOLDER_NAV_DROPDOWN_FEATURED,
+    label: "About Us",
+    href: "/about",
+    children: [
+      { label: "Our Impact", href: "/about/impact" },
+      { label: "Our Model", href: "/about" },
+      { label: "Our Team", href: "/about/team" },
+      { label: "Our Financials", href: "/about/financials" },
+    ],
+    featured: {
+      imageSrc: "/images/about.png",
+      imageAlt: "",
+      text: "About Us",
+      href: "/about",
+    },
+  },
+  {
+    label: "Closing the Gap",
+    href: "/about/problem",
   },
 ];
 
 const MOBILE_NAV_ID = "site-mobile-nav";
 
-/** Liquid glass frost — matches ghost button (Figma 1010:1302) at nav-bar scale. */
-function HeaderGlassLayers() {
-  return (
-    <>
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-[inherit] bg-white/[0.10] backdrop-blur-md"
-      />
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-[inherit] bg-gradient-to-br from-white/12 via-transparent to-black/[0.06]"
-      />
-    </>
-  );
-}
+const LOGO_ICON_SRC = {
+  default: "/images/se-icon-green.png",
+  hero: "/images/se-icon-white.png",
+} as const;
+
+const HEADER_BAR_TRANSITION =
+  "transition-[background-color,box-shadow,border-color,border-radius,padding,max-width] duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] motion-reduce:transition-none";
 
 /** Figma node 1052:2970 — NavigationBar option 1 (desktop + mobile overlay). */
 export function SiteHeader({
@@ -116,18 +139,17 @@ export function SiteHeader({
   secondaryCtaHref = "https://app.sharingexcess.com/sign-in",
   ctaLabel = "Donate",
   ctaHref = "/?form=donate",
+  isHomePage: isHomePageProp = false,
 }: SiteHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeNavIndex, setActiveNavIndex] = useState<number | null>(null);
   const [hoveredNavIndex, setHoveredNavIndex] = useState<number | null>(null);
   const [isMobileViewport, setIsMobileViewport] = useState(false);
-  const [isHomePage, setIsHomePage] = useState(
-    () => typeof window !== "undefined" && window.location.pathname === "/",
-  );
-  const overHomeHero = useHeaderOverHomeHero();
+  const [isHomePage, setIsHomePage] = useState(isHomePageProp);
+  const overHomeHero = useHeaderOverHomeHero(isHomePageProp);
   const scrollVisible = useHideOnScroll({ enabled: isHomePage });
   const visible = isHomePage ? scrollVisible || menuOpen || isMobileViewport : true;
-  const glassOverHero = isHomePage && overHomeHero && !menuOpen;
+  const overHeroNav = isHomePage && overHomeHero && !menuOpen;
 
   useBodyScrollLock(menuOpen);
 
@@ -141,7 +163,7 @@ export function SiteHeader({
 
   useEffect(() => {
     const syncPath = () => {
-      setIsHomePage(window.location.pathname === "/");
+      setIsHomePage(isHomePagePath(window.location.pathname));
     };
     document.addEventListener("astro:after-swap", syncPath);
     syncPath();
@@ -189,10 +211,11 @@ export function SiteHeader({
     <header
       data-site-header
       data-visible={visible}
-      data-over-hero={glassOverHero || undefined}
+      data-over-hero={overHeroNav || undefined}
       data-menu-open={menuOpen || undefined}
       className={cn(
-        "site-header-shell fixed inset-x-0 top-0 z-50 w-full bg-transparent px-4 py-3 lg:px-8 lg:py-4",
+        "site-header-shell fixed inset-x-0 top-0 z-50 w-full bg-transparent py-3 lg:py-4",
+        overHeroNav ? "px-0" : "px-4 lg:px-8",
         !visible && "site-header-shell--hidden",
         className,
       )}
@@ -200,39 +223,50 @@ export function SiteHeader({
       inert={headerInteractive ? undefined : true}
     >
       <div
-        className="relative mx-auto max-w-[1320px]"
+        className={cn(
+          "relative z-10 mx-auto w-full",
+          HEADER_BAR_TRANSITION,
+          overHeroNav ? "max-w-[1512px] px-3 lg:px-6" : "max-w-[1320px]",
+        )}
         onMouseLeave={closeNavDropdown}
       >
         <div
+          data-header-bar
           className={cn(
-            "relative isolate rounded-[var(--radius-xl)] px-4 py-3 transition-[background-color,box-shadow,border-color] duration-300 lg:px-8 lg:py-4",
-            glassOverHero
-              ? "border border-white/25 shadow-[0_2px_12px_rgba(0,0,0,0.16)]"
-              : "border border-transparent bg-neutral-000 shadow-[0_2px_12px_rgba(0,0,0,0.12)]",
+            "relative isolate py-3 lg:py-4",
+            HEADER_BAR_TRANSITION,
+            overHeroNav
+              ? "rounded-none border border-transparent bg-transparent px-0 shadow-none"
+              : "rounded-[var(--radius-xl)] border border-transparent bg-neutral-000 px-4 shadow-[0_2px_12px_rgba(0,0,0,0.12)] lg:px-8",
             menuOpen && "z-50",
           )}
         >
-          {glassOverHero && (
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]"
-            >
-              <HeaderGlassLayers />
-            </div>
-          )}
-          <div className="relative z-10 flex items-center justify-between gap-4 lg:gap-6">
+          <div className="relative flex items-center justify-between gap-4 lg:gap-6">
         <a
           href="/"
-          className="flex shrink-0 items-center gap-[6px] no-underline text-se-green lg:text-[24px]"
+          className={cn(
+            "flex shrink-0 items-center no-underline transition-[font-size,gap,color] duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] motion-reduce:transition-none",
+            overHeroNav ? "gap-2 text-white lg:text-[36px]" : "gap-[6px] text-se-green lg:text-[24px]",
+          )}
         >
           <img
-            src="/images/se-icon-green.png"
+            src={overHeroNav ? LOGO_ICON_SRC.hero : LOGO_ICON_SRC.default}
             alt=""
             width={32}
             height={32}
-            className="size-8 shrink-0 rounded-[6px] lg:h-[1.06em] lg:w-[1.06em] lg:min-w-[1.06em]"
+            className={cn(
+              "shrink-0 rounded-[6px] transition-[width,height,min-width] duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] motion-reduce:transition-none",
+              overHeroNav
+                ? "size-10 lg:h-[1.24em] lg:w-[1.24em] lg:min-w-[1.24em]"
+                : "size-8 lg:h-[1.06em] lg:w-[1.06em] lg:min-w-[1.06em]",
+            )}
           />
-          <span className="font-sans text-[22px] font-semibold leading-[1.06] tracking-[-0.04em] lg:text-[inherit]">
+          <span
+            className={cn(
+              "font-sans font-semibold leading-[1.06] tracking-[-0.04em] transition-[font-size,color] duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] motion-reduce:transition-none lg:text-[inherit]",
+              overHeroNav ? "text-[30px] text-white" : "text-[22px] text-se-green",
+            )}
+          >
             {logoLabel}
           </span>
         </a>
@@ -240,7 +274,7 @@ export function SiteHeader({
         <div className="flex shrink-0 items-center gap-4 lg:gap-6">
           <nav
             className="hidden items-center gap-6 lg:flex"
-            style={glassOverHero ? NAV_BUTTON_GLASS_STYLE : NAV_BUTTON_STYLE}
+            style={overHeroNav ? NAV_BUTTON_GLASS_STYLE : NAV_BUTTON_STYLE}
             aria-label="Main"
             onMouseLeave={() => setHoveredNavIndex(null)}
           >
@@ -251,7 +285,14 @@ export function SiteHeader({
                   "transition-opacity duration-200",
                   focusedNavIndex !== null && focusedNavIndex !== index && "opacity-50",
                 )}
-                onMouseEnter={() => setHoveredNavIndex(index)}
+                onMouseEnter={() => {
+                  setHoveredNavIndex(index);
+                  if ((item.children?.length ?? 0) > 0) {
+                    setActiveNavIndex(index);
+                  } else {
+                    closeNavDropdown();
+                  }
+                }}
               >
                 <NavDropdownTrigger
                   item={item}
@@ -264,12 +305,12 @@ export function SiteHeader({
 
           <div
             className="hidden items-center gap-2 lg:flex"
-            style={glassOverHero ? NAV_BUTTON_GLASS_STYLE : undefined}
+            style={overHeroNav ? NAV_BUTTON_GLASS_STYLE : undefined}
           >
             <Button
               variant="secondary"
               size="sm"
-              colorScheme={glassOverHero ? "dark" : "light"}
+              colorScheme={overHeroNav ? "dark" : "light"}
               href={secondaryCtaHref}
             >
               {secondaryCtaLabel}
@@ -289,7 +330,7 @@ export function SiteHeader({
             open={menuOpen}
             onToggle={toggleMenu}
             controlsId={MOBILE_NAV_ID}
-            inverted={glassOverHero}
+            inverted={overHeroNav}
             className="lg:hidden"
           />
         </div>

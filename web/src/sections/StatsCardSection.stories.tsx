@@ -25,6 +25,8 @@ const meta = {
     title: "*Lorem ipsum* dolor sit amet.",
     body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     stats: STATS_3,
+    sticker: false,
+    stickerName: "free-food",
   },
   argTypes: {
     ...sectionControlArgTypes,
@@ -32,6 +34,11 @@ const meta = {
     columns:     { control: false },
     headingSize: { control: "radio", options: ["h1", "h2"] },
     bodySize:    { control: "radio", options: ["xl", "lg", "md"] },
+    sticker: { control: "boolean" },
+    stickerName: {
+      control: "select",
+      options: ["free-food", "waste-less", "sunrise", "lemon"],
+    },
   },
 } satisfies Meta<typeof StatsCardSection>;
 
@@ -39,6 +46,15 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const ThreeCards: Story = {};
+
+export const WithSticker: Story = {
+  args: {
+    sticker: true,
+    stickerName: "free-food",
+    align: "left",
+    textLayout: "vertical",
+  },
+};
 
 export const TwoCards: Story = {
   args: { columns: 2, stats: STATS_2 },
@@ -74,4 +90,32 @@ export const ImageCards: Story = {
 
 export const ImageCardsTwoUp: Story = {
   args: { columns: 2, stats: IMAGE_STATS_3.slice(0, 2) },
+};
+
+const TEXT_IMAGE_STATS_2 = [
+  {
+    value: "Lorem ipsum?",
+    label: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    type: "image" as const,
+    tilt: "tiltLeft" as const,
+    imageSrc: "/images/peppers.jpg",
+  },
+  {
+    value: "Dolor sit?",
+    label: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    type: "image" as const,
+    tilt: "tiltRight" as const,
+    imageSrc: "/images/tomatoes.jpg",
+  },
+];
+
+export const ImageCardsTwoUpText: Story = {
+  args: {
+    columns: 2,
+    contentVariant: "text",
+    title: "Lorem ipsum",
+    headingSize: "h2",
+    align: "center",
+    stats: TEXT_IMAGE_STATS_2,
+  },
 };

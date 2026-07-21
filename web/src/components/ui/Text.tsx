@@ -9,7 +9,7 @@ export interface TextProps {
 
 // Maps to Foundations/Typography Paragraph styles
 const sizeClasses = {
-  xl: "text-[20px] leading-[1.4]",
+  xl: "text-[20px] leading-[1.6]",
   lg: "text-[18px] leading-[1.4]",
   md: "text-base   leading-[1.4]",
 };

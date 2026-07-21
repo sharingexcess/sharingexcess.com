@@ -1,9 +1,11 @@
 import { cn } from "@/lib/cn";
 import { useFitText } from "@/lib/useFitText";
+import { bodyLgClassName, statCardTextHeaderClassName } from "@/lib/typography";
 import {
   figmaQuickSpring,
   motion,
   motionEase,
+  statCardArrowSpring,
   statCardTiltSpring,
   useReducedMotion,
   type Variants,
@@ -16,16 +18,19 @@ const TILT_RIGHT = 2.46;
 const colorVariants = {
   green: {
     accent: "bg-bright-kelly",
+    arrowButtonHover: "group-hover:bg-bright-kelly",
     colorHoverText: "group-hover:text-kale",
     tilt: TILT_LEFT,
   },
   yellow: {
     accent: "bg-banana",
+    arrowButtonHover: "group-hover:bg-banana",
     colorHoverText: "group-hover:text-dark-cherry",
     tilt: TILT_RIGHT,
   },
   orange: {
     accent: "bg-tangerine",
+    arrowButtonHover: "group-hover:bg-tangerine",
     colorHoverText: "group-hover:text-dark-cherry",
     tilt: TILT_LEFT,
   },
@@ -35,6 +40,12 @@ const colorVariants = {
 const ACTION_BOTTOM = 15;
 const ACTION_RIGHT = 23;
 const ACTION_SIZE = 88;
+
+/** Text image cards — smaller arrow control */
+const TEXT_ACTION_BOTTOM = 20;
+const TEXT_ACTION_RIGHT = 28;
+const TEXT_ACTION_SIZE = 64;
+const TEXT_ARROW_SIZE = 32;
 
 /** Resting color dot — scaled down from 88px */
 const COLOR_REST_SCALE = 0.7;
@@ -101,6 +112,20 @@ const imageButtonVariants: Variants = {
   },
 };
 
+const textArrowButtonVariants: Variants = {
+  rest: { scale: 1 },
+  hover: {
+    scale: 1.16,
+    transition: statCardArrowSpring,
+  },
+};
+
+const IMAGE_SCRIM_GRADIENT =
+  "linear-gradient(0.59deg, rgba(27,27,21,0.62) 52%, rgba(27,27,21,0.48) 72%, rgba(23,23,23,0) 96%)";
+
+const IMAGE_SCRIM_GRADIENT_SUBTLE =
+  "linear-gradient(to top, rgba(27,27,21,0.58) 0%, rgba(27,27,21,0.42) 38%, rgba(23,23,23,0) 78%)";
+
 export type StatCardColorVariant = keyof typeof colorVariants;
 /** @deprecated Use StatCardColorVariant */
 export type StatCardVariant = StatCardColorVariant;
@@ -112,9 +137,14 @@ const imageTiltDegrees: Record<StatCardImageTilt, number> = {
   tiltRight: TILT_RIGHT,
 };
 
+export type StatCardContentVariant = "metric" | "text";
+
 type StatCardBaseProps = {
   value: string;
   label: string;
+  href?: string;
+  /** Metric (default) uses display numerals; text uses eyebrow + lg body */
+  contentVariant?: StatCardContentVariant;
   className?: string;
 };
 
@@ -130,15 +160,15 @@ export type StatCardProps = StatCardBaseProps &
         type: "image";
         imageSrc: string;
         tilt?: StatCardImageTilt;
-        variant?: never;
+        variant?: StatCardColorVariant;
       }
   );
 
-function ArrowRight() {
+function ArrowRight({ size = 43 }: { size?: number }) {
   return (
     <svg
-      width="43"
-      height="43"
+      width={size}
+      height={size}
       viewBox="0 0 43 43"
       fill="none"
       className="block shrink-0"
@@ -159,34 +189,82 @@ export function StatCard(props: StatCardProps) {
   const {
     value,
     label,
+    href,
+    contentVariant = "metric",
     className,
     type = "color",
     ...rest
   } = props;
 
+  const isText = contentVariant === "text";
   const isImage = type === "image";
   const imageSrc = isImage ? rest.imageSrc : undefined;
   const tilt = isImage ? rest.tilt ?? "tiltLeft" : undefined;
-  const variant = !isImage ? rest.variant ?? "green" : "green";
+  const variant = rest.variant ?? "green";
 
   const color = colorVariants[variant];
   const reduceMotion = useReducedMotion();
   const { containerRef: valueContainerRef, textRef: valueRef, fontSizePx } =
-    useFitText(value);
+    useFitText(isText ? "" : value, { minSizePx: 56 });
+
+  const showImageByDefault = isText && isImage;
 
   const hoverRotate = isImage
     ? imageTiltDegrees[tilt!]
     : color.tilt;
 
   const textClass = "text-[var(--section-text)]";
-  const hoverTextClass = isImage
-    ? "group-hover:text-white"
-    : color.colorHoverText;
   const arrowHoverClass = isImage ? "" : color.colorHoverText;
+  const hoverTextClass = isImage
+    ? showImageByDefault
+      ? "text-white"
+      : "group-hover:text-white"
+    : color.colorHoverText;
+  const arrowColorClass = isImage
+    ? showImageByDefault
+      ? cn("text-[var(--section-text)] transition-colors duration-[600ms]", color.colorHoverText)
+      : textClass
+    : cn(textClass, arrowHoverClass);
 
-  return (
+  const activeActionButtonStyle = showImageByDefault
+    ? {
+        bottom: TEXT_ACTION_BOTTOM,
+        right: TEXT_ACTION_RIGHT,
+        width: TEXT_ACTION_SIZE,
+        height: TEXT_ACTION_SIZE,
+      }
+    : actionButtonStyle;
+
+  const activeImageFillVariants: Variants = showImageByDefault
+    ? { rest: { opacity: 1 }, hover: { opacity: 1 } }
+    : imageFillVariants;
+
+  const activeImageScrimVariants: Variants = showImageByDefault
+    ? { rest: { opacity: 1 }, hover: { opacity: 1 } }
+    : imageScrimVariants;
+
+  const activeImageButtonVariants: Variants = showImageByDefault
+    ? textArrowButtonVariants
+    : imageButtonVariants;
+
+  const activeImageAccentVariants: Variants = showImageByDefault
+    ? {
+        rest: { scale: 0, opacity: 0 },
+        hover: { scale: 0, opacity: 0 },
+      }
+    : imageAccentVariants;
+
+  const contentGap = isImage
+    ? isText
+      ? "gap-4"
+      : "gap-2"
+    : isText
+      ? "gap-4"
+      : "gap-[178px]";
+
+  const card = (
     <motion.div
-      className={cn("group w-full cursor-pointer", className)}
+      className={cn("group w-full", href ? "cursor-pointer" : undefined, className)}
       whileHover={
         reduceMotion
           ? undefined
@@ -197,7 +275,9 @@ export function StatCard(props: StatCardProps) {
         className={cn(
           "@container relative h-[432px] w-full overflow-hidden rounded-[var(--radius-md)] bg-[var(--section-surface)] p-[42px]",
           "flex min-w-0 flex-col",
-          isImage ? "gap-2" : "gap-[178px]",
+          contentGap,
+          isText && !isImage && "justify-between",
+          showImageByDefault && "justify-end",
         )}
         initial="rest"
         whileHover={reduceMotion ? undefined : "hover"}
@@ -221,7 +301,7 @@ export function StatCard(props: StatCardProps) {
             className={cn(
               "pointer-events-none absolute rounded-full bg-bright-kelly",
             )}
-            variants={imageAccentVariants}
+            variants={activeImageAccentVariants}
             style={{
               ...actionButtonStyle,
               transformOrigin: "center",
@@ -229,10 +309,17 @@ export function StatCard(props: StatCardProps) {
           />
         )}
 
-        {isImage && imageSrc && (
+        {isImage && imageSrc && showImageByDefault ? (
+          <motion.div
+            className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-[var(--radius-md)]"
+            variants={activeImageFillVariants}
+          >
+            <img src={imageSrc} alt="" className="size-full object-cover" />
+          </motion.div>
+        ) : isImage && imageSrc ? (
           <motion.div
             className="pointer-events-none absolute z-0 overflow-hidden rounded-full"
-            variants={imageFillVariants}
+            variants={activeImageFillVariants}
             style={{
               width: IMAGE_CIRCLE_SIZE,
               height: IMAGE_CIRCLE_SIZE,
@@ -242,71 +329,136 @@ export function StatCard(props: StatCardProps) {
           >
             <img src={imageSrc} alt="" className="size-full object-cover" />
           </motion.div>
-        )}
+        ) : null}
 
-        {/* Figma 980:1057 — top scrim for metric legibility (darkened for readability) */}
         {isImage && (
           <motion.div
-            className="pointer-events-none absolute left-1/2 top-[-12px] z-[1] flex h-[340px] w-[924px] max-w-[calc(100%+80px)] -translate-x-1/2 items-center justify-center mix-blend-multiply"
-            variants={imageScrimVariants}
+            className={cn(
+              "pointer-events-none absolute left-1/2 z-[1] flex h-[340px] w-[924px] max-w-[calc(100%+80px)] -translate-x-1/2 items-center justify-center mix-blend-multiply",
+              showImageByDefault ? "bottom-0" : "top-[-12px]",
+            )}
+            variants={activeImageScrimVariants}
           >
             <div
-              className="h-full w-full -scale-y-100"
+              className={cn("h-full w-full", !showImageByDefault && "-scale-y-100")}
               style={{
-                backgroundImage:
-                  "linear-gradient(0.59deg, rgba(27,27,21,0.62) 52%, rgba(27,27,21,0.48) 72%, rgba(23,23,23,0) 96%)",
+                backgroundImage: showImageByDefault
+                  ? IMAGE_SCRIM_GRADIENT_SUBTLE
+                  : IMAGE_SCRIM_GRADIENT,
               }}
             />
           </motion.div>
         )}
 
-        <div
-          ref={valueContainerRef}
-          className="relative z-10 min-w-0 max-w-full"
-        >
-          <p
-            ref={valueRef}
-            style={fontSizePx != null ? { fontSize: `${fontSizePx}px` } : undefined}
-            className={cn(
-              "inline-block w-fit max-w-full whitespace-nowrap font-display text-[clamp(3.5rem,28.8cqw,8rem)] font-bold leading-[1.06] tracking-[-0.04em] transition-colors duration-[600ms]",
-              textClass,
-              hoverTextClass,
-            )}
-          >
-            {value}
-          </p>
-        </div>
+        {showImageByDefault ? (
+          <div className="relative z-10 flex w-full min-w-0 flex-col gap-4">
+            <p
+              className={cn(
+                "w-full min-w-0 text-pretty transition-colors duration-[600ms]",
+                statCardTextHeaderClassName,
+                textClass,
+                hoverTextClass,
+              )}
+            >
+              {value}
+            </p>
+            <p
+              className={cn(
+                "w-full min-w-0 pr-[92px] text-pretty transition-colors duration-[600ms]",
+                bodyLgClassName,
+                textClass,
+                hoverTextClass,
+              )}
+            >
+              {label}
+            </p>
+          </div>
+        ) : isText ? (
+          <>
+            <p
+              className={cn(
+                "relative z-10 w-full min-w-0 text-pretty transition-colors duration-[600ms]",
+                statCardTextHeaderClassName,
+                textClass,
+                hoverTextClass,
+              )}
+            >
+              {value}
+            </p>
+            <p
+              className={cn(
+                "relative z-10 mt-auto w-full min-w-0 pr-[120px] text-pretty transition-colors duration-[600ms]",
+                bodyLgClassName,
+                textClass,
+                hoverTextClass,
+              )}
+            >
+              {label}
+            </p>
+          </>
+        ) : (
+          <>
+            <div
+              ref={valueContainerRef}
+              className="relative z-10 min-w-0 max-w-full"
+            >
+              <p
+                ref={valueRef}
+                style={fontSizePx != null ? { fontSize: `${fontSizePx}px` } : undefined}
+                className={cn(
+                  "inline-block w-fit max-w-full whitespace-nowrap font-display text-[clamp(3.5rem,28.8cqw,8rem)] font-bold leading-[1.06] tracking-[-0.04em] transition-colors duration-[600ms]",
+                  textClass,
+                  hoverTextClass,
+                )}
+              >
+                {value}
+              </p>
+            </div>
+            <p
+              className={cn(
+                "relative z-10 min-w-full pr-[120px] text-[clamp(1.25rem,7cqw,2rem)] font-medium leading-[1.2] tracking-[-0.04em] transition-colors duration-[600ms]",
+                textClass,
+                hoverTextClass,
+              )}
+            >
+              {label}
+            </p>
+          </>
+        )}
 
-        <p
-          className={cn(
-            "relative z-10 min-w-full pr-[120px] text-[clamp(1.25rem,7cqw,2rem)] font-medium leading-[1.2] tracking-[-0.04em] transition-colors duration-[600ms]",
-            textClass,
-            hoverTextClass,
-          )}
-        >
-          {label}
-        </p>
-
-        <div className={actionButtonClass} style={actionButtonStyle}>
+        <div className={actionButtonClass} style={activeActionButtonStyle}>
           {isImage && (
             <motion.div
-              className="absolute inset-0 rounded-full bg-white"
-              variants={imageButtonVariants}
+              className={cn(
+                "absolute inset-0 rounded-full bg-white transition-colors duration-[600ms]",
+                showImageByDefault && color.arrowButtonHover,
+              )}
+              variants={activeImageButtonVariants}
+              style={{ transformOrigin: "center" }}
             />
           )}
           <span
             className={cn(
-              "relative z-10 flex items-center justify-center transition-colors duration-[600ms]",
-              textClass,
-              arrowHoverClass,
+              "relative z-10 flex items-center justify-center",
+              arrowColorClass,
             )}
           >
-            <ArrowRight />
+            <ArrowRight size={showImageByDefault ? TEXT_ARROW_SIZE : 43} />
           </span>
         </div>
       </motion.div>
     </motion.div>
   );
+
+  if (href) {
+    return (
+      <a href={href} className="block w-full no-underline">
+        {card}
+      </a>
+    );
+  }
+
+  return card;
 }
 
 export default StatCard;

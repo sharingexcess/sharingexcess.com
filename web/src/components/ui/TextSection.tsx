@@ -1,12 +1,31 @@
 import { cn } from "@/lib/cn";
 import { parseEmphasis } from "@/lib/parseEmphasis";
-import { eyebrowClassName } from "@/lib/typography";
+import {
+  eyebrowClassName,
+  bodyLgClassName,
+  bodyXlClassName,
+  sectionH1ClassName,
+  sectionH2ClassName,
+  sectionMetricSubheadingClassName,
+} from "@/lib/typography";
 import { AnimatedHeroHeading } from "@/components/ui/AnimatedHeroHeading";
+import { SlotMachineNumber } from "@/components/ui/SlotMachineNumber";
 import { Button } from "./Button";
+
+function MetricNumber({ value }: { value: string }) {
+  return (
+    <SlotMachineNumber
+      value={value}
+      className="text-[var(--section-emphasis)]"
+    />
+  );
+}
 
 export interface TextSectionProps {
   eyebrow?: string;
-  heading: string;
+  /** Large display numeral shown above the heading */
+  metric?: string;
+  heading?: string;
   headingSize?: "h1" | "h2";
   body?: string;
   bodySize?: "xl" | "lg" | "md";
@@ -32,18 +51,24 @@ export interface TextSectionProps {
 }
 
 const headingClasses = {
-  h1: "text-[clamp(40px,9vw,96px)] font-medium leading-[1.06] tracking-[-0.04em] lg:text-[clamp(48px,6.35cqw,96px)]",
-  h2: "text-[clamp(32px,7.5vw,72px)] font-medium leading-[1.06] tracking-[-0.04em] lg:text-[clamp(36px,4.76cqw,72px)]",
+  h1: sectionH1ClassName,
+  h2: sectionH2ClassName,
 };
 
+function resolveHeadingClassName(headingSize: "h1" | "h2", hasMetric: boolean): string {
+  if (!hasMetric) return headingClasses[headingSize];
+  return headingSize === "h1" ? sectionH2ClassName : sectionMetricSubheadingClassName;
+}
+
 const bodyClasses = {
-  xl: "text-sm leading-[1.4] lg:text-[20px]",
-  lg: "text-sm leading-[1.4] lg:text-[18px]",
+  xl: bodyXlClassName,
+  lg: bodyLgClassName,
   md: "text-sm leading-[1.4] lg:text-base",
 };
 
 export function TextSection({
   eyebrow,
+  metric,
   heading,
   headingSize = "h1",
   body,
@@ -64,19 +89,22 @@ export function TextSection({
   const isCentered = align === "center";
 
   const scheme = buttonScheme === "dark" ? "dark" : "light";
+  const headingClassName = resolveHeadingClassName(headingSize, Boolean(metric));
 
-  const headingEl = animateHeading ? (
-    <AnimatedHeroHeading
-      title={heading}
-      as="p"
-      emphasis={emphasis}
-      className={cn(headingClasses[headingSize], "text-[var(--section-text,#003619)]")}
-    />
-  ) : (
-    <p className={cn(headingClasses[headingSize], "text-[var(--section-text,#003619)]")}>
-      {parseEmphasis(heading, emphasis)}
-    </p>
-  );
+  const headingEl = heading ? (
+    animateHeading ? (
+      <AnimatedHeroHeading
+        title={heading}
+        as="p"
+        emphasis={emphasis}
+        className={cn(headingClassName, "text-[var(--section-text,#003619)]")}
+      />
+    ) : (
+      <p className={cn(headingClassName, "text-pretty whitespace-pre-line text-[var(--section-text,#003619)]")}>
+        {parseEmphasis(heading, emphasis)}
+      </p>
+    )
+  ) : null;
 
   const ctaRow = hasCtas && (
     <div
@@ -103,7 +131,12 @@ export function TextSection({
           <p className={cn(eyebrowClassName, "text-[var(--section-text,#003619)]")}>{eyebrow}</p>
         )}
         <div className="flex flex-col items-start gap-4 lg:flex-row lg:gap-8">
-          <div className="w-full lg:flex-1">{headingEl}</div>
+          {(metric || headingEl) && (
+            <div className={cn("flex w-full flex-col lg:flex-1", metric ? "gap-4 lg:gap-5" : "gap-2")}>
+              {metric && <MetricNumber value={metric} />}
+              {headingEl}
+            </div>
+          )}
           <div className="flex w-full flex-col gap-4 lg:flex-1">
             {body && (
               <p className={cn(bodyClasses[bodySize], "text-[var(--section-text,#003619)]")}>
@@ -119,15 +152,27 @@ export function TextSection({
 
   return (
     <div
-      className={cn("flex flex-col gap-4 lg:gap-8", isCentered && "items-center text-center", className)}
+      className={cn(
+        "flex flex-col",
+        metric ? "gap-6 lg:gap-10" : "gap-4 lg:gap-8",
+        isCentered && "items-center text-center",
+        className,
+      )}
     >
-      <div className="flex flex-col gap-2 lg:gap-2.5">
+      <div className={cn("flex flex-col", metric ? "gap-4 lg:gap-6" : "gap-2 lg:gap-2.5")}>
         {eyebrow && (
           <p className={cn(eyebrowClassName, "text-[var(--section-text,#003619)]")}>{eyebrow}</p>
         )}
+        {metric && <MetricNumber value={metric} />}
         {headingEl}
         {body && (
-          <p className={cn("mt-1 lg:mt-2", bodyClasses[bodySize], "text-[var(--section-text,#003619)]")}>
+          <p
+            className={cn(
+              metric ? "mt-0" : "mt-1 lg:mt-2",
+              bodyClasses[bodySize],
+              "text-[var(--section-text,#003619)]",
+            )}
+          >
             {body}
           </p>
         )}

@@ -24,6 +24,7 @@ const meta = {
     isCard: { control: "boolean" },
     headingSize: { control: "radio", options: ["h1", "h2"] },
     bodySize: { control: "radio", options: ["xl", "lg", "md"] },
+    layout: { control: "radio", options: ["horizontal", "stack-centered"] },
     mapPosition: { control: "radio", options: ["left", "right"] },
     mapContainerShape: { control: "radio", options: ["rounded", "circle"] },
     mapVariant: {
@@ -37,6 +38,15 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+/** Centered text over full-width impact map — mirrors TextImage stack-centered. */
+export const StackCentered: Story = {
+  args: {
+    layout: "stack-centered",
+    headingSize: "h2",
+    bodySize: "lg",
+  },
+};
 
 /** Archive-style Mapbox cluster map fed by surplus-api geojson. */
 export const MapRight: Story = {

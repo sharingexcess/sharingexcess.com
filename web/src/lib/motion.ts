@@ -34,11 +34,25 @@ export const figmaQuickSpring: Transition = {
   bounce: 0,
 };
 
+/** Video testimonial carousel — smooth glide with zero bounce */
+export const carouselSlideSpring: Transition = {
+  type: "spring",
+  visualDuration: 0.48,
+  bounce: 0,
+};
+
 /** StatCard hover tilt — snappier than the fill expand */
 export const statCardTiltSpring: Transition = {
   type: "spring",
   visualDuration: 0.28,
   bounce: 0.28,
+};
+
+/** StatCard text variant arrow — bouncy scale on hover */
+export const statCardArrowSpring: Transition = {
+  type: "spring",
+  visualDuration: 0.36,
+  bounce: 0.62,
 };
 
 /** Nav featured card hover tilt — subtle settle */
@@ -95,6 +109,13 @@ export const buttonScaleSpring: Transition = {
   type: "spring",
   visualDuration: 0.34,
   bounce: 0,
+};
+
+/** Arrow button — springy scale on hover */
+export const arrowButtonScaleSpring: Transition = {
+  type: "spring",
+  visualDuration: 0.36,
+  bounce: 0.42,
 };
 
 /** Secondary button — faster scale + border/text (no fill ripple) */
@@ -237,3 +258,51 @@ export const heroWordContainerVariants: Variants = {
     transition: { staggerChildren: 0.1 },
   },
 };
+
+/** TextImage carousel — snappy spring with bounce for stack enter */
+export const textImageStackEnterSpring: Transition = {
+  type: "spring",
+  visualDuration: 0.42,
+  bounce: 0.38,
+};
+
+/** TextImage carousel — prior front card settling behind */
+export const textImageStackSettleSpring: Transition = {
+  type: "spring",
+  visualDuration: 0.36,
+  bounce: 0.22,
+};
+
+/** TextImage inactive title fade */
+export const textImageTitleSpring: Transition = {
+  duration: 0.4,
+  ease: appleEase,
+};
+
+/** TextImage background carousel — subtle crossfade between slides */
+export const textImageBackgroundFade: Transition = {
+  duration: 0.65,
+  ease: appleEase,
+};
+
+/** Slot-machine metric — full reel cycles before each digit settles */
+export const slotMachineReelCycles = 2;
+
+/** Per-digit reel duration — long ease-out for a weighted landing */
+export const slotMachineDigitDuration = 1.55;
+
+/** Reel easing — gentle acceleration so the spin doesn't kick in abruptly */
+export const slotMachineDigitEase = [0.52, 0, 0.22, 1] as const;
+
+/** Brief pause after scroll trigger before the first digit moves */
+export const slotMachineStartDelay = 0.18;
+
+/** Left-to-right stagger between digit columns */
+export const slotMachineDigitStagger = 0.08;
+
+/** Scroll trigger — negative margins shrink the viewport so the reel starts later */
+export const slotMachineInViewOptions = {
+  once: true,
+  margin: "-45% 0px -40% 0px",
+  amount: 0.6,
+} as const;

@@ -3,6 +3,7 @@ import { ClientRouter } from "astro:transitions";
 import { AppProviders } from "@/components/providers/AppProviders";
 import SiteAnalytics from "@/components/layout/SiteAnalytics.astro";
 import SiteHead from "@/components/layout/SiteHead.astro";
+import { isHomePagePath } from "@/lib/isHomePagePath";
 import "@/styles/global.css";
 
 interface Props {
@@ -13,17 +14,18 @@ interface Props {
 }
 
 const { title, description, canonical, ogType } = Astro.props;
+const isHomePage = isHomePagePath(Astro.url.pathname);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-home-page={isHomePage || undefined}>
   <head>
     <SiteHead title={title} description={description} canonical={canonical} ogType={ogType} />
     <ClientRouter fallback="none" />
   </head>
   <body>
     <SiteAnalytics />
-    <AppProviders client:load transition:persist="app-providers" />
+    <AppProviders client:load transition:persist="app-providers" isHomePage={isHomePage} />
     <slot />
   </body>
 </html>

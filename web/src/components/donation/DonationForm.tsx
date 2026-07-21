@@ -1,23 +1,38 @@
 import { Button } from "@/components/ui/Button";
+import { TextInput } from "@/components/ui/TextInput";
 import { cn } from "@/lib/cn";
+import { formatLargeNumber } from "@/lib/formatNumber";
 import type { SectionTheme } from "@/lib/types";
+import { SECTION_CARD_NESTED_RADIUS_CLASS } from "@/sections/sectionCardConfig";
 import { useState, type ReactNode } from "react";
 
 export type DonationFrequency = "one-time" | "monthly";
+export type DonationFormVariant = "default" | "hero";
 
 export interface DonationFormProps {
-  /** Preset amount options shown in the grid */
+  /** Preset amount options shown in the grid — `default` variant only */
   presetAmounts?: number[];
   /** Initial selected preset amount */
   defaultAmount?: number;
-  /** Initial frequency toggle */
+  /** Initial frequency toggle — `default` variant only */
   defaultFrequency?: DonationFrequency;
   submitLabel?: string;
+  /** Home hero donate card — impact presets with Give Now / Give Monthly CTAs */
+  variant?: DonationFormVariant;
   /** Parent section theme — light uses neutral-050 card fill */
   sectionTheme?: SectionTheme;
+  /** Nested inside a section card — reduces corner radius for even inset */
+  inCard?: boolean;
   className?: string;
   onSubmit?: (data: { frequency: DonationFrequency; amount: number; currency: string }) => void;
 }
+
+const HERO_PRESETS = [
+  { amount: 20, impact: "240 meals" },
+  { amount: 60, impact: "720 meals" },
+  { amount: 120, impact: "1,440 meals" },
+  { amount: 1290, impact: "a full truckload" },
+] as const;
 
 function HeartIcon({ className }: { className?: string }) {
   return (
@@ -104,14 +119,233 @@ function AmountButton({
   );
 }
 
+function ImpactAmountButton({
+  amount,
+  impact,
+  selected,
+  onClick,
+}: {
+  amount: number;
+  impact?: string;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  const formattedAmount =
+    amount >= 1000 ? formatLargeNumber(amount) : String(amount);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      className={cn(
+        "flex flex-col items-center justify-center gap-1 rounded-3xl border px-3 py-3 transition-colors lg:rounded-full",
+        selected
+          ? "border-kale bg-se-green-100 text-kale"
+          : "border-neutral-250 bg-white text-kale hover:border-neutral-300",
+      )}
+    >
+      <span className="text-base font-semibold leading-none">
+        ${formattedAmount}
+      </span>
+      {impact && (
+        <span
+          className={cn(
+            "text-center text-xs font-medium leading-tight",
+            selected ? "text-kale" : "text-kale/70",
+          )}
+        >
+          {impact}
+        </span>
+      )}
+    </button>
+  );
+}
+
+function OtherAmountInput({
+  selected,
+  value,
+  onFocus,
+  onChange,
+}: {
+  selected: boolean;
+  value: string;
+  onFocus: () => void;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="relative flex h-full w-full min-w-0 items-center">
+      <span className="pointer-events-none absolute left-4 z-10 text-base font-semibold leading-none text-kale/70">
+        $
+      </span>
+      <TextInput
+        type="number"
+        min={1}
+        step={1}
+        value={value}
+        placeholder="Other"
+        onFocus={onFocus}
+        onChange={(event) => onChange(event.target.value)}
+        aria-label="Custom donation amount"
+        theme="onWhite"
+        className={cn(
+          "h-full rounded-3xl pl-8 font-semibold leading-none placeholder:text-kale/70 lg:rounded-full",
+          selected
+            ? "border-kale bg-se-green-100 focus:border-kale"
+            : "border-neutral-250 bg-white",
+          "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+        )}
+      />
+    </label>
+  );
+}
+
 const DEFAULT_PRESETS = [500, 130, 85, 55, 25, 10];
 
-export function DonationForm({
+function DonationFormShell({
+  sectionTheme,
+  inCard,
+  className,
+  children,
+  onSubmit,
+  formCard,
+}: {
+  sectionTheme: SectionTheme;
+  inCard: boolean;
+  className?: string;
+  children: ReactNode;
+  onSubmit?: (event: React.FormEvent) => void;
+  /** White/nested form cards reset button tokens inside dark sections */
+  formCard?: "white";
+}) {
+  return (
+    <form
+      onSubmit={onSubmit}
+      data-form-card={formCard}
+      className={cn(
+        "@container flex w-full min-w-0 flex-col gap-6 p-6 text-kale lg:p-10",
+        inCard
+          ? SECTION_CARD_NESTED_RADIUS_CLASS
+          : "rounded-[var(--radius-md)] lg:rounded-[var(--radius-lg)]",
+        sectionTheme === "light" ? "bg-neutral-050" : "bg-white",
+        className,
+      )}
+    >
+      {children}
+    </form>
+  );
+}
+
+function HeroDonationForm({
+  sectionTheme,
+  inCard,
+  className,
+  defaultAmount = 20,
+  onSubmit,
+}: Pick<
+  DonationFormProps,
+  "sectionTheme" | "inCard" | "className" | "defaultAmount" | "onSubmit"
+>) {
+  const [amount, setAmount] = useState(defaultAmount);
+  const [isOther, setIsOther] = useState(false);
+  const [customAmount, setCustomAmount] = useState("");
+
+  const handleGive = (frequency: DonationFrequency) => {
+    const donationAmount = isOther ? Number(customAmount) || 0 : amount;
+    onSubmit?.({ frequency, amount: donationAmount, currency: "USD" });
+  };
+
+  return (
+    <DonationFormShell
+      sectionTheme={sectionTheme ?? "dark"}
+      inCard={inCard ?? false}
+      className={className}
+      formCard="white"
+    >
+      <div className="flex w-full min-w-0 flex-col gap-6">
+        <h3 className="w-full min-w-0 font-sans text-[clamp(1.5rem,8cqw,2.5rem)] font-medium leading-[1.12] tracking-[-0.04em] text-kale">
+          Help get surplus food where it's needed.
+        </h3>
+
+        <div className="grid w-full grid-cols-3 gap-3">
+          {HERO_PRESETS.slice(0, 3).map((preset) => (
+            <ImpactAmountButton
+              key={preset.amount}
+              amount={preset.amount}
+              impact={preset.impact}
+              selected={!isOther && amount === preset.amount}
+              onClick={() => {
+                setIsOther(false);
+                setCustomAmount("");
+                setAmount(preset.amount);
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="grid w-full grid-cols-3 gap-3">
+          <ImpactAmountButton
+            amount={HERO_PRESETS[3].amount}
+            impact={HERO_PRESETS[3].impact}
+            selected={!isOther && amount === HERO_PRESETS[3].amount}
+            onClick={() => {
+              setIsOther(false);
+              setCustomAmount("");
+              setAmount(HERO_PRESETS[3].amount);
+            }}
+          />
+          <div className="col-span-2 min-w-0">
+            <OtherAmountInput
+              selected={isOther}
+              value={customAmount}
+              onFocus={() => {
+                if (!isOther) {
+                  setCustomAmount("");
+                }
+                setIsOther(true);
+              }}
+              onChange={(value) => {
+                setIsOther(true);
+                setCustomAmount(value);
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+          <Button
+            type="button"
+            variant="primary"
+            colorScheme="light"
+            size="md"
+            className="flex-1 rounded-3xl lg:rounded-[99px]"
+            onClick={() => handleGive("one-time")}
+          >
+            Give Now
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            colorScheme="light"
+            size="md"
+            className="flex-1 rounded-3xl lg:rounded-[99px]"
+            onClick={() => handleGive("monthly")}
+          >
+            Give Monthly
+          </Button>
+        </div>
+      </div>
+    </DonationFormShell>
+  );
+}
+
+function DefaultDonationForm({
   presetAmounts = DEFAULT_PRESETS,
   defaultAmount = 10,
   defaultFrequency = "one-time",
   submitLabel = "Make a donation",
   sectionTheme = "dark",
+  inCard = false,
   className,
   onSubmit,
 }: DonationFormProps) {
@@ -127,13 +361,11 @@ export function DonationForm({
   };
 
   return (
-    <form
+    <DonationFormShell
+      sectionTheme={sectionTheme}
+      inCard={inCard}
+      className={className}
       onSubmit={handleSubmit}
-      className={cn(
-        "flex w-full flex-col gap-6 rounded-[var(--radius-md)] p-6 text-kale lg:rounded-[var(--radius-lg)] lg:p-10",
-        sectionTheme === "light" ? "bg-neutral-050" : "bg-white",
-        className,
-      )}
     >
       <div className="flex gap-3">
         <ToggleButton
@@ -213,8 +445,19 @@ export function DonationForm({
       >
         {submitLabel}
       </Button>
-    </form>
+    </DonationFormShell>
   );
+}
+
+export function DonationForm({
+  variant = "default",
+  ...props
+}: DonationFormProps) {
+  if (variant === "hero") {
+    return <HeroDonationForm {...props} />;
+  }
+
+  return <DefaultDonationForm {...props} />;
 }
 
 export default DonationForm;

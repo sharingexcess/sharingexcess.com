@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
-import { eyebrowClassName } from "@/lib/typography";
+import { eyebrowClassName, bodyLgClassName, bodyXlClassName } from "@/lib/typography";
 import type { SectionContentProps } from "@/lib/types";
 import { LogoMarquee } from "./LogoMarquee";
 import { SectionShell } from "./SectionShell";
@@ -8,11 +8,15 @@ import { SectionShell } from "./SectionShell";
 export interface LogoItem {
   src: string;
   alt: string;
+  /** Intrinsic pixel width — reserves layout space before the image decodes. */
+  width?: number;
+  /** Intrinsic pixel height — reserves layout space before the image decodes. */
+  height?: number;
 }
 
 const bodyClasses = {
-  xl: "text-sm leading-[1.4] lg:text-[20px]",
-  lg: "text-sm leading-[1.4] lg:text-[18px]",
+  xl: bodyXlClassName,
+  lg: bodyLgClassName,
   md: "text-sm leading-[1.4] lg:text-base",
 } as const;
 

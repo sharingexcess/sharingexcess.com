@@ -47,6 +47,18 @@ export const ImageLeft: Story = {
   args: { imagePosition: "left", imageStyle: "square" },
 };
 
+export const ImageLeftVideo: Story = {
+  args: {
+    imagePosition: "left",
+    imageStyle: "video",
+    imageSrc: "/images/mangoes-2.jpg",
+    sticker: true,
+    stickerName: "free-food",
+    showButtons: true,
+    eyebrow: "",
+  },
+};
+
 export const RoundImageRight: Story = {
   args: { imagePosition: "right", imageStyle: "round" },
 };
@@ -62,6 +74,21 @@ export const StackLeft: Story = {
     bodySize: "lg",
     titleEmphasis: false,
     showButtons: false
+  },
+};
+
+export const StackLeftVideo: Story = {
+  args: {
+    layout: "stack-left",
+    imageStyle: "video",
+    imageSrc: "/videos/home-hero-poster.jpg",
+    videoSrc: "/videos/home-hero.mp4",
+    sticker: true,
+    stickerName: "free-food",
+    headingSize: "h2",
+    bodySize: "lg",
+    showButtons: true,
+    eyebrow: "",
   },
 };
 

@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react";
 import {
   DEFAULT_FOOTER_BADGES,
   DEFAULT_FOOTER_NAV_SECTIONS,
+  FOOTER_NAV_SECTIONS,
+  FOOTER_SOCIAL_LINKS,
   SiteFooter,
 } from "./SiteFooter";
 
@@ -20,21 +22,23 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    heading:     "Lorem ipsum?",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis.",
-    ctaLabel:    "Contact Us",
-    ctaHref:     "/contact",
-    navSections: DEFAULT_FOOTER_NAV_SECTIONS,
+    heading:     "Let's free food.",
+    description: "We rescue 2 million pounds of surplus food every week.\nThe food is donated; your gift moves it.",
+    ctaLabel:    "Donate now",
+    navSections: FOOTER_NAV_SECTIONS,
+    socialLinks: FOOTER_SOCIAL_LINKS,
     badges: [
-      { src: BADGE_CHARITY_NAV, alt: "Charity Navigator 4-star rating" },
-      { src: BADGE_CANDID,      alt: "Candid Platinum Transparency 2026" },
+      { src: BADGE_CHARITY_NAV, alt: "Charity Navigator 4-star rating", href: "#" },
+      { src: BADGE_CANDID,      alt: "Candid Platinum Transparency 2026", href: "#" },
     ],
   },
 };
 
-/** Site default placeholders — matches Astro pages before real content is wired. */
+/** Figma placeholder copy — Lorem ipsum heading for design review. */
 export const Placeholders: Story = {
   args: {
+    heading:     "Lorem ipsum?",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis.",
     navSections: DEFAULT_FOOTER_NAV_SECTIONS,
     badges: DEFAULT_FOOTER_BADGES,
   },

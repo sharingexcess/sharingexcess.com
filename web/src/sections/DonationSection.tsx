@@ -4,7 +4,7 @@ import type { ImagePosition, SectionContentProps } from "@/lib/types";
 import type { ReactNode } from "react";
 import { SectionLayout } from "./SectionLayout";
 import { SectionShell } from "./SectionShell";
-import { sectionCardContentIsDark } from "./sectionCardConfig";
+import { sectionCardContentIsDark, coerceSectionCardColor, getSectionCardInteriorTheme } from "./sectionCardConfig";
 
 export interface DonationSectionProps extends Omit<SectionContentProps, "primaryCta" | "secondaryCta"> {
   body: string;
@@ -43,18 +43,21 @@ export function DonationSection({
       body={body}
       bodySize={bodySize}
       buttonScheme={isDark ? "dark" : "light"}
-      emphasis={!isCard}
+      emphasis={!isCard || isDark}
       isCard={isCard}
     />
   );
 
-  const sectionTheme = isCard ? "light" : theme;
+  const resolvedCardColor = coerceSectionCardColor(theme, cardColor);
+  const formSectionTheme = isCard
+    ? getSectionCardInteriorTheme(resolvedCardColor, theme)
+    : theme;
   const formSlot = children ?? (
-    <DonationForm submitLabel={submitLabel} sectionTheme={sectionTheme} />
+    <DonationForm submitLabel={submitLabel} sectionTheme={formSectionTheme} inCard={isCard} />
   );
 
   return (
-    <SectionShell theme={isCard ? "light" : theme} archBottom={archBottom} className={className} id={id}>
+    <SectionShell theme={theme} archBottom={archBottom} className={className} id={id}>
       <SectionLayout
         layout="horizontal"
         isCard={isCard}

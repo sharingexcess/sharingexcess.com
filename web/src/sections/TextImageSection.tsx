@@ -1,8 +1,16 @@
 import { ParallaxBackground, ParallaxCover } from "@/components/ui/ParallaxBackground";
+import {
+  Sticker,
+  STICKER_OVERLAP_CARD_TOP_LEFT_CLASS,
+  STICKER_OVERLAP_TOP_CENTER_CLASS,
+  STICKER_SIZE_SM_CLASS,
+  type StickerName,
+} from "@/components/ui/Sticker";
 import { TextSection } from "@/components/ui/TextSection";
+import { VideoPlaceholder } from "@/components/ui/VideoPlaceholder";
 import { cn } from "@/lib/cn";
 import type { ImageFit, ImagePosition, ImageStyle, SectionContentProps } from "@/lib/types";
-import { useRef, type ComponentProps, type CSSProperties } from "react";
+import { useRef, type ComponentProps, type CSSProperties, type ReactNode } from "react";
 import { RoundBleedLayout } from "./RoundBleedLayout";
 import { SectionShell } from "./SectionShell";
 import { SectionLayout } from "./SectionLayout";
@@ -40,12 +48,18 @@ export interface ThreeImageItem {
 export interface TextImageSectionProps extends Omit<SectionContentProps, "body"> {
   layout?: TextImageLayout;
   body: string;
+  /** Reserve space below for an arch transition on the next section */
+  archBottom?: boolean;
   /** Only applies to `layout="horizontal"` */
   imagePosition?: ImagePosition;
-  /** Only applies to `layout="horizontal"` */
+  /** Only applies to `layout="horizontal"` — square, round, or 16:9 video frame */
   imageStyle?: ImageStyle;
-  /** Only applies to `layout="horizontal"` with `imageStyle="square"` */
+  /** Only applies to `layout="horizontal"` with `imageStyle="square"` or `imageStyle="video"` */
   imageFit?: ImageFit;
+  /** Overlap a brand sticker on the top-left of the image. */
+  sticker?: boolean;
+  /** Which sticker to show when `sticker` is true. Defaults to `free-food`. */
+  stickerName?: StickerName;
   /** Used with "three-image-caption" and "three-image-stat" layouts */
   images?: ThreeImageItem[];
 }
@@ -144,17 +158,21 @@ export function TextImageSection({
   secondaryCtaHref,
   imageSrc,
   imageAlt = "",
+  videoSrc,
   imagePosition = "right",
   imageStyle = "square",
   imageFit = "cover",
+  sticker = false,
+  stickerName = "free-food",
   images = [],
   className,
   id,
   flushTop = false,
   flushBottom = false,
   transparentBg = false,
+  archBottom = false,
 }: TextImageSectionProps) {
-  const shellProps = { flushTop, flushBottom, transparentBg, id };
+  const shellProps = { flushTop, flushBottom, transparentBg, archBottom, id };
   const isDark = sectionCardContentIsDark(isCard, cardColor, theme);
   const isRound = imageStyle === "round";
   const imageRadius = isCard
@@ -184,13 +202,14 @@ export function TextImageSection({
   const sharedTextSection = makeTextSection();
 
   const isPhotoFit = imageFit === "cover";
+  const isVideoFrame = imageStyle === "video";
 
-  // Square frame for photos (cover); natural height for diagrams/logos (contain).
+  // Square or 16:9 frame for photos (cover); natural height for diagrams/logos (contain).
   const squareSlot = (
     <div
       className={cn(
         "w-full overflow-hidden",
-        isPhotoFit ? "aspect-square" : "",
+        isVideoFrame ? "aspect-video" : isPhotoFit ? "aspect-square" : "",
         imageRadius,
         !isCard && "lg:rounded-[var(--radius-xl)]",
       )}
@@ -219,7 +238,7 @@ export function TextImageSection({
       const resolvedColor = coerceSectionCardColor(theme, cardColor);
       const interiorTheme = getSectionCardInteriorTheme(resolvedColor, theme);
       return (
-        <SectionShell theme="light" className={className} roundImageSection {...shellProps}>
+        <SectionShell theme={theme} className={className} roundImageSection {...shellProps}>
           <div
             data-section-card
             data-theme={interiorTheme}
@@ -266,9 +285,52 @@ export function TextImageSection({
     />
   ) : null;
 
+  const useVideoPlaceholder =
+    imageStyle === "video" || Boolean(videoSrc?.trim());
+
+  const videoPlaceholderSlot = imageSrc ? (
+    <VideoPlaceholder
+      posterSrc={imageSrc}
+      posterAlt={imageAlt}
+      videoSrc={videoSrc}
+      className={cn(imageRadius, !isCard && "lg:rounded-[var(--radius-xl)]")}
+    />
+  ) : null;
+
+  const wrapWithSticker = (
+    slot: ReactNode,
+    position: "top-left" | "top-center" = "top-left",
+  ) =>
+    sticker ? (
+      <div className="relative overflow-visible">
+        {slot}
+        <div
+          className={cn(
+            position === "top-center"
+              ? STICKER_OVERLAP_TOP_CENTER_CLASS
+              : STICKER_OVERLAP_CARD_TOP_LEFT_CLASS,
+            STICKER_SIZE_SM_CLASS,
+          )}
+          aria-hidden
+        >
+          <Sticker name={stickerName} fillContainer alt="" />
+        </div>
+      </div>
+    ) : (
+      slot
+    );
+
   if (layout === "stack-left") {
+    const contentSlot = useVideoPlaceholder
+      ? wrapWithSticker(videoPlaceholderSlot, "top-center")
+      : fullWidthImage;
+
     return (
-      <SectionShell theme={isCard ? "light" : theme} className={className} {...shellProps}>
+      <SectionShell
+        theme={theme}
+        className={cn(sticker && "overflow-visible", className)}
+        {...shellProps}
+      >
         <SectionLayout
           layout="vertical"
           isCard={isCard}
@@ -276,7 +338,7 @@ export function TextImageSection({
           sectionTheme={theme}
           textSlotClassName="w-full"
           textSlot={makeTextSection({ layout: "horizontal" })}
-          contentSlot={fullWidthImage}
+          contentSlot={contentSlot}
         />
       </SectionShell>
     );
@@ -284,7 +346,7 @@ export function TextImageSection({
 
   if (layout === "stack-centered") {
     return (
-      <SectionShell theme={isCard ? "light" : theme} className={className} {...shellProps}>
+      <SectionShell theme={theme} className={className} {...shellProps}>
         <SectionLayout
           layout="vertical"
           isCard={isCard}
@@ -301,7 +363,7 @@ export function TextImageSection({
 
   if (layout === "three-image-caption") {
     return (
-      <SectionShell theme={isCard ? "light" : theme} className={className} {...shellProps}>
+      <SectionShell theme={theme} className={className} {...shellProps}>
         <SectionLayout
           layout="vertical"
           isCard={isCard}
@@ -341,7 +403,7 @@ export function TextImageSection({
 
   if (layout === "three-image-stat") {
     return (
-      <SectionShell theme={isCard ? "light" : theme} className={className} {...shellProps}>
+      <SectionShell theme={theme} className={className} {...shellProps}>
         <SectionLayout
           layout="vertical"
           isCard={isCard}
@@ -393,7 +455,7 @@ export function TextImageSection({
 
   if (layout === "four-image-caption") {
     return (
-      <SectionShell theme={isCard ? "light" : theme} className={className} {...shellProps}>
+      <SectionShell theme={theme} className={className} {...shellProps}>
         <SectionLayout
           layout="vertical"
           isCard={isCard}
@@ -433,7 +495,7 @@ export function TextImageSection({
 
   if (layout === "four-image-stat") {
     return (
-      <SectionShell theme={isCard ? "light" : theme} className={className} {...shellProps}>
+      <SectionShell theme={theme} className={className} {...shellProps}>
         <SectionLayout
           layout="vertical"
           isCard={isCard}
@@ -485,8 +547,14 @@ export function TextImageSection({
 
   const textSlot = <div>{sharedTextSection}</div>;
 
+  const imageSlot = wrapWithSticker(squareSlot);
+
   return (
-    <SectionShell theme={isCard ? "light" : theme} className={className} {...shellProps}>
+    <SectionShell
+      theme={theme}
+      className={cn(sticker && "overflow-visible", className)}
+      {...shellProps}
+    >
       <SectionLayout
         layout="horizontal"
         isCard={isCard}
@@ -494,7 +562,7 @@ export function TextImageSection({
         sectionTheme={theme}
         reverse={imagePosition === "left"}
         textSlot={textSlot}
-        contentSlot={squareSlot}
+        contentSlot={sticker ? imageSlot : squareSlot}
       />
     </SectionShell>
   );

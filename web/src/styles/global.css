@@ -156,6 +156,8 @@
 [data-form-card="white"],
 [data-form-card="banana"],
 [data-form-card="tangerine"] {
+  --section-btn: var(--color-se-green-base);
+  --section-btn-hover: var(--color-kale);
   --section-btn-primary-bg: var(--color-se-green-base);
   --section-btn-primary-hover-bg: var(--color-se-green-500);
   --section-btn-primary-label: var(--color-neutral-000);
@@ -178,10 +180,45 @@ body {
   background-color: var(--color-neutral-000);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-wrap: pretty;
+}
+
+/* Balance multi-line headings; body copy inherits pretty above to avoid orphans. */
+:where(h1, h2, h3, h4, h5, h6) {
+  text-wrap: balance;
 }
 
 html {
   scroll-padding-top: var(--site-header-height);
+}
+
+/* Home donate hero — scroll-driven fade/scale via --hero-scroll (set in JS, applied in CSS) */
+.home-hero-donate--scroll-fx {
+  --hero-scroll: 0;
+}
+
+.home-hero-donate__bg-wrap {
+  transform: scale(calc(1.1 - 0.1 * var(--hero-scroll)));
+  transform-origin: center center;
+  will-change: transform;
+  contain: layout paint;
+}
+
+.home-hero-donate__content {
+  --hero-content-t: min(1, calc(var(--hero-scroll) / 0.55));
+  opacity: calc(1 - var(--hero-content-t));
+  transform: scale(calc(1 - 0.1 * var(--hero-content-t)));
+  transform-origin: bottom center;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-donate__bg-wrap,
+  .home-hero-donate__content {
+    transform: none;
+    opacity: 1;
+    will-change: auto;
+  }
 }
 
 .site-header-shell {
@@ -224,11 +261,11 @@ html {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .logos-marquee-track {
+  .logos-marquee-track--ready {
     animation: logos-marquee var(--marquee-duration, 40s) linear infinite;
   }
 
-  .logos-marquee-viewport:hover .logos-marquee-track {
+  .logos-marquee-viewport:hover .logos-marquee-track--ready {
     animation-play-state: paused;
   }
 }

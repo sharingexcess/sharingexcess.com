@@ -24,7 +24,7 @@ export const NAV_BUTTON_STYLE = {
   "--section-btn-hover": "var(--color-se-green-base, #00843d)",
 } as React.CSSProperties;
 
-/** Frosted hero nav — white at rest and on hover for contrast on glass. */
+/** Hero overlay nav — white at rest and on hover for contrast on photography. */
 export const NAV_BUTTON_GLASS_STYLE = {
   "--section-btn": "var(--color-neutral-000, #ffffff)",
   "--section-btn-hover": "var(--color-neutral-000, #ffffff)",
@@ -58,7 +58,7 @@ export function NavDropdownTrigger({
   onActivate,
 }: NavDropdownTriggerProps) {
   const children = item.children ?? [];
-  // Always light — parent <nav> sets NAV_BUTTON_* CSS vars (white on glass, kale/green on solid).
+  // Always light — parent <nav> sets NAV_BUTTON_* CSS vars (kale/green).
   const colorScheme = "light";
 
   if (children.length === 0) {
