@@ -11,7 +11,7 @@ const PARTNER_LOGOS = [
   { src: "/images/narrative/logo-deloitte.png", alt: "Deloitte", className: "h-6 w-auto" },
   { src: "/images/narrative/logo-simply-organic.png", alt: "Simply Organic", className: "h-12 w-auto" },
   { src: "/images/narrative/logo-chiquita.png", alt: "Chiquita", className: "h-12 w-auto" },
-  { src: "/images/narrative/logo-layer.png", alt: "Partner", className: "h-8 w-auto" },
+  { src: "/images/narrative/logo-layer.svg", alt: "Partner", className: "h-8 w-auto" },
   { src: "/images/narrative/logo-dole.png", alt: "Dole", className: "h-12 w-auto" },
   { src: "/images/narrative/logo-baldor.png", alt: "Baldor", className: "h-10 w-auto" },
   { src: "/images/narrative/logo-misfits.png", alt: "Misfits Market", className: "h-8 w-auto" },
@@ -73,23 +73,24 @@ function LemonSticker({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "pointer-events-none relative size-[250px] rotate-[13deg] drop-shadow-[0_4px_5px_rgba(0,0,0,0.25)]",
+        // Rotation is applied by the partners GSAP timeline (target ~13°), not here.
+        "pointer-events-none relative size-[250px] drop-shadow-[0_4px_5px_rgba(0,0,0,0.25)]",
         className,
       )}
       aria-hidden="true"
     >
       <img
-        src="/images/narrative/sticker-lemon-fill.png"
+        src="/images/narrative/sticker-lemon-fill.svg"
         alt=""
         className="absolute left-[6%] top-[24%] h-[52%] w-[88%]"
       />
       <img
-        src="/images/narrative/sticker-lemon-stroke.png"
+        src="/images/narrative/sticker-lemon-stroke.svg"
         alt=""
         className="absolute inset-x-0 top-[18%] h-[63%] w-full"
       />
       <img
-        src="/images/narrative/sticker-lemon-stroke-inner.png"
+        src="/images/narrative/sticker-lemon-stroke-inner.svg"
         alt=""
         className="absolute left-[3%] top-[22%] h-[56%] w-[93%]"
       />

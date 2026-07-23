@@ -65,7 +65,7 @@ Downloaded under [`public/images/narrative/`](../../public/images/narrative/):
 
 - `hero-bg.jpg`, `hero-fg.jpg` (hero layers)
 - Partner logos (`logo-*.png` / svg)
-- Lemon sticker pieces (`sticker-*.png`)
+- Lemon sticker pieces (`sticker-*.svg`) and `logo-layer.svg` (SVG exports; must keep `.svg` extension)
 
 Exports from Figma MCP asset URLs (those URLs expire ~7 days; prefer committed files).
 
