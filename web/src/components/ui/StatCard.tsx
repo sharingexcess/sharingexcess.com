@@ -273,7 +273,7 @@ export function StatCard(props: StatCardProps) {
     >
       <motion.div
         className={cn(
-          "@container relative h-[432px] w-full overflow-hidden rounded-[var(--radius-md)] bg-[var(--section-surface)] p-[42px]",
+          "@container relative h-[432px] w-full overflow-hidden rounded-[var(--radius-xl)] bg-[var(--section-surface)] p-[42px]",
           "flex min-w-0 flex-col",
           contentGap,
           isText && !isImage && "justify-between",
@@ -311,7 +311,7 @@ export function StatCard(props: StatCardProps) {
 
         {isImage && imageSrc && showImageByDefault ? (
           <motion.div
-            className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-[var(--radius-md)]"
+            className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-[var(--radius-lg)]"
             variants={activeImageFillVariants}
           >
             <img src={imageSrc} alt="" className="size-full object-cover" />

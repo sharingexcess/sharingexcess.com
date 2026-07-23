@@ -35,7 +35,7 @@ export function HubMarkerCard({ hub, onClose, anchor, className }: HubMarkerCard
         aria-modal="true"
         aria-labelledby={titleId}
         className={cn(
-          "se-map-hub-card w-[min(100vw,20rem)] rounded-[var(--radius-md)] bg-white p-5 shadow-[0_8px_32px_rgba(27,27,21,0.18)]",
+          "se-map-hub-card w-[min(100vw,20rem)] rounded-[var(--radius-xl)] bg-white p-5 shadow-[0_8px_32px_rgba(27,27,21,0.18)]",
           className,
         )}
       >

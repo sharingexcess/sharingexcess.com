@@ -1,6 +1,7 @@
 import { createContext, useContext, type ReactNode } from "react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { PageTransitionCurtain } from "@/components/transitions/PageTransitionCurtain";
+import { GsapProvider } from "./GsapProvider";
 import { MotionProvider } from "./MotionProvider";
 import { SmoothScrollProvider } from "./SmoothScrollProvider";
 
@@ -35,9 +36,11 @@ export function AppProviders({
     <MotionProvider>
       <ScrollInteractionContext.Provider value={scrollInteractions}>
         <SmoothScrollProvider enabled={smoothScroll}>
-          <PageTransitionCurtain />
-          {showHeader && <SiteHeader isHomePage={isHomePage} />}
-          {children}
+          <GsapProvider>
+            <PageTransitionCurtain />
+            {showHeader && <SiteHeader isHomePage={isHomePage} />}
+            {children}
+          </GsapProvider>
         </SmoothScrollProvider>
       </ScrollInteractionContext.Provider>
     </MotionProvider>

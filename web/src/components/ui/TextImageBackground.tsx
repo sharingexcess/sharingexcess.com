@@ -194,7 +194,7 @@ export function TextImageBackground({
             onMouseLeave={() => setIsInteracting(false)}
             onFocusCapture={() => setIsInteracting(true)}
             onBlurCapture={handleCardBlur}
-            className="rounded-[var(--radius-lg)] bg-white p-16 text-kale"
+            className="rounded-[var(--radius-2xl)] bg-white p-16 text-kale"
           >
             {(eyebrow || showPauseControl) && (
               <div className="mb-6 flex items-end justify-between gap-4 lg:mb-8">

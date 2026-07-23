@@ -45,7 +45,7 @@ export function SmoothScrollProvider({
     if (!enabled) return;
 
     const instance = new Lenis({
-      autoRaf: true,
+      autoRaf: false,
       duration: 1.1,
       smoothWheel: true,
     });

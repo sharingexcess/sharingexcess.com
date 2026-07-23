@@ -53,6 +53,16 @@ const specimens: TypeSpecimen[] = [
     style: { fontFamily: '"Poppins", sans-serif', fontSize: 56, fontWeight: 500, lineHeight: 1.06, letterSpacing: "-2.24px", color: "#003619" },
   },
   {
+    name: "Section H3",
+    usage: "Tertiary heading within sections",
+    family: "Poppins",
+    size: "40px",
+    weight: "500 Medium",
+    tracking: "−1.6px",
+    sample: "Lorem ipsum dolor sit",
+    style: { fontFamily: '"Poppins", sans-serif', fontSize: 40, fontWeight: 500, lineHeight: 1.06, letterSpacing: "-1.6px", color: "#003619" },
+  },
+  {
     name: "Eyebrow",
     usage: "Label above section headings",
     family: "Malila",

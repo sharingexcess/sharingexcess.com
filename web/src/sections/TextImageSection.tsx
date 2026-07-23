@@ -10,6 +10,7 @@ import { TextSection } from "@/components/ui/TextSection";
 import { VideoPlaceholder } from "@/components/ui/VideoPlaceholder";
 import { cn } from "@/lib/cn";
 import type { ImageFit, ImagePosition, ImageStyle, SectionContentProps } from "@/lib/types";
+import { isEmbeddableVideo } from "@/lib/toVideoEmbedSrc";
 import { useRef, type ComponentProps, type CSSProperties, type ReactNode } from "react";
 import { RoundBleedLayout } from "./RoundBleedLayout";
 import { SectionShell } from "./SectionShell";
@@ -19,7 +20,7 @@ import {
   getSectionCardClassName,
   getSectionCardDataAttributes,
   getSectionCardInteriorTheme,
-  SECTION_CARD_IMAGE_RADIUS_CLASS,
+  sectionMediaRadiusClass,
   SECTION_CARD_SHELL_CLASS,
   sectionCardContentIsDark,
 } from "./sectionCardConfig";
@@ -50,6 +51,8 @@ export interface TextImageSectionProps extends Omit<SectionContentProps, "body">
   body: string;
   /** Reserve space below for an arch transition on the next section */
   archBottom?: boolean;
+  /** Rounded top edge for parallax handoff over a pinned hero */
+  roundedTop?: boolean;
   /** Only applies to `layout="horizontal"` */
   imagePosition?: ImagePosition;
   /** Only applies to `layout="horizontal"` — square, round, or 16:9 video frame */
@@ -171,13 +174,12 @@ export function TextImageSection({
   flushBottom = false,
   transparentBg = false,
   archBottom = false,
+  roundedTop = false,
 }: TextImageSectionProps) {
-  const shellProps = { flushTop, flushBottom, transparentBg, archBottom, id };
+  const shellProps = { flushTop, flushBottom, transparentBg, archBottom, roundedTop, id };
   const isDark = sectionCardContentIsDark(isCard, cardColor, theme);
   const isRound = imageStyle === "round";
-  const imageRadius = isCard
-    ? SECTION_CARD_IMAGE_RADIUS_CLASS
-    : "rounded-[var(--radius-md)]";
+  const imageRadius = sectionMediaRadiusClass(isCard);
 
   const makeTextSection = (
     overrides: Partial<ComponentProps<typeof TextSection>> = {},
@@ -211,7 +213,6 @@ export function TextImageSection({
         "w-full overflow-hidden",
         isVideoFrame ? "aspect-video" : isPhotoFit ? "aspect-square" : "",
         imageRadius,
-        !isCard && "lg:rounded-[var(--radius-xl)]",
       )}
     >
       <img
@@ -277,25 +278,35 @@ export function TextImageSection({
     );
   }
 
-  const fullWidthImage = imageSrc ? (
+  const parallaxMediaSlot = imageSrc ? (
     <ParallaxCover
       src={imageSrc}
       alt={imageAlt}
+      videoSrc={videoSrc}
       className={cn("aspect-video w-full", imageRadius)}
+      smooth
     />
   ) : null;
 
   const useVideoPlaceholder =
     imageStyle === "video" || Boolean(videoSrc?.trim());
 
+  const useEmbeddableVideoPlaceholder = Boolean(
+    useVideoPlaceholder && videoSrc?.trim() && isEmbeddableVideo(videoSrc),
+  );
+
   const videoPlaceholderSlot = imageSrc ? (
     <VideoPlaceholder
       posterSrc={imageSrc}
       posterAlt={imageAlt}
       videoSrc={videoSrc}
-      className={cn(imageRadius, !isCard && "lg:rounded-[var(--radius-xl)]")}
+      className={imageRadius}
     />
   ) : null;
+
+  const stackMediaSlot = useEmbeddableVideoPlaceholder
+    ? videoPlaceholderSlot
+    : parallaxMediaSlot;
 
   const wrapWithSticker = (
     slot: ReactNode,
@@ -321,14 +332,12 @@ export function TextImageSection({
     );
 
   if (layout === "stack-left") {
-    const contentSlot = useVideoPlaceholder
-      ? wrapWithSticker(videoPlaceholderSlot, "top-center")
-      : fullWidthImage;
+    const contentSlot = wrapWithSticker(stackMediaSlot, "top-center");
 
     return (
       <SectionShell
         theme={theme}
-        className={cn(sticker && "overflow-visible", className)}
+        className={cn(sticker && !roundedTop && "overflow-visible", className)}
         {...shellProps}
       >
         <SectionLayout
@@ -337,7 +346,7 @@ export function TextImageSection({
           cardColor={cardColor}
           sectionTheme={theme}
           textSlotClassName="w-full"
-          textSlot={makeTextSection({ layout: "horizontal" })}
+          textSlot={makeTextSection({ layout: "horizontal", headingAnimation: "blur" })}
           contentSlot={contentSlot}
         />
       </SectionShell>
@@ -355,7 +364,7 @@ export function TextImageSection({
           centered
           textSlotClassName="w-full max-w-3xl"
           textSlot={makeTextSection({ align: "center" })}
-          contentSlot={fullWidthImage}
+          contentSlot={stackMediaSlot}
         />
       </SectionShell>
     );
@@ -552,7 +561,7 @@ export function TextImageSection({
   return (
     <SectionShell
       theme={theme}
-      className={cn(sticker && "overflow-visible", className)}
+      className={cn(sticker && !roundedTop && "overflow-visible", className)}
       {...shellProps}
     >
       <SectionLayout

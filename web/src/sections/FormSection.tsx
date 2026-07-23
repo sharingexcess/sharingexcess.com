@@ -334,7 +334,7 @@ export function FormSection({
       {...formCardAttrs}
       {...warmCardAttrs}
       className={cn(
-        "rounded-[var(--radius-lg)] p-16",
+        "rounded-[var(--radius-2xl)] p-16",
         activeStyles.card,
         glassTone && "relative overflow-hidden",
       )}

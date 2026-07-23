@@ -1,13 +1,18 @@
 import { cn } from "@/lib/cn";
 import {
+  blurWordContainerVariants,
+  blurWordVariants,
   heroWordContainerVariants,
   heroWordVariants,
   motion,
+  sectionHeadingInViewOptions,
   useReducedMotion,
+  type Variants,
 } from "@/lib/motion";
+import { useInViewOnce } from "@/lib/useInViewOnce";
 import { useFitMultilineText } from "@/lib/useFitText";
 import type { CSSProperties, JSX, Ref } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type WordToken = { text: string; emphasized: boolean; key: string };
 
@@ -50,16 +55,18 @@ function WordContent({ token }: { token: WordToken }) {
 function AnimatedWords({
   tokens,
   compact,
+  wordVariants,
 }: {
   tokens: WordToken[];
   compact?: boolean;
+  wordVariants: Variants;
 }) {
   const wordGap = compact ? "0.15em" : "0.25em";
   return tokens.map((token, i) => (
     <motion.span
       key={token.key}
-      variants={heroWordVariants}
-      className="inline-block will-change-[transform,opacity]"
+      variants={wordVariants}
+      className="inline-block will-change-[transform,opacity,filter]"
       style={i < tokens.length - 1 ? { marginRight: wordGap } : undefined}
     >
       <WordContent token={token} />
@@ -91,11 +98,13 @@ function WordLine({
   multiline,
   animated,
   fitLine,
+  wordVariants,
 }: {
   tokens: WordToken[];
   multiline: boolean;
   animated: boolean;
   fitLine?: boolean;
+  wordVariants?: Variants;
 }) {
   return (
     <span
@@ -106,8 +115,8 @@ function WordLine({
         multiline && !fitLine && "lg:whitespace-nowrap",
       )}
     >
-      {animated ? (
-        <AnimatedWords tokens={tokens} compact={fitLine} />
+      {animated && wordVariants ? (
+        <AnimatedWords tokens={tokens} compact={fitLine} wordVariants={wordVariants} />
       ) : (
         <StaticWords tokens={tokens} compact={fitLine} />
       )}
@@ -126,9 +135,28 @@ export interface AnimatedHeroHeadingProps {
   emphasis?: boolean;
   /** Scale font size down so each nowrap line fits the container (home hero) */
   fitText?: boolean;
+  /** Per-word motion style */
+  reveal?: "slide" | "blur";
+  /** When to start the reveal — mount on load, inView after scroll */
+  trigger?: "mount" | "inView";
+  /** Seconds before the first word animates in */
+  revealDelay?: number;
+  /** Seconds between each word */
+  revealStagger?: number;
   /** Fires once the word-by-word reveal finishes */
   onRevealComplete?: () => void;
 }
+
+const revealPresets = {
+  slide: {
+    wordVariants: heroWordVariants,
+    containerVariants: heroWordContainerVariants,
+  },
+  blur: {
+    wordVariants: blurWordVariants,
+    containerVariants: blurWordContainerVariants,
+  },
+} as const;
 
 /** Word-by-word hero heading reveal — waits for fonts, respects reduced motion */
 export function AnimatedHeroHeading({
@@ -138,11 +166,39 @@ export function AnimatedHeroHeading({
   multiline = false,
   emphasis = true,
   fitText = false,
+  reveal = "slide",
+  trigger = "mount",
+  revealDelay,
+  revealStagger,
   onRevealComplete,
 }: AnimatedHeroHeadingProps) {
   const reduceMotion = useReducedMotion();
+  const headingRef = useRef<HTMLElement>(null);
+  const inView = useInViewOnce(headingRef, sectionHeadingInViewOptions);
   const [fontsReady, setFontsReady] = useState(Boolean(reduceMotion));
   const lines = useMemo(() => tokenizeTitle(title, emphasis), [title, emphasis]);
+  const { wordVariants, containerVariants } = revealPresets[reveal];
+  const resolvedContainerVariants = useMemo(() => {
+    if (revealDelay == null && revealStagger == null) return containerVariants;
+
+    const baseTransition =
+      typeof containerVariants.visible === "object" &&
+      containerVariants.visible !== null &&
+      "transition" in containerVariants.visible
+        ? containerVariants.visible.transition
+        : {};
+
+    return {
+      ...containerVariants,
+      visible: {
+        transition: {
+          ...baseTransition,
+          ...(revealDelay != null ? { delayChildren: revealDelay } : {}),
+          ...(revealStagger != null ? { staggerChildren: revealStagger } : {}),
+        },
+      },
+    };
+  }, [containerVariants, revealDelay, revealStagger]);
   const shouldFitText = fitText && multiline;
   const { containerRef, fontSizePx } = useFitMultilineText(
     shouldFitText ? lines.length : 0,
@@ -150,6 +206,7 @@ export function AnimatedHeroHeading({
   );
   const fitTextStyle =
     fontSizePx != null ? ({ fontSize: `${fontSizePx}px` } as CSSProperties) : undefined;
+  const revealActive = trigger === "inView" ? fontsReady && inView : fontsReady;
 
   useEffect(() => {
     if (reduceMotion) {
@@ -177,15 +234,16 @@ export function AnimatedHeroHeading({
 
   const heading = (
     <Tag
+      ref={headingRef}
       data-fit-heading={shouldFitText ? "" : undefined}
       style={shouldFitText ? fitTextStyle : undefined}
       className={cn(className, !fontsReady && "invisible")}
       aria-label={title.replace(/\*/g, "")}
     >
       <motion.span
-        variants={heroWordContainerVariants}
+        variants={resolvedContainerVariants}
         initial="hidden"
-        animate={fontsReady ? "visible" : "hidden"}
+        animate={revealActive ? "visible" : "hidden"}
         onAnimationComplete={(definition) => {
           if (definition === "visible") onRevealComplete?.();
         }}
@@ -198,6 +256,7 @@ export function AnimatedHeroHeading({
             multiline={multiline}
             animated
             fitLine={shouldFitText}
+            wordVariants={wordVariants}
           />
         ))}
       </motion.span>

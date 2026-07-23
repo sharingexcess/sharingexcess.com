@@ -8,14 +8,17 @@ import { TextSection } from "@/components/ui/TextSection";
 import { useLenis } from "@/components/providers/SmoothScrollProvider";
 import { cn } from "@/lib/cn";
 import type { HeroLayout, SectionContentProps } from "@/lib/types";
+import { eyebrowClassName, sectionH1ClassName } from "@/lib/typography";
 import {
   heroWordSpring,
+  homeHeroRevealDelay,
+  homeHeroRevealStagger,
   motion,
   useReducedMotion,
 } from "@/lib/motion";
-import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { SectionShell } from "./SectionShell";
-import { sectionCardContentIsDark } from "./sectionCardConfig";
+import { sectionCardContentIsDark, sectionMediaRadiusClass } from "./sectionCardConfig";
 
 export interface HeroSectionProps extends SectionContentProps {
   layout?: HeroLayout;
@@ -34,6 +37,15 @@ export interface HeroSectionProps extends SectionContentProps {
 
 /** Figma MacBook Pro 14" artboard (1512×982) — cqw clamps need `@container` parent */
 const FIGMA_ARTBOARD_CLASS = "@container mx-auto w-full max-w-[1512px]";
+/** Standard page content width — matches SiteHeader nav bar */
+const STANDARD_CONTENT_CLASS = "mx-auto w-full max-w-[1320px] px-4 lg:px-8";
+/** Equal space above and below the intro headline in the green band */
+const HOME_HERO_INTRO_BAND_CLASS =
+  "box-border flex h-[calc(var(--hero-frame-start)-var(--site-header-height))] w-full flex-col items-center justify-center";
+/** Gap between multiline hero body paragraphs */
+const HOME_HERO_BODY_PARAGRAPH_GAP = "gap-3 lg:gap-4";
+/** Max width for hero donate card */
+const HOME_HERO_DONATE_FORM_MAX_WIDTH = "w-full max-w-[480px]";
 const FIGMA_CONTENT_CLASS = "max-w-[1512px]";
 /** Figma space/7xl — equal padding on all sides of hero text containers */
 const FIGMA_PADDING = "p-[clamp(24px,6.35cqw,96px)]";
@@ -42,6 +54,15 @@ const HOME_HERO_PADDING =
   "px-[clamp(12px,2.12cqw,24px)] pb-[clamp(16px,4.23cqw,56px)] pt-[clamp(12px,2.12cqw,24px)]";
 const FIGMA_INNER_PADDING = "px-[clamp(24px,6.35cqw,96px)]";
 const HERO_HEIGHT = "h-[100vh]";
+/** Rounded home hero — inset card within brand-green frame */
+const HOME_ROUNDED_SHELL_CLASS = "mx-auto max-w-[1512px] bg-se-green p-6";
+/** Top inset positions the inner hero edge at the nav midpoint for a half overlap */
+const HOME_ROUNDED_SHELL_FULL_WIDTH_CLASS =
+  "w-full bg-se-green px-6 pb-6 pt-[calc(var(--site-header-height)/2)]";
+const HOME_ROUNDED_INNER_CLASS =
+  "@container relative overflow-hidden rounded-[var(--radius-2xl)] h-[80vh]";
+const HOME_ROUNDED_DONATE_INNER_CLASS =
+  "@container relative overflow-hidden rounded-[var(--radius-xl)] h-[100vh]";
 
 const heroHeadingLevel: Record<"h1" | "h2", 1 | 2 | 3> = { h1: 2, h2: 3 };
 
@@ -60,15 +81,16 @@ const HOME_HERO_BOTTOM_GRADIENT =
 const HOME_HERO_TOP_GRADIENT =
   "linear-gradient(to bottom, rgba(27,27,21,0.32) 0%, rgba(27,27,21,0.12) 45%, transparent 100%)";
 const HOME_HERO_GRADIENT_HEIGHT = "h-[clamp(260px,48vh,420px)]";
-const HOME_HERO_DONATE_GRADIENT_HEIGHT = "h-[clamp(280px,55vh,520px)]";
 const HOME_HERO_TOP_GRADIENT_HEIGHT = "h-[clamp(120px,20vh,200px)]";
 
 function HomeHeroGradients({
   bottomHeightClass = HOME_HERO_GRADIENT_HEIGHT,
   showTopGradient = false,
+  showBottomGradient = true,
 }: {
   bottomHeightClass?: string;
   showTopGradient?: boolean;
+  showBottomGradient?: boolean;
 }) {
   return (
     <>
@@ -82,14 +104,16 @@ function HomeHeroGradients({
           style={{ backgroundImage: HOME_HERO_TOP_GRADIENT }}
         />
       )}
-      <div
-        aria-hidden
-        className={cn(
-          "pointer-events-none absolute inset-x-0 bottom-0 z-[1]",
-          bottomHeightClass,
-        )}
-        style={{ backgroundImage: HOME_HERO_BOTTOM_GRADIENT }}
-      />
+      {showBottomGradient && (
+        <div
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute inset-x-0 bottom-0 z-[1]",
+            bottomHeightClass,
+          )}
+          style={{ backgroundImage: HOME_HERO_BOTTOM_GRADIENT }}
+        />
+      )}
     </>
   );
 }
@@ -99,9 +123,9 @@ function heroHeadingTag(level: 1 | 2 | 3): "h1" | "h2" | "h3" {
 }
 
 const heroHomeBodyClasses = {
-  xl: "text-base leading-[1.4] lg:text-[clamp(18px,1.59cqw,24px)]",
-  lg: "text-sm leading-[1.4] lg:text-[20px]",
-  md: "text-sm leading-[1.4] lg:text-lg",
+  xl: "text-base leading-[1.5] lg:text-[clamp(18px,1.59cqw,24px)] lg:leading-[1.55]",
+  lg: "text-sm leading-[1.5] lg:text-[20px]",
+  md: "text-sm leading-[1.5] lg:text-lg",
 };
 
 function HeroHomeContent({
@@ -154,16 +178,20 @@ function HeroHomeContent({
       />
       {body &&
         (reduceMotion ? (
-          <p
+          <div
             className={cn(
+              "flex flex-col",
+              HOME_HERO_BODY_PARAGRAPH_GAP,
               heroHomeBodyClasses[bodySize],
-              "whitespace-pre-line text-white",
+              "text-white",
             )}
           >
-            {body}
-          </p>
+            {body.split("\n").map((line, lineIndex) => (
+              <p key={lineIndex}>{line}</p>
+            ))}
+          </div>
         ) : (
-          <motion.p
+          <motion.div
             initial="hidden"
             animate={bodyVisible ? "visible" : "hidden"}
             variants={{
@@ -172,10 +200,15 @@ function HeroHomeContent({
                 transition: { staggerChildren: 0.12 },
               },
             }}
-            className={cn(heroHomeBodyClasses[bodySize], "text-white")}
+            className={cn(
+              "flex flex-col",
+              HOME_HERO_BODY_PARAGRAPH_GAP,
+              heroHomeBodyClasses[bodySize],
+              "text-white",
+            )}
           >
             {body.split("\n").map((line, lineIndex) => (
-              <motion.span
+              <motion.p
                 key={lineIndex}
                 variants={{
                   hidden: { opacity: 0, y: 24 },
@@ -185,12 +218,11 @@ function HeroHomeContent({
                     transition: heroWordSpring,
                   },
                 }}
-                className="block"
               >
                 {line}
-              </motion.span>
+              </motion.p>
             ))}
-          </motion.p>
+          </motion.div>
         ))}
       {showButtons && (primaryCta || secondaryCta) &&
         (reduceMotion ? (
@@ -235,6 +267,7 @@ function SubpageHeroImage({
   caption,
   sticker,
   stickerName = "free-food",
+  isCard = false,
   className,
 }: {
   src: string;
@@ -242,6 +275,7 @@ function SubpageHeroImage({
   caption?: string;
   sticker?: boolean;
   stickerName?: StickerName;
+  isCard?: boolean;
   className?: string;
 }) {
   const scrollRef = useRef<HTMLElement>(null);
@@ -251,7 +285,8 @@ function SubpageHeroImage({
       <figure
         ref={scrollRef}
         className={cn(
-          "relative w-full overflow-hidden rounded-[52px]",
+          "relative w-full overflow-hidden",
+          sectionMediaRadiusClass(isCard),
           "h-[80vh]",
         )}
       >
@@ -284,20 +319,51 @@ function SubpageHeroImage({
 }
 
 const heroCoverClass = "absolute inset-0 size-full object-cover";
+/** Slight lift so hero footage reads brighter and more vivid under the gradient overlay */
+const heroVideoFilterClass = "brightness-[1.1] saturate-[1.15]";
 
 function HomeHeroBackground({
   imageSrc,
   imageAlt,
   videoSrc,
+  scrollRef,
 }: {
   imageSrc: string;
   imageAlt: string;
   videoSrc?: string;
+  /** When set, video/image scroll with parallax inside the hero pin */
+  scrollRef?: RefObject<Element | null>;
 }) {
+  if (scrollRef) {
+    return (
+      <ParallaxBackground
+        scrollRef={scrollRef}
+        src={imageSrc}
+        alt={imageAlt}
+        videoSrc={videoSrc}
+        travel={16}
+        offset={["start start", "end end"]}
+        smooth
+      />
+    );
+  }
+
   return videoSrc ? (
     <div className="absolute inset-0 z-0">
-      <img src={imageSrc} alt="" aria-hidden className={heroCoverClass} />
-      <video autoPlay loop muted playsInline aria-hidden className={heroCoverClass}>
+      <img
+        src={imageSrc}
+        alt=""
+        aria-hidden
+        className={cn(heroCoverClass, heroVideoFilterClass)}
+      />
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        aria-hidden
+        className={cn(heroCoverClass, heroVideoFilterClass)}
+      >
         <source src={videoSrc} type="video/mp4" />
       </video>
     </div>
@@ -369,9 +435,26 @@ function HomeFullWidthHero({
 }
 
 /** rAF-batched scroll progress → CSS var (avoids Framer Motion per-frame work) */
+function measureHomeHeroScrollProgress(
+  el: HTMLElement,
+  viewport: number,
+  scrollY: number,
+): number {
+  const isStacked = el.classList.contains("home-hero-donate--stacked");
+
+  if (isStacked) {
+    const scrollDepth = Math.max(0, -el.getBoundingClientRect().top);
+    const range = Math.max(1, el.offsetHeight - viewport);
+    return Math.max(0, Math.min(1, scrollDepth / range));
+  }
+
+  return Math.max(0, Math.min(1, scrollY / viewport));
+}
+
 function useHomeHeroDonateScrollCssVar(
   sectionRef: RefObject<HTMLElement | null>,
   enabled: boolean,
+  onScrollProgress?: (progress: number) => void,
 ) {
   const lenis = useLenis();
   const reduceMotion = useReducedMotion();
@@ -388,12 +471,11 @@ function useHomeHeroDonateScrollCssVar(
         const el = sectionRef.current;
         if (!el) return;
 
-        const scrollY = lenis?.scroll ?? window.scrollY;
         const viewport = window.innerHeight || 1;
-        el.style.setProperty(
-          "--hero-scroll",
-          String(Math.max(0, Math.min(1, scrollY / viewport))),
-        );
+        const scrollY = lenis?.scroll ?? window.scrollY;
+        const progress = measureHomeHeroScrollProgress(el, viewport, scrollY);
+        el.style.setProperty("--hero-scroll", String(progress));
+        onScrollProgress?.(progress);
       });
     };
 
@@ -401,20 +483,139 @@ function useHomeHeroDonateScrollCssVar(
 
     if (lenis) {
       lenis.on("scroll", update);
-      return () => {
-        lenis.off("scroll", update);
-        if (raf) cancelAnimationFrame(raf);
-      };
+    } else {
+      window.addEventListener("scroll", update, { passive: true });
     }
 
-    window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
+    document.addEventListener("astro:after-swap", update);
+
     return () => {
-      window.removeEventListener("scroll", update);
+      if (lenis) {
+        lenis.off("scroll", update);
+      } else {
+        window.removeEventListener("scroll", update);
+      }
       window.removeEventListener("resize", update);
+      document.removeEventListener("astro:after-swap", update);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [enabled, lenis, reduceMotion, sectionRef]);
+  }, [enabled, lenis, onScrollProgress, reduceMotion, sectionRef]);
+}
+
+const HOME_STACKED_SCROLL_HEIGHT = "min-h-[240vh]";
+const HOME_STACKED_INTRO_HEADING_CLASS = cn(
+  "m-0 text-center text-se-green [text-box-trim:trim-both] [text-box-edge:cap_alphabetic]",
+  sectionH1ClassName,
+  "[&>span]:gap-[0.1em] lg:[&>span]:gap-[0.14em]",
+);
+
+function HomeHeroIntroBand({ children }: { children: ReactNode }) {
+  return (
+    <div className={HOME_HERO_INTRO_BAND_CLASS}>
+      <div className={STANDARD_CONTENT_CLASS}>{children}</div>
+    </div>
+  );
+}
+
+function HomeHeroIntroContent({
+  title,
+  body,
+  bodySize = "xl",
+}: {
+  title: string;
+  body?: string;
+  bodySize?: HeroSectionProps["bodySize"];
+}) {
+  const reduceMotion = useReducedMotion();
+  const [bodyVisible, setBodyVisible] = useState(reduceMotion);
+
+  const bodyEl = body &&
+    (reduceMotion ? (
+      <p className="whitespace-pre-line text-base leading-[1.6] text-white lg:text-lg">
+        {body}
+      </p>
+    ) : (
+      <motion.p
+        initial="hidden"
+        animate={bodyVisible ? "visible" : "hidden"}
+        variants={{
+          hidden: {},
+          visible: { transition: { staggerChildren: 0.12 } },
+        }}
+        className="text-base leading-[1.6] text-white lg:text-lg"
+      >
+        {body.split("\n").map((line, lineIndex) => (
+          <motion.span
+            key={lineIndex}
+            variants={{
+              hidden: { opacity: 0, y: 24 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: heroWordSpring,
+              },
+            }}
+            className="block"
+          >
+            {line}
+          </motion.span>
+        ))}
+      </motion.p>
+    ));
+
+  return (
+    <div className="flex w-full flex-col gap-3 lg:gap-4">
+      <AnimatedHeroHeading
+        title={title}
+        as="h1"
+        multiline
+        revealDelay={homeHeroRevealDelay}
+        revealStagger={homeHeroRevealStagger}
+        onRevealComplete={() => setBodyVisible(true)}
+        className={HOME_STACKED_INTRO_HEADING_CLASS}
+      />
+      {bodyEl}
+    </div>
+  );
+}
+
+function HomeHeroDonateContent({
+  title,
+  body,
+  bodySize,
+}: {
+  title: string;
+  body?: string;
+  bodySize?: HeroSectionProps["bodySize"];
+}) {
+  return (
+    <div
+      className={cn(
+        FIGMA_ARTBOARD_CLASS,
+        HOME_HERO_PADDING,
+        "flex w-full flex-col items-start gap-8 pb-[clamp(16px,4.23cqw,56px)] lg:flex-row lg:items-end lg:justify-between lg:gap-16",
+      )}
+    >
+      <HeroHomeContent
+        title={title}
+        body={body}
+        bodySize={bodySize}
+        showButtons={false}
+        headingAs="h2"
+        headingClassName={heroHeadingClasses.h2}
+        constrainWidth={false}
+        className="w-full max-w-[min(915px,60.55cqw)] max-lg:max-w-none lg:w-auto lg:shrink-0"
+      />
+      <div className="w-full min-w-0 max-w-[480px] shrink-0 self-stretch">
+        <DonationForm
+          variant="hero"
+          sectionTheme="dark"
+          className="shadow-[0_8px_32px_rgba(0,0,0,0.24)]"
+        />
+      </div>
+    </div>
+  );
 }
 
 function HomeFullWidthHeroWithDonate({
@@ -444,31 +645,7 @@ function HomeFullWidthHeroWithDonate({
   useHomeHeroDonateScrollCssVar(sectionRef, scrollFx);
 
   const donateContent = (
-    <div
-      className={cn(
-        FIGMA_ARTBOARD_CLASS,
-        HOME_HERO_PADDING,
-        "flex w-full flex-col items-start gap-8 pb-[clamp(16px,4.23cqw,56px)] lg:flex-row lg:items-end lg:justify-between lg:gap-16",
-      )}
-    >
-      <HeroHomeContent
-        title={title}
-        body={body}
-        bodySize={bodySize}
-        showButtons={false}
-        headingAs="h2"
-        headingClassName={heroHeadingClasses.h2}
-        constrainWidth={false}
-        className="w-full max-w-[min(915px,60.55cqw)] max-lg:max-w-none lg:w-auto lg:shrink-0"
-      />
-      <div className="w-full min-w-0 max-w-[480px] shrink-0 self-stretch">
-        <DonationForm
-          variant="hero"
-          sectionTheme="dark"
-          className="shadow-[0_8px_32px_rgba(0,0,0,0.24)]"
-        />
-      </div>
-    </div>
+    <HomeHeroDonateContent title={title} body={body} bodySize={bodySize} />
   );
 
   return (
@@ -501,10 +678,7 @@ function HomeFullWidthHeroWithDonate({
           videoSrc={videoSrc}
         />
       )}
-      <HomeHeroGradients
-        bottomHeightClass={HOME_HERO_DONATE_GRADIENT_HEIGHT}
-        showTopGradient
-      />
+      <HomeHeroGradients showTopGradient showBottomGradient={false} />
       <div
         className={cn(
           "relative z-[2] flex h-full flex-col justify-end",
@@ -539,16 +713,8 @@ function HomeRoundedHero({
   className?: string;
 }) {
   return (
-    <section
-      id={id}
-      className={cn("mx-auto max-w-[1512px] bg-white p-6", className)}
-    >
-      <div
-        className={cn(
-          "@container relative overflow-hidden rounded-[var(--radius-xl)]",
-          HERO_HEIGHT,
-        )}
-      >
+    <section id={id} className={cn(HOME_ROUNDED_SHELL_CLASS, className)}>
+      <div className={HOME_ROUNDED_INNER_CLASS}>
         <img
           src={imageSrc}
           alt={imageAlt}
@@ -569,6 +735,139 @@ function HomeRoundedHero({
               constrainWidth={false}
             />
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HomeRoundedHeroWithDonate({
+  id,
+  imageSrc,
+  imageAlt,
+  videoSrc,
+  title,
+  body,
+  pinOnScroll = true,
+  className,
+}: {
+  id?: string;
+  imageSrc: string;
+  imageAlt: string;
+  videoSrc?: string;
+  title: string;
+  body?: string;
+  bodySize?: HeroSectionProps["bodySize"];
+  pinOnScroll?: boolean;
+  className?: string;
+}) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const reduceMotion = useReducedMotion();
+  const scrollFx = pinOnScroll && !reduceMotion;
+  const [introRevealed, setIntroRevealed] = useState(reduceMotion);
+  useHomeHeroDonateScrollCssVar(sectionRef, scrollFx, (progress) => {
+    if (progress > 0.02) setIntroRevealed(true);
+  });
+
+  useEffect(() => {
+    if (reduceMotion) setIntroRevealed(true);
+  }, [reduceMotion]);
+
+  const heroHeading = (
+    <AnimatedHeroHeading
+      title={title}
+      as="h1"
+      multiline
+      revealDelay={homeHeroRevealDelay}
+      revealStagger={homeHeroRevealStagger}
+      onRevealComplete={() => setIntroRevealed(true)}
+      className={HOME_STACKED_INTRO_HEADING_CLASS}
+    />
+  );
+
+  const donateForm = (
+    <div className={HOME_HERO_DONATE_FORM_MAX_WIDTH}>
+      <DonationForm
+        variant="hero"
+        sectionTheme="dark"
+        eyebrow={body?.split("\n")[0]}
+        className="shadow-[0_8px_32px_rgba(0,0,0,0.24)]"
+      />
+    </div>
+  );
+
+  if (!scrollFx) {
+    return (
+      <section
+        id={id}
+        data-home-hero
+        data-theme="dark"
+        className={cn("w-full bg-se-green-100 home-hero-donate--stacked", className)}
+      >
+        <div className={cn("w-full pb-6 pt-[var(--site-header-height)]")}>
+          <HomeHeroIntroBand>{heroHeading}</HomeHeroIntroBand>
+          <div className="relative min-h-[65vh] overflow-hidden rounded-[var(--radius-xl)]">
+            <HomeHeroBackground imageSrc={imageSrc} imageAlt={imageAlt} videoSrc={videoSrc} />
+            <div className="absolute inset-x-0 bottom-0 z-[2] pb-[clamp(24px,4vh,48px)]">
+              <div className={STANDARD_CONTENT_CLASS}>{donateForm}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section
+      ref={sectionRef}
+      id={id}
+      data-home-hero
+      data-theme="dark"
+      data-hero-intro-revealed={introRevealed || undefined}
+      className={cn(
+        "home-hero-donate home-hero-donate--stacked relative z-0 bg-se-green-100",
+        HOME_STACKED_SCROLL_HEIGHT,
+        "home-hero-donate--scroll-fx",
+        className,
+      )}
+    >
+      <div className="home-hero-donate__pin sticky top-0 h-screen w-full overflow-hidden">
+        <div className="absolute inset-0 bg-se-green-100" aria-hidden />
+
+        {/* Heading — in green space above video, video scrolls over it */}
+        <div
+          className={cn(
+            "home-hero-donate__intro home-hero-donate__intro--scroll-fx",
+            HOME_HERO_INTRO_BAND_CLASS,
+            "pointer-events-none absolute inset-x-0 z-10",
+          )}
+        >
+          <div className={STANDARD_CONTENT_CLASS}>
+            <div className="home-hero-donate__intro-scale">{heroHeading}</div>
+          </div>
+        </div>
+
+        {/* Video frame — expands from below heading to fullscreen */}
+        <div className="home-hero-donate__frame home-hero-donate__frame--scroll-fx absolute z-20 overflow-hidden">
+          <div className="home-hero-donate__bg-wrap absolute inset-0">
+            <HomeHeroBackground
+              scrollRef={sectionRef}
+              imageSrc={imageSrc}
+              imageAlt={imageAlt}
+              videoSrc={videoSrc}
+            />
+          </div>
+        </div>
+
+        {/* Body + Donate — appears over fullscreen video, slides up from bottom */}
+        <div
+          className={cn(
+            "home-hero-donate__content home-hero-donate__content--scroll-fx",
+            "absolute inset-x-0 bottom-0 z-30",
+            "pb-[clamp(32px,5vh,72px)]",
+          )}
+        >
+          <div className={STANDARD_CONTENT_CLASS}>{donateForm}</div>
         </div>
       </div>
     </section>
@@ -695,6 +994,7 @@ export function HeroSection({
             caption={imageCaption}
             sticker={sticker}
             stickerName={stickerName}
+            isCard={isCard}
           />
         </div>
       </SectionShell>
@@ -736,6 +1036,7 @@ export function HeroSection({
             caption={imageCaption}
             sticker={sticker}
             stickerName={stickerName}
+            isCard={isCard}
           />
         </div>
       </SectionShell>
@@ -764,6 +1065,22 @@ export function HeroSection({
   if (resolvedLayout === "full-width-donate") {
     return (
       <HomeFullWidthHeroWithDonate
+        id={id}
+        imageSrc={imageSrc}
+        imageAlt={imageAlt}
+        videoSrc={videoSrc}
+        title={title}
+        body={body}
+        bodySize={bodySize}
+        pinOnScroll={pinOnScroll}
+        className={className}
+      />
+    );
+  }
+
+  if (resolvedLayout === "rounded-donate") {
+    return (
+      <HomeRoundedHeroWithDonate
         id={id}
         imageSrc={imageSrc}
         imageAlt={imageAlt}

@@ -10,6 +10,68 @@ import { ROUND_IMAGE_SECTION_ATTR } from "@/lib/roundSectionScroll";
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import type { SectionProps } from "@/lib/types";
 
+/**
+ * Only the animated arch visual — no content wrapper and no negative marginTop.
+ * Use this when archTop is needed on a scroll-pinned section where wrapping sticky
+ * content would conflict with the pinned layout.
+ */
+export function SectionArchVisual() {
+  const archRef = useRef<HTMLDivElement>(null);
+  const lenis = useLenis();
+  const reduceMotion = useReducedMotion();
+
+  const rise = useMotionValue(ARCH_RISE);
+  const top = useTransform(rise, (v) => -v);
+  const radiusX = `${ARCH_WIDTH_VW / 2}vw`;
+  const borderTopLeftRadius = useTransform(rise, (v) => `${radiusX} ${v}px`);
+  const borderTopRightRadius = useTransform(rise, (v) => `${radiusX} ${v}px`);
+
+  useEffect(() => {
+    if (reduceMotion) {
+      rise.set(0);
+      return;
+    }
+    if (!lenis) return;
+
+    const update = () => {
+      const section = archRef.current?.closest("section");
+      if (!section) return;
+      const sectionTop = section.getBoundingClientRect().top;
+      const vh = window.innerHeight;
+      const scrolledPast = vh + ARCH_RISE - sectionTop;
+      const progress = Math.max(
+        0,
+        Math.min(1, (scrolledPast - ARCH_HOLD_PX) / ARCH_FLATTEN_PX),
+      );
+      rise.set(ARCH_RISE * (1 - progress));
+    };
+
+    lenis.on("scroll", update);
+    update();
+    return () => lenis.off("scroll", update);
+  }, [lenis, reduceMotion, rise]);
+
+  return (
+    <div
+      ref={archRef}
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-x-0 top-0 z-[1] overflow-x-clip"
+      style={{ height: ARCH_RISE + 32 }}
+    >
+      <motion.div
+        style={{
+          top,
+          width: `${ARCH_WIDTH_VW}vw`,
+          borderTopLeftRadius,
+          borderTopRightRadius,
+          height: ARCH_RISE + 32,
+        }}
+        className="pointer-events-none absolute left-1/2 -translate-x-1/2 bg-[var(--section-bg)]"
+      />
+    </div>
+  );
+}
+
 /** How far (px) the arch peak rises above the section boundary at the center. */
 const ARCH_RISE = 180;
 
@@ -31,6 +93,79 @@ const ARCH_FLATTEN_PX = ARCH_RISE;
  */
 const ARCH_WIDTH_VW = 162;
 
+/** Scroll progress where corner flattening begins — full radius held before this. */
+const ROUNDED_TOP_FLATTEN_START = 0.5;
+/** Scroll progress where corners finish flattening to 0. */
+const ROUNDED_TOP_FLATTEN_END = 1;
+const ROUNDED_TOP_RADIUS_MOBILE = 40;
+const ROUNDED_TOP_RADIUS_DESKTOP = 40;
+
+function roundedTopFlattenProgress(scrollProgress: number): number {
+  if (scrollProgress <= ROUNDED_TOP_FLATTEN_START) return 0;
+  if (scrollProgress >= ROUNDED_TOP_FLATTEN_END) return 1;
+  return (
+    (scrollProgress - ROUNDED_TOP_FLATTEN_START) /
+    (ROUNDED_TOP_FLATTEN_END - ROUNDED_TOP_FLATTEN_START)
+  );
+}
+
+function roundedTopMaxRadiusPx(): number {
+  if (typeof window === "undefined") return ROUNDED_TOP_RADIUS_MOBILE;
+  return window.matchMedia("(min-width: 1024px)").matches
+    ? ROUNDED_TOP_RADIUS_DESKTOP
+    : ROUNDED_TOP_RADIUS_MOBILE;
+}
+
+function useRoundedTopScrollRadius(enabled: boolean) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const lenis = useLenis();
+  const reduceMotion = useReducedMotion();
+  const radiusPx = useMotionValue(
+    enabled && !reduceMotion ? ROUNDED_TOP_RADIUS_MOBILE : 0,
+  );
+  const borderTopLeftRadius = useTransform(radiusPx, (r) => `${r}px`);
+  const borderTopRightRadius = useTransform(radiusPx, (r) => `${r}px`);
+  const animate = enabled && !reduceMotion;
+
+  useEffect(() => {
+    if (!animate) {
+      radiusPx.set(0);
+      return;
+    }
+
+    const update = () => {
+      const section = sectionRef.current;
+      if (!section) return;
+
+      const max = roundedTopMaxRadiusPx();
+      const viewport = window.innerHeight || 1;
+      const top = section.getBoundingClientRect().top;
+      const progress = Math.max(0, Math.min(1, 1 - top / viewport));
+      const flatten = roundedTopFlattenProgress(progress);
+      radiusPx.set(max * (1 - flatten));
+    };
+
+    if (lenis) {
+      lenis.on("scroll", update);
+    } else {
+      window.addEventListener("scroll", update, { passive: true });
+    }
+    window.addEventListener("resize", update);
+    update();
+
+    return () => {
+      if (lenis) {
+        lenis.off("scroll", update);
+      } else {
+        window.removeEventListener("scroll", update);
+      }
+      window.removeEventListener("resize", update);
+    };
+  }, [animate, lenis, radiusPx]);
+
+  return { borderTopLeftRadius, borderTopRightRadius, animate, sectionRef };
+}
+
 /**
  * How far above the section boundary the content sits when the arch is fully
  * peaked. The section's own paddingTop (64px from py-16) plus this value gives
@@ -42,7 +177,7 @@ const ARCH_WIDTH_VW = 162;
 const ARCH_SECTION_PT = 64; // py-16 on the archTop section (LogosBannerSection)
 const ARCH_CONTENT_PULLUP = 80; // px above section boundary at full rise
 
-function ArchRoot({
+export function SectionArchRoot({
   children,
   contentClassName,
 }: {
@@ -116,7 +251,7 @@ function ArchRoot({
       <motion.div
         style={{ marginTop }}
         className={cn(
-          "@container mx-auto max-w-6xl relative z-[1]",
+          "@container mx-auto max-w-7xl relative z-[1]",
           contentClassName,
         )}
       >
@@ -142,6 +277,11 @@ export interface SectionShellProps extends SectionProps {
    * next section does not overlap its content.
    */
   archBottom?: boolean;
+  /**
+   * Rounded top edge — use when a section scrolls over a pinned hero so the
+   * handoff matches the hero card radius during parallax.
+   */
+  roundedTop?: boolean;
 }
 
 export function SectionShell({
@@ -154,39 +294,70 @@ export function SectionShell({
   roundImageSection = false,
   archTop = false,
   archBottom = false,
+  roundedTop = false,
   flushTop = false,
   flushBottom = false,
   transparentBg = false,
 }: SectionShellProps) {
-  const needsOverflowVisible = roundImageSection || archTop;
+  const needsOverflowVisible = (roundImageSection || archTop) && !roundedTop;
+  const {
+    borderTopLeftRadius,
+    borderTopRightRadius,
+    animate: animateRoundedTop,
+    sectionRef,
+  } = useRoundedTopScrollRadius(roundedTop);
+
+  const shellClassName = cn(
+    "relative px-6 text-[var(--section-text)] lg:px-24",
+    transparentBg ? "bg-transparent" : "bg-[var(--section-bg)]",
+    flushTop ? "pt-0" : "pt-12 lg:pt-[var(--spacing-xxl)]",
+    flushBottom ? "pb-0" : "pb-12 lg:pb-[var(--spacing-xxl)]",
+    roundedTop &&
+      !animateRoundedTop &&
+      "rounded-t-[var(--radius-xl)] lg:rounded-t-[var(--radius-2xl)]",
+    needsOverflowVisible ? "overflow-visible" : "overflow-hidden",
+    className,
+  );
+
+  const shellStyle = archBottom
+    ? ({ paddingBottom: `${ARCH_RISE + 140}px` } as CSSProperties)
+    : undefined;
+
+  const shellProps = {
+    id,
+    "data-section": "",
+    "data-theme": theme,
+    ...(roundImageSection ? { [ROUND_IMAGE_SECTION_ATTR]: "" } : undefined),
+    ...(archTop ? { "data-arch-top": "" } : undefined),
+    className: shellClassName,
+    style: shellStyle,
+  };
+
+  const shellChildren = archTop ? (
+    <SectionArchRoot contentClassName={contentClassName}>{children}</SectionArchRoot>
+  ) : (
+    <div className={cn("@container mx-auto max-w-7xl", contentClassName)}>{children}</div>
+  );
+
+  if (animateRoundedTop) {
+    return (
+      <motion.section
+        ref={sectionRef}
+        {...shellProps}
+        style={{
+          ...shellStyle,
+          borderTopLeftRadius,
+          borderTopRightRadius,
+        }}
+      >
+        {shellChildren}
+      </motion.section>
+    );
+  }
+
   return (
-    <Tag
-      id={id}
-      data-section=""
-      data-theme={theme}
-      {...(roundImageSection ? { [ROUND_IMAGE_SECTION_ATTR]: "" } : undefined)}
-      {...(archTop ? { "data-arch-top": "" } : undefined)}
-      className={cn(
-        "relative px-6 text-[var(--section-text)] lg:px-24",
-        transparentBg ? "bg-transparent" : "bg-[var(--section-bg)]",
-        flushTop ? "pt-0" : "pt-12 lg:pt-[var(--spacing-xxl)]",
-        flushBottom ? "pb-0" : "pb-12 lg:pb-[var(--spacing-xxl)]",
-        needsOverflowVisible ? "overflow-visible" : "overflow-hidden",
-        className,
-      )}
-      style={
-        archBottom
-          ? ({ paddingBottom: `${ARCH_RISE + 140}px` } as CSSProperties)
-          : undefined
-      }
-    >
-      {archTop ? (
-        <ArchRoot contentClassName={contentClassName}>{children}</ArchRoot>
-      ) : (
-        <div className={cn("@container mx-auto max-w-6xl", contentClassName)}>
-          {children}
-        </div>
-      )}
+    <Tag {...shellProps}>
+      {shellChildren}
     </Tag>
   );
 }

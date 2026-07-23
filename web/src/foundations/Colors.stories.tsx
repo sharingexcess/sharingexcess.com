@@ -14,6 +14,7 @@ const brand: SwatchData[] = [
 
 const seGreen: SwatchData[] = [
   { label: "se-green",     cssVar: "--color-se-green-base", hex: "#00843D" },
+  { label: "se-green-050", cssVar: "--color-se-green-050",  hex: "#ECF8EC" },
   { label: "se-green-100", cssVar: "--color-se-green-100",  hex: "#D8F0D8" },
   { label: "se-green-200", cssVar: "--color-se-green-200",  hex: "#AFDBB8" },
   { label: "se-green-300", cssVar: "--color-se-green-300",  hex: "#69B57B" },
@@ -26,6 +27,7 @@ const seGreen: SwatchData[] = [
 
 const guava: SwatchData[] = [
   { label: "guava",     cssVar: "--color-guava-base", hex: "#F66B4F" },
+  { label: "guava-050", cssVar: "--color-guava-050",  hex: "#FEF6F5" },
   { label: "guava-100", cssVar: "--color-guava-100",  hex: "#FDECEA" },
   { label: "guava-200", cssVar: "--color-guava-200",  hex: "#FBDAD5" },
   { label: "guava-300", cssVar: "--color-guava-300",  hex: "#F9C5BE" },
@@ -39,6 +41,7 @@ const guava: SwatchData[] = [
 
 const banana: SwatchData[] = [
   { label: "banana",     cssVar: "--color-banana-base", hex: "#FFD951" },
+  { label: "banana-050", cssVar: "--color-banana-050",  hex: "#FFFCF0" },
   { label: "banana-100", cssVar: "--color-banana-100",  hex: "#FFF8E1" },
   { label: "banana-200", cssVar: "--color-banana-200",  hex: "#FFF1C2" },
   { label: "banana-300", cssVar: "--color-banana-300",  hex: "#FFE9A2" },
@@ -52,6 +55,7 @@ const banana: SwatchData[] = [
 
 const tangerine: SwatchData[] = [
   { label: "tangerine",     cssVar: "--color-tangerine-base", hex: "#FBA62F" },
+  { label: "tangerine-050", cssVar: "--color-tangerine-050",  hex: "#FFF7ED" },
   { label: "tangerine-100", cssVar: "--color-tangerine-100",  hex: "#FFEEDB" },
   { label: "tangerine-200", cssVar: "--color-tangerine-200",  hex: "#FFDDB6" },
   { label: "tangerine-300", cssVar: "--color-tangerine-300",  hex: "#FFCB91" },
@@ -65,6 +69,7 @@ const tangerine: SwatchData[] = [
 
 const blueberry: SwatchData[] = [
   { label: "blueberry",     cssVar: "--color-blueberry-base", hex: "#67C3E4" },
+  { label: "blueberry-050", cssVar: "--color-blueberry-050",  hex: "#F1F9FC" },
   { label: "blueberry-100", cssVar: "--color-blueberry-100",  hex: "#E3F3FA" },
   { label: "blueberry-200", cssVar: "--color-blueberry-200",  hex: "#C6E7F5" },
   { label: "blueberry-300", cssVar: "--color-blueberry-300",  hex: "#A8DBEF" },

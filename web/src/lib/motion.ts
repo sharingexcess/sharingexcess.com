@@ -184,6 +184,45 @@ export const fadeInUp: Variants = {
   },
 };
 
+/** Display heading — soft focus resolve, slower than Quick spring */
+export const blurInSpring: Transition = {
+  type: "spring",
+  visualDuration: 1.1,
+  bounce: 0,
+};
+
+export const blurIn: Variants = {
+  hidden: { opacity: 0, filter: "blur(16px)" },
+  visible: {
+    opacity: 1,
+    filter: "blur(0px)",
+    transition: blurInSpring,
+  },
+};
+
+export const blurWordVariants: Variants = {
+  hidden: { opacity: 0, filter: "blur(12px)" },
+  visible: {
+    opacity: 1,
+    filter: "blur(0px)",
+    transition: blurInSpring,
+  },
+};
+
+export const blurWordContainerVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.14, delayChildren: 0.25 },
+  },
+};
+
+/** Section headings — wait until the block is well into view before revealing */
+export const sectionHeadingInViewOptions = {
+  once: true,
+  margin: "-55% 0px -40% 0px",
+  amount: 0.65,
+} as const;
+
 export const staggerContainer: Variants = {
   hidden: {},
   visible: {
@@ -258,6 +297,10 @@ export const heroWordContainerVariants: Variants = {
     transition: { staggerChildren: 0.1 },
   },
 };
+
+/** Home hero intro — longer pause before the headline begins revealing */
+export const homeHeroRevealDelay = 0.55;
+export const homeHeroRevealStagger = 0.14;
 
 /** TextImage carousel — snappy spring with bounce for stack enter */
 export const textImageStackEnterSpring: Transition = {

@@ -22,9 +22,9 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    heading:     "Let's free food.",
-    description: "We rescue 2 million pounds of surplus food every week.\nThe food is donated; your gift moves it.",
-    ctaLabel:    "Donate now",
+    heading:     "Lorem ipsum dolor sit amet.",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum.",
+    submitLabel: "Primary CTA",
     navSections: FOOTER_NAV_SECTIONS,
     socialLinks: FOOTER_SOCIAL_LINKS,
     badges: [

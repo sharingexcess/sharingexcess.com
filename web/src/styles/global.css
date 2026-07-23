@@ -14,6 +14,7 @@
   --color-guava: var(--color-guava-base);
 
   /* Guava scale */
+  --color-guava-050: var(--color-guava-050);
   --color-guava-100: var(--color-guava-100);
   --color-guava-200: var(--color-guava-200);
   --color-guava-300: var(--color-guava-300);
@@ -25,6 +26,7 @@
   --color-guava-900: var(--color-guava-900);
 
   /* SE Green scale */
+  --color-se-green-050: var(--color-se-green-050);
   --color-se-green-100: var(--color-se-green-100);
   --color-se-green-200: var(--color-se-green-200);
   --color-se-green-300: var(--color-se-green-300);
@@ -35,6 +37,7 @@
   --color-se-green-800: var(--color-se-green-800);
 
   /* Banana scale */
+  --color-banana-050: var(--color-banana-050);
   --color-banana-100: var(--color-banana-100);
   --color-banana-200: var(--color-banana-200);
   --color-banana-300: var(--color-banana-300);
@@ -46,6 +49,7 @@
   --color-banana-900: var(--color-banana-900);
 
   /* Tangerine scale */
+  --color-tangerine-050: var(--color-tangerine-050);
   --color-tangerine-100: var(--color-tangerine-100);
   --color-tangerine-200: var(--color-tangerine-200);
   --color-tangerine-300: var(--color-tangerine-300);
@@ -57,6 +61,7 @@
   --color-tangerine-900: var(--color-tangerine-900);
 
   /* Blueberry scale */
+  --color-blueberry-050: var(--color-blueberry-050);
   --color-blueberry-100: var(--color-blueberry-100);
   --color-blueberry-200: var(--color-blueberry-200);
   --color-blueberry-300: var(--color-blueberry-300);
@@ -90,9 +95,15 @@
   --font-display: "malila", sans-serif;
 
   /* Radius */
+  --radius-none: var(--radius-none);
+  --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
   --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+  --radius-3xl: var(--radius-3xl);
+  --radius-4xl: var(--radius-4xl);
+  --radius-full: var(--radius-full);
 
   /* Spacing */
   --spacing-xxl: var(--spacing-xxl);
@@ -197,14 +208,15 @@ html {
   --hero-scroll: 0;
 }
 
-.home-hero-donate__bg-wrap {
+/* Full-width overlay hero (legacy layout) */
+.home-hero-donate--scroll-fx:not(.home-hero-donate--stacked) .home-hero-donate__bg-wrap {
   transform: scale(calc(1.1 - 0.1 * var(--hero-scroll)));
   transform-origin: center center;
   will-change: transform;
   contain: layout paint;
 }
 
-.home-hero-donate__content {
+.home-hero-donate--scroll-fx:not(.home-hero-donate--stacked) .home-hero-donate__content {
   --hero-content-t: min(1, calc(var(--hero-scroll) / 0.55));
   opacity: calc(1 - var(--hero-content-t));
   transform: scale(calc(1 - 0.1 * var(--hero-content-t)));
@@ -212,9 +224,69 @@ html {
   will-change: transform, opacity;
 }
 
+/* Stacked rounded hero — heading above video, expand to fullscreen, body+form slide up */
+.home-hero-donate--stacked {
+  --hero-frame-start: 48vh;
+}
+
+.home-hero-donate--stacked.home-hero-donate--scroll-fx {
+  --hero-frame-t:   clamp(0, calc(var(--hero-scroll) / 0.52), 1);
+  --hero-heading-t: clamp(0, calc(var(--hero-scroll) / 0.40), 1);
+  /* Donate card only enters after the video frame is fullscreen (frame-t = 1 @ 0.52) */
+  --hero-content-t: clamp(0, calc((var(--hero-scroll) - 0.52) / 0.28), 1);
+}
+
+.home-hero-donate--stacked .home-hero-donate__intro--scroll-fx {
+  top: var(--site-header-height);
+  opacity: 1;
+  will-change: auto;
+}
+
+.home-hero-donate--stacked .home-hero-donate__intro-scale {
+  /* Scale only while scrolling — not during the mount-time word reveal */
+  transform: scale(calc(1 - 0.15 * var(--hero-heading-t)));
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.home-hero-donate--stacked:not([data-hero-intro-revealed]) .home-hero-donate__intro-scale {
+  transform: none;
+}
+
+.home-hero-donate--stacked .home-hero-donate__frame--scroll-fx {
+  left:   calc((1 - var(--hero-frame-t)) * max(24px, calc((100% - 1320px) / 2)));
+  right:  calc((1 - var(--hero-frame-t)) * max(24px, calc((100% - 1320px) / 2)));
+  top:    calc(var(--hero-frame-start) * (1 - var(--hero-frame-t)));
+  bottom: calc(-8vh * (1 - var(--hero-frame-t)));
+  border-radius: calc(40px * (1 - var(--hero-frame-t)));
+  will-change: top, left, right, bottom, border-radius;
+}
+
+.home-hero-donate--stacked .home-hero-donate__bg-wrap {
+  transform: scale(calc(1.08 - 0.08 * var(--hero-frame-t)));
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.home-hero-donate--stacked .home-hero-donate__content--scroll-fx {
+  opacity: 1;
+  /* Fully off-screen until content-t > 0 (video is fullscreen) */
+  transform: translateY(calc(100% * (1 - var(--hero-content-t))));
+  will-change: transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .home-hero-donate__bg-wrap,
-  .home-hero-donate__content {
+  .home-hero-donate--scroll-fx:not(.home-hero-donate--stacked) .home-hero-donate__bg-wrap,
+  .home-hero-donate--scroll-fx:not(.home-hero-donate--stacked) .home-hero-donate__content {
+    transform: none;
+    opacity: 1;
+    will-change: auto;
+  }
+
+  .home-hero-donate--stacked .home-hero-donate__intro--scroll-fx,
+  .home-hero-donate--stacked .home-hero-donate__intro-scale,
+  .home-hero-donate--stacked .home-hero-donate__frame--scroll-fx,
+  .home-hero-donate--stacked .home-hero-donate__content--scroll-fx {
     transform: none;
     opacity: 1;
     will-change: auto;

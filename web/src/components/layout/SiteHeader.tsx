@@ -1,7 +1,6 @@
 import { cn } from "@/lib/cn";
 import { isHomePagePath } from "@/lib/isHomePagePath";
 import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
-import { useHeaderOverHomeHero } from "@/lib/useHeaderOverHomeHero";
 import { useHideOnScroll } from "@/lib/useHideOnScroll";
 import { Button } from "@/components/ui/Button";
 import { MenuToggle } from "@/components/layout/MenuToggle";
@@ -9,7 +8,6 @@ import { MobileNavPanel } from "@/components/layout/MobileNavPanel";
 import {
   NavDropdownPanel,
   NavDropdownTrigger,
-  NAV_BUTTON_GLASS_STYLE,
   NAV_BUTTON_STYLE,
 } from "@/components/layout/NavDropdown";
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
@@ -121,13 +119,15 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
 
 const MOBILE_NAV_ID = "site-mobile-nav";
 
-const LOGO_ICON_SRC = {
-  default: "/images/se-icon-green.png",
-  hero: "/images/se-icon-white.png",
-} as const;
+const LOGO_ICON_SRC = "/images/se-icon-green.png";
 
 const HEADER_BAR_TRANSITION =
   "transition-[background-color,box-shadow,border-color,border-radius,padding,max-width] duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] motion-reduce:transition-none";
+
+const STANDARD_NAV_MAX_WIDTH = "max-w-[1320px]";
+
+const HEADER_BAR_CLASS =
+  "relative isolate rounded-[var(--radius-3xl)] border border-transparent bg-neutral-000 px-4 py-3 lg:px-8 lg:py-4";
 
 /** Figma node 1052:2970 — NavigationBar option 1 (desktop + mobile overlay). */
 export function SiteHeader({
@@ -146,10 +146,8 @@ export function SiteHeader({
   const [hoveredNavIndex, setHoveredNavIndex] = useState<number | null>(null);
   const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [isHomePage, setIsHomePage] = useState(isHomePageProp);
-  const overHomeHero = useHeaderOverHomeHero(isHomePageProp);
   const scrollVisible = useHideOnScroll({ enabled: isHomePage });
   const visible = isHomePage ? scrollVisible || menuOpen || isMobileViewport : true;
-  const overHeroNav = isHomePage && overHomeHero && !menuOpen;
 
   useBodyScrollLock(menuOpen);
 
@@ -211,11 +209,9 @@ export function SiteHeader({
     <header
       data-site-header
       data-visible={visible}
-      data-over-hero={overHeroNav || undefined}
       data-menu-open={menuOpen || undefined}
       className={cn(
-        "site-header-shell fixed inset-x-0 top-0 z-50 w-full bg-transparent py-3 lg:py-4",
-        overHeroNav ? "px-0" : "px-4 lg:px-8",
+        "site-header-shell fixed inset-x-0 top-0 z-50 w-full bg-transparent px-4 py-3 lg:px-8 lg:py-4",
         !visible && "site-header-shell--hidden",
         className,
       )}
@@ -226,46 +222,32 @@ export function SiteHeader({
         className={cn(
           "relative z-10 mx-auto w-full",
           HEADER_BAR_TRANSITION,
-          overHeroNav ? "max-w-[1512px] px-3 lg:px-6" : "max-w-[1320px]",
+          STANDARD_NAV_MAX_WIDTH,
         )}
         onMouseLeave={closeNavDropdown}
       >
         <div
           data-header-bar
           className={cn(
-            "relative isolate py-3 lg:py-4",
+            HEADER_BAR_CLASS,
             HEADER_BAR_TRANSITION,
-            overHeroNav
-              ? "rounded-none border border-transparent bg-transparent px-0 shadow-none"
-              : "rounded-[var(--radius-xl)] border border-transparent bg-neutral-000 px-4 shadow-[0_2px_12px_rgba(0,0,0,0.12)] lg:px-8",
             menuOpen && "z-50",
           )}
         >
           <div className="relative flex items-center justify-between gap-4 lg:gap-6">
         <a
           href="/"
-          className={cn(
-            "flex shrink-0 items-center no-underline transition-[font-size,gap,color] duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] motion-reduce:transition-none",
-            overHeroNav ? "gap-2 text-white lg:text-[36px]" : "gap-[6px] text-se-green lg:text-[24px]",
-          )}
+          className="flex shrink-0 items-center gap-[6px] text-[22px] text-se-green no-underline lg:text-[24px]"
         >
           <img
-            src={overHeroNav ? LOGO_ICON_SRC.hero : LOGO_ICON_SRC.default}
+            src={LOGO_ICON_SRC}
             alt=""
             width={32}
             height={32}
-            className={cn(
-              "shrink-0 rounded-[6px] transition-[width,height,min-width] duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] motion-reduce:transition-none",
-              overHeroNav
-                ? "size-10 lg:h-[1.24em] lg:w-[1.24em] lg:min-w-[1.24em]"
-                : "size-8 lg:h-[1.06em] lg:w-[1.06em] lg:min-w-[1.06em]",
-            )}
+            className="size-8 shrink-0 rounded-[6px] lg:h-[1.06em] lg:w-[1.06em] lg:min-w-[1.06em]"
           />
           <span
-            className={cn(
-              "font-sans font-semibold leading-[1.06] tracking-[-0.04em] transition-[font-size,color] duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] motion-reduce:transition-none lg:text-[inherit]",
-              overHeroNav ? "text-[30px] text-white" : "text-[22px] text-se-green",
-            )}
+            className="font-sans text-[22px] font-semibold leading-[1.06] tracking-[-0.04em] text-se-green lg:text-[inherit]"
           >
             {logoLabel}
           </span>
@@ -274,7 +256,7 @@ export function SiteHeader({
         <div className="flex shrink-0 items-center gap-4 lg:gap-6">
           <nav
             className="hidden items-center gap-6 lg:flex"
-            style={overHeroNav ? NAV_BUTTON_GLASS_STYLE : NAV_BUTTON_STYLE}
+            style={NAV_BUTTON_STYLE}
             aria-label="Main"
             onMouseLeave={() => setHoveredNavIndex(null)}
           >
@@ -303,14 +285,11 @@ export function SiteHeader({
             ))}
           </nav>
 
-          <div
-            className="hidden items-center gap-2 lg:flex"
-            style={overHeroNav ? NAV_BUTTON_GLASS_STYLE : undefined}
-          >
+          <div className="hidden items-center gap-2 lg:flex">
             <Button
               variant="secondary"
               size="sm"
-              colorScheme={overHeroNav ? "dark" : "light"}
+              colorScheme="light"
               href={secondaryCtaHref}
             >
               {secondaryCtaLabel}
@@ -330,7 +309,6 @@ export function SiteHeader({
             open={menuOpen}
             onToggle={toggleMenu}
             controlsId={MOBILE_NAV_ID}
-            inverted={overHeroNav}
             className="lg:hidden"
           />
         </div>

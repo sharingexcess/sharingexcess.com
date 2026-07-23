@@ -194,15 +194,40 @@ export interface ParallaxCoverProps {
   alt: string;
   className?: string;
   travel?: number;
+  /** Optional cover video layered above `src` (poster frame) */
+  videoSrc?: string;
+  /**
+   * Scroll offsets for the parallax — defaults to full-viewport range so the
+   * effect is visible as the element enters and exits.
+   */
+  offset?: ParallaxScrollOffset;
+  /** Ease image travel with a light spring */
+  smooth?: boolean;
 }
 
 /** Overflow-hidden frame with an inset parallax cover image */
-export function ParallaxCover({ src, alt, className, travel }: ParallaxCoverProps) {
+export function ParallaxCover({
+  src,
+  alt,
+  className,
+  travel,
+  videoSrc,
+  offset = ["start end", "end start"],
+  smooth = false,
+}: ParallaxCoverProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
     <div ref={scrollRef} className={cn("relative overflow-hidden", className)}>
-      <ParallaxBackground scrollRef={scrollRef} src={src} alt={alt} travel={travel} />
+      <ParallaxBackground
+        scrollRef={scrollRef}
+        src={src}
+        alt={alt}
+        travel={travel}
+        videoSrc={videoSrc}
+        offset={offset}
+        smooth={smooth}
+      />
     </div>
   );
 }

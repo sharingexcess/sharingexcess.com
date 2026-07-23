@@ -59,6 +59,7 @@ const meta = {
     ...sectionCardControlArgTypes,
     isCard: { control: "boolean" },
     imagePosition: { control: "radio", options: ["left", "right"] },
+    imageBleed: { control: "boolean" },
     advanceOnScroll: { control: "boolean" },
     autoAdvance: { control: "boolean" },
     defaultIndex: {
@@ -74,6 +75,10 @@ export const Default: Story = {};
 
 export const ImageRight: Story = {
   args: { imagePosition: "right" },
+};
+
+export const EdgeBleed: Story = {
+  args: { imagePosition: "left", imageBleed: true },
 };
 
 export const WithoutEyebrow: Story = {

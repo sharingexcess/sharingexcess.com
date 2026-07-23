@@ -2,15 +2,13 @@ import { useLenis } from "@/components/providers/SmoothScrollProvider";
 import { cn } from "@/lib/cn";
 import { measureDepthFadeProgress } from "@/lib/sectionScrollFade";
 import { motion, useMotionValue, useReducedMotion } from "@/lib/motion";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode, type RefObject } from "react";
 
-export interface SectionScrollHandoffProps {
-  children: ReactNode;
-  className?: string;
-  /** Background at the start of the handoff zone */
-  fadeFrom?: "light" | "dark";
-  /** Background at the end of the handoff zone */
-  fadeTo?: "light" | "dark";
+type FadeTone = "light" | "dark";
+
+export interface SectionScrollFadePhase {
+  fadeFrom?: FadeTone;
+  fadeTo?: FadeTone;
   /** Wrapper scroll depth (0–1) where the crossfade begins */
   fadeStart?: number;
   /** Wrapper scroll depth (0–1) where the crossfade completes */
@@ -21,28 +19,58 @@ export interface SectionScrollHandoffProps {
   fadeEndVh?: number;
 }
 
-/**
- * Phantom-style scroll handoff — crossfades a shared background across wrapped
- * sections as the user scrolls (e.g. dark hero → light follower).
- */
-export function SectionScrollHandoff({
-  children,
-  className,
-  fadeFrom = "dark",
-  fadeTo = "light",
-  fadeStart = 0.28,
-  fadeEnd = 0.4,
-  fadeStartVh,
-  fadeEndVh,
-}: SectionScrollHandoffProps) {
-  const wrapperRef = useRef<HTMLDivElement>(null);
+export interface SectionScrollHandoffProps extends SectionScrollFadePhase {
+  children: ReactNode;
+  className?: string;
+  /** Optional second crossfade within the same scroll zone (e.g. white → green before map) */
+  secondFade?: SectionScrollFadePhase;
+}
+
+function resolveFadeRatio(
+  scrollDepth: number,
+  totalHeight: number,
+  start: number | undefined,
+  end: number | undefined,
+  startVh: number | undefined,
+  endVh: number | undefined,
+  vhPx: number,
+): number {
+  const startRatio =
+    startVh != null ? (startVh * vhPx) / totalHeight : (start ?? 0);
+  const endRatio = endVh != null ? (endVh * vhPx) / totalHeight : (end ?? 1);
+  return measureDepthFadeProgress(scrollDepth, totalHeight, startRatio, endRatio);
+}
+
+function initialOverlayOpacity(fadeFrom: FadeTone, fadeTo: FadeTone): number {
+  if (fadeFrom === fadeTo) return 0;
+  return 0;
+}
+
+function overlayTone(fadeFrom: FadeTone, fadeTo: FadeTone): FadeTone | null {
+  if (fadeFrom === fadeTo) return null;
+  if (fadeFrom === "dark" && fadeTo === "light") return "light";
+  if (fadeFrom === "light" && fadeTo === "dark") return "dark";
+  return null;
+}
+
+function toneClassName(tone: FadeTone): string {
+  return tone === "dark" ? "bg-kale" : "bg-[var(--color-neutral-000)]";
+}
+
+function useScrollFadeOpacity(
+  wrapperRef: RefObject<HTMLDivElement | null>,
+  phase: SectionScrollFadePhase,
+  enabled: boolean,
+) {
   const lenis = useLenis();
   const reduceMotion = useReducedMotion();
-  const overlayOpacity = useMotionValue(fadeFrom === fadeTo ? 0 : fadeFrom === "dark" ? 0 : 1);
+  const fadeFrom = phase.fadeFrom ?? "dark";
+  const fadeTo = phase.fadeTo ?? "light";
+  const opacity = useMotionValue(initialOverlayOpacity(fadeFrom, fadeTo));
 
   useEffect(() => {
-    if (fadeFrom === fadeTo) {
-      overlayOpacity.set(0);
+    if (!enabled || fadeFrom === fadeTo) {
+      opacity.set(0);
       return;
     }
 
@@ -53,19 +81,16 @@ export function SectionScrollHandoff({
       const rect = el.getBoundingClientRect();
       const scrollDepth = Math.max(0, -rect.top);
       const vhPx = window.innerHeight / 100;
-      const startRatio =
-        fadeStartVh != null
-          ? (fadeStartVh * vhPx) / rect.height
-          : fadeStart;
-      const endRatio =
-        fadeEndVh != null ? (fadeEndVh * vhPx) / rect.height : fadeEnd;
-      const progress = measureDepthFadeProgress(
+      const progress = resolveFadeRatio(
         scrollDepth,
         rect.height,
-        startRatio,
-        endRatio,
+        phase.fadeStart,
+        phase.fadeEnd,
+        phase.fadeStartVh,
+        phase.fadeEndVh,
+        vhPx,
       );
-      overlayOpacity.set(reduceMotion ? (progress >= 1 ? 1 : 0) : progress);
+      opacity.set(reduceMotion ? (progress >= 1 ? 1 : 0) : progress);
     };
 
     if (lenis) {
@@ -86,11 +111,47 @@ export function SectionScrollHandoff({
       }
       window.removeEventListener("resize", update);
     };
-  }, [fadeEnd, fadeEndVh, fadeFrom, fadeStart, fadeStartVh, fadeTo, lenis, overlayOpacity, reduceMotion]);
+  }, [
+    enabled,
+    fadeFrom,
+    fadeTo,
+    lenis,
+    opacity,
+    phase.fadeEnd,
+    phase.fadeEndVh,
+    phase.fadeStart,
+    phase.fadeStartVh,
+    reduceMotion,
+    wrapperRef,
+  ]);
+
+  return { opacity, tone: overlayTone(fadeFrom, fadeTo) };
+}
+
+/**
+ * Phantom-style scroll handoff — crossfades a shared background across wrapped
+ * sections as the user scrolls (e.g. dark hero → light follower).
+ */
+export function SectionScrollHandoff({
+  children,
+  className,
+  fadeFrom = "dark",
+  fadeTo = "light",
+  fadeStart = 0.28,
+  fadeEnd = 0.4,
+  fadeStartVh,
+  fadeEndVh,
+  secondFade,
+}: SectionScrollHandoffProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const primaryFade = useScrollFadeOpacity(
+    wrapperRef,
+    { fadeFrom, fadeTo, fadeStart, fadeEnd, fadeStartVh, fadeEndVh },
+    true,
+  );
+  const secondaryFade = useScrollFadeOpacity(wrapperRef, secondFade ?? {}, Boolean(secondFade));
 
   const baseIsDark = fadeFrom === "dark";
-  const overlayIsLight = fadeFrom === "dark" && fadeTo === "light";
-  const overlayIsDark = fadeFrom === "light" && fadeTo === "dark";
 
   return (
     <div ref={wrapperRef} className={cn("relative isolate", className)}>
@@ -101,14 +162,21 @@ export function SectionScrollHandoff({
           baseIsDark ? "bg-kale" : "bg-[var(--color-neutral-000)]",
         )}
       />
-      {(overlayIsLight || overlayIsDark) && (
+      {primaryFade.tone && (
+        <motion.div
+          aria-hidden
+          className={cn("pointer-events-none absolute inset-0 z-0", toneClassName(primaryFade.tone))}
+          style={{ opacity: primaryFade.opacity }}
+        />
+      )}
+      {secondaryFade.tone && (
         <motion.div
           aria-hidden
           className={cn(
             "pointer-events-none absolute inset-0 z-0",
-            overlayIsLight ? "bg-[var(--color-neutral-000)]" : "bg-kale",
+            toneClassName(secondaryFade.tone),
           )}
-          style={{ opacity: overlayOpacity }}
+          style={{ opacity: secondaryFade.opacity }}
         />
       )}
       <div className="relative z-[1]">{children}</div>

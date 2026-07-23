@@ -30,7 +30,7 @@ const meta = {
     ...sectionControlArgTypes,
     layout: {
       control: "radio",
-      options: ["full-width", "full-width-donate", "rounded", "stack-left", "stack-centered", "text"],
+      options: ["full-width", "full-width-donate", "rounded", "rounded-donate", "stack-left", "stack-centered", "text"],
     },
     isCard: { control: "boolean" },
     headingSize: { control: "radio", options: ["h1", "h2"] },
@@ -114,6 +114,30 @@ export const HomeRounded: Story = {
     body: { control: false },
     headingSize: { control: false },
     bodySize: { control: false },
+  },
+};
+
+export const HomeRoundedDonate: Story = {
+  parameters: {
+    viewport: { defaultViewport: "figmaDesktop" },
+  },
+  args: {
+    layout: "rounded-donate",
+    title: homeTitle,
+    body: subpageBody,
+    bodySize: "xl",
+    eyebrow: undefined,
+    imageSrc: "/images/oranges.jpg",
+    imageAlt: "",
+    submitLabel: "Make a donation",
+  },
+  argTypes: {
+    layout: { control: false },
+    isCard: { control: false },
+    eyebrow: { control: false },
+    headingSize: { control: false },
+    primaryCta: { control: false },
+    secondaryCta: { control: false },
   },
 };
 

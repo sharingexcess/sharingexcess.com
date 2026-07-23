@@ -7,9 +7,9 @@ import {
   slotMachineInViewOptions,
   slotMachineReelCycles,
   slotMachineStartDelay,
-  useInView,
   useReducedMotion,
 } from "@/lib/motion";
+import { useInViewOnce } from "@/lib/useInViewOnce";
 import { metricNumberClassName } from "@/lib/typography";
 import { useFitText } from "@/lib/useFitText";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
@@ -163,7 +163,7 @@ export interface SlotMachineNumberProps {
 export function SlotMachineNumber({ value, className }: SlotMachineNumberProps) {
   const reduceMotion = useReducedMotion();
   const inViewRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(inViewRef, slotMachineInViewOptions);
+  const inView = useInViewOnce(inViewRef, slotMachineInViewOptions);
   const [animationValue, setAnimationValue] = useState<string | null>(null);
   const [settled, setSettled] = useState(false);
   const displayValue = settled || reduceMotion ? value : (animationValue ?? value);

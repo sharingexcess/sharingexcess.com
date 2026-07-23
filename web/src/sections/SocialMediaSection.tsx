@@ -99,7 +99,7 @@ export function SocialMediaSection({
             const aspect = item.aspect ?? "story";
             const isHighlighted = showNavigation && index === highlightedIndex;
             const cardClassName = cn(
-              "relative block shrink-0 overflow-hidden rounded-[var(--radius-md)] transition-transform duration-300",
+              "relative block shrink-0 overflow-hidden rounded-[var(--radius-lg)] transition-transform duration-300",
               aspectClasses[aspect],
               showNavigation && !isHighlighted && "opacity-65",
               isHighlighted &&

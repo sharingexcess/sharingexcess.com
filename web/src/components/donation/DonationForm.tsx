@@ -3,6 +3,7 @@ import { TextInput } from "@/components/ui/TextInput";
 import { cn } from "@/lib/cn";
 import { formatLargeNumber } from "@/lib/formatNumber";
 import type { SectionTheme } from "@/lib/types";
+import { eyebrowClassName } from "@/lib/typography";
 import { SECTION_CARD_NESTED_RADIUS_CLASS } from "@/sections/sectionCardConfig";
 import { useState, type ReactNode } from "react";
 
@@ -19,6 +20,8 @@ export interface DonationFormProps {
   submitLabel?: string;
   /** Home hero donate card — impact presets with Give Now / Give Monthly CTAs */
   variant?: DonationFormVariant;
+  /** Eyebrow above the hero card heading — e.g. impact stat line */
+  eyebrow?: string;
   /** Parent section theme — light uses neutral-050 card fill */
   sectionTheme?: SectionTheme;
   /** Nested inside a section card — reduces corner radius for even inset */
@@ -119,19 +122,43 @@ function AmountButton({
   );
 }
 
+/** Per-index accent themes for the hero preset buttons (green → banana → tangerine → blueberry) */
+const HERO_BUTTON_THEMES = [
+  {
+    selected: "border-kale bg-se-green-100 text-kale",
+    impact: "text-kale",
+  },
+  {
+    selected: "border-banana-700 bg-banana-100 text-banana-700",
+    impact: "text-banana-700",
+  },
+  {
+    selected: "border-tangerine-700 bg-tangerine-100 text-tangerine-700",
+    impact: "text-tangerine-700",
+  },
+  {
+    selected: "border-blueberry-700 bg-blueberry-100 text-blueberry-700",
+    impact: "text-blueberry-700",
+  },
+] as const;
+
 function ImpactAmountButton({
   amount,
   impact,
   selected,
   onClick,
+  colorIndex = 0,
 }: {
   amount: number;
   impact?: string;
   selected: boolean;
   onClick: () => void;
+  colorIndex?: number;
 }) {
   const formattedAmount =
     amount >= 1000 ? formatLargeNumber(amount) : String(amount);
+
+  const theme = HERO_BUTTON_THEMES[colorIndex % HERO_BUTTON_THEMES.length];
 
   return (
     <button
@@ -139,9 +166,9 @@ function ImpactAmountButton({
       onClick={onClick}
       aria-pressed={selected}
       className={cn(
-        "flex flex-col items-center justify-center gap-1 rounded-3xl border px-3 py-3 transition-colors lg:rounded-full",
+        "flex flex-col items-center justify-center gap-1 rounded-2xl border px-3 py-3 transition-colors",
         selected
-          ? "border-kale bg-se-green-100 text-kale"
+          ? theme.selected
           : "border-neutral-250 bg-white text-kale hover:border-neutral-300",
       )}
     >
@@ -152,7 +179,7 @@ function ImpactAmountButton({
         <span
           className={cn(
             "text-center text-xs font-medium leading-tight",
-            selected ? "text-kale" : "text-kale/70",
+            selected ? theme.impact : "text-kale/70",
           )}
         >
           {impact}
@@ -189,7 +216,7 @@ function OtherAmountInput({
         aria-label="Custom donation amount"
         theme="onWhite"
         className={cn(
-          "h-full rounded-3xl pl-8 font-semibold leading-none placeholder:text-kale/70 lg:rounded-full",
+          "h-full rounded-2xl pl-8 font-semibold leading-none placeholder:text-kale/70",
           selected
             ? "border-kale bg-se-green-100 focus:border-kale"
             : "border-neutral-250 bg-white",
@@ -226,7 +253,7 @@ function DonationFormShell({
         "@container flex w-full min-w-0 flex-col gap-6 p-6 text-kale lg:p-10",
         inCard
           ? SECTION_CARD_NESTED_RADIUS_CLASS
-          : "rounded-[var(--radius-md)] lg:rounded-[var(--radius-lg)]",
+          : "rounded-[var(--radius-lg)] lg:rounded-[var(--radius-xl)]",
         sectionTheme === "light" ? "bg-neutral-050" : "bg-white",
         className,
       )}
@@ -241,10 +268,11 @@ function HeroDonationForm({
   inCard,
   className,
   defaultAmount = 20,
+  eyebrow,
   onSubmit,
 }: Pick<
   DonationFormProps,
-  "sectionTheme" | "inCard" | "className" | "defaultAmount" | "onSubmit"
+  "sectionTheme" | "inCard" | "className" | "defaultAmount" | "eyebrow" | "onSubmit"
 >) {
   const [amount, setAmount] = useState(defaultAmount);
   const [isOther, setIsOther] = useState(false);
@@ -263,17 +291,24 @@ function HeroDonationForm({
       formCard="white"
     >
       <div className="flex w-full min-w-0 flex-col gap-6">
-        <h3 className="w-full min-w-0 font-sans text-[clamp(1.5rem,8cqw,2.5rem)] font-medium leading-[1.12] tracking-[-0.04em] text-kale">
-          Help get surplus food where it's needed.
-        </h3>
+        <div className="flex w-full min-w-0 flex-col gap-2">
+          {eyebrow && (
+            <p className={cn(eyebrowClassName, "text-kale")}>{eyebrow}</p>
+          )}
+          <h3 className="w-full min-w-0 font-sans text-[clamp(1.875rem,10cqw,3rem)] font-medium leading-[1.12] tracking-[-0.04em] text-kale">
+            The food is donated;{" "}
+            <em className="not-italic text-se-green">your gift moves it.</em>
+          </h3>
+        </div>
 
         <div className="grid w-full grid-cols-3 gap-3">
-          {HERO_PRESETS.slice(0, 3).map((preset) => (
+          {HERO_PRESETS.slice(0, 3).map((preset, i) => (
             <ImpactAmountButton
               key={preset.amount}
               amount={preset.amount}
               impact={preset.impact}
               selected={!isOther && amount === preset.amount}
+              colorIndex={i}
               onClick={() => {
                 setIsOther(false);
                 setCustomAmount("");
@@ -288,6 +323,7 @@ function HeroDonationForm({
             amount={HERO_PRESETS[3].amount}
             impact={HERO_PRESETS[3].impact}
             selected={!isOther && amount === HERO_PRESETS[3].amount}
+            colorIndex={3}
             onClick={() => {
               setIsOther(false);
               setCustomAmount("");
@@ -318,7 +354,7 @@ function HeroDonationForm({
             variant="primary"
             colorScheme="light"
             size="md"
-            className="flex-1 rounded-3xl lg:rounded-[99px]"
+            className="flex-1 rounded-2xl"
             onClick={() => handleGive("one-time")}
           >
             Give Now
@@ -328,7 +364,7 @@ function HeroDonationForm({
             variant="secondary"
             colorScheme="light"
             size="md"
-            className="flex-1 rounded-3xl lg:rounded-[99px]"
+            className="flex-1 rounded-2xl"
             onClick={() => handleGive("monthly")}
           >
             Give Monthly

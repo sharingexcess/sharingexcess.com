@@ -14,6 +14,10 @@ export const sectionH1ClassName =
 export const sectionH2ClassName =
   "text-[clamp(32px,7.5vw,72px)] font-medium leading-[1.06] tracking-[-0.04em] lg:text-[clamp(36px,4.76cqw,72px)]";
 
+/** Section H3 — tertiary heading within sections */
+export const sectionH3ClassName =
+  "text-[clamp(22px,4.5vw,40px)] font-medium leading-[1.06] tracking-[-0.04em] lg:text-[clamp(24px,2.65cqw,40px)]";
+
 /** Subheading below a metric number — one step below Section H2 */
 export const sectionMetricSubheadingClassName =
   "text-[clamp(24px,5vw,48px)] font-medium leading-[1.2] tracking-[-0.04em] lg:text-[clamp(28px,3.2cqw,48px)]";

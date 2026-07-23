@@ -306,7 +306,7 @@ export function NavDropdownPanel({
           <div className="pt-2" onBlur={onBlur}>
             <div
               className={cn(
-                "overflow-hidden rounded-[var(--radius-md)] border border-neutral-200/80",
+                "overflow-hidden rounded-[var(--radius-xl)] border border-neutral-200/80",
                 "bg-neutral-000 px-4 py-5 shadow-[0_4px_20px_rgba(0,0,0,0.08)] lg:px-8 lg:py-6",
               )}
             >

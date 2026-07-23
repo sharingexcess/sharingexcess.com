@@ -6,7 +6,7 @@ import { scrollTrackToIndex, useScrollDrivenIndex } from "@/lib/useScrollDrivenI
 import type { ImagePosition, SectionCardColor, SectionProps, SectionTheme } from "@/lib/types";
 import { useCallback, useRef } from "react";
 import { SectionLayout } from "./SectionLayout";
-import { SectionShell } from "./SectionShell";
+import { SectionArchVisual, SectionShell } from "./SectionShell";
 
 export type { TextImageItem };
 
@@ -28,6 +28,10 @@ export interface TextImageCarouselSectionProps extends SectionProps {
   scrollStepVh?: number;
   autoAdvance?: boolean;
   autoAdvanceMs?: number;
+  /** Arch-shaped dark-to-light transition at the top of this section */
+  archTop?: boolean;
+  /** 50/50 split with image panel full-bleed to viewport edge */
+  imageBleed?: boolean;
 }
 
 export function TextImageCarouselSection({
@@ -47,6 +51,8 @@ export function TextImageCarouselSection({
   flushTop,
   flushBottom,
   transparentBg,
+  archTop = false,
+  imageBleed = false,
 }: TextImageCarouselSectionProps) {
   const trackRef = useRef<HTMLElement>(null);
   const lenis = useLenis();
@@ -79,6 +85,8 @@ export function TextImageCarouselSection({
       autoAdvanceMs={autoAdvanceMs}
       isCard={isCard}
       pinnedLayout={useScrollControl}
+      imageBleed={imageBleed}
+      sectionRef={imageBleed && useScrollControl ? trackRef : undefined}
     />
   );
 
@@ -95,6 +103,16 @@ export function TextImageCarouselSection({
     carousel
   );
 
+  const pinnedCarousel = imageBleed ? (
+    <div className="sticky top-0 z-[1] flex h-svh w-full items-stretch px-6 lg:px-24">
+      <div className="relative mx-auto h-full w-full max-w-6xl">{carouselContent}</div>
+    </div>
+  ) : (
+    <div className="sticky top-0 z-[1] flex h-svh w-full items-center justify-center px-6 lg:px-24">
+      <div className="@container mx-auto w-full max-w-6xl">{carouselContent}</div>
+    </div>
+  );
+
   if (useScrollControl) {
     return (
       <section
@@ -102,6 +120,7 @@ export function TextImageCarouselSection({
         id={id}
         data-section=""
         data-theme={theme}
+        {...(archTop ? { "data-arch-top": "" } : undefined)}
         style={{ height: `${items.length * scrollStepVh}vh` }}
         className={cn(
           "relative overflow-visible text-[var(--section-text)]",
@@ -109,14 +128,8 @@ export function TextImageCarouselSection({
           className,
         )}
       >
-        <div
-          className={cn(
-            "sticky top-0 z-[1] flex h-svh w-full items-center justify-center px-6 lg:px-24",
-            transparentBg ? "bg-transparent" : "bg-[var(--section-bg)]",
-          )}
-        >
-          <div className="@container mx-auto w-full max-w-6xl">{carouselContent}</div>
-        </div>
+        {archTop && <SectionArchVisual />}
+        {pinnedCarousel}
       </section>
     );
   }
@@ -124,7 +137,8 @@ export function TextImageCarouselSection({
   return (
     <SectionShell
       theme={theme}
-      className={className}
+      archTop={archTop}
+      className={cn(archTop && "py-16 lg:py-16", className)}
       id={id}
       flushTop={flushTop}
       flushBottom={flushBottom}

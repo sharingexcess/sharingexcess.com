@@ -43,6 +43,8 @@ export interface TextSectionProps {
   align?: "left" | "center";
   /** Word-by-word entrance animation for hero headings */
   animateHeading?: boolean;
+  /** Blur-in or word-by-word heading entrance — `animateHeading` is shorthand for `"words"` */
+  headingAnimation?: "words" | "blur";
   /** When false, *asterisk* spans render as plain text */
   emphasis?: boolean;
   /** Card layout — secondary CTA keeps rest color on hover */
@@ -81,6 +83,7 @@ export function TextSection({
   layout = "vertical",
   align = "left",
   animateHeading = false,
+  headingAnimation,
   emphasis = true,
   isCard = false,
   className,
@@ -90,17 +93,32 @@ export function TextSection({
 
   const scheme = buttonScheme === "dark" ? "dark" : "light";
   const headingClassName = resolveHeadingClassName(headingSize, Boolean(metric));
+  const resolvedHeadingAnimation =
+    headingAnimation ?? (animateHeading ? "words" : undefined);
+  const headingTextClassName = cn(
+    headingClassName,
+    "text-pretty whitespace-pre-line text-[var(--section-text,#003619)]",
+  );
 
   const headingEl = heading ? (
-    animateHeading ? (
+    resolvedHeadingAnimation === "words" ? (
       <AnimatedHeroHeading
         title={heading}
         as="p"
         emphasis={emphasis}
         className={cn(headingClassName, "text-[var(--section-text,#003619)]")}
       />
+    ) : resolvedHeadingAnimation === "blur" ? (
+      <AnimatedHeroHeading
+        title={heading}
+        as="p"
+        emphasis={emphasis}
+        reveal="blur"
+        trigger="inView"
+        className={cn(headingClassName, "text-[var(--section-text,#003619)]")}
+      />
     ) : (
-      <p className={cn(headingClassName, "text-pretty whitespace-pre-line text-[var(--section-text,#003619)]")}>
+      <p className={headingTextClassName}>
         {parseEmphasis(heading, emphasis)}
       </p>
     )

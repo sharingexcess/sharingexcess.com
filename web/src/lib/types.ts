@@ -85,6 +85,8 @@ export type HeroLayout =
   /** Full-bleed home hero with embedded donation form */
   | "full-width-donate"
   | "rounded"
+  /** Rounded home hero with embedded donation form and scroll fade */
+  | "rounded-donate"
   | "stack-left"
   | "stack-centered"
   /** Text-only placeholder during migration — no image */

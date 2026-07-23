@@ -13,7 +13,7 @@ import {
   getSectionCardClassName,
   getSectionCardDataAttributes,
   getSectionCardInteriorTheme,
-  SECTION_CARD_IMAGE_RADIUS_CLASS,
+  sectionMediaRadiusClass,
   SECTION_CARD_SHELL_CLASS,
   sectionCardContentIsDark,
 } from "./sectionCardConfig";
@@ -73,9 +73,7 @@ export function MapSection({
   const shellProps = { flushTop, flushBottom, transparentBg, id };
   const isDark = sectionCardContentIsDark(isCard, cardColor, theme);
   const isCircle = mapContainerShape === "circle";
-  const mapRadius = isCard
-    ? SECTION_CARD_IMAGE_RADIUS_CLASS
-    : "rounded-[var(--radius-md)]";
+  const mapRadius = sectionMediaRadiusClass(isCard);
 
   const textSection = (
     <TextSection
@@ -110,7 +108,6 @@ export function MapSection({
         className={cn(
           "relative aspect-video w-full overflow-hidden",
           mapRadius,
-          !isCard && "lg:rounded-[var(--radius-xl)]",
         )}
       >
         <DeferredInteractiveMap className="absolute inset-0" {...mapProps} />
@@ -203,7 +200,6 @@ export function MapSection({
         className={cn(
           "relative aspect-square w-full overflow-hidden",
           mapRadius,
-          !isCard && "lg:rounded-[var(--radius-xl)]",
         )}
       >
         <DeferredInteractiveMap className="absolute inset-0" {...mapProps} />

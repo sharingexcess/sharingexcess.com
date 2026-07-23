@@ -34,7 +34,7 @@ export interface VideoTestimonialsCarouselSectionProps extends SectionProps {
 }
 
 const CARD_CLASS =
-  "group relative h-[640px] w-[360px] shrink-0 overflow-hidden rounded-[var(--radius-md)]";
+  "group relative h-[640px] w-[360px] shrink-0 overflow-hidden rounded-[var(--radius-lg)]";
 
 const POSTER_CLASS = "absolute inset-0 size-full object-cover";
 

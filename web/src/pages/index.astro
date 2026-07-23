@@ -2,7 +2,6 @@
 import PageLayout from "@/layouts/PageLayout.astro";
 import HomeHero from "@/sections/HomeHero";
 import DonationSection from "@/sections/DonationSection";
-import FormSection from "@/sections/FormSection";
 import LogosBannerSection from "@/sections/LogosBannerSection";
 import MapSection from "@/sections/MapSection";
 import TextImageCarouselSection from "@/sections/TextImageCarouselSection";
@@ -30,15 +29,17 @@ const supporterLogos = [
 >
   <HomeHero client:visible
     title={"Rescuing Food,\nFeeding Communities"}
-    body={"We rescue 2 million pounds of surplus food every week.\nThe food is donated; your gift moves it."}
+    body={"We rescue 2 million pounds of surplus food every week."}
     bodySize="xl"
     imageSrc="/images/community-people.jpg"
     imageAlt=""
+    videoSrc="/videos/home-hero.mp4"
   />
 
   <TextImageSection client:visible
     className="relative z-10"
-    theme="light"
+    theme="dark"
+    archBottom
     layout="stack-left"
     title={"There is more than enough food to\u00A0feed *everyone on\u00A0Earth*."}
     body="America wastes 40% of its food every year, while 47 million people go hungry. We built the network that closes that gap, rescuing surplus and moving it to communities nationwide through 2,200+ partners."
@@ -58,13 +59,21 @@ const supporterLogos = [
 
   <SectionScrollHandoff
     client:visible
+    className="z-[11]"
     fadeFrom="light"
-    fadeTo="dark"
-    fadeStartVh={335}
-    fadeEndVh={385}
+    secondFade={{
+      fadeFrom: "light",
+      fadeTo: "dark",
+      fadeStartVh: 335,
+      fadeEndVh: 385,
+    }}
   >
     <TextImageCarouselSection client:visible
+      theme="light"
+      archTop
       transparentBg
+      imagePosition="left"
+      imageBleed
       eyebrow="Food rescue works because it's"
       items={[
         {
@@ -102,7 +111,7 @@ const supporterLogos = [
       ]}
     />
 
-    <MapSection client:visible
+    <MapSection client:load
       theme="dark"
       transparentBg
       layout="stack-centered"
@@ -117,21 +126,6 @@ const supporterLogos = [
       secondaryCtaHref="https://docs.sharingexcess.com/docs/impact-measurement"
     />
   </SectionScrollHandoff>
-
-  <TextImageSection client:visible
-    theme="dark"
-    archBottom
-    headingSize="h2"
-    title="America throws away 40% of its food while *47 million people go hungry*."
-    body="Rescuing just 7% of it would close the meal gap entirely."
-    bodySize="xl"
-    imageSrc="/images/problem.jpg"
-    imageAlt=""
-    imagePosition="right"
-    imageStyle="square"
-    primaryCta="Help us solve this problem"
-    primaryCtaHref="/about/problem"
-  />
 
   <VideoTestimonialsCarouselSection client:visible
     theme="light"
@@ -164,6 +158,7 @@ const supporterLogos = [
     theme="light"
     eyebrow="Our Supporters"
     logos={supporterLogos}
+    grayscale={false}
   />
 
   <DonationSection client:visible
@@ -178,16 +173,5 @@ const supporterLogos = [
     bodySize="lg"
     formPosition="left"
     submitLabel="Donate Now"
-  />
-
-  <FormSection client:visible
-    id="newsletter"
-    theme="light"
-    layout="horizontal"
-    headingSize="h2"
-    formKind="newsletter"
-    title="Subscribe to Our Newsletter."
-    body="Receive a monthly update on what's happening @ Sharing Excess."
-    submitLabel="Subscribe"
   />
 </PageLayout>

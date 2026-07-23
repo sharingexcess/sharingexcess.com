@@ -98,11 +98,19 @@ export function getSectionCardClassName(cardColor: SectionCardColor): string {
 
 /** Outer section card — radius.md on mobile, radius.lg at desktop */
 export const SECTION_CARD_SHELL_CLASS =
-  "rounded-[var(--radius-md)] p-6 sm:p-10 lg:rounded-[var(--radius-lg)] lg:p-16";
+  "rounded-[var(--radius-xl)] p-6 sm:p-10 lg:rounded-[var(--radius-2xl)] lg:p-16";
 
 /** Image corners inside a section card */
 export const SECTION_CARD_IMAGE_RADIUS_CLASS =
-  "rounded-3xl lg:rounded-[var(--radius-md)]";
+  "rounded-[var(--radius-xl)] lg:rounded-[var(--radius-md)]";
 
-/** Nested form/content corners inside a section card — same softer inset as images */
-export const SECTION_CARD_NESTED_RADIUS_CLASS = SECTION_CARD_IMAGE_RADIUS_CLASS;
+/** Nested form/content corners inside a section card */
+export const SECTION_CARD_NESTED_RADIUS_CLASS =
+  "rounded-3xl lg:rounded-[var(--radius-xl)]";
+
+/** Shared radius for photos, videos, and maps — matches horizontal image containers */
+export function sectionMediaRadiusClass(isCard: boolean): string {
+  return isCard
+    ? SECTION_CARD_IMAGE_RADIUS_CLASS
+    : "rounded-[var(--radius-md)] lg:rounded-[var(--radius-xl)]";
+}

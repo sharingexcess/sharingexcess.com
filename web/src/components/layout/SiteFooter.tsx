@@ -1,6 +1,6 @@
+import { NewsletterSignupForm } from "@/components/forms/NewsletterSignupForm";
 import { useLenis } from "@/components/providers/SmoothScrollProvider";
 import { measureOffsetProgress } from "@/components/ui/ParallaxBackground";
-import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import {
   motion,
@@ -30,8 +30,7 @@ export interface FooterSocialLink {
 export interface SiteFooterProps {
   heading?: string;
   description?: string;
-  ctaLabel?: string;
-  ctaHref?: string;
+  submitLabel?: string;
   /** 4 nav sections — first 2 are stacked in the left nav column */
   navSections?: FooterNavSection[];
   socialLinks?: FooterSocialLink[];
@@ -219,10 +218,9 @@ export const DEFAULT_FOOTER_BADGES: NonNullable<SiteFooterProps["badges"]> = [
 ];
 
 export function SiteFooter({
-  heading = "Let's free food.",
-  description = "We rescue 2 million pounds of surplus food every week.\nThe food is donated; your gift moves it.",
-  ctaLabel = "Donate now",
-  ctaHref = "/?form=donate",
+  heading = "Subscribe to Our Newsletter.",
+  description = "Receive a monthly update on what's happening @ Sharing Excess.",
+  submitLabel = "Subscribe",
   navSections = FOOTER_NAV_SECTIONS,
   socialLinks = FOOTER_SOCIAL_LINKS,
   badges = DEFAULT_FOOTER_BADGES,
@@ -247,7 +245,7 @@ export function SiteFooter({
       >
       <div
         data-theme="dark"
-        className="overflow-hidden rounded-t-[var(--radius-md)] bg-[#00843d] lg:rounded-t-[var(--radius-lg)]"
+        className="overflow-hidden rounded-t-[var(--radius-xl)] bg-[#00843d] lg:rounded-t-[var(--radius-2xl)]"
       >
         <div className="flex flex-col gap-10 px-6 pb-10 pt-12 lg:flex-row lg:items-start lg:gap-[120px] lg:px-24 lg:pb-12 lg:pt-16">
           <div className="flex w-full shrink-0 flex-col gap-8 lg:w-[312px] lg:gap-12">
@@ -258,13 +256,13 @@ export function SiteFooter({
               {description ? (
                 <p className="whitespace-pre-line text-base leading-[1.4] text-white">{description}</p>
               ) : null}
-              <Button
-                variant="secondary"
-                colorScheme="dark"
-                href={ctaHref}
-              >
-                {ctaLabel}
-              </Button>
+              <NewsletterSignupForm
+                inputTheme="onColor"
+                submitLabel={submitLabel}
+                buttonVariant="secondary"
+                buttonColorScheme="dark"
+                nameFieldsClassName="grid-cols-1"
+              />
             </div>
             {badges.length > 0 && (
               <div className="flex items-start gap-4">
