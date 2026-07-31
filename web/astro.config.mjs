@@ -20,6 +20,11 @@ export default {
   },
   vite: {
     plugins: [tailwindcss()],
+    // react-dom/client is CJS; without pre-bundling, dev serves it raw and
+    // hydration fails with "does not provide an export named 'createRoot'".
+    optimizeDeps: {
+      include: ["react", "react-dom", "react-dom/client", "react/jsx-runtime"],
+    },
     resolve: {
       tsconfigPaths: true,
       alias: {
