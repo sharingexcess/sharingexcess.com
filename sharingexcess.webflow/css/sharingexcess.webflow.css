@@ -1,6 +1,15 @@
 :root {
   --black--black-92: #18181beb;
-  --black--black: #18181b;
+  --black--black: #003619;
+  --black--black-section: #001f0a;
+  --black--black-text-80: #003619cc;
+  --black--black-text-64: #003619a3;
+  --black--black-text-48: #0036197a;
+  --black--black-text-36: #0036195c;
+  --black--black-text-24: #0036193d;
+  --black--black-text-12: #0036191f;
+  --black--black-text-8: #00361914;
+  --black--black-text-4: #0036190a;
   --font--4xl: 48px;
   --font--3xl: 40px;
   --font--2xl: 28px;
@@ -147,7 +156,7 @@
   appearance: none;
   background-color: #000;
   border-width: 0;
-  border-radius: 2px;
+  border-radius: var(--radius--full);
   align-items: center;
   height: 38px;
   min-height: 30px;
@@ -169,7 +178,7 @@
   appearance: none;
   background-color: #000;
   border-width: 0;
-  border-radius: 2px;
+  border-radius: var(--radius--full);
   justify-content: center;
   align-items: center;
   height: 38px;
@@ -761,7 +770,7 @@
   text-align: center;
   background-color: #3898ec;
   border-width: 0;
-  border-radius: 3px;
+  border-radius: var(--radius--full);
   align-items: center;
   margin-bottom: 20px;
   padding: 9px 15px;
@@ -1090,6 +1099,11 @@ img {
   aspect-ratio: 16 / 9;
   object-fit: contain;
   position: relative;
+}
+
+/* Blend away residual white matte on raster partner logos (off-white page bg) */
+.infinite-scroll-banner-image:not([src$=".svg"]) {
+  mix-blend-mode: multiply;
 }
 
 .footer {
@@ -1970,12 +1984,12 @@ img {
     box-shadow: 0 16px 48px var(--black--black-24), 0 0 0 1px var(--black--black-12);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-    color: var(--black--black-80);
+    color: var(--black--black-text-80);
   }
 
   .nav-dropdown-list.w--open .nav-dropdown-list-item,
   .nav-dropdown-list.w--open .nav-dropdown-list-item:visited {
-    color: var(--black--black-80);
+    color: var(--black--black-text-80);
   }
 
   .nav-dropdown-list.w--open .nav-dropdown-list-item:hover {
@@ -2115,7 +2129,7 @@ img {
   padding: var(--space--md) var(--space--xl);
   grid-column-gap: var(--space--sm);
   grid-row-gap: var(--space--sm);
-  border-radius: var(--radius--md);
+  border-radius: var(--radius--full);
   background-color: var(--green--primary);
   color: var(--white--white);
   font-size: var(--font--md);
@@ -2149,7 +2163,7 @@ img {
 
 .button.sm {
   padding: var(--space--sm) var(--space--lg);
-  border-radius: var(--radius--sm);
+  border-radius: var(--radius--full);
   font-size: var(--font--sm);
   line-height: var(--font--sm);
 }
@@ -2158,7 +2172,7 @@ img {
   padding: var(--space--lg) var(--space--2xl);
   grid-column-gap: var(--space--md);
   grid-row-gap: var(--space--md);
-  border-radius: var(--radius--md);
+  border-radius: var(--radius--full);
   font-size: var(--font--lg);
   line-height: var(--font--lg);
   text-decoration: none;
@@ -2179,9 +2193,13 @@ img {
   padding: var(--space--xs) var(--space--sm);
   grid-column-gap: var(--space--xs);
   grid-row-gap: var(--space--xs);
-  border-radius: var(--radius--sm);
+  border-radius: var(--radius--full);
   font-size: var(--font--xs);
   line-height: var(--font--sm);
+}
+
+.w-button {
+  border-radius: var(--radius--full);
 }
 
 .font-size-xs {
@@ -2447,36 +2465,48 @@ img {
   color: var(--white--white);
 }
 
+/* Default link green fails contrast on dark sections; use secondary green from the palette. */
+.section.background-black .color-white a,
+.section.background-black .color-white-64 a,
+.section.background-black .color-white-80 a,
+.section.background-black .paragraph.color-white a,
+.background-black .color-white a,
+.background-black .color-white-64 a,
+.background-black .color-white-80 a,
+.background-black .paragraph.color-white a {
+  color: var(--green--secondary);
+}
+
 .color-black-80 {
-  color: var(--black--black-80);
+  color: var(--black--black-text-80);
 }
 
 .color-black-64 {
-  color: var(--black--black-64);
+  color: var(--black--black-text-64);
 }
 
 .color-black-48 {
-  color: var(--black--black-48);
+  color: var(--black--black-text-48);
 }
 
 .color-black-36 {
-  color: var(--black--black-36);
+  color: var(--black--black-text-36);
 }
 
 .color-black-24 {
-  color: var(--black--black-24);
+  color: var(--black--black-text-24);
 }
 
 .color-black-12 {
-  color: var(--black--black-12);
+  color: var(--black--black-text-12);
 }
 
 .color-black-8 {
-  color: var(--black--black-8);
+  color: var(--black--black-text-8);
 }
 
 .color-black-4 {
-  color: var(--black--black-4);
+  color: var(--black--black-text-4);
 }
 
 .section {
@@ -2533,7 +2563,7 @@ img {
 }
 
 .section._50-50-page-header {
-  background-color: var(--black--black);
+  background-color: var(--black--black-section);
   height: 100vh;
   min-height: 868px;
 }
@@ -2739,7 +2769,7 @@ img {
 }
 
 .background-black {
-  background-color: var(--black--black);
+  background-color: var(--black--black-section);
 }
 
 .icon-size-md {
@@ -2807,7 +2837,7 @@ img {
 }
 
 .hover-animation-card.direct-link-background-image {
-  background-image: linear-gradient(180deg, transparent, var(--black--black-80)), url('../images/53795236350_d7a04bcabb_3k-1.jpg');
+  background-image: linear-gradient(180deg, transparent, var(--black--black-80)), url('../images/53773492941_9df87a59f9_k.jpg');
   background-position: 0 0, 50%;
   background-size: auto, cover;
   position: relative;
@@ -3147,8 +3177,8 @@ img {
 }
 
 .input::placeholder {
-  color: var(--black--black-24);
-  -webkit-text-stroke-color: var(--black--black-48);
+  color: var(--black--black-text-24);
+  -webkit-text-stroke-color: var(--black--black-text-48);
 }
 
 .textarea {
@@ -3161,12 +3191,12 @@ img {
 }
 
 .textarea::placeholder {
-  color: var(--black--black-24);
-  -webkit-text-stroke-color: var(--black--black-48);
+  color: var(--black--black-text-24);
+  -webkit-text-stroke-color: var(--black--black-text-48);
 }
 
 .label {
-  color: var(--black--black-48);
+  color: var(--black--black-text-48);
   font-size: var(--font--sm);
   font-weight: 600;
   text-transform: none;

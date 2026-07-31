@@ -30,3 +30,4 @@ Monorepo-style layout: **`legacy/`** (current production site) and **`web/`** (g
 - `web/` uses Tailwind v4 (`@tailwindcss/vite`) + React; `legacy/` stays on Tailwind v3 + Webflow CSS.
 - Validation: `bun run build` (legacy) or `bun run build:web` (new site).
 - Extract legacy copy for migration: `bun scripts/rewrite/extract-fragment-content.ts about.html.body.html`
+- **`sync:webflow` is disabled** — do not re-enable without removing `--delete`. Edit `public/` and `legacy/src/webflow-fragments/` directly for content changes.

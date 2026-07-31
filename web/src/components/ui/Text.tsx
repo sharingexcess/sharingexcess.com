@@ -7,7 +7,16 @@ export interface TextProps {
 }
 
 export function Text({ children, className, as: Tag = "p" }: TextProps) {
-  return <Tag className={cn("text-base leading-relaxed", className)}>{children}</Tag>;
+  return (
+    <Tag
+      className={cn(
+        "text-base leading-relaxed text-[var(--section-body-text,var(--color-kale))]",
+        className,
+      )}
+    >
+      {children}
+    </Tag>
+  );
 }
 
 export default Text;

@@ -27,7 +27,7 @@
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: -0.02em;
-  color: var(--black--black, #1a1a1a);
+  color: var(--black--black, #003619);
   margin: 0 0 0.75rem;
 }
 
@@ -89,7 +89,7 @@
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.015em;
-  color: var(--black--black, #1a1a1a);
+  color: var(--black--black, #003619);
   margin: 2.75rem 0 1rem;
 }
 
@@ -97,7 +97,7 @@
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.35;
-  color: var(--black--black, #1a1a1a);
+  color: var(--black--black, #003619);
   margin: 2rem 0 0.75rem;
 }
 
@@ -128,7 +128,7 @@
 
 .blog-prose strong {
   font-weight: 600;
-  color: var(--black--black, #1a1a1a);
+  color: var(--black--black, #003619);
 }
 
 .blog-prose blockquote {
@@ -159,7 +159,7 @@
 .blog-author-name {
   font-size: 1.0625rem;
   font-weight: 600;
-  color: var(--black--black, #1a1a1a);
+  color: var(--black--black, #003619);
   margin-bottom: 0.5rem;
 }
 

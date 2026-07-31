@@ -80,12 +80,14 @@
 [data-theme="dark"] {
   --section-bg: var(--color-se-green-700);
   --section-text: var(--color-neutral-000);
+  --section-body-text: var(--color-neutral-000);
   --section-accent: var(--color-bright-kelly);
 }
 
 [data-theme="light"] {
   --section-bg: var(--color-neutral-000);
   --section-text: var(--color-se-green);
+  --section-body-text: var(--color-kale);
   --section-accent: var(--color-bright-kelly);
 }
 
@@ -93,4 +95,9 @@ body {
   font-family: var(--font-sans);
   color: var(--color-neutral-900);
   background-color: var(--color-neutral-000);
+}
+
+/* Inline emphasis in body copy — semibold, not full bold. */
+p :is(strong, b) {
+  font-weight: 600;
 }
