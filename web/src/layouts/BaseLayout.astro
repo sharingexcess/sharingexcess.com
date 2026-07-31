@@ -15,6 +15,7 @@ const { title, description, canonical, ogType } = Astro.props;
 <!doctype html>
 <html lang="en">
   <head>
+    <script is:inline>document.documentElement.classList.add("js");</script>
     <SiteHead title={title} description={description} canonical={canonical} ogType={ogType} />
   </head>
   <body>

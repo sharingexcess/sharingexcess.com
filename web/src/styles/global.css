@@ -75,6 +75,7 @@
   --color-neutral-950: #0c0c0c;
 
   --font-sans: Poppins, ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
 }
 
 [data-theme="dark"] {
@@ -93,4 +94,20 @@ body {
   font-family: var(--font-sans);
   color: var(--color-neutral-900);
   background-color: var(--color-neutral-000);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Hide reveal targets only once JS is confirmed, so static HTML stays readable
+   if hydration never runs. */
+.js [data-reveal] {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal] {
+    opacity: 1;
+  }
 }
