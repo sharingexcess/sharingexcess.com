@@ -441,7 +441,7 @@ export function Button({
   const secondaryScheme = secondaryColorScheme[colorScheme];
 
   const classes = cn(
-    "inline-flex items-center justify-center box-border font-sans font-semibold whitespace-nowrap no-underline",
+    "inline-flex cursor-pointer items-center justify-center box-border font-sans font-semibold whitespace-nowrap no-underline",
     disabled
       ? cn(
           isGhost

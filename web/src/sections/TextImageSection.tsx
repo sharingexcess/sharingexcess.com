@@ -346,7 +346,7 @@ export function TextImageSection({
           cardColor={cardColor}
           sectionTheme={theme}
           textSlotClassName="w-full"
-          textSlot={makeTextSection({ layout: "horizontal", headingAnimation: "blur" })}
+          textSlot={makeTextSection({ layout: "horizontal" })}
           contentSlot={contentSlot}
         />
       </SectionShell>

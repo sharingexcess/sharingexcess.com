@@ -4,9 +4,10 @@ import HomeHero from "@/sections/HomeHero";
 import DonationSection from "@/sections/DonationSection";
 import LogosBannerSection from "@/sections/LogosBannerSection";
 import MapSection from "@/sections/MapSection";
-import TextImageCarouselSection from "@/sections/TextImageCarouselSection";
+import StackingCardsSection from "@/sections/StackingCardsSection";
 import SectionScrollHandoff from "@/sections/SectionScrollHandoff";
 import TextImageSection from "@/sections/TextImageSection";
+import TextMarqueeBanner from "@/sections/TextMarqueeBanner";
 import VideoTestimonialsCarouselSection from "@/sections/VideoTestimonialsCarouselSection";
 
 const supporterLogos = [
@@ -36,10 +37,11 @@ const supporterLogos = [
     videoSrc="/videos/home-hero.mp4"
   />
 
+  <TextMarqueeBanner client:visible />
+
   <TextImageSection client:visible
     className="relative z-10"
     theme="dark"
-    archBottom
     layout="stack-left"
     title={"There is more than enough food to\u00A0feed *everyone on\u00A0Earth*."}
     body="America wastes 40% of its food every year, while 47 million people go hungry. We built the network that closes that gap, rescuing surplus and moving it to communities nationwide through 2,200+ partners."
@@ -59,28 +61,23 @@ const supporterLogos = [
 
   <SectionScrollHandoff
     client:visible
-    className="z-[11]"
+    className="relative z-[11]"
     fadeFrom="light"
-    secondFade={{
-      fadeFrom: "light",
-      fadeTo: "dark",
-      fadeStartVh: 335,
-      fadeEndVh: 385,
-    }}
+    fadeTo="dark"
+    fadeStartVh={405}
+    fadeEndVh={440}
   >
-    <TextImageCarouselSection client:visible
+    <StackingCardsSection client:visible
       theme="light"
-      archTop
       transparentBg
-      imagePosition="left"
-      imageBleed
-      eyebrow="Food rescue works because it's"
+      exitScrollVh={50}
+      eyebrow="*Food rescue* works because it's"
       items={[
         {
           title: "Free.",
           body: "Every pound we deliver is donated. Dollars fund trucks, not food.",
           imageSrc: "/images/handoff.jpg",
-          imageAlt: "",
+          imageAlt: "SE volunteer handing boxes of food to a community member",
           primaryCta: "Our Financials",
           primaryCtaHref: "/about/financials",
         },
@@ -88,7 +85,7 @@ const supporterLogos = [
           title: "Fast.",
           body: "Rescued and delivered while it's still fresh, often same-day.",
           imageSrc: "/images/truck-driver.jpg",
-          imageAlt: "",
+          imageAlt: "SE truck driver ready for a food rescue run",
           primaryCta: "Our Model",
           primaryCtaHref: "/about",
         },
@@ -96,7 +93,7 @@ const supporterLogos = [
           title: "Tracked.",
           body: "Every pound moves through [Surplus](https://surplus.sharingexcess.com), our platform for tracking food from pickup to delivery.",
           imageSrc: "/images/Impact-Dash.png",
-          imageAlt: "",
+          imageAlt: "Surplus impact dashboard showing food rescue data",
           primaryCta: "Our Impact",
           primaryCtaHref: "/about/impact",
         },
@@ -104,12 +101,14 @@ const supporterLogos = [
           title: "Everywhere.",
           body: "2,000+ distribution sites across 36 states.",
           imageSrc: "/images/Jul2026-ImpactMap.png",
-          imageAlt: "",
+          imageAlt: "Map showing Sharing Excess distribution sites across the US",
           primaryCta: "Our Impact",
           primaryCtaHref: "/about/impact",
         },
       ]}
     />
+
+    <div aria-hidden class="h-[15vh] min-h-[120px]" />
 
     <MapSection client:load
       theme="dark"
@@ -124,13 +123,16 @@ const supporterLogos = [
       primaryCtaHref="/about/impact"
       secondaryCta="How We Measure"
       secondaryCtaHref="https://docs.sharingexcess.com/docs/impact-measurement"
+      archBottom
     />
   </SectionScrollHandoff>
 
   <VideoTestimonialsCarouselSection client:visible
     theme="light"
     archTop
+    className="relative z-[12]"
     title="Hear directly from the *communities we serve*."
+    body="Placeholder paragraph — real copy coming soon. Partners, volunteers, and neighbors share what rescued food means in their communities."
     headingSize="h2"
     items={[
       {
@@ -154,24 +156,28 @@ const supporterLogos = [
     ]}
   />
 
-  <LogosBannerSection client:visible
-    theme="light"
-    eyebrow="Our Supporters"
-    logos={supporterLogos}
-    grayscale={false}
-  />
+  <SectionScrollHandoff client:visible fadeFrom="light" fadeTo="green" fadeStart={0.04} fadeEnd={0.2}>
+    <LogosBannerSection client:visible
+      theme="light"
+      transparentBg
+      eyebrow="Our Supporters"
+      logos={supporterLogos}
+      grayscale={false}
+    />
 
-  <DonationSection client:visible
-    id="donate"
-    theme="light"
-    isCard={true}
-    cardColor="kale"
-    eyebrow="Support our mission"
-    title="Giving $1 can provide *12 meals*."
-    body="All the food we rescue is donated — your gift moves it. Every dollar goes directly toward transportation and logistics."
-    headingSize="h2"
-    bodySize="lg"
-    formPosition="left"
-    submitLabel="Donate Now"
-  />
+    <DonationSection client:visible
+      id="donate"
+      theme="light"
+      transparentBg
+      isCard={true}
+      cardColor="kale"
+      eyebrow="Support our mission"
+      title="Giving $1 can provide *12 meals*."
+      body="All the food we rescue is donated — your gift moves it. Every dollar goes directly toward transportation and logistics."
+      headingSize="h2"
+      bodySize="lg"
+      formPosition="left"
+      submitLabel="Donate Now"
+    />
+  </SectionScrollHandoff>
 </PageLayout>

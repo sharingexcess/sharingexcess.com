@@ -3,6 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "postinstall": "bun run build:tokens",
     "build:tokens": "bun style-dictionary.config.ts",
     "dev": "bun run build:tokens && astro dev --port 4322",
     "build": "bun run build:tokens && astro build",

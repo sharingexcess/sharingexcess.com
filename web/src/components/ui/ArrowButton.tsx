@@ -15,6 +15,8 @@ export interface ArrowButtonProps {
   variant?: "primary" | "secondary";
   /** Light/dark surface tokens — matches `Button` `colorScheme` */
   colorScheme?: "light" | "dark";
+  /** Circle diameter — default matches Figma carousel nav (75px) */
+  size?: "default" | "sm";
   /** Accessible label — required for icon-only controls */
   "aria-label": string;
   className?: string;
@@ -96,7 +98,17 @@ const disabledSecondaryClasses: Record<
 };
 
 const shellBaseClasses =
-  "inline-flex shrink-0 items-center justify-center rounded-full p-0 box-border size-[75px] max-lg:size-14 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--section-btn,#00843d)]";
+  "inline-flex shrink-0 items-center justify-center rounded-full p-0 box-border focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--section-btn,#00843d)]";
+
+const shellSizeClasses = {
+  default: "size-[75px] max-lg:size-14",
+  sm: "size-12",
+} as const;
+
+const iconSizeClasses = {
+  default: "size-[43px] max-lg:size-8",
+  sm: "size-6",
+} as const;
 
 const primaryShellVariants = (
   colorScheme: keyof typeof primaryColorScheme,
@@ -145,7 +157,13 @@ const secondaryShellVariants = (
   };
 };
 
-function ArrowIcon({ direction }: { direction: NonNullable<ArrowButtonProps["direction"]> }) {
+function ArrowIcon({
+  direction,
+  size = "default",
+}: {
+  direction: NonNullable<ArrowButtonProps["direction"]>;
+  size?: NonNullable<ArrowButtonProps["size"]>;
+}) {
   return (
     <svg
       width="43"
@@ -154,7 +172,8 @@ function ArrowIcon({ direction }: { direction: NonNullable<ArrowButtonProps["dir
       fill="none"
       aria-hidden
       className={cn(
-        "block size-[43px] max-lg:size-8",
+        "block",
+        iconSizeClasses[size],
         direction === "prev" && "rotate-180",
       )}
     >
@@ -173,6 +192,7 @@ export function ArrowButton({
   direction = "next",
   variant = "primary",
   colorScheme = "light",
+  size = "default",
   className,
   type = "button",
   disabled,
@@ -185,6 +205,7 @@ export function ArrowButton({
 
   const classes = cn(
     shellBaseClasses,
+    shellSizeClasses[size],
     disabled
       ? cn(
           isPrimary
@@ -202,7 +223,7 @@ export function ArrowButton({
     className,
   );
 
-  const icon = <ArrowIcon direction={direction} />;
+  const icon = <ArrowIcon direction={direction} size={size} />;
 
   if (useMotion) {
     return (

@@ -280,7 +280,9 @@ export function NavDropdownPanel({
   const featured = item?.featured ?? PLACEHOLDER_NAV_DROPDOWN_FEATURED;
   const secondaryFeatured = item?.secondaryFeatured;
   const featuredTilt = navIndex !== null ? getFeaturedTilt(navIndex) : FEATURED_TILT_OUTER;
-  const [leftLinks, rightLinks] = splitLinksIntoColumns(links, 2);
+  const featuredChildLinks = links.filter((link) => link.featured);
+  const textLinks = links.filter((link) => !link.featured);
+  const [leftLinks, rightLinks] = splitLinksIntoColumns(textLinks, 2);
   const instant = reduceMotion ? { duration: 0 } : undefined;
 
   const onBlur = useCallback(
@@ -338,6 +340,19 @@ export function NavDropdownPanel({
                         onClose={onClose}
                       />
                     )}
+                    {featuredChildLinks.map((link) => (
+                      <NavDropdownFeaturedCard
+                        key={link.href}
+                        featured={{
+                          imageSrc: link.featured!.imageSrc,
+                          imageAlt: link.featured!.imageAlt,
+                          text: link.label,
+                          href: link.href,
+                        }}
+                        tilt={featuredTilt}
+                        onClose={onClose}
+                      />
+                    ))}
                   </motion.div>
 
                   <div

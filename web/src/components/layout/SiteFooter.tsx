@@ -15,6 +15,7 @@ import {
   TiktokIcon,
   type SocialBrandIcon,
 } from "@/components/icons/socialIcons";
+import { FooterLogoMarquee } from "@/components/layout/FooterLogoMarquee";
 
 export interface FooterNavSection {
   title: string;
@@ -29,7 +30,6 @@ export interface FooterSocialLink {
 
 export interface SiteFooterProps {
   heading?: string;
-  description?: string;
   submitLabel?: string;
   /** 4 nav sections — first 2 are stacked in the left nav column */
   navSections?: FooterNavSection[];
@@ -219,7 +219,6 @@ export const DEFAULT_FOOTER_BADGES: NonNullable<SiteFooterProps["badges"]> = [
 
 export function SiteFooter({
   heading = "Subscribe to Our Newsletter.",
-  description = "Receive a monthly update on what's happening @ Sharing Excess.",
   submitLabel = "Subscribe",
   navSections = FOOTER_NAV_SECTIONS,
   socialLinks = FOOTER_SOCIAL_LINKS,
@@ -253,9 +252,6 @@ export function SiteFooter({
               <p className="font-sans text-2xl font-semibold leading-[1.1] tracking-[-0.02em] text-white lg:text-[28px] lg:tracking-[-0.56px]">
                 {heading}
               </p>
-              {description ? (
-                <p className="whitespace-pre-line text-base leading-[1.4] text-white">{description}</p>
-              ) : null}
               <NewsletterSignupForm
                 inputTheme="onColor"
                 submitLabel={submitLabel}
@@ -317,8 +313,8 @@ export function SiteFooter({
           </div>
         </div>
 
-        <div className="flex w-full items-center justify-center px-6 pt-16 lg:px-[42px] lg:pt-[120px]">
-          <img src="/images/footer-logo.svg" alt="Sharing Excess" className="w-full" />
+        <div className="w-full pt-16 lg:pt-[120px]">
+          <FooterLogoMarquee />
         </div>
       </div>
       </motion.div>

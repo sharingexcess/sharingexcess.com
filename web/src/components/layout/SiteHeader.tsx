@@ -10,11 +10,14 @@ import {
   NavDropdownTrigger,
   NAV_BUTTON_STYLE,
 } from "@/components/layout/NavDropdown";
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useHeaderOverWhiteBackground } from "@/lib/useHeaderOverWhiteBackground";
 
 export interface SiteHeaderNavLink {
   label: string;
   href: string;
+  /** When set, renders as an image tile in the desktop dropdown instead of a text link */
+  featured?: Pick<NavDropdownFeatured, "imageSrc" | "imageAlt">;
 }
 
 export interface NavDropdownFeatured {
@@ -99,8 +102,22 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
     label: "About Us",
     href: "/about",
     children: [
-      { label: "Our Impact", href: "/about/impact" },
-      { label: "Our Model", href: "/about" },
+      {
+        label: "Our Impact",
+        href: "/about/impact",
+        featured: {
+          imageSrc: "/images/Screen-Shot-2023-07-17-at-6.44.52-PM_1.avif",
+          imageAlt: "",
+        },
+      },
+      {
+        label: "Our Model",
+        href: "/about",
+        featured: {
+          imageSrc: "/images/54178994461_4d4abdca3b_k_1.avif",
+          imageAlt: "",
+        },
+      },
       { label: "Our Team", href: "/about/team" },
       { label: "Our Financials", href: "/about/financials" },
     ],
@@ -129,6 +146,8 @@ const STANDARD_NAV_MAX_WIDTH = "max-w-[1320px]";
 const HEADER_BAR_CLASS =
   "relative isolate rounded-[var(--radius-3xl)] border border-transparent bg-neutral-000 px-4 py-3 lg:px-8 lg:py-4";
 
+const HEADER_BAR_SHADOW_CLASS = "shadow-[0_2px_12px_rgba(0,0,0,0.05)]";
+
 /** Figma node 1052:2970 — NavigationBar option 1 (desktop + mobile overlay). */
 export function SiteHeader({
   className,
@@ -142,6 +161,8 @@ export function SiteHeader({
   isHomePage: isHomePageProp = false,
 }: SiteHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const headerBarRef = useRef<HTMLDivElement>(null);
+  const overWhiteBackground = useHeaderOverWhiteBackground(headerBarRef);
   const [activeNavIndex, setActiveNavIndex] = useState<number | null>(null);
   const [hoveredNavIndex, setHoveredNavIndex] = useState<number | null>(null);
   const [isMobileViewport, setIsMobileViewport] = useState(false);
@@ -227,10 +248,12 @@ export function SiteHeader({
         onMouseLeave={closeNavDropdown}
       >
         <div
+          ref={headerBarRef}
           data-header-bar
           className={cn(
             HEADER_BAR_CLASS,
             HEADER_BAR_TRANSITION,
+            overWhiteBackground && HEADER_BAR_SHADOW_CLASS,
             menuOpen && "z-50",
           )}
         >

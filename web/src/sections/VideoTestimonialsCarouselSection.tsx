@@ -1,16 +1,19 @@
 import { ArrowButton } from "@/components/ui/ArrowButton";
+import { Sticker } from "@/components/ui/Sticker";
 import { TextSection } from "@/components/ui/TextSection";
 import { YoutubeChromelessEmbed } from "@/components/ui/YoutubeChromelessEmbed";
 import { cn } from "@/lib/cn";
 import {
   carouselSlideSpring,
   motion,
+  statCardTiltSpring,
   useInView,
   useReducedMotion,
 } from "@/lib/motion";
 import { isEmbeddableVideo } from "@/lib/toVideoEmbedSrc";
 import type { SectionProps, SectionTheme } from "@/lib/types";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { SectionLayout } from "./SectionLayout";
 import { SectionShell } from "./SectionShell";
 
 export interface VideoTestimonialItem {
@@ -27,10 +30,51 @@ export interface VideoTestimonialsCarouselSectionProps extends SectionProps {
   eyebrow?: string;
   title?: string;
   headingSize?: "h1" | "h2";
+  body?: string;
+  bodySize?: "xl" | "lg" | "md";
   items: VideoTestimonialItem[];
   defaultIndex?: number;
   /** Arch-shaped dark-to-light transition at the top of this section */
   archTop?: boolean;
+}
+
+const CARD_WIDTH = 360;
+const CARD_HEIGHT = 640;
+const LEFT_PEEK_X = "calc(-50% - 156px)";
+const LEFT_PEEK_SCALE = 0.76;
+
+/** Straddles the left edge of the left peek slot, halfway between top and center */
+const leftPeekStickerClassName =
+  "pointer-events-auto absolute z-30 aspect-[250/159] left-0 top-1/4 w-[clamp(128px,14vw,168px)] -translate-x-1/2 -translate-y-1/2 cursor-default";
+
+function LeftPeekSticker({ reduceMotion }: { reduceMotion: boolean }) {
+  return (
+    <motion.div
+      className={leftPeekStickerClassName}
+      initial={false}
+      animate={{ rotate: -6 }}
+      whileHover={reduceMotion ? undefined : { rotate: 6 }}
+      transition={statCardTiltSpring}
+      aria-hidden
+    >
+      <Sticker name="lemon" fillContainer alt="" />
+    </motion.div>
+  );
+}
+
+function LeftPeekStickerSlot({ reduceMotion }: { reduceMotion: boolean }) {
+  return (
+    <motion.div
+      className="pointer-events-none absolute left-1/2 top-0 z-20 origin-center"
+      style={{ width: CARD_WIDTH, height: CARD_HEIGHT }}
+      initial={false}
+      animate={{ x: LEFT_PEEK_X, scale: LEFT_PEEK_SCALE }}
+      transition={{ duration: 0 }}
+      aria-hidden
+    >
+      <LeftPeekSticker reduceMotion={reduceMotion} />
+    </motion.div>
+  );
 }
 
 const CARD_CLASS =
@@ -149,7 +193,7 @@ function getSlideZIndex(
   return 10;
 }
 
-function offsetMotion(
+function offsetTransform(
   offset: CarouselOffset,
   reduceMotion: boolean,
 ) {
@@ -163,6 +207,12 @@ function offsetMotion(
   return {
     x,
     scale: offset === 0 ? 1 : 0.76,
+    transition: reduceMotion ? { duration: 0 } : carouselSlideSpring,
+  };
+}
+
+function offsetOpacity(offset: CarouselOffset, reduceMotion: boolean) {
+  return {
     opacity: offset === 0 ? 1 : 0.65,
     transition: reduceMotion ? { duration: 0 } : carouselSlideSpring,
   };
@@ -173,6 +223,8 @@ export function VideoTestimonialsCarouselSection({
   eyebrow,
   title,
   headingSize = "h2",
+  body,
+  bodySize = "lg",
   items,
   defaultIndex = 0,
   className,
@@ -217,6 +269,97 @@ export function VideoTestimonialsCarouselSection({
   const activeItem = items[activeIndex];
   const buttonScheme = isDark ? "dark" : "light";
 
+  const carousel = (
+    <div
+      className="relative mx-auto w-full max-w-[920px] lg:mx-0 lg:max-w-none"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label={title ?? "Video testimonials"}
+    >
+      <div
+        ref={carouselRef}
+        className="relative mx-auto h-[640px] max-w-[360px] overflow-visible"
+      >
+        <LeftPeekStickerSlot reduceMotion={reduceMotion} />
+
+        {items.map((item, index) => {
+          const offset = getCarouselOffset(index, activeIndex, items.length);
+          const isActive = offset === 0;
+          const slideKey = item.id ?? item.videoSrc;
+          const zIndex = getSlideZIndex(
+            index,
+            activeIndex,
+            previousActiveIndex,
+            items.length,
+          );
+
+          return (
+            <motion.div
+              key={slideKey}
+              initial={false}
+              className={cn(
+                "absolute left-1/2 top-0 origin-center will-change-transform",
+                !isActive && "cursor-pointer",
+              )}
+              style={{ zIndex }}
+              animate={offsetTransform(offset, reduceMotion)}
+              aria-hidden={!isActive}
+              role={!isActive ? "button" : undefined}
+              tabIndex={!isActive ? -1 : undefined}
+              onClick={!isActive ? () => goTo(index) : undefined}
+              onKeyDown={
+                !isActive
+                  ? (event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        goTo(index);
+                      }
+                    }
+                  : undefined
+              }
+            >
+              <motion.div animate={offsetOpacity(offset, reduceMotion)}>
+                <VideoTestimonialCard
+                  item={item}
+                  isActive={isActive}
+                  canAutoplay={canAutoplay}
+                />
+              </motion.div>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {activeItem ? (
+        <p
+          aria-live="polite"
+          className="mx-auto mt-6 max-w-[360px] text-center text-sm italic text-[var(--section-text)]/65"
+        >
+          {activeItem.caption}
+        </p>
+      ) : null}
+
+      <div className="mt-6 flex items-center justify-center gap-4">
+        <ArrowButton
+          direction="prev"
+          variant="secondary"
+          colorScheme={buttonScheme}
+          size="sm"
+          onClick={goPrev}
+          aria-label="Previous testimonial"
+        />
+        <ArrowButton
+          direction="next"
+          variant="secondary"
+          colorScheme={buttonScheme}
+          size="sm"
+          onClick={goNext}
+          aria-label="Next testimonial"
+        />
+      </div>
+    </div>
+  );
+
   return (
     <SectionShell
       theme={theme}
@@ -231,102 +374,23 @@ export function VideoTestimonialsCarouselSection({
       flushBottom={flushBottom}
       transparentBg={transparentBg}
     >
-      <div className="flex flex-col gap-16">
-        {(eyebrow || title) && (
-          <TextSection
-            eyebrow={eyebrow}
-            heading={title}
-            headingSize={headingSize}
-            buttonScheme={buttonScheme}
-            align="center"
-            className="mx-auto max-w-[915px]"
-          />
-        )}
-
-        <div
-          className="relative mx-auto w-full max-w-[920px]"
-          role="region"
-          aria-roledescription="carousel"
-          aria-label={title ?? "Video testimonials"}
-        >
-          <ArrowButton
-            direction="prev"
-            variant="secondary"
-            colorScheme={buttonScheme}
-            onClick={goPrev}
-            aria-label="Previous testimonial"
-            className="absolute left-0 top-1/2 z-30 -translate-y-1/2 max-lg:-left-2"
-          />
-
-          <ArrowButton
-            direction="next"
-            variant="secondary"
-            colorScheme={buttonScheme}
-            onClick={goNext}
-            aria-label="Next testimonial"
-            className="absolute right-0 top-1/2 z-30 -translate-y-1/2 max-lg:-right-2"
-          />
-
-          <div
-            ref={carouselRef}
-            className="relative mx-auto h-[640px] max-w-[360px] px-20 max-lg:px-14"
-          >
-            {items.map((item, index) => {
-              const offset = getCarouselOffset(index, activeIndex, items.length);
-              const isActive = offset === 0;
-              const slideKey = item.id ?? item.videoSrc;
-              const zIndex = getSlideZIndex(
-                index,
-                activeIndex,
-                previousActiveIndex,
-                items.length,
-              );
-
-              return (
-                <motion.div
-                  key={slideKey}
-                  initial={false}
-                  className={cn(
-                    "absolute left-1/2 top-0 origin-center will-change-transform",
-                    !isActive && "cursor-pointer",
-                  )}
-                  style={{ zIndex }}
-                  animate={offsetMotion(offset, reduceMotion)}
-                  aria-hidden={!isActive}
-                  role={!isActive ? "button" : undefined}
-                  tabIndex={!isActive ? -1 : undefined}
-                  onClick={!isActive ? () => goTo(index) : undefined}
-                  onKeyDown={
-                    !isActive
-                      ? (event) => {
-                          if (event.key === "Enter" || event.key === " ") {
-                            event.preventDefault();
-                            goTo(index);
-                          }
-                        }
-                      : undefined
-                  }
-                >
-                  <VideoTestimonialCard
-                    item={item}
-                    isActive={isActive}
-                    canAutoplay={canAutoplay}
-                  />
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {activeItem ? (
-            <p
-              aria-live="polite"
-              className="mx-auto mt-6 max-w-[360px] text-center text-sm italic text-[var(--section-text)]/65"
-            >
-              {activeItem.caption}
-            </p>
-          ) : null}
-        </div>
-      </div>
+      <SectionLayout
+        layout="horizontal"
+        textSlot={
+          (eyebrow || title || body) ? (
+            <TextSection
+              eyebrow={eyebrow}
+              heading={title}
+              headingSize={headingSize}
+              body={body}
+              bodySize={bodySize}
+              buttonScheme={buttonScheme}
+              align="left"
+            />
+          ) : null
+        }
+        contentSlot={carousel}
+      />
     </SectionShell>
   );
 }

@@ -23,7 +23,6 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     heading:     "Lorem ipsum dolor sit amet.",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum.",
     submitLabel: "Primary CTA",
     navSections: FOOTER_NAV_SECTIONS,
     socialLinks: FOOTER_SOCIAL_LINKS,
@@ -38,7 +37,6 @@ export const Default: Story = {
 export const Placeholders: Story = {
   args: {
     heading:     "Lorem ipsum?",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis.",
     navSections: DEFAULT_FOOTER_NAV_SECTIONS,
     badges: DEFAULT_FOOTER_BADGES,
   },

@@ -4,7 +4,7 @@ import type { LogoItem } from "./LogosBannerSection";
 
 const logoImageClassName = (grayscale: boolean) =>
   cn(
-    "h-[54px] w-auto max-w-[256px] shrink-0 object-contain transition-[filter] duration-300",
+    "h-[64px] w-auto max-w-[300px] shrink-0 object-contain transition-[filter] duration-300",
     grayscale && "grayscale hover:grayscale-0",
   );
 
@@ -27,16 +27,16 @@ function preloadLogos(logos: LogoItem[]): Promise<Record<string, { width: number
           image.onload = () => {
             resolve({
               src,
-              width: image.naturalWidth || logo?.width || 256,
-              height: image.naturalHeight || logo?.height || 54,
+              width: image.naturalWidth || logo?.width || 300,
+              height: image.naturalHeight || logo?.height || 64,
             });
           };
 
           image.onerror = () => {
             resolve({
               src,
-              width: logo?.width || 256,
-              height: logo?.height || 54,
+              width: logo?.width || 300,
+              height: logo?.height || 64,
             });
           };
 

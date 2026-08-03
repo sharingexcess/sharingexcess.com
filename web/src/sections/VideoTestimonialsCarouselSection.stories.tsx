@@ -31,6 +31,7 @@ const meta = {
     ...sectionThemeArgs,
     eyebrow: "Lorem ipsum",
     title: "Lorem ipsum dolor sit amet *conspectus*.",
+    body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis.",
     headingSize: "h2",
     items: TESTIMONIAL_ITEMS,
     defaultIndex: 0,

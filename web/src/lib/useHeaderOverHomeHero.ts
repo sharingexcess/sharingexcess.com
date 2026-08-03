@@ -12,7 +12,7 @@ function getScrollY(): number {
   return window.scrollY;
 }
 
-function isOverHomeHero(scrollY = getScrollY()): boolean {
+export function isOverHomeHero(scrollY = getScrollY()): boolean {
   if (typeof window === "undefined") return false;
   if (!isHomePagePath(window.location.pathname)) return false;
 

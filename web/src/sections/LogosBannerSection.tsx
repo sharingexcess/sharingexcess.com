@@ -55,6 +55,7 @@ export function LogosBannerSection({
   className,
   id,
   archTop,
+  transparentBg,
 }: LogosBannerSectionProps) {
   const buttonScheme = theme === "dark" ? "dark" : "light";
   const hasIntroText = Boolean(eyebrow?.trim() || body?.trim());
@@ -63,6 +64,7 @@ export function LogosBannerSection({
     <SectionShell
       theme={theme}
       archTop={archTop}
+      transparentBg={transparentBg}
       className={cn("overflow-visible py-16 lg:py-16", className)}
       id={id}
     >

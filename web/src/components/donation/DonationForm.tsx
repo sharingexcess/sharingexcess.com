@@ -85,7 +85,7 @@ function ToggleButton({
       onClick={onClick}
       aria-pressed={selected}
       className={cn(
-        "flex flex-1 items-center justify-center gap-2 rounded-3xl border px-4 py-3 text-base font-semibold leading-none transition-colors lg:rounded-full",
+        "flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-3xl border px-4 py-3 text-base font-semibold leading-none transition-colors lg:rounded-full",
         selected
           ? "border-kale bg-se-green-100 text-kale"
           : "border-neutral-250 bg-white text-kale hover:border-neutral-300",
@@ -111,7 +111,7 @@ function AmountButton({
       onClick={onClick}
       aria-pressed={selected}
       className={cn(
-        "rounded-3xl border px-4 py-3 text-base font-semibold leading-none transition-colors lg:rounded-full",
+        "cursor-pointer rounded-3xl border px-4 py-3 text-base font-semibold leading-none transition-colors lg:rounded-full",
         selected
           ? "border-kale bg-se-green-100 text-kale"
           : "border-neutral-250 bg-white text-kale hover:border-neutral-300",
@@ -166,7 +166,7 @@ function ImpactAmountButton({
       onClick={onClick}
       aria-pressed={selected}
       className={cn(
-        "flex flex-col items-center justify-center gap-1 rounded-2xl border px-3 py-3 transition-colors",
+        "flex cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border px-3 py-3 transition-colors",
         selected
           ? theme.selected
           : "border-neutral-250 bg-white text-kale hover:border-neutral-300",
@@ -401,6 +401,7 @@ function DefaultDonationForm({
       sectionTheme={sectionTheme}
       inCard={inCard}
       className={className}
+      formCard="white"
       onSubmit={handleSubmit}
     >
       <div className="flex gap-3">
@@ -446,7 +447,7 @@ function DefaultDonationForm({
           </label>
           <button
             type="button"
-            className="flex shrink-0 items-center gap-1 text-sm font-medium text-kale/70"
+            className="flex shrink-0 cursor-pointer items-center gap-1 text-sm font-medium text-kale/70"
             aria-label="Currency"
           >
             USD
@@ -454,20 +455,23 @@ function DefaultDonationForm({
           </button>
         </div>
 
-        <button
+        <Button
           type="button"
+          variant="tertiary"
+          colorScheme="light"
+          size="sm"
           onClick={() => setShowComment((open) => !open)}
-          className="self-start text-sm font-medium text-kale underline underline-offset-2"
+          className="self-start"
         >
           Add comment
-        </button>
+        </Button>
 
         {showComment && (
           <textarea
             rows={3}
             placeholder="Leave a note with your gift"
             aria-label="Donation comment"
-            className="w-full resize-none rounded-2xl border border-neutral-250 bg-neutral-100 px-4 py-3 text-base leading-[1.4] text-kale placeholder:text-neutral-400 outline-none transition-colors focus:border-se-green-base lg:rounded-3xl"
+            className="w-full resize-none rounded-[var(--radius-sm)] border border-neutral-250 bg-neutral-100 px-4 py-3 text-base leading-[1.4] text-kale placeholder:text-neutral-400 outline-none transition-colors focus:border-se-green-base"
           />
         )}
       </div>

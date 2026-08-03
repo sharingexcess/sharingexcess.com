@@ -32,6 +32,7 @@ export function DonationSection({
   className,
   id,
   archBottom,
+  transparentBg,
 }: DonationSectionProps) {
   const isDark = sectionCardContentIsDark(isCard, cardColor, theme);
 
@@ -57,7 +58,7 @@ export function DonationSection({
   );
 
   return (
-    <SectionShell theme={theme} archBottom={archBottom} className={className} id={id}>
+    <SectionShell theme={theme} archBottom={archBottom} transparentBg={transparentBg} className={className} id={id}>
       <SectionLayout
         layout="horizontal"
         isCard={isCard}

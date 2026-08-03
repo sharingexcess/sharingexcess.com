@@ -4,7 +4,7 @@ import { measureDepthFadeProgress } from "@/lib/sectionScrollFade";
 import { motion, useMotionValue, useReducedMotion } from "@/lib/motion";
 import { useEffect, useRef, type ReactNode, type RefObject } from "react";
 
-type FadeTone = "light" | "dark";
+type FadeTone = "light" | "dark" | "green";
 
 export interface SectionScrollFadePhase {
   fadeFrom?: FadeTone;
@@ -48,13 +48,18 @@ function initialOverlayOpacity(fadeFrom: FadeTone, fadeTo: FadeTone): number {
 
 function overlayTone(fadeFrom: FadeTone, fadeTo: FadeTone): FadeTone | null {
   if (fadeFrom === fadeTo) return null;
-  if (fadeFrom === "dark" && fadeTo === "light") return "light";
-  if (fadeFrom === "light" && fadeTo === "dark") return "dark";
-  return null;
+  return fadeTo;
 }
 
 function toneClassName(tone: FadeTone): string {
-  return tone === "dark" ? "bg-kale" : "bg-[var(--color-neutral-000)]";
+  switch (tone) {
+    case "dark":
+      return "bg-kale";
+    case "green":
+      return "bg-se-green-100";
+    case "light":
+      return "bg-[var(--color-neutral-000)]";
+  }
 }
 
 function useScrollFadeOpacity(
@@ -151,16 +156,11 @@ export function SectionScrollHandoff({
   );
   const secondaryFade = useScrollFadeOpacity(wrapperRef, secondFade ?? {}, Boolean(secondFade));
 
-  const baseIsDark = fadeFrom === "dark";
-
   return (
     <div ref={wrapperRef} className={cn("relative isolate", className)}>
       <div
         aria-hidden
-        className={cn(
-          "pointer-events-none absolute inset-0 z-0",
-          baseIsDark ? "bg-kale" : "bg-[var(--color-neutral-000)]",
-        )}
+        className={cn("pointer-events-none absolute inset-0 z-0", toneClassName(fadeFrom))}
       />
       {primaryFade.tone && (
         <motion.div

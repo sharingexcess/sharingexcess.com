@@ -36,6 +36,11 @@ export interface MapSectionProps extends Omit<SectionContentProps, "imageSrc" | 
   hubs?: MapHub[];
   /** Region-highlights — defaults to macro US regions with state outlines */
   regions?: MapMacroRegion[];
+  /**
+   * Add clearance at the bottom so the rising arch on the next section does
+   * not overlap this section's content.
+   */
+  archBottom?: boolean;
 }
 
 export function MapSection({
@@ -63,6 +68,7 @@ export function MapSection({
   flushTop = false,
   flushBottom = false,
   transparentBg = false,
+  archBottom = false,
 }: MapSectionProps) {
   const donatedWeightLbs = useLiveDonatedWeight();
   const liveTitleSplit = splitLiveTotalLbsTitle(title, donatedWeightLbs);
@@ -70,7 +76,7 @@ export function MapSection({
     ? liveTitleSplit.heading
     : resolveLiveTotalLbsTitle(title, donatedWeightLbs);
   const metric = liveTitleSplit?.metric;
-  const shellProps = { flushTop, flushBottom, transparentBg, id };
+  const shellProps = { flushTop, flushBottom, transparentBg, id, archBottom };
   const isDark = sectionCardContentIsDark(isCard, cardColor, theme);
   const isCircle = mapContainerShape === "circle";
   const mapRadius = sectionMediaRadiusClass(isCard);
