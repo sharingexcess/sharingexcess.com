@@ -1,0 +1,106 @@
+import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/cn";
+import { eyebrowClassName, bodyLgClassName, bodyXlClassName } from "@/lib/typography";
+import type { SectionContentProps } from "@/lib/types";
+import { LogoMarquee } from "./LogoMarquee";
+import { SectionShell } from "./SectionShell";
+
+export interface LogoItem {
+  src: string;
+  alt: string;
+  /** Intrinsic pixel width — reserves layout space before the image decodes. */
+  width?: number;
+  /** Intrinsic pixel height — reserves layout space before the image decodes. */
+  height?: number;
+}
+
+const bodyClasses = {
+  xl: bodyXlClassName,
+  lg: bodyLgClassName,
+  md: "text-sm leading-[1.4] lg:text-base",
+} as const;
+
+export interface LogosBannerSectionProps
+  extends Omit<
+    SectionContentProps,
+    | "imageSrc"
+    | "imageAlt"
+    | "isCard"
+    | "cardColor"
+    | "title"
+    | "headingSize"
+    | "secondaryCta"
+    | "secondaryCtaHref"
+  > {
+  logos: LogoItem[];
+  /** Monochrome partner lockups — matches surplus.sharingexcess.com */
+  grayscale?: boolean;
+  /** Full loop duration in seconds */
+  duration?: number;
+  id?: string;
+  /** Arch-shaped dark-to-light transition at the top of this section */
+  archTop?: boolean;
+}
+
+export function LogosBannerSection({
+  theme = "light",
+  eyebrow,
+  body,
+  bodySize = "lg",
+  primaryCta,
+  primaryCtaHref,
+  logos,
+  grayscale = true,
+  duration = 40,
+  className,
+  id,
+  archTop,
+  transparentBg,
+}: LogosBannerSectionProps) {
+  const buttonScheme = theme === "dark" ? "dark" : "light";
+  const hasIntroText = Boolean(eyebrow?.trim() || body?.trim());
+
+  return (
+    <SectionShell
+      theme={theme}
+      archTop={archTop}
+      transparentBg={transparentBg}
+      className={cn("overflow-visible py-16 lg:py-16", className)}
+      id={id}
+    >
+      <div className="flex flex-col gap-12">
+        {hasIntroText && (
+          <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center lg:gap-6">
+            {eyebrow?.trim() && (
+              <p className={cn(eyebrowClassName, "text-[var(--section-text)]")}>{eyebrow}</p>
+            )}
+            {body?.trim() && (
+              <p className={cn(bodyClasses[bodySize], "text-[var(--section-text)]")}>
+                {body}
+              </p>
+            )}
+          </div>
+        )}
+
+        <div className="relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen max-w-none">
+          <LogoMarquee logos={logos} grayscale={grayscale} duration={duration} />
+        </div>
+
+        {primaryCta && (
+          <div className="flex justify-center">
+            <Button
+              variant="primary"
+              colorScheme={buttonScheme}
+              href={primaryCtaHref}
+              size="md"
+            >
+              {primaryCta}
+            </Button>
+          </div>
+        )}
+      </div>
+    </SectionShell>
+  );
+}
+
+export default LogosBannerSection;

@@ -2551,7 +2551,7 @@ p :is(strong, b) {
 }
 
 .section.landing-hero {
-  background-color: var(--black--black-36);
+  background-color: transparent;
   justify-content: flex-start;
   align-items: flex-end;
   width: 100%;
@@ -2561,6 +2561,24 @@ p :is(strong, b) {
   padding-bottom: 0;
   display: flex;
   position: relative;
+}
+
+.section.landing-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: linear-gradient(180deg, transparent 52%, var(--black--black-64));
+}
+
+.section.landing-hero .hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.section.landing-hero .background-video > video {
+  filter: saturate(1.35);
 }
 
 .section.landing-hero .hero-content > h1 {

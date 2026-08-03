@@ -2,6 +2,7 @@
   "name": "sharingexcess.com",
   "private": true,
   "scripts": {
+    "setup": "bun install --cwd legacy && bun install --cwd web && bun run --cwd web build:tokens",
     "dev": "bun run --cwd legacy dev",
     "build": "bun run --cwd legacy build",
     "preview": "bun run --cwd legacy preview",
@@ -15,7 +16,6 @@
     "generate": "bun run --cwd legacy generate",
     "verify": "bun run --cwd legacy verify",
     "extract": "bun scripts/rewrite/extract-fragment-content.ts",
-    "cutover:check": "bun scripts/cutover/verify-ready.ts",
-    "map:export-style": "bun scripts/map/export-surplus-dark-style.ts"
+    "cutover:check": "bun scripts/cutover/verify-ready.ts"
   }
 }

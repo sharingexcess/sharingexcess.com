@@ -1,27 +1,183 @@
 ---
 import PageLayout from "@/layouts/PageLayout.astro";
-import HeroSection from "@/sections/HeroSection";
-import StatsCardSection from "@/sections/StatsCardSection";
+import HomeHero from "@/sections/HomeHero";
+import DonationSection from "@/sections/DonationSection";
+import LogosBannerSection from "@/sections/LogosBannerSection";
+import MapSection from "@/sections/MapSection";
+import StackingCardsSection from "@/sections/StackingCardsSection";
+import SectionScrollHandoff from "@/sections/SectionScrollHandoff";
+import TextImageSection from "@/sections/TextImageSection";
+import TextMarqueeBanner from "@/sections/TextMarqueeBanner";
+import VideoTestimonialsCarouselSection from "@/sections/VideoTestimonialsCarouselSection";
+
+const supporterLogos = [
+  { src: "/images/Mr-Beast_1.avif", alt: "MrBeast", width: 1920, height: 329 },
+  { src: "/images/Trader-Joes.avif", alt: "Trader Joe's", width: 1920, height: 815 },
+  { src: "/images/Pew-Logo.avif", alt: "The Pew Charitable Trusts", width: 768, height: 274 },
+  { src: "/images/robin-Hood_1.avif", alt: "Robin Hood", width: 1920, height: 353 },
+  { src: "/images/Beast-Philanthropy_Logo_1.avif", alt: "Beast Philanthropy", width: 1719, height: 430 },
+  { src: "/images/Tony-Robbins-Foundation.avif", alt: "Tony Robbins Foundation" },
+  { src: "/images/Hunts-Point-1_1.avif", alt: "Hunts Point Produce Market" },
+  { src: "/images/Misfits-Market.avif", alt: "Misfits Market" },
+  { src: "/images/PWPM-1.avif", alt: "Philadelphia Wholesale Produce Market" },
+  { src: "/images/independence-blue-cross-logo.png", alt: "Independence Blue Cross" },
+];
 ---
 
 <PageLayout
   title="Sharing Excess | National Food Rescue Nonprofit"
-  description="Sharing Excess rescues surplus food and delivers it to communities facing food insecurity."
+  description="Sharing Excess rescues and distributes more than 2,000,000 lbs. of food every week in partnership with grocers, wholesalers, and farmers."
 >
-  <HeroSection
-    theme="dark"
-    title="Rescue food. Feed communities."
-    subtitle="The new Sharing Excess site is under construction. Explore the design system in Storybook."
-    ctaLabel="About us"
-    ctaHref="/about"
+  <HomeHero client:visible
+    title={"Rescuing Food,\nFeeding Communities"}
+    body={"We rescue 2 million pounds of surplus food every week."}
+    bodySize="xl"
+    imageSrc="/images/community-people.jpg"
+    imageAlt=""
+    videoSrc="/videos/Website-Sizzle-Aug-2026.mp4"
   />
-  <StatsCardSection
+
+  <TextMarqueeBanner client:visible />
+
+  <TextImageSection client:visible
+    className="relative z-10"
+    theme="dark"
+    layout="stack-left"
+    title={"There is more than enough food to\u00A0feed *everyone on\u00A0Earth*."}
+    body="America wastes 40% of its food every year, while 47 million people go hungry. We built the network that closes that gap, rescuing surplus and moving it to communities nationwide through 2,200+ partners."
+    headingSize="h2"
+    bodySize="xl"
+    imageStyle="video"
+    imageSrc="/videos/home-hero-poster.jpg"
+    videoSrc="/videos/home-hero.mp4"
+    imageAlt=""
+    sticker={true}
+    stickerName="free-food"
+    primaryCta="Donate surplus food"
+    primaryCtaHref="/get-involved/partner"
+    secondaryCta="Find food"
+    secondaryCtaHref="/find-food"
+  />
+
+  <SectionScrollHandoff
+    client:visible
+    className="relative z-[11]"
+    fadeFrom="light"
+    fadeTo="dark"
+    fadeStartVh={405}
+    fadeEndVh={440}
+  >
+    <StackingCardsSection client:visible
+      theme="light"
+      transparentBg
+      exitScrollVh={50}
+      eyebrow="*Food rescue* works because it's"
+      items={[
+        {
+          title: "Free.",
+          body: "Every pound we deliver is donated. Dollars fund trucks, not food.",
+          imageSrc: "/images/handoff.jpg",
+          imageAlt: "SE volunteer handing boxes of food to a community member",
+          primaryCta: "Our Financials",
+          primaryCtaHref: "/about/financials",
+        },
+        {
+          title: "Fast.",
+          body: "Rescued and delivered while it's still fresh, often same-day.",
+          imageSrc: "/images/truck-driver.jpg",
+          imageAlt: "SE truck driver ready for a food rescue run",
+          primaryCta: "Our Model",
+          primaryCtaHref: "/about",
+        },
+        {
+          title: "Tracked.",
+          body: "Every pound moves through [Surplus](https://surplus.sharingexcess.com), our platform for tracking food from pickup to delivery.",
+          imageSrc: "/images/Impact-Dash.png",
+          imageAlt: "Surplus impact dashboard showing food rescue data",
+          primaryCta: "Our Impact",
+          primaryCtaHref: "/about/impact",
+        },
+        {
+          title: "Everywhere.",
+          body: "2,000+ distribution sites across 36 states.",
+          imageSrc: "/images/Jul2026-ImpactMap.png",
+          imageAlt: "Map showing Sharing Excess distribution sites across the US",
+          primaryCta: "Our Impact",
+          primaryCtaHref: "/about/impact",
+        },
+      ]}
+    />
+
+    <div aria-hidden class="h-[15vh] min-h-[120px]" />
+
+    <MapSection client:load
+      theme="dark"
+      transparentBg
+      layout="stack-centered"
+      headingSize="h2"
+      eyebrow="Live from Surplus"
+      title="{totalLbs} pounds of food rescued. And counting."
+      mapVariant="impact-clusters"
+      mapCaption="Over 2,000 distribution locations across 36 states"
+      primaryCta="Impact Data"
+      primaryCtaHref="/about/impact"
+      secondaryCta="How We Measure"
+      secondaryCtaHref="https://docs.sharingexcess.com/docs/impact-measurement"
+      archBottom
+    />
+  </SectionScrollHandoff>
+
+  <VideoTestimonialsCarouselSection client:visible
     theme="light"
-    title="Our impact"
-    stats={[
-      { value: "1.2M+", label: "Pounds rescued" },
-      { value: "80+", label: "Partner organizations" },
-      { value: "5K+", label: "Volunteers" },
+    archTop
+    className="relative z-[12]"
+    title="Hear directly from the *communities we serve*."
+    body="Partners, volunteers, and neighbors share what rescued food means in their communities."
+    headingSize="h2"
+    items={[
+      {
+        posterSrc: "https://i.ytimg.com/vi/-6JX7-pEVrA/hqdefault.jpg",
+        posterAlt: "",
+        videoSrc: "https://www.youtube.com/shorts/-6JX7-pEVrA",
+        caption: "Adama, Afrikana",
+      },
+      {
+        posterSrc: "https://i.ytimg.com/vi/rBza6eJcFrU/hqdefault.jpg",
+        posterAlt: "",
+        videoSrc: "https://www.youtube.com/shorts/rBza6eJcFrU",
+        caption: "Endang, Bethany Church",
+      },
+      {
+        posterSrc: "https://i.ytimg.com/vi/L-4UTfPUinM/hqdefault.jpg",
+        posterAlt: "",
+        videoSrc: "https://www.youtube.com/watch?v=L-4UTfPUinM",
+        caption: "Anthony, Volunteer",
+      },
     ]}
   />
+
+  <SectionScrollHandoff client:visible fadeFrom="light" fadeTo="green" fadeStart={0.04} fadeEnd={0.2}>
+    <LogosBannerSection client:visible
+      theme="light"
+      transparentBg
+      eyebrow="Our Supporters"
+      logos={supporterLogos}
+      grayscale={false}
+    />
+
+    <DonationSection client:visible
+      id="donate"
+      theme="light"
+      transparentBg
+      isCard={true}
+      cardColor="kale"
+      eyebrow="Support our mission"
+      title="Giving $1 can provide *12 meals*."
+      body="All the food we rescue is donated — your gift moves it. Every dollar goes directly toward transportation and logistics."
+      headingSize="h2"
+      bodySize="lg"
+      formPosition="left"
+      submitLabel="Donate Now"
+    />
+  </SectionScrollHandoff>
 </PageLayout>
