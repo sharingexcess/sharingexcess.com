@@ -21,6 +21,10 @@ const isHomePage = isHomePagePath(Astro.url.pathname);
 <html lang="en" data-home-page={isHomePage || undefined}>
   <head>
     <SiteHead title={title} description={description} canonical={canonical} ogType={ogType} />
+    <script is:inline>
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+      window.scrollTo(0, 0);
+    </script>
     <ClientRouter fallback="none" />
   </head>
   <body>

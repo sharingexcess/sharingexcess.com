@@ -1,5 +1,6 @@
 import Lenis from "lenis";
 import { getLenisInstance, setLenisInstance, subscribeLenisInstance } from "@/lib/lenisInstance";
+import { resetScrollToTop } from "@/lib/resetScrollToTop";
 import {
   destroyRoundSectionScrollLock,
   initRoundSectionScrollLock,
@@ -41,6 +42,18 @@ export function SmoothScrollProvider({
 }: SmoothScrollProviderProps) {
   const [lenis, setLenis] = useState<Lenis | null>(null);
 
+  // Hard page load — reset before Lenis mounts (browser may restore prior scroll).
+  useEffect(() => {
+    resetScrollToTop();
+  }, []);
+
+  // SPA route changes — snap to top without a transition curtain.
+  useEffect(() => {
+    const onAfterSwap = () => resetScrollToTop();
+    document.addEventListener("astro:after-swap", onAfterSwap);
+    return () => document.removeEventListener("astro:after-swap", onAfterSwap);
+  }, []);
+
   useEffect(() => {
     if (!enabled) return;
 
@@ -53,6 +66,7 @@ export function SmoothScrollProvider({
     setLenis(instance);
     setLenisInstance(instance);
     initRoundSectionScrollLock(instance);
+    resetScrollToTop();
 
     return () => {
       destroyRoundSectionScrollLock();

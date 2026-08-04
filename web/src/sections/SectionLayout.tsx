@@ -55,9 +55,11 @@ export function SectionLayout({
       <div>{contentSlot}</div>
     </div>
   ) : (
-    <div className={cn("flex flex-col gap-8 lg:gap-16", centered && "items-center")}>
-      {textSlot && <div className={textSlotClassName}>{textSlot}</div>}
-      {contentSlot && <div className="w-full">{contentSlot}</div>}
+    <div className={cn("flex flex-col gap-10 lg:gap-16", centered && "items-center")}>
+      {textSlot && (
+        <div className={cn(centered && "min-w-0", textSlotClassName)}>{textSlot}</div>
+      )}
+      {contentSlot && <div className="w-full min-w-0">{contentSlot}</div>}
     </div>
   );
 

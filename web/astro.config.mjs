@@ -14,7 +14,17 @@ const CLIENT_OPTIMIZE_DEPS = [
   "react-dom",
   "react-dom/client",
   "@astrojs/react/client.js",
+  "framer-motion",
 ];
+
+/** Keep a single React build in dev — mixed prod/dev prebundles break hooks. */
+const CLIENT_OPTIMIZE_ESBUILD = {
+  define: {
+    "process.env.NODE_ENV": JSON.stringify(
+      process.env.NODE_ENV === "production" ? "production" : "development",
+    ),
+  },
+};
 
 /** Astro view-transition modules pull in virtual:astro:adapter-config/client, which esbuild cannot pre-bundle. */
 const CLIENT_OPTIMIZE_EXCLUDE = [
@@ -37,6 +47,7 @@ function optimizeClientDeps() {
           optimizeDeps: {
             include: CLIENT_OPTIMIZE_DEPS,
             exclude: CLIENT_OPTIMIZE_EXCLUDE,
+            esbuildOptions: CLIENT_OPTIMIZE_ESBUILD,
           },
         };
       }
@@ -57,6 +68,11 @@ export default {
   },
   vite: {
     plugins: [tailwindcss(), optimizeClientDeps()],
+    optimizeDeps: {
+      include: CLIENT_OPTIMIZE_DEPS,
+      exclude: CLIENT_OPTIMIZE_EXCLUDE,
+      esbuildOptions: CLIENT_OPTIMIZE_ESBUILD,
+    },
     resolve: {
       tsconfigPaths: true,
       dedupe: ["react", "react-dom"],

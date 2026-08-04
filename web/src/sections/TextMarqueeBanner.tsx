@@ -5,7 +5,7 @@ const DEFAULT_TEXT = "LET'S FREE FOOD";
 const SEGMENT_REPEATS = 8;
 
 const itemClassName =
-  "font-sans text-base font-bold uppercase tracking-[0.12em] sm:text-lg";
+  "font-display text-base font-extrabold uppercase tracking-[0.04em] sm:text-lg";
 
 const dotClassName = "h-1.5 w-1.5 shrink-0 rounded-full bg-current";
 

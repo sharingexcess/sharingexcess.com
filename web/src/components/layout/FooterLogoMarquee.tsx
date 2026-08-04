@@ -10,13 +10,30 @@ const logoClassName =
 
 export interface FooterLogoMarqueeProps {
   duration?: number;
+  /** Full-width static logo instead of scrolling marquee */
+  static?: boolean;
   className?: string;
 }
 
 export function FooterLogoMarquee({
   duration = 120,
+  static: isStatic = false,
   className,
 }: FooterLogoMarqueeProps) {
+  if (isStatic) {
+    return (
+      <div className={cn("w-full", className)}>
+        <img
+          src={FOOTER_LOGO_SRC}
+          alt={FOOTER_LOGO_ALT}
+          className="block h-auto w-full object-contain"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+    );
+  }
+
   const segment = Array.from({ length: SEGMENT_REPEATS }, (_, index) => index);
   const trackItems = [...segment, ...segment];
 
@@ -26,12 +43,7 @@ export function FooterLogoMarquee({
 
   return (
     <>
-      <div
-        className={cn(
-          "hidden w-full items-center justify-center motion-reduce:flex",
-          className,
-        )}
-      >
+      <div className="hidden w-full items-center justify-center motion-reduce:flex">
         <img
           src={FOOTER_LOGO_SRC}
           alt={FOOTER_LOGO_ALT}

@@ -19,9 +19,15 @@ export interface SectionScrollFadePhase {
   fadeEndVh?: number;
 }
 
+/** Matches SiteFooter negative margin overlap — keeps handoff bg visible behind rounded footer top */
+const FOOTER_OVERLAP_BLEED_CLASS = "-bottom-16 lg:-bottom-24";
+const FOOTER_OVERLAP_PAD_CLASS = "pb-16 lg:pb-24";
+
 export interface SectionScrollHandoffProps extends SectionScrollFadePhase {
   children: ReactNode;
   className?: string;
+  /** Extra bottom padding + background bleed for footer overlap on the home page */
+  extendForFooter?: boolean;
   /** Optional second crossfade within the same scroll zone (e.g. white → green before map) */
   secondFade?: SectionScrollFadePhase;
 }
@@ -146,6 +152,7 @@ export function SectionScrollHandoff({
   fadeEnd = 0.4,
   fadeStartVh,
   fadeEndVh,
+  extendForFooter = false,
   secondFade,
 }: SectionScrollHandoffProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -155,17 +162,31 @@ export function SectionScrollHandoff({
     true,
   );
   const secondaryFade = useScrollFadeOpacity(wrapperRef, secondFade ?? {}, Boolean(secondFade));
+  const bgInsetClass = extendForFooter
+    ? cn("inset-x-0 top-0", FOOTER_OVERLAP_BLEED_CLASS)
+    : "inset-0";
 
   return (
-    <div ref={wrapperRef} className={cn("relative isolate", className)}>
+    <div
+      ref={wrapperRef}
+      className={cn(
+        "relative isolate",
+        extendForFooter && FOOTER_OVERLAP_PAD_CLASS,
+        className,
+      )}
+    >
       <div
         aria-hidden
-        className={cn("pointer-events-none absolute inset-0 z-0", toneClassName(fadeFrom))}
+        className={cn("pointer-events-none absolute z-0", bgInsetClass, toneClassName(fadeFrom))}
       />
       {primaryFade.tone && (
         <motion.div
           aria-hidden
-          className={cn("pointer-events-none absolute inset-0 z-0", toneClassName(primaryFade.tone))}
+          className={cn(
+            "pointer-events-none absolute z-0",
+            bgInsetClass,
+            toneClassName(primaryFade.tone),
+          )}
           style={{ opacity: primaryFade.opacity }}
         />
       )}
@@ -173,7 +194,8 @@ export function SectionScrollHandoff({
         <motion.div
           aria-hidden
           className={cn(
-            "pointer-events-none absolute inset-0 z-0",
+            "pointer-events-none absolute z-0",
+            bgInsetClass,
             toneClassName(secondaryFade.tone),
           )}
           style={{ opacity: secondaryFade.opacity }}

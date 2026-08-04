@@ -10,6 +10,7 @@ import {
   type Variants,
 } from "@/lib/motion";
 import { useInViewOnce } from "@/lib/useInViewOnce";
+import { useIntroRevealed } from "@/lib/useIntroRevealed";
 import { useFitMultilineText } from "@/lib/useFitText";
 import type { CSSProperties, JSX, Ref } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -145,6 +146,8 @@ export interface AnimatedHeroHeadingProps {
   revealStagger?: number;
   /** Fires once the word-by-word reveal finishes */
   onRevealComplete?: () => void;
+  /** When true, the reveal waits until the home intro overlay has finished */
+  waitForIntroReveal?: boolean;
 }
 
 const revealPresets = {
@@ -171,8 +174,10 @@ export function AnimatedHeroHeading({
   revealDelay,
   revealStagger,
   onRevealComplete,
+  waitForIntroReveal = false,
 }: AnimatedHeroHeadingProps) {
   const reduceMotion = useReducedMotion();
+  const introRevealed = useIntroRevealed();
   const headingRef = useRef<HTMLElement>(null);
   const inView = useInViewOnce(headingRef, sectionHeadingInViewOptions);
   const [fontsReady, setFontsReady] = useState(Boolean(reduceMotion));
@@ -206,7 +211,9 @@ export function AnimatedHeroHeading({
   );
   const fitTextStyle =
     fontSizePx != null ? ({ fontSize: `${fontSizePx}px` } as CSSProperties) : undefined;
-  const revealActive = trigger === "inView" ? fontsReady && inView : fontsReady;
+  const revealActive =
+    (!waitForIntroReveal || introRevealed) &&
+    (trigger === "inView" ? fontsReady && inView : fontsReady);
 
   useEffect(() => {
     if (reduceMotion) {
@@ -237,7 +244,10 @@ export function AnimatedHeroHeading({
       ref={headingRef}
       data-fit-heading={shouldFitText ? "" : undefined}
       style={shouldFitText ? fitTextStyle : undefined}
-      className={cn(className, !fontsReady && "invisible")}
+      className={cn(
+        className,
+        (!fontsReady || (waitForIntroReveal && !introRevealed)) && "invisible",
+      )}
       aria-label={title.replace(/\*/g, "")}
     >
       <motion.span

@@ -293,9 +293,33 @@ export function SiteFooter({
           </div>
 
           <div className="flex min-w-0 flex-1 flex-col justify-between self-stretch">
-            <div className="grid grid-cols-2 gap-x-10 gap-y-10 lg:flex lg:items-start lg:gap-24">
+            {/* Mobile: stack sections in columns (Get Food/About | Get Involved/Connect) */}
+            <div className="flex gap-x-10 lg:hidden">
+              <div className="flex min-w-0 flex-1 flex-col gap-10">
+                {navSections[0] && (
+                  <NavSection section={navSections[0]} />
+                )}
+                {navSections[2] && (
+                  <NavSection section={navSections[2]} />
+                )}
+              </div>
+              <div className="flex min-w-0 flex-1 flex-col gap-10">
+                {navSections[1] && (
+                  <NavSection section={navSections[1]} />
+                )}
+                {navSections[3] && (
+                  <NavSection
+                    section={navSections[3]}
+                    socialLinks={socialLinks}
+                  />
+                )}
+              </div>
+            </div>
+
+            {/* Desktop: left stack + individual right sections */}
+            <div className="hidden lg:flex lg:items-start lg:gap-24">
               {leftNavSections.length > 0 && (
-                <div className="contents lg:flex lg:flex-col lg:gap-12">
+                <div className="flex flex-col gap-12">
                   {leftNavSections.map((section, index) => (
                     <NavSection key={`nav-left-${index}`} section={section} />
                   ))}
@@ -313,8 +337,9 @@ export function SiteFooter({
           </div>
         </div>
 
-        <div className="w-full pt-16 lg:pt-[120px]">
-          <FooterLogoMarquee />
+        <div className="w-full pt-10 lg:pt-[120px]">
+          <FooterLogoMarquee static className="lg:hidden" />
+          <FooterLogoMarquee className="hidden lg:block" />
         </div>
       </div>
       </motion.div>

@@ -12,6 +12,7 @@ import {
 } from "@/lib/motion";
 import { isEmbeddableVideo } from "@/lib/toVideoEmbedSrc";
 import type { SectionProps, SectionTheme } from "@/lib/types";
+import { captionClassName } from "@/lib/typography";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SectionLayout } from "./SectionLayout";
 import { SectionShell } from "./SectionShell";
@@ -40,12 +41,15 @@ export interface VideoTestimonialsCarouselSectionProps extends SectionProps {
 
 const CARD_WIDTH = 360;
 const CARD_HEIGHT = 640;
-const LEFT_PEEK_X = "calc(-50% - 156px)";
+/** Peek offset as a fraction of card width — was 156px at 360px */
+const CARD_PEEK_FRACTION = 156 / CARD_WIDTH;
+const LEFT_PEEK_X = `calc(-50% - ${CARD_PEEK_FRACTION * 100}%)`;
 const LEFT_PEEK_SCALE = 0.76;
+const DESKTOP_SLIDE_CLASS = "w-[360px]";
 
 /** Straddles the left edge of the left peek slot, halfway between top and center */
 const leftPeekStickerClassName =
-  "pointer-events-auto absolute z-30 aspect-[250/159] left-0 top-1/4 w-[clamp(128px,14vw,168px)] -translate-x-1/2 -translate-y-1/2 cursor-default";
+  "pointer-events-auto absolute z-30 aspect-[250/159] left-0 top-1/4 w-[clamp(80px,12vw,168px)] -translate-x-1/2 -translate-y-1/2 cursor-default";
 
 function LeftPeekSticker({ reduceMotion }: { reduceMotion: boolean }) {
   return (
@@ -77,7 +81,10 @@ function LeftPeekStickerSlot({ reduceMotion }: { reduceMotion: boolean }) {
   );
 }
 
-const CARD_CLASS =
+const MOBILE_CARD_CLASS =
+  "group relative aspect-[9/16] w-full shrink-0 overflow-hidden rounded-[var(--radius-lg)]";
+
+const DESKTOP_CARD_CLASS =
   "group relative h-[640px] w-[360px] shrink-0 overflow-hidden rounded-[var(--radius-lg)]";
 
 const POSTER_CLASS = "absolute inset-0 size-full object-cover";
@@ -86,10 +93,12 @@ function VideoTestimonialCard({
   item,
   isActive,
   canAutoplay,
+  desktop = false,
 }: {
   item: VideoTestimonialItem;
   isActive: boolean;
   canAutoplay: boolean;
+  desktop?: boolean;
 }) {
   const isYoutube = isEmbeddableVideo(item.videoSrc);
   const isMp4 = !isYoutube;
@@ -107,7 +116,7 @@ function VideoTestimonialCard({
 
   return (
     <div
-      className={CARD_CLASS}
+      className={desktop ? DESKTOP_CARD_CLASS : MOBILE_CARD_CLASS}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -199,9 +208,9 @@ function offsetTransform(
 ) {
   const x =
     offset === -1
-      ? "calc(-50% - 156px)"
+      ? LEFT_PEEK_X
       : offset === 1
-        ? "calc(-50% + 156px)"
+        ? `calc(-50% + ${CARD_PEEK_FRACTION * 100}%)`
         : "-50%";
 
   return {
@@ -216,6 +225,23 @@ function offsetOpacity(offset: CarouselOffset, reduceMotion: boolean) {
     opacity: offset === 0 ? 1 : 0.65,
     transition: reduceMotion ? { duration: 0 } : carouselSlideSpring,
   };
+}
+
+function useIsLgUp() {
+  const [isLgUp, setIsLgUp] = useState(() =>
+    typeof window !== "undefined"
+      ? window.matchMedia("(min-width: 1024px)").matches
+      : false,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const onChange = () => setIsLgUp(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  return isLgUp;
 }
 
 export function VideoTestimonialsCarouselSection({
@@ -236,6 +262,7 @@ export function VideoTestimonialsCarouselSection({
 }: VideoTestimonialsCarouselSectionProps) {
   const isDark = theme === "dark";
   const reduceMotion = useReducedMotion();
+  const isLgUp = useIsLgUp();
   const carouselRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(carouselRef, { once: true, amount: 0.45 });
   const canAutoplay = isInView && !reduceMotion;
@@ -271,75 +298,98 @@ export function VideoTestimonialsCarouselSection({
 
   const carousel = (
     <div
-      className="relative mx-auto w-full max-w-[920px] lg:mx-0 lg:max-w-none"
+      className="relative mx-auto w-full max-w-[920px]"
       role="region"
       aria-roledescription="carousel"
       aria-label={title ?? "Video testimonials"}
     >
       <div
         ref={carouselRef}
-        className="relative mx-auto h-[640px] max-w-[360px] overflow-visible"
+        className={cn(
+          "relative mx-auto overflow-visible",
+          isLgUp
+            ? "h-[640px] w-[360px]"
+            : "aspect-[9/16] w-full max-w-[360px] overflow-hidden",
+        )}
       >
-        <LeftPeekStickerSlot reduceMotion={reduceMotion} />
+        {isLgUp ? (
+          <>
+            <LeftPeekStickerSlot reduceMotion={reduceMotion} />
 
-        {items.map((item, index) => {
-          const offset = getCarouselOffset(index, activeIndex, items.length);
-          const isActive = offset === 0;
-          const slideKey = item.id ?? item.videoSrc;
-          const zIndex = getSlideZIndex(
-            index,
-            activeIndex,
-            previousActiveIndex,
-            items.length,
-          );
+            {items.map((item, index) => {
+              const offset = getCarouselOffset(index, activeIndex, items.length);
+              const isActive = offset === 0;
+              const slideKey = item.id ?? item.videoSrc;
+              const zIndex = getSlideZIndex(
+                index,
+                activeIndex,
+                previousActiveIndex,
+                items.length,
+              );
 
-          return (
-            <motion.div
-              key={slideKey}
-              initial={false}
-              className={cn(
-                "absolute left-1/2 top-0 origin-center will-change-transform",
-                !isActive && "cursor-pointer",
-              )}
-              style={{ zIndex }}
-              animate={offsetTransform(offset, reduceMotion)}
-              aria-hidden={!isActive}
-              role={!isActive ? "button" : undefined}
-              tabIndex={!isActive ? -1 : undefined}
-              onClick={!isActive ? () => goTo(index) : undefined}
-              onKeyDown={
-                !isActive
-                  ? (event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        goTo(index);
-                      }
-                    }
-                  : undefined
-              }
-            >
-              <motion.div animate={offsetOpacity(offset, reduceMotion)}>
-                <VideoTestimonialCard
-                  item={item}
-                  isActive={isActive}
-                  canAutoplay={canAutoplay}
-                />
-              </motion.div>
-            </motion.div>
-          );
-        })}
+              return (
+                <motion.div
+                  key={slideKey}
+                  initial={false}
+                  className={cn(
+                    "absolute left-1/2 top-0 origin-center will-change-transform",
+                    DESKTOP_SLIDE_CLASS,
+                    !isActive && "cursor-pointer",
+                  )}
+                  style={{ zIndex }}
+                  animate={offsetTransform(offset, reduceMotion)}
+                  aria-hidden={!isActive}
+                  role={!isActive ? "button" : undefined}
+                  tabIndex={!isActive ? -1 : undefined}
+                  onClick={!isActive ? () => goTo(index) : undefined}
+                  onKeyDown={
+                    !isActive
+                      ? (event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            goTo(index);
+                          }
+                        }
+                      : undefined
+                  }
+                >
+                  <motion.div animate={offsetOpacity(offset, reduceMotion)}>
+                    <VideoTestimonialCard
+                      item={item}
+                      isActive={isActive}
+                      canAutoplay={canAutoplay}
+                      desktop
+                    />
+                  </motion.div>
+                </motion.div>
+              );
+            })}
+          </>
+        ) : (
+          activeItem ? (
+            <VideoTestimonialCard
+              key={activeItem.id ?? activeItem.videoSrc}
+              item={activeItem}
+              isActive
+              canAutoplay={canAutoplay}
+            />
+          ) : null
+        )}
       </div>
 
       {activeItem ? (
         <p
           aria-live="polite"
-          className="mx-auto mt-6 max-w-[360px] text-center text-sm italic text-[var(--section-text)]/65"
+          className={cn(
+            "mx-auto mt-3 w-full max-w-[360px] text-center text-[var(--section-text)]/65",
+            captionClassName,
+          )}
         >
           {activeItem.caption}
         </p>
       ) : null}
 
-      <div className="mt-6 flex items-center justify-center gap-4">
+      <div className="mt-3 flex items-center justify-center gap-4">
         <ArrowButton
           direction="prev"
           variant="secondary"
@@ -366,7 +416,7 @@ export function VideoTestimonialsCarouselSection({
       archTop={archTop}
       className={cn(
         "overflow-visible",
-        archTop && "py-16 lg:py-16",
+        archTop && "py-12 lg:py-16",
         className,
       )}
       id={id}
@@ -389,7 +439,7 @@ export function VideoTestimonialsCarouselSection({
             />
           ) : null
         }
-        contentSlot={carousel}
+        contentSlot={<div className="min-w-0 overflow-visible">{carousel}</div>}
       />
     </SectionShell>
   );

@@ -1,4 +1,5 @@
 import { TextSection } from "@/components/ui/TextSection";
+import { captionClassName } from "@/lib/typography";
 import { DeferredInteractiveMap } from "@/components/map/DeferredInteractiveMap";
 import type { MapVariant, MapHub, MapMacroRegion } from "@/components/map/types";
 import { cn } from "@/lib/cn";
@@ -109,17 +110,17 @@ export function MapSection({
   const mapMedia = <DeferredInteractiveMap className="size-full" {...mapProps} />;
 
   const fullWidthMap = (
-    <div className="flex flex-col gap-2">
+    <div className="flex w-full min-w-0 flex-col gap-2">
       <div
         className={cn(
-          "relative aspect-video w-full overflow-hidden",
+          "relative mx-auto aspect-square w-full max-w-md overflow-hidden sm:max-w-none sm:aspect-video",
           mapRadius,
         )}
       >
         <DeferredInteractiveMap className="absolute inset-0" {...mapProps} />
       </div>
       {mapCaption && (
-        <p className="text-center text-xs italic opacity-64 text-[var(--section-text)]">
+        <p className={cn("text-center text-[var(--section-text)]", captionClassName)}>
           {mapCaption}
         </p>
       )}
@@ -135,7 +136,7 @@ export function MapSection({
           cardColor={cardColor}
           sectionTheme={theme}
           centered
-          textSlotClassName="w-full max-w-3xl"
+          textSlotClassName="w-full min-w-0 max-w-3xl"
           textSlot={
             <TextSection
               eyebrow={eyebrow}
@@ -211,7 +212,7 @@ export function MapSection({
         <DeferredInteractiveMap className="absolute inset-0" {...mapProps} />
       </div>
       {mapCaption && (
-        <p className="text-center text-xs italic opacity-64 text-[var(--section-text)]">
+        <p className={cn("text-center text-[var(--section-text)]", captionClassName)}>
           {mapCaption}
         </p>
       )}

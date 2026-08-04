@@ -8,14 +8,17 @@ import { TextSection } from "@/components/ui/TextSection";
 import { useLenis } from "@/components/providers/SmoothScrollProvider";
 import { cn } from "@/lib/cn";
 import type { HeroLayout, SectionContentProps } from "@/lib/types";
-import { eyebrowClassName, sectionH1ClassName } from "@/lib/typography";
+import { bodyLgClassName, bodyMdClassName, bodyXlClassName } from "@/lib/typography";
 import {
   heroWordSpring,
   homeHeroRevealDelay,
   homeHeroRevealStagger,
+  homeHeroVideoEnterDelay,
+  homeHeroVideoEnterSpring,
   motion,
   useReducedMotion,
 } from "@/lib/motion";
+import { useIntroRevealed } from "@/lib/useIntroRevealed";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { SectionShell } from "./SectionShell";
 import { sectionCardContentIsDark, sectionMediaRadiusClass } from "./sectionCardConfig";
@@ -39,9 +42,9 @@ export interface HeroSectionProps extends SectionContentProps {
 const FIGMA_ARTBOARD_CLASS = "@container mx-auto w-full max-w-[1512px]";
 /** Standard page content width — matches SiteHeader nav bar */
 const STANDARD_CONTENT_CLASS = "mx-auto w-full max-w-[1320px] px-4 lg:px-8";
-/** Equal space above and below the intro headline in the green band */
+/** Tight vertical inset around the intro headline — capped so video fills slack on tall viewports */
 const HOME_HERO_INTRO_BAND_CLASS =
-  "box-border flex h-[calc(var(--hero-frame-start)-var(--site-header-height))] w-full flex-col items-center justify-center";
+  "box-border flex w-full flex-col items-start justify-center py-[clamp(18px,2.5vh,40px)] lg:items-center lg:py-[clamp(24px,3vh,40px)]";
 /** Gap between multiline hero body paragraphs */
 const HOME_HERO_BODY_PARAGRAPH_GAP = "gap-3 lg:gap-4";
 /** Max width for hero donate card */
@@ -123,9 +126,9 @@ function heroHeadingTag(level: 1 | 2 | 3): "h1" | "h2" | "h3" {
 }
 
 const heroHomeBodyClasses = {
-  xl: "text-base leading-[1.5] lg:text-[clamp(18px,1.59cqw,24px)] lg:leading-[1.55]",
-  lg: "text-sm leading-[1.5] lg:text-[20px]",
-  md: "text-sm leading-[1.5] lg:text-lg",
+  xl: cn(bodyXlClassName, "text-white"),
+  lg: cn(bodyLgClassName, "text-white"),
+  md: cn(bodyMdClassName, "text-white"),
 };
 
 function HeroHomeContent({
@@ -320,7 +323,7 @@ function SubpageHeroImage({
 
 const heroCoverClass = "absolute inset-0 size-full object-cover";
 /** Slight lift so hero footage reads brighter and more vivid under the gradient overlay */
-const heroVideoFilterClass = "brightness-[1.1] saturate-[1.15]";
+const heroVideoFilterClass = "brightness-[1.1] saturate-[1.3]";
 
 function HomeHeroBackground({
   imageSrc,
@@ -344,6 +347,7 @@ function HomeHeroBackground({
         travel={16}
         offset={["start start", "end end"]}
         smooth
+        className={videoSrc ? heroVideoFilterClass : undefined}
       />
     );
   }
@@ -451,6 +455,53 @@ function measureHomeHeroScrollProgress(
   return Math.max(0, Math.min(1, scrollY / viewport));
 }
 
+/** Positions the video frame directly below the intro band (video fills remaining viewport height). */
+function useHomeHeroFrameStart(
+  sectionRef: RefObject<HTMLElement | null>,
+  introRef: RefObject<HTMLElement | null>,
+  enabled: boolean,
+) {
+  useEffect(() => {
+    if (!enabled) return;
+
+    const section = sectionRef.current;
+    const intro = introRef.current;
+    if (!section || !intro) return;
+
+    let raf = 0;
+
+    const update = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const pin = section.querySelector<HTMLElement>(".home-hero-donate__pin");
+        if (!pin) return;
+
+        const frameStart = Math.max(
+          0,
+          intro.getBoundingClientRect().bottom - pin.getBoundingClientRect().top + 12,
+        );
+        section.style.setProperty("--hero-frame-start", `${frameStart}px`);
+      });
+    };
+
+    const ro = new ResizeObserver(update);
+    ro.observe(intro);
+    ro.observe(section);
+    window.addEventListener("resize", update);
+    document.addEventListener("astro:after-swap", update);
+    void document.fonts?.ready.then(update);
+    update();
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+      document.removeEventListener("astro:after-swap", update);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [enabled, introRef, sectionRef]);
+}
+
 function useHomeHeroDonateScrollCssVar(
   sectionRef: RefObject<HTMLElement | null>,
   enabled: boolean,
@@ -503,10 +554,20 @@ function useHomeHeroDonateScrollCssVar(
   }, [enabled, lenis, onScrollProgress, reduceMotion, sectionRef]);
 }
 
+const HOME_HERO_VIDEO_ENTER = {
+  initial: { opacity: 0, y: "10vh" as const },
+  animate: { opacity: 1, y: 0 },
+  transition: {
+    ...homeHeroVideoEnterSpring,
+    delay: homeHeroVideoEnterDelay,
+  },
+};
+
 const HOME_STACKED_SCROLL_HEIGHT = "min-h-[240vh]";
 const HOME_STACKED_INTRO_HEADING_CLASS = cn(
-  "m-0 text-center text-se-green [text-box-trim:trim-both] [text-box-edge:cap_alphabetic]",
-  sectionH1ClassName,
+  "m-0 text-left text-se-green [text-box-trim:trim-both] [text-box-edge:cap_alphabetic] lg:text-center",
+  "text-[clamp(3rem,14vw,4.25rem)] font-medium leading-[1.06] tracking-[-0.04em] lg:text-[clamp(48px,6.35cqw,96px)]",
+  "font-semibold tracking-[-0.05em]",
   "[&>span]:gap-[0.1em] lg:[&>span]:gap-[0.14em]",
 );
 
@@ -532,7 +593,7 @@ function HomeHeroIntroContent({
 
   const bodyEl = body &&
     (reduceMotion ? (
-      <p className="whitespace-pre-line text-base leading-[1.6] text-white lg:text-lg">
+      <p className={cn("whitespace-pre-line text-white", bodyXlClassName)}>
         {body}
       </p>
     ) : (
@@ -543,7 +604,7 @@ function HomeHeroIntroContent({
           hidden: {},
           visible: { transition: { staggerChildren: 0.12 } },
         }}
-        className="text-base leading-[1.6] text-white lg:text-lg"
+        className={cn("text-white", bodyXlClassName)}
       >
         {body.split("\n").map((line, lineIndex) => (
           <motion.span
@@ -762,9 +823,12 @@ function HomeRoundedHeroWithDonate({
   className?: string;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
+  const introRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
   const scrollFx = pinOnScroll && !reduceMotion;
+  const pageRevealed = useIntroRevealed();
   const [introRevealed, setIntroRevealed] = useState(reduceMotion);
+  useHomeHeroFrameStart(sectionRef, introRef, scrollFx);
   useHomeHeroDonateScrollCssVar(sectionRef, scrollFx, (progress) => {
     if (progress > 0.02) setIntroRevealed(true);
   });
@@ -780,6 +844,7 @@ function HomeRoundedHeroWithDonate({
       multiline
       revealDelay={homeHeroRevealDelay}
       revealStagger={homeHeroRevealStagger}
+      waitForIntroReveal
       onRevealComplete={() => setIntroRevealed(true)}
       className={HOME_STACKED_INTRO_HEADING_CLASS}
     />
@@ -804,14 +869,21 @@ function HomeRoundedHeroWithDonate({
         data-theme="dark"
         className={cn("w-full bg-se-green-100 home-hero-donate--stacked", className)}
       >
-        <div className={cn("w-full pb-6 pt-[var(--site-header-height)]")}>
+        <div className="flex min-h-screen w-full flex-col overflow-x-hidden pt-[var(--site-header-height)]">
           <HomeHeroIntroBand>{heroHeading}</HomeHeroIntroBand>
-          <div className="relative min-h-[65vh] overflow-hidden rounded-[var(--radius-xl)]">
-            <HomeHeroBackground imageSrc={imageSrc} imageAlt={imageAlt} videoSrc={videoSrc} />
-            <div className="absolute inset-x-0 bottom-0 z-[2] pb-[clamp(24px,4vh,48px)]">
+          <motion.div
+            className="relative min-h-0 flex-1 rounded-[var(--radius-xl)] -mb-[8vh]"
+            initial={reduceMotion ? false : HOME_HERO_VIDEO_ENTER.initial}
+            animate={pageRevealed ? HOME_HERO_VIDEO_ENTER.animate : HOME_HERO_VIDEO_ENTER.initial}
+            transition={{ ...homeHeroVideoEnterSpring, delay: homeHeroVideoEnterDelay }}
+          >
+            <div className="absolute inset-0 overflow-hidden rounded-[var(--radius-xl)]">
+              <HomeHeroBackground imageSrc={imageSrc} imageAlt={imageAlt} videoSrc={videoSrc} />
+            </div>
+            <div className="absolute inset-x-0 bottom-0 z-[2] pb-4 lg:pb-[clamp(24px,4vh,48px)]">
               <div className={STANDARD_CONTENT_CLASS}>{donateForm}</div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
     );
@@ -836,6 +908,7 @@ function HomeRoundedHeroWithDonate({
 
         {/* Heading — in green space above video, video scrolls over it */}
         <div
+          ref={introRef}
           className={cn(
             "home-hero-donate__intro home-hero-donate__intro--scroll-fx",
             HOME_HERO_INTRO_BAND_CLASS,
@@ -848,7 +921,12 @@ function HomeRoundedHeroWithDonate({
         </div>
 
         {/* Video frame — expands from below heading to fullscreen */}
-        <div className="home-hero-donate__frame home-hero-donate__frame--scroll-fx absolute z-20 overflow-hidden">
+        <motion.div
+          className="home-hero-donate__frame home-hero-donate__frame--scroll-fx absolute z-20 overflow-hidden"
+          initial={reduceMotion ? false : HOME_HERO_VIDEO_ENTER.initial}
+          animate={pageRevealed ? HOME_HERO_VIDEO_ENTER.animate : HOME_HERO_VIDEO_ENTER.initial}
+          transition={{ ...homeHeroVideoEnterSpring, delay: homeHeroVideoEnterDelay }}
+        >
           <div className="home-hero-donate__bg-wrap absolute inset-0">
             <HomeHeroBackground
               scrollRef={sectionRef}
@@ -857,14 +935,14 @@ function HomeRoundedHeroWithDonate({
               videoSrc={videoSrc}
             />
           </div>
-        </div>
+        </motion.div>
 
         {/* Body + Donate — appears over fullscreen video, slides up from bottom */}
         <div
           className={cn(
             "home-hero-donate__content home-hero-donate__content--scroll-fx",
             "absolute inset-x-0 bottom-0 z-30",
-            "pb-[clamp(32px,5vh,72px)]",
+            "pb-4 lg:pb-[clamp(32px,5vh,72px)]",
           )}
         >
           <div className={STANDARD_CONTENT_CLASS}>{donateForm}</div>

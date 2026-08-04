@@ -14,12 +14,14 @@ import { metricNumberClassName } from "@/lib/typography";
 import { useFitText } from "@/lib/useFitText";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
 
+const MOBILE_FIT_MQ = "(max-width: 639px)";
+
 const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"] as const;
 
 type MetricPhase = "idle" | "playing" | "settled";
 
 const digitSlotClassName =
-  "relative inline-block h-[1em] w-[1ch] overflow-hidden align-top";
+  "relative inline-block h-[1em] w-[0.93ch] overflow-hidden align-top lg:w-[1ch]";
 
 const digitGlyphClassName = "block h-[1em] shrink-0 leading-[1.06] text-center";
 
@@ -113,12 +115,15 @@ function MetricDigits({
 
 function MetricDisplay({
   value,
+  sizerValue,
   className,
   textRef,
   fontStyle,
   phase,
 }: {
   value: string;
+  /** All digits replaced with "0" so the sizer matches the 1ch slot widths exactly */
+  sizerValue: string;
   className: string;
   textRef: RefObject<HTMLElement | null>;
   fontStyle?: CSSProperties;
@@ -128,13 +133,15 @@ function MetricDisplay({
 
   return (
     <>
+      {/* Invisible sizer — digits replaced with "0" so natural "0" glyph width (= 1ch) over-estimates
+          the actual 0.93ch slots, making fit-text conservatively smaller than needed. */}
       <span
         ref={textRef}
         aria-hidden
         style={fontStyle}
         className={cn(className, "pointer-events-none invisible absolute whitespace-nowrap")}
       >
-        {value}
+        {sizerValue}
       </span>
       <p
         style={fontStyle}
@@ -167,7 +174,22 @@ export function SlotMachineNumber({ value, className }: SlotMachineNumberProps) 
   const [animationValue, setAnimationValue] = useState<string | null>(null);
   const [settled, setSettled] = useState(false);
   const displayValue = settled || reduceMotion ? value : (animationValue ?? value);
-  const { containerRef, textRef, fontSizePx } = useFitText(displayValue, { minSizePx: 56 });
+  // Replace every digit with "0" so the invisible sizer matches the 1ch fixed-width slots
+  const sizerValue = displayValue.replace(/\d/g, "0");
+  const [mobileFit, setMobileFit] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia(MOBILE_FIT_MQ);
+    const update = () => setMobileFit(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  const { containerRef, textRef, fontSizePx } = useFitText(sizerValue, {
+    minSizePx: 32,
+    enabled: mobileFit,
+  });
   const fontStyle = fontSizePx != null ? { fontSize: `${fontSizePx}px` } : undefined;
 
   const digitCount = useMemo(() => (value.match(/\d/g) ?? []).length, [value]);
@@ -198,7 +220,7 @@ export function SlotMachineNumber({ value, className }: SlotMachineNumberProps) 
 
   const numberClassName = cn(
     metricNumberClassName,
-    "relative inline-flex w-fit max-w-full items-baseline tabular-nums",
+    "relative inline-flex w-fit max-w-full items-baseline tabular-nums max-sm:w-full max-sm:justify-center",
     className,
   );
 
@@ -208,9 +230,10 @@ export function SlotMachineNumber({ value, className }: SlotMachineNumberProps) 
   };
 
   return (
-    <div ref={mergeRefs} className="relative min-w-0 max-w-full">
+    <div ref={mergeRefs} className="relative w-fit min-w-0 max-w-full max-sm:w-full max-sm:overflow-hidden">
       <MetricDisplay
         value={displayValue}
+        sizerValue={sizerValue}
         className={numberClassName}
         textRef={textRef}
         fontStyle={fontStyle}

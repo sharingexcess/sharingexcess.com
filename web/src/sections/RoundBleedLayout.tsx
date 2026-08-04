@@ -1,6 +1,7 @@
 import { RoundImageCircle } from "@/components/ui/RoundImageCircle";
 import { useScrollInteractionsEnabled } from "@/components/providers/AppProviders";
 import { useLenis } from "@/components/providers/SmoothScrollProvider";
+import { captionClassName } from "@/lib/typography";
 import { cn } from "@/lib/cn";
 import {
   motion,
@@ -124,7 +125,7 @@ export function RoundBleedLayout({
       : roundImageGlideVariants(onLeft);
 
   const captionEl = caption ? (
-    <p className="text-center text-xs italic opacity-64 text-[var(--section-text)]">{caption}</p>
+    <p className={cn("text-center text-[var(--section-text)]", captionClassName)}>{caption}</p>
   ) : null;
 
   return (
@@ -193,7 +194,8 @@ export function RoundBleedLayout({
           {caption && (
             <p
               className={cn(
-                "pointer-events-none absolute bottom-[6%] z-10 max-w-[280px] text-center text-xs italic opacity-64 text-[var(--section-text)]",
+                "pointer-events-none absolute bottom-[6%] z-10 max-w-[280px] text-center text-[var(--section-text)]",
+                captionClassName,
                 onLeft ? "left-[14%]" : "right-[14%]",
               )}
             >

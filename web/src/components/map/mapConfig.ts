@@ -13,7 +13,7 @@ export const MAP_POINT_COLOR = "#008236";
 export const MAP_HUB_MARKER_COLOR = "#15803D";
 
 export const DEFAULT_MAP_CENTER: [number, number] = [-98.5795, 39.8283];
-export const DEFAULT_MAP_ZOOM = 3.5;
+export const DEFAULT_MAP_ZOOM = 4.25;
 export const DEFAULT_MAX_ZOOM = 9;
 
 /** Disable scroll, pinch, and keyboard zoom — map stays at the fitted viewport. */

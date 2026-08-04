@@ -15,40 +15,56 @@ import { useInViewOnce } from "@/lib/useInViewOnce";
 import { useScrollDrivenIndex } from "@/lib/useScrollDrivenIndex";
 import type { SectionProps, SectionTheme } from "@/lib/types";
 import { bodyLgClassName, sectionH2ClassName } from "@/lib/typography";
-import { useEffect, useRef, type CSSProperties, type RefObject } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type RefObject,
+} from "react";
 
 /**
- * Per-slide theme — card surface, title accent, and button fill.
- * Same palette as TextImage carousel (index order: Free, Fast, Tracked, Everywhere).
+ * Per-slide theme — base-color card surfaces with AA-compliant text.
+ * Index order: Free, Fast, Tracked, Everywhere.
+ * Text picks the closest passing token per base (light on se-green, dark on warm bases).
  */
 const SLIDE_THEMES = [
   {
-    cardBg: "var(--color-se-green-100)",
-    accentColor: "var(--color-se-green-500)",
-    bodyColor: "var(--color-se-green-800)",
-    buttonBg: "var(--color-se-green-500)",
-    buttonHoverBg: "var(--color-se-green-600)",
+    cardBg: "var(--color-se-green-base)",
+    accentColor: "var(--color-neutral-000)",
+    bodyColor: "var(--color-neutral-000)",
+    buttonBg: "var(--color-neutral-000)",
+    buttonHoverBg: "var(--color-neutral-050)",
+    buttonLabel: "var(--color-kale)",
+    buttonHoverLabel: "var(--color-kale)",
   },
   {
-    cardBg: "var(--color-guava-100)",
-    accentColor: "var(--color-guava-700)",
-    bodyColor: "var(--color-se-green-800)",
-    buttonBg: "var(--color-guava-700)",
-    buttonHoverBg: "var(--color-guava-800)",
+    cardBg: "var(--color-banana-base)",
+    accentColor: "var(--color-banana-900)",
+    bodyColor: "var(--color-banana-800)",
+    buttonBg: "var(--color-banana-800)",
+    buttonHoverBg: "var(--color-banana-900)",
+    buttonLabel: "var(--color-neutral-000)",
+    buttonHoverLabel: "var(--color-neutral-000)",
   },
   {
-    cardBg: "var(--color-tangerine-100)",
-    accentColor: "var(--color-tangerine-700)",
-    bodyColor: "var(--color-se-green-800)",
-    buttonBg: "var(--color-tangerine-700)",
-    buttonHoverBg: "var(--color-tangerine-800)",
+    cardBg: "var(--color-tangerine-base)",
+    accentColor: "var(--color-tangerine-900)",
+    bodyColor: "var(--color-kale)",
+    buttonBg: "var(--color-tangerine-800)",
+    buttonHoverBg: "var(--color-tangerine-900)",
+    buttonLabel: "var(--color-neutral-000)",
+    buttonHoverLabel: "var(--color-neutral-000)",
   },
   {
-    cardBg: "var(--color-blueberry-100)",
-    accentColor: "var(--color-blueberry-700)",
-    bodyColor: "var(--color-se-green-800)",
+    cardBg: "var(--color-blueberry-base)",
+    accentColor: "var(--color-blueberry-800)",
+    bodyColor: "var(--color-kale)",
     buttonBg: "var(--color-blueberry-700)",
     buttonHoverBg: "var(--color-blueberry-800)",
+    buttonLabel: "var(--color-neutral-000)",
+    buttonHoverLabel: "var(--color-neutral-000)",
   },
 ] as const;
 
@@ -59,21 +75,27 @@ const SCALE_PER_DEPTH = 0.065;
 const MIN_BURIED_SCALE = 0.82;
 /** How many px of the NEXT card peek above the bottom of the card stack */
 const PEEK_PX = 52;
-/** Image starts slightly underscaled and eases to 1 when its card scrolls in */
-const IMAGE_ENTER_SCALE = 0.94;
+/** Image rests at 1 so the rounded clip stays covered; zooms in on enter */
+const IMAGE_SCALE_REST = 1;
+const IMAGE_SCALE_ENTER = 1.1;
 /** Wait until the stack is further into view before the first card enters */
 const STACK_ENTRY_IN_VIEW_OPTIONS = {
   once: true,
   margin: "-50% 0px -40% 0px",
   amount: 0.6,
 } as const;
-/** Top padding once the sticky viewport is locked (pt-10) */
+/** Top padding once the sticky viewport is locked (desktop scroll animation) */
 const LOCKED_PADDING_PX = 40;
-/** Top padding when the section is still scrolling into place */
+/** Top padding when the section is still scrolling into place (desktop) */
 const ENTRY_PADDING_PX = 120;
 /** Scroll span before/after the lock point used to ease padding */
 const PADDING_FADE_BEFORE_PX = 100;
 const PADDING_FADE_AFTER_PX = 100;
+const CARD_BODY_SIZE_LG_PX = 18;
+/** Extra px subtracted from available width to account for negative tracking */
+const TITLE_WIDTH_BUFFER_PX = 8;
+/** Do not shrink card text below this fraction of its base size */
+const MIN_TEXT_SCALE = 0.55;
 
 function smoothstep(t: number): number {
   return t * t * (3 - 2 * t);
@@ -115,6 +137,7 @@ function useStackingStickyPadding(
 
     if (lenis) {
       lenis.on("scroll", update);
+      window.addEventListener("resize", update);
     } else {
       window.addEventListener("scroll", update, { passive: true });
       window.addEventListener("resize", update);
@@ -125,6 +148,7 @@ function useStackingStickyPadding(
     return () => {
       if (lenis) {
         lenis.off("scroll", update);
+        window.removeEventListener("resize", update);
       } else {
         window.removeEventListener("scroll", update);
         window.removeEventListener("resize", update);
@@ -133,6 +157,83 @@ function useStackingStickyPadding(
   }, [lenis, reduceMotion, target, trackRef]);
 
   return paddingTop;
+}
+
+/**
+ * Measure every card title at the base font size and return one pixel size
+ * shared by all cards so long titles like "Everywhere." fit without clipping.
+ */
+function useUnifiedCardTextSizes(
+  titles: string[],
+  containerRef: RefObject<HTMLElement | null>,
+  measurerRef: RefObject<HTMLElement | null>,
+) {
+  const [sizes, setSizes] = useState<{ titlePx?: number; bodyPx?: number }>({});
+
+  useEffect(() => {
+    const measure = () => {
+      const container = containerRef.current;
+      const measurer = measurerRef.current;
+      if (!container || !measurer) return;
+
+      const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+      if (!isDesktop) {
+        setSizes({});
+        return;
+      }
+
+      const textCol = container.querySelector<HTMLElement>("[data-card-text-col]");
+      if (!textCol) return;
+
+      const availableWidth = textCol.clientWidth - TITLE_WIDTH_BUFFER_PX;
+      if (availableWidth <= 0) return;
+
+      const baseTitlePx = parseFloat(getComputedStyle(measurer).fontSize);
+      if (!baseTitlePx) return;
+
+      let minScale = 1;
+      for (const title of titles) {
+        measurer.textContent = title;
+        const titleWidth = measurer.scrollWidth;
+        if (titleWidth > availableWidth) {
+          minScale = Math.min(minScale, availableWidth / titleWidth);
+        }
+      }
+
+      const scale = Math.max(MIN_TEXT_SCALE, minScale);
+      const titlePx = baseTitlePx * scale;
+      const bodyPx = CARD_BODY_SIZE_LG_PX * scale;
+
+      setSizes((prev) =>
+        prev.titlePx !== undefined && Math.abs(prev.titlePx - titlePx) < 0.5
+          ? prev
+          : { titlePx, bodyPx },
+      );
+    };
+
+    const scheduleMeasure = () => {
+      requestAnimationFrame(() => requestAnimationFrame(measure));
+    };
+
+    scheduleMeasure();
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    const ro = new ResizeObserver(scheduleMeasure);
+    ro.observe(container);
+
+    const mq = window.matchMedia("(min-width: 1024px)");
+    mq.addEventListener("change", scheduleMeasure);
+    document.fonts?.ready.then(scheduleMeasure);
+
+    return () => {
+      ro.disconnect();
+      mq.removeEventListener("change", scheduleMeasure);
+    };
+  }, [containerRef, measurerRef, titles]);
+
+  return sizes;
 }
 
 export interface StackingCardItem {
@@ -159,12 +260,12 @@ function slideTheme(index: number) {
 }
 
 function cardButtonStyle(index: number): CSSProperties {
-  const { buttonBg, buttonHoverBg } = slideTheme(index);
+  const { buttonBg, buttonHoverBg, buttonLabel, buttonHoverLabel } = slideTheme(index);
   return {
     "--section-btn-primary-bg": buttonBg,
     "--section-btn-primary-hover-bg": buttonHoverBg,
-    "--section-btn-primary-label": "#ffffff",
-    "--section-btn-primary-hover-label": "#ffffff",
+    "--section-btn-primary-label": buttonLabel,
+    "--section-btn-primary-hover-label": buttonHoverLabel,
   } as CSSProperties;
 }
 
@@ -174,12 +275,16 @@ function StackingCard({
   activeIndex,
   reduceMotion,
   entryRevealed,
+  titleSizePx,
+  bodySizePx,
 }: {
   item: StackingCardItem;
   index: number;
   activeIndex: number;
   reduceMotion: boolean;
   entryRevealed: boolean;
+  titleSizePx?: number;
+  bodySizePx?: number;
 }) {
   const depth = Math.max(0, activeIndex - index);
   const isBuried = depth > 0;
@@ -210,10 +315,11 @@ function StackingCard({
       ? figmaQuickSpring
       : { duration: 0.45, ease: appleEase };
 
-  const imageEntered = isBuried || (isActive && (index > 0 || entryRevealed));
-  const imageScale = reduceMotion || imageEntered ? 1 : IMAGE_ENTER_SCALE;
+  const imageZoomed =
+    !reduceMotion && isActive && (index > 0 || entryRevealed);
+  const imageScale = imageZoomed ? IMAGE_SCALE_ENTER : IMAGE_SCALE_REST;
   const imageTransition =
-    isActive && (index > 0 || entryRevealed) && !reduceMotion
+    imageZoomed && !reduceMotion
       ? { ...figmaQuickSpring, delay: 0.08 }
       : figmaQuickSpring;
 
@@ -243,17 +349,35 @@ function StackingCard({
         className="h-full min-h-full rounded-[var(--radius-xl)]"
         style={{ backgroundColor: cardBg }}
       >
-        <div className="grid h-full min-h-full grid-cols-1 lg:grid-cols-[1fr_2fr]">
-          {/* Text column */}
-          <div className="flex flex-col justify-center gap-4 p-8 lg:gap-5 lg:p-14 xl:p-16">
+        <div
+          data-card-grid
+          className="grid h-full min-h-full grid-cols-1 grid-rows-[auto_minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(50%,1fr)] lg:grid-rows-none lg:gap-x-10 lg:gap-y-6 xl:gap-x-12"
+        >
+          {/* Text column — min-w-0 so long titles cannot squeeze the image below 50% */}
+          <div
+            data-card-text-col
+            className="flex min-w-0 flex-col justify-start gap-3 p-4 sm:p-6 lg:justify-center lg:gap-5 lg:p-14 xl:p-16"
+          >
             <h2
-              className="text-[clamp(52px,7.5vw,112px)] font-medium leading-[1.0] tracking-[-0.04em]"
-              style={{ color: accentColor }}
+              className={cn(
+                "w-full font-display font-bold leading-[1.0] tracking-[-0.05em]",
+                titleSizePx === undefined && "text-[clamp(36px,12vw,112px)]",
+              )}
+              style={{
+                color: accentColor,
+                ...(titleSizePx !== undefined ? { fontSize: titleSizePx } : {}),
+              }}
             >
               {item.title}
             </h2>
             {item.body && (
-              <p className={cn(bodyLgClassName, "max-w-[340px]")} style={{ color: bodyColor }}>
+              <p
+                className={cn(bodyLgClassName, "w-full lg:max-w-none")}
+                style={{
+                  color: bodyColor,
+                  ...(bodySizePx !== undefined ? { fontSize: bodySizePx } : {}),
+                }}
+              >
                 {parseBodyLinks(item.body)}
               </p>
             )}
@@ -271,19 +395,23 @@ function StackingCard({
             )}
           </div>
 
-          {/* Image column — inset container clips; image scales independently inside */}
-          <div className="relative flex min-h-[48vw] items-stretch p-4 lg:min-h-0 lg:p-6 xl:p-8">
-            <div className="relative min-h-0 flex-1 overflow-hidden rounded-[var(--radius-md)]">
-              <motion.img
-                src={item.imageSrc}
-                alt={item.imageAlt ?? ""}
-                className="absolute inset-0 h-full w-full object-cover"
-                loading={index === 0 ? "eager" : "lazy"}
-                initial={reduceMotion ? { scale: 1 } : { scale: IMAGE_ENTER_SCALE }}
+          {/* Image column — static rounded clip; only the inner layer scales */}
+          <div className="relative flex min-h-0 items-stretch p-4 pt-0 sm:p-6 sm:pt-0 lg:min-h-0 lg:p-6 xl:p-8">
+            <div className="relative isolate min-h-0 flex-1 overflow-hidden rounded-[var(--radius-md)]">
+              <motion.div
+                className="absolute inset-0"
+                initial={{ scale: IMAGE_SCALE_REST }}
                 animate={{ scale: imageScale }}
                 transition={imageTransition}
                 style={{ transformOrigin: "50% 50%" }}
-              />
+              >
+                <img
+                  src={item.imageSrc}
+                  alt={item.imageAlt ?? ""}
+                  className="block h-full w-full object-cover"
+                  loading={index === 0 ? "eager" : "lazy"}
+                />
+              </motion.div>
               {isBuried && (
                 <div
                   aria-hidden
@@ -311,11 +439,27 @@ export function StackingCardsSection({
 }: StackingCardsSectionProps) {
   const trackRef = useRef<HTMLElement>(null);
   const stackRef = useRef<HTMLDivElement>(null);
+  const titleMeasurerRef = useRef<HTMLSpanElement>(null);
+  const { titlePx: titleSizePx, bodyPx: bodySizePx } = useUnifiedCardTextSizes(
+    items.map((item) => item.title),
+    stackRef,
+    titleMeasurerRef,
+  );
   const reduceMotion = useReducedMotion();
   const entryRevealed = useInViewOnce(stackRef, STACK_ENTRY_IN_VIEW_OPTIONS) || reduceMotion;
   const useScroll = items.length > 1 && !reduceMotion;
   const activeIndex = useScrollDrivenIndex(trackRef, items.length, useScroll);
   const stickyPaddingTop = useStackingStickyPadding(trackRef, reduceMotion);
+  const [useAnimatedTopPadding, setUseAnimatedTopPadding] = useState(false);
+
+  useLayoutEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const sync = () => setUseAnimatedTopPadding(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
   const trackHeightVh = items.length * scrollStepVh + exitScrollVh;
 
   return (
@@ -333,21 +477,26 @@ export function StackingCardsSection({
     >
       {/* Sticky viewport — entry padding eases from 120px down to pt-10 across the lock point */}
       <motion.div
-        className="sticky z-[1] flex flex-col px-6 lg:px-24"
+        className="sticky z-[1] flex flex-col px-4 pt-12 sm:px-6 lg:px-24 lg:pt-0"
         style={{
           top: 0,
           height: "100svh",
-          paddingTop: stickyPaddingTop,
+          ...(useAnimatedTopPadding ? { paddingTop: stickyPaddingTop } : {}),
         }}
       >
         {eyebrow && (
-          <h2 className={cn(sectionH2ClassName, "mb-10 shrink-0 text-[var(--section-text)] lg:mb-14")}>
+          <h2 className={cn(sectionH2ClassName, "mb-6 shrink-0 text-[var(--section-text)] sm:mb-8 lg:mb-14")}>
             {parseEmphasis(eyebrow)}
           </h2>
         )}
 
         {/* Card stack — no overflow or border-radius container; cards are plain absolute children */}
         <div ref={stackRef} className="relative min-h-0 flex-1">
+          <span
+            ref={titleMeasurerRef}
+            aria-hidden
+            className="pointer-events-none invisible absolute whitespace-nowrap font-display text-[clamp(36px,12vw,112px)] font-bold leading-[1.0] tracking-[-0.05em]"
+          />
           {items.map((item, index) => (
             <StackingCard
               key={`${item.title}-${index}`}
@@ -356,6 +505,8 @@ export function StackingCardsSection({
               activeIndex={activeIndex}
               reduceMotion={reduceMotion}
               entryRevealed={entryRevealed}
+              titleSizePx={titleSizePx}
+              bodySizePx={bodySizePx}
             />
           ))}
         </div>

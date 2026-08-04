@@ -176,7 +176,7 @@
 }
 
 :root {
-  --site-header-height: 5.25rem;
+  --site-header-height: 4.625rem;
 }
 
 @media (min-width: 1024px) {
@@ -226,7 +226,15 @@ html {
 
 /* Stacked rounded hero — heading above video, expand to fullscreen, body+form slide up */
 .home-hero-donate--stacked {
-  --hero-frame-start: 48vh;
+  /* Measured from intro band in JS; fallback until first paint */
+  --hero-frame-start: calc(var(--site-header-height) + 194px);
+  --hero-frame-bottom-overflow: -8vh;
+}
+
+@media (min-width: 1024px) {
+  .home-hero-donate--stacked {
+    --hero-frame-start: calc(var(--site-header-height) + 220px);
+  }
 }
 
 .home-hero-donate--stacked.home-hero-donate--scroll-fx {
@@ -245,8 +253,14 @@ html {
 .home-hero-donate--stacked .home-hero-donate__intro-scale {
   /* Scale only while scrolling — not during the mount-time word reveal */
   transform: scale(calc(1 - 0.15 * var(--hero-heading-t)));
-  transform-origin: center center;
+  transform-origin: left center;
   will-change: transform;
+}
+
+@media (min-width: 1024px) {
+  .home-hero-donate--stacked .home-hero-donate__intro-scale {
+    transform-origin: center center;
+  }
 }
 
 .home-hero-donate--stacked:not([data-hero-intro-revealed]) .home-hero-donate__intro-scale {
@@ -257,7 +271,7 @@ html {
   left:   calc((1 - var(--hero-frame-t)) * max(24px, calc((100% - 1320px) / 2)));
   right:  calc((1 - var(--hero-frame-t)) * max(24px, calc((100% - 1320px) / 2)));
   top:    calc(var(--hero-frame-start) * (1 - var(--hero-frame-t)));
-  bottom: calc(-8vh * (1 - var(--hero-frame-t)));
+  bottom: calc(var(--hero-frame-bottom-overflow) * (1 - var(--hero-frame-t)));
   border-radius: calc(40px * (1 - var(--hero-frame-t)));
   will-change: top, left, right, bottom, border-radius;
 }
@@ -303,9 +317,15 @@ html {
 }
 
 @media (max-width: 1023px) {
-  .site-header-shell--hidden {
-    pointer-events: auto;
-    transform: none;
+  html {
+    overflow-x: clip;
+  }
+}
+
+@media (max-width: 359px) {
+  .home-hero-donate--stacked .home-hero-donate__frame--scroll-fx {
+    left: calc((1 - var(--hero-frame-t)) * 16px);
+    right: calc((1 - var(--hero-frame-t)) * 16px);
   }
 }
 
@@ -323,8 +343,24 @@ html {
 .nav-dropdown-featured-shell {
   display: block;
   height: 240px;
-  width: 300px;
-  flex-shrink: 0;
+  width: 100%;
+}
+
+.nav-dropdown-stacked-featured-column {
+  height: 240px;
+  width: 100%;
+  --nav-dropdown-stacked-height: 240px;
+}
+
+/* Full-height crop — tile expansion clips/reveals; image never rescales */
+.nav-dropdown-stacked-featured-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--nav-dropdown-stacked-height);
+  object-fit: cover;
+  object-position: top;
 }
 
 .logos-marquee-track {
@@ -410,7 +446,7 @@ html {
   }
 }
 
-/* Page transition overlay handles route changes — disable the default crossfade. */
+/* Instant route swaps — no crossfade. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;

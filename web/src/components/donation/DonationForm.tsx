@@ -166,13 +166,13 @@ function ImpactAmountButton({
       onClick={onClick}
       aria-pressed={selected}
       className={cn(
-        "flex cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border px-3 py-3 transition-colors",
+        "flex cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border px-2 py-2.5 transition-colors sm:px-3 sm:py-3",
         selected
           ? theme.selected
           : "border-neutral-250 bg-white text-kale hover:border-neutral-300",
       )}
     >
-      <span className="text-base font-semibold leading-none">
+      <span className="text-sm font-semibold leading-none sm:text-base">
         ${formattedAmount}
       </span>
       {impact && (
@@ -250,7 +250,7 @@ function DonationFormShell({
       onSubmit={onSubmit}
       data-form-card={formCard}
       className={cn(
-        "@container flex w-full min-w-0 flex-col gap-6 p-6 text-kale lg:p-10",
+        "@container flex w-full min-w-0 flex-col gap-6 p-4 text-kale sm:p-6 lg:p-10",
         inCard
           ? SECTION_CARD_NESTED_RADIUS_CLASS
           : "rounded-[var(--radius-lg)] lg:rounded-[var(--radius-xl)]",
@@ -301,7 +301,7 @@ function HeroDonationForm({
           </h3>
         </div>
 
-        <div className="grid w-full grid-cols-3 gap-3">
+        <div className="grid w-full grid-cols-3 gap-2 sm:gap-3">
           {HERO_PRESETS.slice(0, 3).map((preset, i) => (
             <ImpactAmountButton
               key={preset.amount}
@@ -318,7 +318,7 @@ function HeroDonationForm({
           ))}
         </div>
 
-        <div className="grid w-full grid-cols-3 gap-3">
+        <div className="grid w-full grid-cols-3 gap-2 sm:gap-3">
           <ImpactAmountButton
             amount={HERO_PRESETS[3].amount}
             impact={HERO_PRESETS[3].impact}

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
-import { eyebrowClassName, bodyLgClassName, bodyXlClassName } from "@/lib/typography";
+import { eyebrowClassName, bodyLgClassName, bodyMdClassName, bodyXlClassName } from "@/lib/typography";
 import type { SectionContentProps } from "@/lib/types";
 import { LogoMarquee } from "./LogoMarquee";
 import { SectionShell } from "./SectionShell";
@@ -17,7 +17,7 @@ export interface LogoItem {
 const bodyClasses = {
   xl: bodyXlClassName,
   lg: bodyLgClassName,
-  md: "text-sm leading-[1.4] lg:text-base",
+  md: bodyMdClassName,
 } as const;
 
 export interface LogosBannerSectionProps
@@ -65,10 +65,10 @@ export function LogosBannerSection({
       theme={theme}
       archTop={archTop}
       transparentBg={transparentBg}
-      className={cn("overflow-visible py-16 lg:py-16", className)}
+      className={cn("overflow-visible py-12 lg:py-16", className)}
       id={id}
     >
-      <div className="flex flex-col gap-12">
+      <div className="flex flex-col gap-8 lg:gap-12">
         {hasIntroText && (
           <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center lg:gap-6">
             {eyebrow?.trim() && (

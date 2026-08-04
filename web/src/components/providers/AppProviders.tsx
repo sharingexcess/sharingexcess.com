@@ -1,6 +1,6 @@
 import { createContext, useContext, type ReactNode } from "react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
-import { PageTransitionCurtain } from "@/components/transitions/PageTransitionCurtain";
+import { HomeIntroOverlay } from "@/components/transitions/HomeIntroOverlay";
 import { GsapProvider } from "./GsapProvider";
 import { MotionProvider } from "./MotionProvider";
 import { SmoothScrollProvider } from "./SmoothScrollProvider";
@@ -37,7 +37,7 @@ export function AppProviders({
       <ScrollInteractionContext.Provider value={scrollInteractions}>
         <SmoothScrollProvider enabled={smoothScroll}>
           <GsapProvider>
-            <PageTransitionCurtain />
+            <HomeIntroOverlay isHomePage={isHomePage} />
             {showHeader && <SiteHeader isHomePage={isHomePage} />}
             {children}
           </GsapProvider>

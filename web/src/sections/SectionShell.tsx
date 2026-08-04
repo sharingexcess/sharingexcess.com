@@ -31,24 +31,29 @@ export function SectionArchVisual() {
       rise.set(0);
       return;
     }
-    if (!lenis) return;
 
     const update = () => {
       const section = archRef.current?.closest("section");
       if (!section) return;
-      const sectionTop = section.getBoundingClientRect().top;
-      const vh = window.innerHeight;
-      const scrolledPast = vh + ARCH_RISE - sectionTop;
-      const progress = Math.max(
-        0,
-        Math.min(1, (scrolledPast - ARCH_HOLD_PX) / ARCH_FLATTEN_PX),
-      );
-      rise.set(ARCH_RISE * (1 - progress));
+      rise.set(computeArchRise(section.getBoundingClientRect().top));
     };
 
-    lenis.on("scroll", update);
+    if (lenis) {
+      lenis.on("scroll", update);
+    } else {
+      window.addEventListener("scroll", update, { passive: true });
+    }
+    window.addEventListener("resize", update);
     update();
-    return () => lenis.off("scroll", update);
+
+    return () => {
+      if (lenis) {
+        lenis.off("scroll", update);
+      } else {
+        window.removeEventListener("scroll", update);
+      }
+      window.removeEventListener("resize", update);
+    };
   }, [lenis, reduceMotion, rise]);
 
   return (
@@ -76,10 +81,33 @@ export function SectionArchVisual() {
 const ARCH_RISE = 180;
 
 /**
- * How far (px) the section must scroll past the viewport bottom before the
- * arch begins to flatten.
+ * Desktop: how far (px) past the viewport bottom before the arch flattens.
+ * Mobile hold scales with viewport so the arch completes within shorter sections.
  */
-const ARCH_HOLD_PX = 800;
+const ARCH_HOLD_PX_DESKTOP = 800;
+
+function getArchHoldPx(): number {
+  if (typeof window === "undefined") return ARCH_HOLD_PX_DESKTOP;
+  const vh = window.innerHeight || 800;
+  return window.matchMedia("(min-width: 1024px)").matches
+    ? ARCH_HOLD_PX_DESKTOP
+    : Math.round(vh * 0.35);
+}
+
+function getArchSectionPt(): number {
+  if (typeof window === "undefined") return 48;
+  return window.matchMedia("(min-width: 1024px)").matches ? 64 : 48;
+}
+
+function computeArchRise(sectionTop: number): number {
+  const vh = window.innerHeight || 800;
+  const scrolledPast = vh + ARCH_RISE - sectionTop;
+  const progress = Math.max(
+    0,
+    Math.min(1, (scrolledPast - getArchHoldPx()) / ARCH_FLATTEN_PX),
+  );
+  return ARCH_RISE * (1 - progress);
+}
 
 /**
  * Setting this equal to ARCH_RISE keeps the arch peak stationary in the
@@ -168,13 +196,9 @@ function useRoundedTopScrollRadius(enabled: boolean) {
 
 /**
  * How far above the section boundary the content sits when the arch is fully
- * peaked. The section's own paddingTop (64px from py-16) plus this value gives
- * the total negative marginTop applied at full rise.
- *   -marginTop_max = SECTION_PT + ARCH_CONTENT_PULLUP = 64 + 80 = 144px
- * When rise → 0 the marginTop returns to 0 and the section's paddingTop alone
- * provides the top spacing, keeping the flat state consistent with other sections.
+ * peaked. Section paddingTop (48px mobile / 64px desktop) plus this value
+ * gives the total negative marginTop at full rise.
  */
-const ARCH_SECTION_PT = 64; // py-16 on the archTop section (LogosBannerSection)
 const ARCH_CONTENT_PULLUP = 80; // px above section boundary at full rise
 
 export function SectionArchRoot({
@@ -189,6 +213,7 @@ export function SectionArchRoot({
   const reduceMotion = useReducedMotion();
 
   const rise = useMotionValue(ARCH_RISE);
+  const pullMax = useMotionValue(getArchSectionPt() + ARCH_CONTENT_PULLUP);
   const top = useTransform(rise, (v) => -v);
   const radiusX = `${ARCH_WIDTH_VW / 2}vw`;
   const borderTopLeftRadius = useTransform(rise, (v) => `${radiusX} ${v}px`);
@@ -196,33 +221,47 @@ export function SectionArchRoot({
 
   // Pull content up into the arch when peaked; return to 0 when flat so the
   // section's own paddingTop takes over — no position jump at either extreme.
-  const marginTop = useTransform(rise, (v) =>
-    Math.round(-((ARCH_SECTION_PT + ARCH_CONTENT_PULLUP) * v) / ARCH_RISE),
+  const marginTop = useTransform([rise, pullMax], ([v, pull]) =>
+    Math.round(-((pull as number) * (v as number)) / ARCH_RISE),
   );
+
+  useEffect(() => {
+    const syncPullMax = () => {
+      pullMax.set(getArchSectionPt() + ARCH_CONTENT_PULLUP);
+    };
+    syncPullMax();
+    window.addEventListener("resize", syncPullMax);
+    return () => window.removeEventListener("resize", syncPullMax);
+  }, [pullMax]);
 
   useEffect(() => {
     if (reduceMotion) {
       rise.set(0);
       return;
     }
-    if (!lenis) return;
 
     const update = () => {
       const section = sectionRef.current?.closest("section");
       if (!section) return;
-      const sectionTop = section.getBoundingClientRect().top;
-      const vh = window.innerHeight;
-      const scrolledPast = vh + ARCH_RISE - sectionTop;
-      const progress = Math.max(
-        0,
-        Math.min(1, (scrolledPast - ARCH_HOLD_PX) / ARCH_FLATTEN_PX),
-      );
-      rise.set(ARCH_RISE * (1 - progress));
+      rise.set(computeArchRise(section.getBoundingClientRect().top));
     };
 
-    lenis.on("scroll", update);
+    if (lenis) {
+      lenis.on("scroll", update);
+    } else {
+      window.addEventListener("scroll", update, { passive: true });
+    }
+    window.addEventListener("resize", update);
     update();
-    return () => lenis.off("scroll", update);
+
+    return () => {
+      if (lenis) {
+        lenis.off("scroll", update);
+      } else {
+        window.removeEventListener("scroll", update);
+      }
+      window.removeEventListener("resize", update);
+    };
   }, [lenis, reduceMotion, rise]);
 
   return (
@@ -308,7 +347,7 @@ export function SectionShell({
   } = useRoundedTopScrollRadius(roundedTop);
 
   const shellClassName = cn(
-    "relative px-6 text-[var(--section-text)] lg:px-24",
+    "relative px-4 text-[var(--section-text)] sm:px-6 lg:px-24",
     transparentBg ? "bg-transparent" : "bg-[var(--section-bg)]",
     flushTop ? "pt-0" : "pt-12 lg:pt-[var(--spacing-xxl)]",
     flushBottom ? "pb-0" : "pb-12 lg:pb-[var(--spacing-xxl)]",

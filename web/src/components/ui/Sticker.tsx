@@ -29,7 +29,7 @@ const STICKER_DROP_SHADOW =
 export const STICKER_SIZE_CLASS = "size-[clamp(100px,11.36vw,150px)]";
 
 /** Smaller sticker for stat card gutters */
-export const STICKER_SIZE_SM_CLASS = "size-[clamp(72px,8.5vw,112px)]";
+export const STICKER_SIZE_SM_CLASS = "size-[clamp(64px,8.5vw,112px)]";
 
 /** Overlap container top edge — hero image, section intro, etc. */
 export const STICKER_OVERLAP_TOP_CLASS =

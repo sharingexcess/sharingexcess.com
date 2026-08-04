@@ -34,7 +34,7 @@ const supporterLogos = [
     bodySize="xl"
     imageSrc="/images/community-people.jpg"
     imageAlt=""
-    videoSrc="/videos/home-hero.mp4"
+    videoSrc="/videos/Website%20Sizzle-08-2026.mp4"
   />
 
   <TextMarqueeBanner client:visible />
@@ -49,7 +49,7 @@ const supporterLogos = [
     bodySize="xl"
     imageStyle="video"
     imageSrc="/videos/home-hero-poster.jpg"
-    videoSrc="/videos/home-hero.mp4"
+    videoSrc="/videos/Website%20Sizzle-08-2026.mp4"
     imageAlt=""
     sticker={true}
     stickerName="free-food"
@@ -108,7 +108,7 @@ const supporterLogos = [
       ]}
     />
 
-    <div aria-hidden class="h-[15vh] min-h-[120px]" />
+    <div aria-hidden class="h-[8vh] min-h-[64px] lg:h-[15vh] lg:min-h-[120px]" />
 
     <MapSection client:load
       theme="dark"
@@ -123,16 +123,14 @@ const supporterLogos = [
       primaryCtaHref="/about/impact"
       secondaryCta="How We Measure"
       secondaryCtaHref="https://docs.sharingexcess.com/docs/impact-measurement"
-      archBottom
     />
   </SectionScrollHandoff>
 
   <VideoTestimonialsCarouselSection client:visible
     theme="light"
-    archTop
     className="relative z-[12]"
     title="Hear directly from the *communities we serve*."
-    body="Placeholder paragraph — real copy coming soon. Partners, volunteers, and neighbors share what rescued food means in their communities."
+    body="Partners, volunteers, and neighbors share what rescued food means in their communities."
     headingSize="h2"
     items={[
       {
@@ -156,7 +154,7 @@ const supporterLogos = [
     ]}
   />
 
-  <SectionScrollHandoff client:visible fadeFrom="light" fadeTo="green" fadeStart={0.04} fadeEnd={0.2}>
+  <SectionScrollHandoff client:visible fadeFrom="light" fadeTo="green" fadeStart={0.04} fadeEnd={0.2} extendForFooter>
     <LogosBannerSection client:visible
       theme="light"
       transparentBg
@@ -175,7 +173,7 @@ const supporterLogos = [
       title="Giving $1 can provide *12 meals*."
       body="All the food we rescue is donated — your gift moves it. Every dollar goes directly toward transportation and logistics."
       headingSize="h2"
-      bodySize="lg"
+      bodySize="xl"
       formPosition="left"
       submitLabel="Donate Now"
     />

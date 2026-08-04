@@ -120,7 +120,7 @@ function TextImageFullImageLayout({
         {/* row flex + items-end: child sticks to the bottom of the vh frame */}
         <div className="flex h-full items-end">
           {/* gradient is inset-0 relative to THIS wrapper — only darkens the text strip, not the full photo */}
-          <div className="relative w-full px-6 py-10 lg:p-24">
+          <div className="relative w-full px-4 py-10 sm:px-6 lg:p-24">
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgba(27,27,21,0.58)] from-50% to-transparent mix-blend-multiply"

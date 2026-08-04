@@ -90,6 +90,13 @@ export const navDropdownLinkSpring: Transition = {
   bounce: 0.2,
 };
 
+/** Nav dropdown stacked column — expand one card, collapse siblings */
+export const navStackedExpandSpring: Transition = {
+  type: "spring",
+  visualDuration: 0.32,
+  bounce: 0.12,
+};
+
 /** Primary button color ripple — smooth sweep, zero bounce */
 export const buttonHoverSpring: Transition = {
   type: "spring",
@@ -301,6 +308,24 @@ export const heroWordContainerVariants: Variants = {
 /** Home hero intro — longer pause before the headline begins revealing */
 export const homeHeroRevealDelay = 0.55;
 export const homeHeroRevealStagger = 0.14;
+
+/** Home page load — nav bar fades and settles from above */
+export const homeNavEnterSpring: Transition = {
+  type: "spring",
+  visualDuration: 0.55,
+  bounce: 0,
+};
+
+export const homeNavEnterDelay = 0.12;
+
+/** Home page load — hero video frame rises from below */
+export const homeHeroVideoEnterSpring: Transition = {
+  type: "spring",
+  visualDuration: 0.85,
+  bounce: 0,
+};
+
+export const homeHeroVideoEnterDelay = 0.28;
 
 /** TextImage carousel — snappy spring with bounce for stack enter */
 export const textImageStackEnterSpring: Transition = {

@@ -223,7 +223,13 @@ async function fitBoundsFromGeoJson(
     }
 
     if (!bounds.isEmpty()) {
-      map.fitBounds(bounds, { padding: 40, maxZoom: DEFAULT_MAX_ZOOM });
+      const isMobile = window.matchMedia("(max-width: 1023px)").matches;
+      const padding = isMobile ? 16 : 28;
+      const maxZoom = isMobile ? 5.25 : 4.75;
+      const zoomBoost = isMobile ? 0.85 : 0.55;
+
+      map.fitBounds(bounds, { padding, maxZoom, animate: false });
+      map.setZoom(Math.min(map.getZoom() + zoomBoost, maxZoom));
     }
   } catch {
     // Keep default viewport when geojson is unavailable (e.g. offline Storybook).

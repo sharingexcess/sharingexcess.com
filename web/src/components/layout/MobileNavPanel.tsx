@@ -251,14 +251,14 @@ export function MobileNavPanel({
             </motion.ul>
 
             <motion.div
-              className="pointer-events-auto flex flex-col gap-3 pt-8"
+              className="pointer-events-auto flex flex-row gap-2 pt-8"
               variants={footerVariants}
               transition={instant}
             >
-              <Button variant="secondary" size="lg" href={secondaryCtaHref} className="w-full">
+              <Button variant="secondary" size="lg" href={secondaryCtaHref} className="min-w-0 flex-1">
                 {secondaryCtaLabel}
               </Button>
-              <Button variant="primary" size="lg" href={ctaHref} className="w-full">
+              <Button variant="primary" size="lg" href={ctaHref} className="min-w-0 flex-1">
                 {ctaLabel}
               </Button>
             </motion.div>

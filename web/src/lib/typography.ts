@@ -1,10 +1,14 @@
 /** Malila bold label above section headings — Foundations/Typography "Eyebrow" */
 export const eyebrowClassName =
-  "font-display text-[24px] font-bold leading-[1.1]";
+  "font-display text-lg font-bold leading-[1.1] lg:text-[24px]";
+
+/** Secondary captions — map footnotes, carousel labels, etc. */
+export const captionClassName =
+  "text-xs leading-[1.4] italic opacity-64 lg:text-sm";
 
 /** Large stat figures — Foundations/Typography "Metric Number" */
 export const metricNumberClassName =
-  "font-display text-[clamp(4rem,22vw,8rem)] font-bold leading-[1.06] tabular-nums";
+  "font-display text-[40px] font-bold leading-[1.06] tabular-nums lg:text-[clamp(4rem,22vw,8rem)]";
 
 /** Section H1 — primary heading within page sections (TextSection, carousel active item) */
 export const sectionH1ClassName =
@@ -23,8 +27,9 @@ export const sectionMetricSubheadingClassName =
   "text-[clamp(24px,5vw,48px)] font-medium leading-[1.2] tracking-[-0.04em] lg:text-[clamp(28px,3.2cqw,48px)]";
 
 /** Section body copy — matches TextSection `bodySize` tokens */
-export const bodyXlClassName = "text-sm leading-[1.6] lg:text-[20px]";
-export const bodyLgClassName = "text-sm leading-[1.4] lg:text-[18px]";
+export const bodyXlClassName = "text-base leading-[1.6] lg:text-[20px]";
+export const bodyLgClassName = "text-base leading-[1.4] lg:text-[18px]";
+export const bodyMdClassName = "text-sm leading-[1.4] lg:text-base";
 
 /** Stat card text variant — scales with card width; wraps at container edge */
 export const statCardTextHeaderClassName =

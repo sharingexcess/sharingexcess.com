@@ -3,6 +3,7 @@ import { parseEmphasis } from "@/lib/parseEmphasis";
 import {
   eyebrowClassName,
   bodyLgClassName,
+  bodyMdClassName,
   bodyXlClassName,
   sectionH1ClassName,
   sectionH2ClassName,
@@ -65,7 +66,7 @@ function resolveHeadingClassName(headingSize: "h1" | "h2", hasMetric: boolean): 
 const bodyClasses = {
   xl: bodyXlClassName,
   lg: bodyLgClassName,
-  md: "text-sm leading-[1.4] lg:text-base",
+  md: bodyMdClassName,
 };
 
 export function TextSection({
@@ -127,15 +128,28 @@ export function TextSection({
   const ctaRow = hasCtas && (
     <div
       {...(isCard ? { "data-section-card": true } : {})}
-      className={cn("flex flex-wrap gap-2 lg:gap-4", isCentered && "justify-center")}
+      className={cn(
+        "flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-2 lg:gap-4",
+        isCentered && "items-stretch sm:items-center sm:justify-center",
+      )}
     >
       {primaryCta && (
-        <Button variant="primary" colorScheme={scheme} href={primaryCtaHref}>
+        <Button
+          variant="primary"
+          colorScheme={scheme}
+          href={primaryCtaHref}
+          className={isCentered ? "w-full sm:w-auto" : undefined}
+        >
           {primaryCta}
         </Button>
       )}
       {secondaryCta && (
-        <Button variant="secondary" colorScheme={scheme} href={secondaryCtaHref}>
+        <Button
+          variant="secondary"
+          colorScheme={scheme}
+          href={secondaryCtaHref}
+          className={isCentered ? "w-full sm:w-auto" : undefined}
+        >
           {secondaryCta}
         </Button>
       )}
@@ -144,7 +158,7 @@ export function TextSection({
 
   if (layout === "horizontal") {
     return (
-      <div className={cn("flex flex-col gap-3", className)}>
+      <div className={cn("flex flex-col gap-4", className)}>
         {eyebrow && (
           <p className={cn(eyebrowClassName, "text-[var(--section-text,#003619)]")}>{eyebrow}</p>
         )}
@@ -171,18 +185,30 @@ export function TextSection({
   return (
     <div
       className={cn(
-        "flex flex-col",
+        "flex w-full min-w-0 flex-col",
         metric ? "gap-6 lg:gap-10" : "gap-4 lg:gap-8",
         isCentered && "items-center text-center",
         className,
       )}
     >
-      <div className={cn("flex flex-col", metric ? "gap-4 lg:gap-6" : "gap-2 lg:gap-2.5")}>
+      <div
+        className={cn(
+          "flex w-full min-w-0 flex-col",
+          metric ? "gap-4 lg:gap-6" : "gap-3 lg:gap-4",
+          isCentered && "items-center",
+        )}
+      >
         {eyebrow && (
           <p className={cn(eyebrowClassName, "text-[var(--section-text,#003619)]")}>{eyebrow}</p>
         )}
-        {metric && <MetricNumber value={metric} />}
-        {headingEl}
+        {metric && (
+          <div className="max-sm:w-full max-sm:min-w-0">
+            <MetricNumber value={metric} />
+          </div>
+        )}
+        {headingEl && (
+          <div className="w-full min-w-0 max-w-full">{headingEl}</div>
+        )}
         {body && (
           <p
             className={cn(

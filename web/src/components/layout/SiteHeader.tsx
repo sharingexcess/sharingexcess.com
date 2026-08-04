@@ -9,8 +9,16 @@ import {
   NavDropdownPanel,
   NavDropdownTrigger,
   NAV_BUTTON_STYLE,
+  NAV_SURFACE_SHADOW_CLASS,
 } from "@/components/layout/NavDropdown";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  homeNavEnterDelay,
+  homeNavEnterSpring,
+  motion,
+  useReducedMotion,
+} from "@/lib/motion";
+import { useIntroRevealed } from "@/lib/useIntroRevealed";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useHeaderOverWhiteBackground } from "@/lib/useHeaderOverWhiteBackground";
 
 export interface SiteHeaderNavLink {
@@ -18,6 +26,8 @@ export interface SiteHeaderNavLink {
   href: string;
   /** When set, renders as an image tile in the desktop dropdown instead of a text link */
   featured?: Pick<NavDropdownFeatured, "imageSrc" | "imageAlt">;
+  /** `stacked` — compact accordion tiles; `stacked-tall` — full-size labels with gradient scrim */
+  featuredLayout?: "standard" | "stacked" | "stacked-tall";
 }
 
 export interface NavDropdownFeatured {
@@ -34,6 +44,8 @@ export interface SiteHeaderNavItem {
   featured?: NavDropdownFeatured;
   /** Optional second featured card — only shown when `showSecondaryFeatured` is enabled */
   secondaryFeatured?: NavDropdownFeatured;
+  /** When true, stacked featured links render after standard featured cards (e.g. About Us) */
+  stackedFeaturedLast?: boolean;
 }
 
 /** Figma placeholder links — real links go in Astro pages when content is finalized. */
@@ -85,11 +97,49 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
     label: "Get Involved",
     href: "/get-involved",
     children: [
-      { label: "For Food Businesses", href: "/get-involved/partners#food-business" },
-      { label: "For Community Organizations", href: "/get-involved/partners#community-orgs" },
-      { label: "For Foundations", href: "/get-involved/partners#foundations" },
-      { label: "Give Monthly", href: "/collective" },
-      { label: "Volunteer", href: "/get-involved/volunteer" },
+      {
+        label: "For Food Businesses",
+        href: "/get-involved/partners#food-business",
+        featured: {
+          imageSrc: "/images/Screen-Shot-2023-07-17-at-8.32.43-PM_1.avif",
+          imageAlt: "",
+        },
+        featuredLayout: "stacked",
+      },
+      {
+        label: "For Community Organizations",
+        href: "/get-involved/partners#community-orgs",
+        featured: {
+          imageSrc: "/images/fall-food-featured-photo-1-1160x680.remini-enhanced_1.avif",
+          imageAlt: "",
+        },
+        featuredLayout: "stacked",
+      },
+      {
+        label: "For Foundations",
+        href: "/get-involved/partners#foundations",
+        featured: {
+          imageSrc: "/images/Screen-Shot-2023-07-17-at-9.09.58-PM.remini-enhanced_1.avif",
+          imageAlt: "",
+        },
+        featuredLayout: "stacked",
+      },
+      {
+        label: "Give Monthly",
+        href: "/collective",
+        featured: {
+          imageSrc: "/images/collective_footer_image_1.avif",
+          imageAlt: "",
+        },
+      },
+      {
+        label: "Volunteer",
+        href: "/get-involved/volunteer",
+        featured: {
+          imageSrc: "/images/volunteer.jpg",
+          imageAlt: "",
+        },
+      },
     ],
     featured: {
       imageSrc: "/images/peppers.jpg",
@@ -101,6 +151,7 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
   {
     label: "About Us",
     href: "/about",
+    stackedFeaturedLast: true,
     children: [
       {
         label: "Our Impact",
@@ -118,8 +169,24 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
           imageAlt: "",
         },
       },
-      { label: "Our Team", href: "/about/team" },
-      { label: "Our Financials", href: "/about/financials" },
+      {
+        label: "Our Team",
+        href: "/about/team",
+        featured: {
+          imageSrc: "/images/team.jpg",
+          imageAlt: "",
+        },
+        featuredLayout: "stacked-tall",
+      },
+      {
+        label: "Our Financials",
+        href: "/about/financials",
+        featured: {
+          imageSrc: "/images/financials.jpg",
+          imageAlt: "",
+        },
+        featuredLayout: "stacked-tall",
+      },
     ],
     featured: {
       imageSrc: "/images/about.png",
@@ -144,9 +211,7 @@ const HEADER_BAR_TRANSITION =
 const STANDARD_NAV_MAX_WIDTH = "max-w-[1320px]";
 
 const HEADER_BAR_CLASS =
-  "relative isolate rounded-[var(--radius-3xl)] border border-transparent bg-neutral-000 px-4 py-3 lg:px-8 lg:py-4";
-
-const HEADER_BAR_SHADOW_CLASS = "shadow-[0_2px_12px_rgba(0,0,0,0.05)]";
+  "relative isolate rounded-[var(--radius-3xl)] border border-transparent bg-neutral-000 px-4 py-2.5 lg:px-8 lg:py-4";
 
 /** Figma node 1052:2970 — NavigationBar option 1 (desktop + mobile overlay). */
 export function SiteHeader({
@@ -165,20 +230,16 @@ export function SiteHeader({
   const overWhiteBackground = useHeaderOverWhiteBackground(headerBarRef);
   const [activeNavIndex, setActiveNavIndex] = useState<number | null>(null);
   const [hoveredNavIndex, setHoveredNavIndex] = useState<number | null>(null);
-  const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [isHomePage, setIsHomePage] = useState(isHomePageProp);
+  const reduceMotion = useReducedMotion();
+  const introRevealed = useIntroRevealed();
+  const [homeEnterKey, setHomeEnterKey] = useState(0);
   const scrollVisible = useHideOnScroll({ enabled: isHomePage });
-  const visible = isHomePage ? scrollVisible || menuOpen || isMobileViewport : true;
+  const visible = isHomePage ? scrollVisible || menuOpen : true;
+  const animateHomeNav = isHomePage && !reduceMotion && introRevealed;
+  const homeNavEnter = isHomePage && !reduceMotion;
 
   useBodyScrollLock(menuOpen);
-
-  useLayoutEffect(() => {
-    const media = window.matchMedia("(max-width: 1023px)");
-    const sync = () => setIsMobileViewport(media.matches);
-    sync();
-    media.addEventListener("change", sync);
-    return () => media.removeEventListener("change", sync);
-  }, []);
 
   useEffect(() => {
     const syncPath = () => {
@@ -188,6 +249,16 @@ export function SiteHeader({
     syncPath();
     return () => document.removeEventListener("astro:after-swap", syncPath);
   }, []);
+
+  useEffect(() => {
+    const replayHomeEnter = () => {
+      if (isHomePagePath(window.location.pathname) && !reduceMotion) {
+        setHomeEnterKey((key) => key + 1);
+      }
+    };
+    document.addEventListener("astro:after-swap", replayHomeEnter);
+    return () => document.removeEventListener("astro:after-swap", replayHomeEnter);
+  }, [reduceMotion]);
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const toggleMenu = useCallback(() => setMenuOpen((open) => !open), []);
@@ -224,7 +295,7 @@ export function SiteHeader({
     };
   }, [closeMenu, closeNavDropdown]);
 
-  const headerInteractive = visible || isMobileViewport;
+  const headerInteractive = visible || menuOpen;
 
   return (
     <header
@@ -232,7 +303,7 @@ export function SiteHeader({
       data-visible={visible}
       data-menu-open={menuOpen || undefined}
       className={cn(
-        "site-header-shell fixed inset-x-0 top-0 z-50 w-full bg-transparent px-4 py-3 lg:px-8 lg:py-4",
+        "site-header-shell fixed inset-x-0 top-0 z-50 w-full bg-transparent px-4 py-2.5 lg:px-8 lg:py-4",
         !visible && "site-header-shell--hidden",
         className,
       )}
@@ -247,20 +318,31 @@ export function SiteHeader({
         )}
         onMouseLeave={closeNavDropdown}
       >
-        <div
+        <motion.div
+          key={animateHomeNav ? homeEnterKey : undefined}
           ref={headerBarRef}
           data-header-bar
+          initial={homeNavEnter ? { opacity: 0, y: -14 } : false}
+          animate={
+            homeNavEnter && !introRevealed
+              ? { opacity: 0, y: -14 }
+              : { opacity: 1, y: 0 }
+          }
+          transition={{
+            ...homeNavEnterSpring,
+            delay: homeNavEnter && introRevealed ? homeNavEnterDelay : 0,
+          }}
           className={cn(
             HEADER_BAR_CLASS,
             HEADER_BAR_TRANSITION,
-            overWhiteBackground && HEADER_BAR_SHADOW_CLASS,
+            overWhiteBackground && NAV_SURFACE_SHADOW_CLASS,
             menuOpen && "z-50",
           )}
         >
           <div className="relative flex items-center justify-between gap-4 lg:gap-6">
         <a
           href="/"
-          className="flex shrink-0 items-center gap-[6px] text-[22px] text-se-green no-underline lg:text-[24px]"
+          className="flex shrink-0 items-center gap-[6px] text-[20px] text-se-green no-underline min-[360px]:text-[22px] lg:text-[24px]"
         >
           <img
             src={LOGO_ICON_SRC}
@@ -270,7 +352,7 @@ export function SiteHeader({
             className="size-8 shrink-0 rounded-[6px] lg:h-[1.06em] lg:w-[1.06em] lg:min-w-[1.06em]"
           />
           <span
-            className="font-sans text-[22px] font-semibold leading-[1.06] tracking-[-0.04em] text-se-green lg:text-[inherit]"
+            className="font-sans text-[20px] font-semibold leading-[1.06] tracking-[-0.04em] text-se-green min-[360px]:text-[22px] lg:text-[inherit]"
           >
             {logoLabel}
           </span>
@@ -336,7 +418,7 @@ export function SiteHeader({
           />
         </div>
         </div>
-        </div>
+        </motion.div>
 
         <NavDropdownPanel
           item={activeNavItem}
@@ -344,6 +426,7 @@ export function SiteHeader({
           open={navDropdownOpen}
           onClose={closeNavDropdown}
           showSecondaryFeatured={showSecondaryFeatured}
+          overWhiteBackground={overWhiteBackground}
         />
       </div>
 
