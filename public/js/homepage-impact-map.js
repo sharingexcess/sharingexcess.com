@@ -214,7 +214,25 @@
     });
   }
 
+  function injectMapControlStyles() {
+    if (document.getElementById("se-impact-map-control-styles")) return;
+    var style = document.createElement("style");
+    style.id = "se-impact-map-control-styles";
+    style.textContent =
+      ".mapboxgl-ctrl-logo,.mapboxgl-ctrl-attrib{display:none!important}" +
+      ".mapboxgl-ctrl-group{background:rgba(250,250,250,.24)!important;" +
+      "backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);" +
+      "border-radius:8px!important;box-shadow:none!important;border:none!important;overflow:hidden}" +
+      ".mapboxgl-ctrl-group button{width:36px!important;height:36px!important;" +
+      "background:transparent!important;border:none!important}" +
+      ".mapboxgl-ctrl-group button+button{border-top:1px solid rgba(250,250,250,.24)!important}" +
+      ".mapboxgl-ctrl-group button:hover{background-color:rgba(250,250,250,.36)!important}" +
+      ".mapboxgl-ctrl-group button .mapboxgl-ctrl-icon{filter:brightness(0) invert(1)}";
+    document.head.appendChild(style);
+  }
+
   function initImpactMap(mapStyle, loadingLogo) {
+    injectMapControlStyles();
     mapboxgl.accessToken = ACCESS_TOKEN;
     var map = new mapboxgl.Map({
       container: "impact-map",
@@ -222,8 +240,9 @@
       center: [-98.5795, 39.8283],
       zoom: 3.5,
       maxZoom: 9,
+      attributionControl: false,
     });
-    map.addControl(new mapboxgl.NavigationControl());
+    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
 
     function hideLoadingLogo() {
       if (loadingLogo) loadingLogo.style.display = "none";
