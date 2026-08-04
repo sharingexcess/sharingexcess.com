@@ -2583,6 +2583,9 @@ p :is(strong, b) {
 
 .section.landing-hero .hero-content > h1 {
   margin-bottom: var(--space--lg);
+  text-shadow:
+    0 2px 20px rgba(0, 0, 0, 0.22),
+    0 8px 48px rgba(0, 0, 0, 0.18);
 }
 
 .section.landing-hero .hero-content > p {
@@ -3815,6 +3818,17 @@ p :is(strong, b) {
     line-height: 1em;
   }
 
+  .section.landing-hero {
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: stretch;
+  }
+
+  .section.landing-hero .hero-content {
+    padding-bottom: var(--space--2xl);
+    justify-content: flex-end;
+  }
+
   .section.page-header {
     height: 384px;
     padding-top: var(--space--5xl);
@@ -4488,7 +4502,7 @@ p :is(strong, b) {
 
   .hero-content {
     padding-right: var(--space--2xl);
-    padding-bottom: var(--space--6xl);
+    padding-bottom: var(--space--2xl);
     padding-left: var(--space--2xl);
     text-align: left;
     justify-content: flex-end;
@@ -4525,8 +4539,9 @@ p :is(strong, b) {
   }
 
   .section.landing-hero {
-    justify-content: center;
-    align-items: flex-end;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: stretch;
     height: 100vh;
   }
 
