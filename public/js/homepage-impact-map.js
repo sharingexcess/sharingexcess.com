@@ -21,6 +21,8 @@
   };
   var ACCESS_TOKEN =
     "pk.eyJ1Ijoic2Fya2FyaWNodGVyIiwiYSI6ImNtOXU5cDkwNjA3dGgycXB5Zmt1NGpreWEifQ.prxEqERsrMZSwXxahDnkbg";
+  var MAP_LAND_COLOR = "#003619";
+  var MAP_WATER_COLOR = "#001F0A";
   var FALLBACK_MAP_STYLE = "mapbox://styles/mapbox/dark-v11";
   var SURPLUS_MAP_STYLE_URL = "/js/surplus-dark-map-style.json";
   var SOURCE_ID = "impact-locations";
@@ -214,6 +216,33 @@
     });
   }
 
+  function applyMapTheme(map) {
+    if (typeof map.setProjection === "function") {
+      map.setProjection("globe");
+    }
+    if (typeof map.setFog === "function") {
+      map.setFog(null);
+    }
+    if (typeof map.setLights === "function") {
+      map.setLights([]);
+    }
+    if (map.getLayer("land")) {
+      map.setPaintProperty("land", "background-color", MAP_LAND_COLOR);
+    }
+    if (map.getLayer("water")) {
+      map.setPaintProperty("water", "fill-color", MAP_WATER_COLOR);
+    }
+    if (map.getLayer("waterway")) {
+      map.setPaintProperty("waterway", "line-color", MAP_WATER_COLOR);
+    }
+    if (map.getLayer("land-structure-polygon")) {
+      map.setPaintProperty("land-structure-polygon", "fill-color", MAP_LAND_COLOR);
+    }
+    if (map.getLayer("land-structure-line")) {
+      map.setPaintProperty("land-structure-line", "line-color", MAP_LAND_COLOR);
+    }
+  }
+
   function injectMapControlStyles() {
     if (document.getElementById("se-impact-map-control-styles")) return;
     var style = document.createElement("style");
@@ -255,6 +284,8 @@
     });
 
     map.on("load", function () {
+      applyMapTheme(map);
+
       if (!addMarkerImage(map)) {
         hideLoadingLogo();
         return;
