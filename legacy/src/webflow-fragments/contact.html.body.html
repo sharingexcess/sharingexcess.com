@@ -57,10 +57,10 @@
         <a href="/donate-food.html" data-mixpanel-component-id="news" data-mixpanel-component="nav_dropdown" class="nav-link w-nav-link">Donate Food</a>
         <a href="/contact.html" data-mixpanel-component-id="contact" data-mixpanel-component="nav_dropdown" aria-current="page" class="nav-link w-nav-link w--current">Contact</a>
         <div class="nav-button-container">
-          <a data-mixpanel-component="nav_donate_button" href="/?form=donate" class="button sm w-inline-block"><img loading="lazy" src="/images/hand-heart-icon.svg" alt="" class="icon-md">
+          <a data-mixpanel-component="nav_donate_button" href="/?form=donate" class="button w-inline-block"><img loading="lazy" src="/images/hand-heart-icon.svg" alt="" class="icon-md">
             <div>Donate</div>
           </a>
-          <a data-mixpanel-component="nav_partner_login_button" href="https://app.sharingexcess.com" target="_blank" class="button secondary-white sm w-inline-block"><img loading="lazy" src="/images/user-icon.svg" alt="" class="icon-md">
+          <a data-mixpanel-component="nav_partner_login_button" href="https://surplus.sharingexcess.com" target="_blank" class="button secondary-white w-inline-block"><img loading="lazy" src="/images/user-icon.svg" alt="" class="icon-md">
             <div>Partner Login</div>
           </a>
         </div>
@@ -102,7 +102,7 @@
             <textarea class="textarea margin-bottom-xl" rows="5" name="message" id="message" required></textarea>
             <input type="hidden" name="_subject" id="email-subject" value="Contact Form Submission">
           </fieldset>
-          <input type="submit" value="Submit" class="button width-100" style="border: none">
+          <input type="submit" value="Submit" class="button" style="border: none">
         </form>
       </div>
     </div>
@@ -137,40 +137,56 @@
     }
     #mc_embed_signup form {
       margin: 0;
+      text-align: left;
     }
     #mc_embed_signup h2 {
       color: var(--black--black);
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 0;
+      font-size: var(--font--3xl);
+      font-weight: 500;
+      letter-spacing: -.04em;
+      line-height: 1.2em;
+      margin-bottom: var(--space--sm);
       margin-top: 0;
+      text-wrap: balance;
     }
     #mc_embed_signup p {
-      color: var(--black--black-64);
-      font-size: 0.675rem;
+      color: var(--black--black-text-64);
+      font-size: var(--font--md);
       font-weight: 400;
-      margin-bottom: 0.375rem;
+      line-height: 1.6em;
+      margin-bottom: var(--space--2xl);
     }
     #mc_embed_signup .mc-field-group {
       margin-bottom: 0;
       width: 100%;
-      padding-bottom: 0.25rem;
+      padding-bottom: 0;
     }
     #mc_embed_signup .mc-field-group label {
       display: block;
-      font-size: 0.675rem;
+      font-size: var(--font--sm);
       font-weight: 600;
-      margin-bottom: 0;
-      color: var(--black--black-64);
+      margin-bottom: var(--space--xs);
+      color: var(--black--black-text-48);
+      text-transform: none;
     }
     #mc_embed_signup .mc-field-group input {
-      border: 1px solid var(--black--black-8);
-      background: var(--black--black-8);
-      color: var(--black-black);
-      border-radius: 4px;
-      font-size: 0.75rem;
-      padding: 0.375rem;
+      border: 1px solid var(--black--black-12);
+      background: var(--black--black-4);
+      color: var(--black--black);
+      border-radius: var(--radius--md);
+      font-size: var(--font--md);
+      padding: var(--space--sm) var(--space--md);
       width: 100%;
+      margin-bottom: var(--space--xl);
+      box-sizing: border-box;
+    }
+    @media screen and (max-width: 767px) {
+      #mc_embed_signup h2 {
+        font-size: var(--font--lg);
+      }
+      #mc_embed_signup p {
+        font-size: var(--font--sm);
+      }
     }
     #mc_embed_signup #mc-embedded-subscribe-form div.mce_inline_error {
       background: none !important;
@@ -184,19 +200,20 @@
       color: var(--black--black);
     }
     #mc_embed_signup .button {
-      background: var(--green--primary);
-      color: var(--white--white);
-      font-size: 14px;
-      padding: 2px;
-      width: 100%;
-      font-weight: 600;
       height: unset !important;
-      transition: all 0.1s ease;
-      border-radius: 4px;
       margin: 0 !important;
+      width: auto;
+      padding: var(--space--md) var(--space--xl) !important;
+      font-size: var(--font--md) !important;
+      line-height: var(--font--md) !important;
+      border-radius: var(--radius--full) !important;
+      background: var(--green--primary) !important;
+      color: var(--white--white) !important;
+      font-weight: 600;
+      transition: all 0.1s ease;
     }
     #mc_embed_signup .button:hover {
-      background: var(--green--primary-with-hover-highlight);
+      background: var(--green--primary-with-hover-highlight) !important;
     }
     #mc_embed_signup #mce-responses #mce-error-response {
       margin: 0 !important;
@@ -215,7 +232,7 @@
               <div id="mc_embed_signup_scroll">
                 <h2>Subscribe to Our Newsletter</h2>
                 <p>Receive a monthly update on what's happening @ Sharing Excess.</p>
-                <div class="flex row gap-lg">
+                <div class="flex row gap-lg mobile-column mobile-gap-0">
                   <div class="mc-field-group">
                     <label for="mce-FNAME">First Name </label>
                     <input type="text" name="FNAME" class="text" id="mce-FNAME" value="">
@@ -237,7 +254,7 @@
                   <input type="text" name="b_788eca2f39db4eb9efdbf6724_bb7d153d20" tabindex="-1" value="">
                 </div>
                 <div class="clear">
-                  <input type="submit" name="subscribe" id="mc-embedded-subscribe" class="button sm" value="Subscribe">
+                  <input type="submit" name="subscribe" id="mc-embedded-subscribe" class="button" value="Subscribe">
                 </div>
               </div>
             </form>
@@ -306,7 +323,7 @@
                 <textarea class="textarea margin-bottom-sm font-size-sm" rows="2" name="message" id="message" required></textarea>
                 <input type="hidden" name="_subject" id="email-subject" value="Contact Form Submission">
               </fieldset>
-              <input type="submit" value="Submit" class="button width-100" style="border: none">
+              <input type="submit" value="Submit" class="button" style="border: none">
             </form>
           </div>
         </div>
@@ -324,7 +341,7 @@
             <div class="flex row gap-lg width-100 justify-end mobile-justify-center">
               <a href="/contact.html" aria-current="page" class="font-size-xs w--current">Contact</a>
               <a href="/?form=donate" class="font-size-xs">Donate</a>
-              <a href="https://app.sharingexcess.com/sign-in" target="_blank" class="font-size-xs">Partner Login</a>
+              <a href="https://surplus.sharingexcess.com" target="_blank" class="font-size-xs">Partner Login</a>
               <a href="/documents/Sharing-Excess-Privacy-Policy.pdf" class="font-size-xs">Privacy</a>
             </div>
           </div>

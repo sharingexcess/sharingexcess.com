@@ -7,7 +7,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "start": "serve dist -l tcp://0.0.0.0:4321",
-    "sync:webflow": "rsync -a --delete ../sharingexcess.webflow/css ../sharingexcess.webflow/js ../sharingexcess.webflow/images ../sharingexcess.webflow/documents ../sharingexcess.webflow/videos ../public/",
+    "sync:webflow": "echo 'ERROR: sync:webflow is disabled — it deletes custom assets in public/ that are not in the Webflow export. Edit legacy/ and public/ directly, or run generate after a one-off Webflow export.' >&2 && exit 1",
     "generate": "bun ../scripts/migration/generate-webflow-astro.ts",
     "verify": "bun run build && bun ../scripts/migration/verify-build.ts"
   },

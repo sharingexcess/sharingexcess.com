@@ -50,7 +50,7 @@ Sadly, however, this is part of the reason why gaps in food access still exist. 
 
 A grocery store may have thousands of pounds of excess produce available, but no easy way to locate nearby organizations that can pick it up immediately. One pantry may receive more bread or dairy products than it can distribute before expiration, while another pantry nearby experiences shortages. Food rescue organizations help bridge these gaps by creating more connected systems that move food faster and more efficiently, while also modernizing food distribution networks that were never originally designed to handle large-scale perishable recovery.
 
-Since 2018, [Sharing Excess has helped feed over 10 million people](/about/impact), in large part because we're able to more efficiently facilitate food redistribution through a much wider network of donors, through tools such as [Surplus, our food Rescue App](https://surplus.sharingexcess.com/).
+Since 2018, [Sharing Excess has helped feed over 10 million people](/about/impact), in large part because we're able to more efficiently facilitate food redistribution through a much wider network of donors, through tools such as [our Surplus app](https://surplus.sharingexcess.com).
 
 ### Diversity in Food Distribution
 

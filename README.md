@@ -28,13 +28,12 @@ bun run build:web    # new site
 bun run preview
 ```
 
-## Webflow export
+## Content updates
 
-Extract the Webflow code ZIP to **`sharingexcess.webflow/`** at the repo root, then:
+**`legacy/` and `public/` are the source of truth.** Edit page content in `legacy/src/webflow-fragments/` and add assets to `public/images/`.
 
-```bash
-bun run sync:webflow
-bun run generate
-```
+`sync:webflow` is **disabled** — it used `rsync --delete` and removed custom assets (logos, headshots, etc.) that are not in the Webflow export.
+
+For a rare bulk import from Webflow Designer, extract the ZIP to **`sharingexcess.webflow/`** and run `bun run generate` (review the diff carefully; it overwrites fragments).
 
 See [AGENTS.md](AGENTS.md) for cutover steps when the rewrite is ready.

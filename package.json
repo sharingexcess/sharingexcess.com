@@ -2,6 +2,7 @@
   "name": "sharingexcess.com",
   "private": true,
   "scripts": {
+    "setup": "bun install --cwd legacy && bun install --cwd web && bun run --cwd web build:tokens",
     "dev": "bun run --cwd legacy dev",
     "build": "bun run --cwd legacy build",
     "preview": "bun run --cwd legacy preview",
