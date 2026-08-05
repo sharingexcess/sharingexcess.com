@@ -21,11 +21,20 @@ import { useIntroRevealed } from "@/lib/useIntroRevealed";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useHeaderOverWhiteBackground } from "@/lib/useHeaderOverWhiteBackground";
 
+/** Design-system accent for nav dropdown arrow buttons — hardcoded per card, not derived from images */
+export type NavDropdownArrowAccent =
+  | "se-green"
+  | "bright-kelly"
+  | "tangerine"
+  | "banana"
+  | "blueberry"
+  | "guava";
+
 export interface SiteHeaderNavLink {
   label: string;
   href: string;
   /** When set, renders as an image tile in the desktop dropdown instead of a text link */
-  featured?: Pick<NavDropdownFeatured, "imageSrc" | "imageAlt">;
+  featured?: Pick<NavDropdownFeatured, "imageSrc" | "imageAlt" | "arrowAccent">;
   /** `stacked` — compact accordion tiles; `stacked-tall` — full-size labels with gradient scrim */
   featuredLayout?: "standard" | "stacked" | "stacked-tall";
 }
@@ -35,6 +44,7 @@ export interface NavDropdownFeatured {
   imageAlt?: string;
   text: string;
   href?: string;
+  arrowAccent?: NavDropdownArrowAccent;
 }
 
 export interface SiteHeaderNavItem {
@@ -103,6 +113,7 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
         featured: {
           imageSrc: "/images/Screen-Shot-2023-07-17-at-8.32.43-PM_1.avif",
           imageAlt: "",
+          arrowAccent: "se-green",
         },
         featuredLayout: "stacked",
       },
@@ -112,6 +123,7 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
         featured: {
           imageSrc: "/images/fall-food-featured-photo-1-1160x680.remini-enhanced_1.avif",
           imageAlt: "",
+          arrowAccent: "banana",
         },
         featuredLayout: "stacked",
       },
@@ -121,6 +133,7 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
         featured: {
           imageSrc: "/images/Screen-Shot-2023-07-17-at-9.09.58-PM.remini-enhanced_1.avif",
           imageAlt: "",
+          arrowAccent: "blueberry",
         },
         featuredLayout: "stacked",
       },
@@ -130,22 +143,25 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
         featured: {
           imageSrc: "/images/collective_footer_image_1.avif",
           imageAlt: "",
+          arrowAccent: "guava",
         },
       },
       {
         label: "Volunteer",
         href: "/get-involved/volunteer",
         featured: {
-          imageSrc: "/images/volunteer.jpg",
+          imageSrc: "/images/freefood-volunteer.jpg",
           imageAlt: "",
+          arrowAccent: "bright-kelly",
         },
       },
     ],
     featured: {
-      imageSrc: "/images/peppers.jpg",
+      imageSrc: "/images/get-involved.jpg",
       imageAlt: "",
       text: "Get Involved",
       href: "/get-involved",
+      arrowAccent: "tangerine",
     },
   },
   {
@@ -159,6 +175,7 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
         featured: {
           imageSrc: "/images/Screen-Shot-2023-07-17-at-6.44.52-PM_1.avif",
           imageAlt: "",
+          arrowAccent: "banana",
         },
       },
       {
@@ -167,6 +184,7 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
         featured: {
           imageSrc: "/images/54178994461_4d4abdca3b_k_1.avif",
           imageAlt: "",
+          arrowAccent: "tangerine",
         },
       },
       {
@@ -175,6 +193,7 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
         featured: {
           imageSrc: "/images/team.jpg",
           imageAlt: "",
+          arrowAccent: "guava",
         },
         featuredLayout: "stacked-tall",
       },
@@ -184,6 +203,7 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
         featured: {
           imageSrc: "/images/financials.jpg",
           imageAlt: "",
+          arrowAccent: "blueberry",
         },
         featuredLayout: "stacked-tall",
       },
@@ -193,6 +213,7 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
       imageAlt: "",
       text: "About Us",
       href: "/about",
+      arrowAccent: "se-green",
     },
   },
   {
