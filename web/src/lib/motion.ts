@@ -5,10 +5,12 @@
 import type { Transition, Variants } from "framer-motion";
 
 export {
+  animate,
   AnimatePresence,
   MotionConfig,
   motion,
   useInView,
+  useMotionTemplate,
   useMotionValue,
   useReducedMotion,
   useScroll,
@@ -240,7 +242,7 @@ export const staggerContainer: Variants = {
 /** Hero heading — word-by-word reveal; soft spring, no overshoot */
 export const heroWordSpring: Transition = {
   type: "spring",
-  visualDuration: 0.6,
+  visualDuration: 0.48,
   bounce: 0,
 };
 
@@ -305,9 +307,18 @@ export const heroWordContainerVariants: Variants = {
   },
 };
 
-/** Home hero intro — longer pause before the headline begins revealing */
-export const homeHeroRevealDelay = 0.55;
-export const homeHeroRevealStagger = 0.14;
+/** Home hero intro — pause before the headline begins revealing */
+export const homeHeroRevealDelay = 0.28;
+export const homeHeroRevealStagger = 0.1;
+
+/** Hero heading — seconds each word leads the highlight wave */
+export const heroWordHighlightCyclePerWord = 1.15;
+
+/** Gaussian spread — higher = softer overlap between neighboring words */
+export const heroWordHighlightSpread = 0.42;
+
+/** Fraction of each word beat held at full brand green before transitioning */
+export const heroWordHighlightLinger = 0.22;
 
 /** Home page load — nav bar fades and settles from above */
 export const homeNavEnterSpring: Transition = {
@@ -321,11 +332,11 @@ export const homeNavEnterDelay = 0.12;
 /** Home page load — hero video frame rises from below */
 export const homeHeroVideoEnterSpring: Transition = {
   type: "spring",
-  visualDuration: 0.85,
+  visualDuration: 0.65,
   bounce: 0,
 };
 
-export const homeHeroVideoEnterDelay = 0.28;
+export const homeHeroVideoEnterDelay = 0.18;
 
 /** TextImage carousel — snappy spring with bounce for stack enter */
 export const textImageStackEnterSpring: Transition = {
@@ -365,6 +376,12 @@ export const slotMachineDigitEase = [0.52, 0, 0.22, 1] as const;
 /** Brief pause after scroll trigger before the first digit moves */
 export const slotMachineStartDelay = 0.18;
 
+/** Fade-in delay — starts after the reel spin so stationary zeros aren't visible */
+export const slotMachineFadeInDelayMs = Math.round((slotMachineStartDelay + 0.12) * 1000);
+
+/** Fade-in duration for the metric numeral */
+export const slotMachineFadeInDurationMs = 700;
+
 /** Left-to-right stagger between digit columns */
 export const slotMachineDigitStagger = 0.08;
 
@@ -374,3 +391,12 @@ export const slotMachineInViewOptions = {
   margin: "-45% 0px -40% 0px",
   amount: 0.6,
 } as const;
+
+/** Live metric tick — pause between +1 increments after the main reel reveal */
+export const slotMachineLiveTickIntervalMs = 650;
+
+/** Shorter pause before the first live tick, right after the reel reveal lands */
+export const slotMachineLiveTickInitialDelayMs = 350;
+
+/** Per-digit duration when ticking up to the live target count */
+export const slotMachineLiveTickDigitDuration = 0.35;

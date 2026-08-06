@@ -1,6 +1,6 @@
 import { useLenis } from "@/components/providers/SmoothScrollProvider";
 import { cn } from "@/lib/cn";
-import { measureDepthFadeProgress } from "@/lib/sectionScrollFade";
+import { resolveHandoffFadeProgress } from "@/lib/sectionScrollHandoffMeasure";
 import { motion, useMotionValue, useReducedMotion } from "@/lib/motion";
 import { useEffect, useRef, type ReactNode, type RefObject } from "react";
 
@@ -41,10 +41,15 @@ function resolveFadeRatio(
   endVh: number | undefined,
   vhPx: number,
 ): number {
-  const startRatio =
-    startVh != null ? (startVh * vhPx) / totalHeight : (start ?? 0);
-  const endRatio = endVh != null ? (endVh * vhPx) / totalHeight : (end ?? 1);
-  return measureDepthFadeProgress(scrollDepth, totalHeight, startRatio, endRatio);
+  return resolveHandoffFadeProgress(
+    scrollDepth,
+    totalHeight,
+    start,
+    end,
+    startVh,
+    endVh,
+    vhPx,
+  );
 }
 
 function initialOverlayOpacity(fadeFrom: FadeTone, fadeTo: FadeTone): number {
@@ -169,6 +174,20 @@ export function SectionScrollHandoff({
   return (
     <div
       ref={wrapperRef}
+      data-section-scroll-handoff
+      data-fade-from={fadeFrom}
+      data-fade-to={fadeTo}
+      data-fade-start={fadeStart}
+      data-fade-end={fadeEnd}
+      {...(fadeStartVh != null ? { "data-fade-start-vh": fadeStartVh } : {})}
+      {...(fadeEndVh != null ? { "data-fade-end-vh": fadeEndVh } : {})}
+      data-has-second-fade={secondFade ? "true" : "false"}
+      {...(secondFade?.fadeFrom ? { "data-second-fade-from": secondFade.fadeFrom } : {})}
+      {...(secondFade?.fadeTo ? { "data-second-fade-to": secondFade.fadeTo } : {})}
+      {...(secondFade?.fadeStart != null ? { "data-second-fade-start": secondFade.fadeStart } : {})}
+      {...(secondFade?.fadeEnd != null ? { "data-second-fade-end": secondFade.fadeEnd } : {})}
+      {...(secondFade?.fadeStartVh != null ? { "data-second-fade-start-vh": secondFade.fadeStartVh } : {})}
+      {...(secondFade?.fadeEndVh != null ? { "data-second-fade-end-vh": secondFade.fadeEndVh } : {})}
       className={cn(
         "relative isolate",
         extendForFooter && FOOTER_OVERLAP_PAD_CLASS,

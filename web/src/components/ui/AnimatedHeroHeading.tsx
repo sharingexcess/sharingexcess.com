@@ -1,12 +1,20 @@
 import { cn } from "@/lib/cn";
+import { headingEmphasisClassName } from "@/lib/typography";
 import {
+  animate,
   blurWordContainerVariants,
   blurWordVariants,
   heroWordContainerVariants,
+  heroWordHighlightCyclePerWord,
+  heroWordHighlightLinger,
+  heroWordHighlightSpread,
   heroWordVariants,
   motion,
   sectionHeadingInViewOptions,
+  useMotionValue,
   useReducedMotion,
+  useTransform,
+  type MotionValue,
   type Variants,
 } from "@/lib/motion";
 import { useInViewOnce } from "@/lib/useInViewOnce";
@@ -16,6 +24,77 @@ import type { CSSProperties, JSX, Ref } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type WordToken = { text: string; emphasized: boolean; key: string };
+
+const KALE_COLOR = "var(--color-kale)";
+const BRAND_GREEN_COLOR = "var(--color-se-green-base)";
+
+function warpProgressForLinger(progress: number, wordCount: number, linger: number): number {
+  if (wordCount <= 1 || linger <= 0) return progress;
+
+  const wrapped = ((progress % wordCount) + wordCount) % wordCount;
+  const whole = Math.floor(wrapped);
+  const frac = wrapped - whole;
+  const hold = Math.min(linger * 0.5, 0.4);
+
+  let remappedFrac: number;
+  if (frac < hold) {
+    remappedFrac = 0;
+  } else if (frac > 1 - hold) {
+    remappedFrac = 1;
+  } else {
+    remappedFrac = (frac - hold) / (1 - 2 * hold);
+  }
+
+  return whole + remappedFrac;
+}
+
+function wordHighlightIntensity(
+  progress: number,
+  wordIndex: number,
+  wordCount: number,
+  spread: number,
+  linger: number,
+): number {
+  if (wordCount <= 1) return 1;
+
+  const pos = warpProgressForLinger(progress, wordCount, linger) % wordCount;
+  let dist = Math.abs(pos - wordIndex);
+  dist = Math.min(dist, wordCount - dist);
+
+  return Math.exp(-(dist * dist) / (2 * spread * spread));
+}
+
+function HighlightWord({
+  token,
+  wordIndex,
+  wordCount,
+  progress,
+  highlightActive,
+}: {
+  token: WordToken;
+  wordIndex: number;
+  wordCount: number;
+  progress: MotionValue<number>;
+  highlightActive: boolean;
+}) {
+  const color = useTransform(progress, (value) => {
+    const intensity = wordHighlightIntensity(
+      value,
+      wordIndex,
+      wordCount,
+      heroWordHighlightSpread,
+      heroWordHighlightLinger,
+    );
+    const kaleMix = Math.round((1 - intensity) * 100);
+    return `color-mix(in srgb, ${KALE_COLOR} ${kaleMix}%, ${BRAND_GREEN_COLOR})`;
+  });
+
+  return (
+    <motion.span className="inline-block" style={highlightActive ? { color } : undefined}>
+      <WordContent token={token} />
+    </motion.span>
+  );
+}
 
 function tokenizeLine(line: string, lineIndex: number, emphasis = true): WordToken[] {
   const tokens: WordToken[] = [];
@@ -47,7 +126,7 @@ function tokenizeTitle(title: string, emphasis = true): WordToken[][] {
 function WordContent({ token }: { token: WordToken }) {
   if (token.emphasized) {
     return (
-      <em className="not-italic text-[var(--section-emphasis)]">{token.text}</em>
+      <em className={headingEmphasisClassName}>{token.text}</em>
     );
   }
   return token.text;
@@ -57,22 +136,44 @@ function AnimatedWords({
   tokens,
   compact,
   wordVariants,
+  wordOffset = 0,
+  wordCount = 0,
+  highlightActive = false,
+  highlightProgress,
 }: {
   tokens: WordToken[];
   compact?: boolean;
   wordVariants: Variants;
+  wordOffset?: number;
+  wordCount?: number;
+  highlightActive?: boolean;
+  highlightProgress?: MotionValue<number>;
 }) {
   const wordGap = compact ? "0.15em" : "0.25em";
-  return tokens.map((token, i) => (
-    <motion.span
-      key={token.key}
-      variants={wordVariants}
-      className="inline-block will-change-[transform,opacity,filter]"
-      style={i < tokens.length - 1 ? { marginRight: wordGap } : undefined}
-    >
-      <WordContent token={token} />
-    </motion.span>
-  ));
+  return tokens.map((token, i) => {
+    const flatIndex = wordOffset + i;
+
+    return (
+      <motion.span
+        key={token.key}
+        variants={wordVariants}
+        className="inline-block will-change-[transform,opacity,filter]"
+        style={i < tokens.length - 1 ? { marginRight: wordGap } : undefined}
+      >
+        {highlightProgress ? (
+          <HighlightWord
+            token={token}
+            wordIndex={flatIndex}
+            wordCount={wordCount}
+            progress={highlightProgress}
+            highlightActive={highlightActive}
+          />
+        ) : (
+          <WordContent token={token} />
+        )}
+      </motion.span>
+    );
+  });
 }
 
 function StaticWords({
@@ -100,12 +201,20 @@ function WordLine({
   animated,
   fitLine,
   wordVariants,
+  wordOffset = 0,
+  wordCount = 0,
+  highlightActive = false,
+  highlightProgress,
 }: {
   tokens: WordToken[];
   multiline: boolean;
   animated: boolean;
   fitLine?: boolean;
   wordVariants?: Variants;
+  wordOffset?: number;
+  wordCount?: number;
+  highlightActive?: boolean;
+  highlightProgress?: MotionValue<number>;
 }) {
   return (
     <span
@@ -117,12 +226,57 @@ function WordLine({
       )}
     >
       {animated && wordVariants ? (
-        <AnimatedWords tokens={tokens} compact={fitLine} wordVariants={wordVariants} />
+        <AnimatedWords
+          tokens={tokens}
+          compact={fitLine}
+          wordVariants={wordVariants}
+          wordOffset={wordOffset}
+          wordCount={wordCount}
+          highlightActive={highlightActive}
+          highlightProgress={highlightProgress}
+        />
       ) : (
         <StaticWords tokens={tokens} compact={fitLine} />
       )}
     </span>
   );
+}
+
+function countWords(lines: WordToken[][]): number {
+  return lines.reduce((total, line) => total + line.length, 0);
+}
+
+function useWordHighlightLoop(
+  wordCount: number,
+  enabled: boolean,
+  reduceMotion: boolean | null,
+) {
+  const progress = useMotionValue(0);
+  const [highlightActive, setHighlightActive] = useState(false);
+
+  useEffect(() => {
+    if (!enabled || reduceMotion || wordCount === 0) {
+      setHighlightActive(false);
+      progress.set(0);
+      return;
+    }
+
+    setHighlightActive(true);
+    progress.set(0);
+
+    const controls = animate(progress, wordCount, {
+      duration: wordCount * heroWordHighlightCyclePerWord,
+      ease: "linear",
+      repeat: Infinity,
+    });
+
+    return () => controls.stop();
+  }, [enabled, progress, reduceMotion, wordCount]);
+
+  return {
+    highlightProgress: progress,
+    highlightActive: enabled && highlightActive && !reduceMotion,
+  };
 }
 
 export interface AnimatedHeroHeadingProps {
@@ -146,8 +300,12 @@ export interface AnimatedHeroHeadingProps {
   revealStagger?: number;
   /** Fires once the word-by-word reveal finishes */
   onRevealComplete?: () => void;
+  /** Fires once when the reveal animation begins */
+  onRevealStart?: () => void;
   /** When true, the reveal waits until the home intro overlay has finished */
   waitForIntroReveal?: boolean;
+  /** After reveal, cycle brand-green highlight across words one at a time */
+  wordHighlight?: "loop";
 }
 
 const revealPresets = {
@@ -174,14 +332,25 @@ export function AnimatedHeroHeading({
   revealDelay,
   revealStagger,
   onRevealComplete,
+  onRevealStart,
   waitForIntroReveal = false,
+  wordHighlight,
 }: AnimatedHeroHeadingProps) {
   const reduceMotion = useReducedMotion();
   const introRevealed = useIntroRevealed();
   const headingRef = useRef<HTMLElement>(null);
   const inView = useInViewOnce(headingRef, sectionHeadingInViewOptions);
   const [fontsReady, setFontsReady] = useState(Boolean(reduceMotion));
-  const lines = useMemo(() => tokenizeTitle(title, emphasis), [title, emphasis]);
+  const [revealComplete, setRevealComplete] = useState(Boolean(reduceMotion));
+  const parseEmphasis = wordHighlight !== "loop" && emphasis;
+  const lines = useMemo(() => tokenizeTitle(title, parseEmphasis), [title, parseEmphasis]);
+  const wordCount = useMemo(() => countWords(lines), [lines]);
+  const highlightLoopEnabled = wordHighlight === "loop" && revealComplete;
+  const { highlightProgress, highlightActive } = useWordHighlightLoop(
+    wordCount,
+    highlightLoopEnabled,
+    reduceMotion,
+  );
   const { wordVariants, containerVariants } = revealPresets[reveal];
   const resolvedContainerVariants = useMemo(() => {
     if (revealDelay == null && revealStagger == null) return containerVariants;
@@ -214,6 +383,15 @@ export function AnimatedHeroHeading({
   const revealActive =
     (!waitForIntroReveal || introRevealed) &&
     (trigger === "inView" ? fontsReady && inView : fontsReady);
+  const revealStartedRef = useRef(false);
+
+  useEffect(() => {
+    if (revealStartedRef.current) return;
+    if (!reduceMotion && !revealActive) return;
+
+    revealStartedRef.current = true;
+    onRevealStart?.();
+  }, [onRevealStart, reduceMotion, revealActive]);
 
   useEffect(() => {
     if (reduceMotion) {
@@ -255,20 +433,33 @@ export function AnimatedHeroHeading({
         initial="hidden"
         animate={revealActive ? "visible" : "hidden"}
         onAnimationComplete={(definition) => {
-          if (definition === "visible") onRevealComplete?.();
+          if (definition === "visible") {
+            setRevealComplete(true);
+            onRevealComplete?.();
+          }
         }}
         className={cn(multiline && "flex flex-col")}
       >
-        {lines.map((tokens, lineIndex) => (
-          <WordLine
-            key={lineIndex}
-            tokens={tokens}
-            multiline={multiline}
-            animated
-            fitLine={shouldFitText}
-            wordVariants={wordVariants}
-          />
-        ))}
+        {lines.map((tokens, lineIndex) => {
+          const wordOffset = lines
+            .slice(0, lineIndex)
+            .reduce((total, line) => total + line.length, 0);
+
+          return (
+            <WordLine
+              key={lineIndex}
+              tokens={tokens}
+              multiline={multiline}
+              animated
+              fitLine={shouldFitText}
+              wordVariants={wordVariants}
+              wordOffset={wordOffset}
+              wordCount={wordCount}
+              highlightActive={highlightActive}
+              highlightProgress={highlightLoopEnabled ? highlightProgress : undefined}
+            />
+          );
+        })}
       </motion.span>
     </Tag>
   );

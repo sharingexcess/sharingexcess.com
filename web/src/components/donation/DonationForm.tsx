@@ -22,6 +22,10 @@ export interface DonationFormProps {
   variant?: DonationFormVariant;
   /** Eyebrow above the hero card heading — e.g. impact stat line */
   eyebrow?: string;
+  /** Hide the built-in hero card heading — use when the parent section supplies title/body */
+  hideHeader?: boolean;
+  /** Hide the built-in hero card heading — use when the parent section supplies title/body */
+  hideHeader?: boolean;
   /** Parent section theme — light uses neutral-050 card fill */
   sectionTheme?: SectionTheme;
   /** Nested inside a section card — reduces corner radius for even inset */
@@ -269,10 +273,11 @@ function HeroDonationForm({
   className,
   defaultAmount = 20,
   eyebrow,
+  hideHeader = false,
   onSubmit,
 }: Pick<
   DonationFormProps,
-  "sectionTheme" | "inCard" | "className" | "defaultAmount" | "eyebrow" | "onSubmit"
+  "sectionTheme" | "inCard" | "className" | "defaultAmount" | "eyebrow" | "hideHeader" | "onSubmit"
 >) {
   const [amount, setAmount] = useState(defaultAmount);
   const [isOther, setIsOther] = useState(false);
@@ -291,15 +296,17 @@ function HeroDonationForm({
       formCard="white"
     >
       <div className="flex w-full min-w-0 flex-col gap-6">
-        <div className="flex w-full min-w-0 flex-col gap-2">
-          {eyebrow && (
-            <p className={cn(eyebrowClassName, "text-kale")}>{eyebrow}</p>
-          )}
-          <h3 className="w-full min-w-0 font-sans text-[clamp(1.875rem,10cqw,3rem)] font-medium leading-[1.12] tracking-[-0.04em] text-kale">
-            The food is donated;{" "}
-            <em className="not-italic text-se-green">your gift moves it.</em>
-          </h3>
-        </div>
+        {!hideHeader && (
+          <div className="flex w-full min-w-0 flex-col gap-2">
+            {eyebrow && (
+              <p className={cn(eyebrowClassName, "text-kale")}>{eyebrow}</p>
+            )}
+            <h3 className="w-full min-w-0 font-sans text-[clamp(1.875rem,10cqw,3rem)] font-medium leading-[1.12] tracking-[-0.04em] text-kale">
+              The food is donated;{" "}
+              <em className="not-italic text-se-green">your gift moves it.</em>
+            </h3>
+          </div>
+        )}
 
         <div className="grid w-full grid-cols-3 gap-2 sm:gap-3">
           {HERO_PRESETS.slice(0, 3).map((preset, i) => (

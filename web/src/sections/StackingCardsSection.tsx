@@ -1,8 +1,8 @@
 import { useLenis } from "@/components/providers/SmoothScrollProvider";
+import { TextSection } from "@/components/ui/TextSection";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import { parseBodyLinks } from "@/lib/parseBodyLinks";
-import { parseEmphasis } from "@/lib/parseEmphasis";
 import {
   motion,
   useMotionValue,
@@ -14,10 +14,11 @@ import {
 import { useInViewOnce } from "@/lib/useInViewOnce";
 import { useScrollDrivenIndex } from "@/lib/useScrollDrivenIndex";
 import type { SectionProps, SectionTheme } from "@/lib/types";
-import { bodyLgClassName, sectionH2ClassName } from "@/lib/typography";
+import { bodyXlClassName } from "@/lib/typography";
 import {
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   type CSSProperties,
@@ -27,7 +28,8 @@ import {
 /**
  * Per-slide theme — base-color card surfaces with AA-compliant text.
  * Index order: Free, Fast, Tracked, Everywhere.
- * Text picks the closest passing token per base (light on se-green, dark on warm bases).
+ * Titles use the darkest passing shade (-900, or -800 when no -900 exists);
+ * body copy uses -800 from the same family (white on se-green).
  */
 const SLIDE_THEMES = [
   {
@@ -51,7 +53,7 @@ const SLIDE_THEMES = [
   {
     cardBg: "var(--color-tangerine-base)",
     accentColor: "var(--color-tangerine-900)",
-    bodyColor: "var(--color-kale)",
+    bodyColor: "var(--color-tangerine-800)",
     buttonBg: "var(--color-tangerine-800)",
     buttonHoverBg: "var(--color-tangerine-900)",
     buttonLabel: "var(--color-neutral-000)",
@@ -60,7 +62,7 @@ const SLIDE_THEMES = [
   {
     cardBg: "var(--color-blueberry-base)",
     accentColor: "var(--color-blueberry-800)",
-    bodyColor: "var(--color-kale)",
+    bodyColor: "var(--color-blueberry-800)",
     buttonBg: "var(--color-blueberry-700)",
     buttonHoverBg: "var(--color-blueberry-800)",
     buttonLabel: "var(--color-neutral-000)",
@@ -75,6 +77,12 @@ const SCALE_PER_DEPTH = 0.065;
 const MIN_BURIED_SCALE = 0.82;
 /** How many px of the NEXT card peek above the bottom of the card stack */
 const PEEK_PX = 52;
+/** Per-card peek tilt (deg); eases to 0 when each card becomes active */
+const PEEK_ROTATE_DEGS = [2.5, -3.25, 1.75, -2] as const;
+
+function peekRotateDeg(index: number): number {
+  return PEEK_ROTATE_DEGS[index % PEEK_ROTATE_DEGS.length];
+}
 /** Image rests at 1 so the rounded clip stays covered; zooms in on enter */
 const IMAGE_SCALE_REST = 1;
 const IMAGE_SCALE_ENTER = 1.1;
@@ -91,11 +99,8 @@ const ENTRY_PADDING_PX = 120;
 /** Scroll span before/after the lock point used to ease padding */
 const PADDING_FADE_BEFORE_PX = 100;
 const PADDING_FADE_AFTER_PX = 100;
-const CARD_BODY_SIZE_LG_PX = 18;
 /** Extra px subtracted from available width to account for negative tracking */
-const TITLE_WIDTH_BUFFER_PX = 8;
-/** Do not shrink card text below this fraction of its base size */
-const MIN_TEXT_SCALE = 0.55;
+const TITLE_WIDTH_BUFFER_PX = 16;
 
 function smoothstep(t: number): number {
   return t * t * (3 - 2 * t);
@@ -161,16 +166,17 @@ function useStackingStickyPadding(
 
 /**
  * Measure every card title at the base font size and return one pixel size
- * shared by all cards so long titles like "Everywhere." fit without clipping.
+ * shared by all cards so long titles like "It's everywhere." fit without clipping.
  */
-function useUnifiedCardTextSizes(
+function useUnifiedCardTitleSize(
   titles: string[],
   containerRef: RefObject<HTMLElement | null>,
   measurerRef: RefObject<HTMLElement | null>,
 ) {
-  const [sizes, setSizes] = useState<{ titlePx?: number; bodyPx?: number }>({});
+  const [titlePx, setTitlePx] = useState<number | undefined>();
+  const titlesKey = useMemo(() => titles.join("\0"), [titles]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const measure = () => {
       const container = containerRef.current;
       const measurer = measurerRef.current;
@@ -178,14 +184,18 @@ function useUnifiedCardTextSizes(
 
       const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
       if (!isDesktop) {
-        setSizes({});
+        setTitlePx(undefined);
         return;
       }
 
       const textCol = container.querySelector<HTMLElement>("[data-card-text-col]");
       if (!textCol) return;
 
-      const availableWidth = textCol.clientWidth - TITLE_WIDTH_BUFFER_PX;
+      const colStyle = getComputedStyle(textCol);
+      const horizontalPadding =
+        parseFloat(colStyle.paddingLeft) + parseFloat(colStyle.paddingRight);
+      const availableWidth =
+        textCol.clientWidth - horizontalPadding - TITLE_WIDTH_BUFFER_PX;
       if (availableWidth <= 0) return;
 
       const baseTitlePx = parseFloat(getComputedStyle(measurer).fontSize);
@@ -200,14 +210,10 @@ function useUnifiedCardTextSizes(
         }
       }
 
-      const scale = Math.max(MIN_TEXT_SCALE, minScale);
-      const titlePx = baseTitlePx * scale;
-      const bodyPx = CARD_BODY_SIZE_LG_PX * scale;
+      const nextTitlePx = baseTitlePx * Math.min(1, minScale);
 
-      setSizes((prev) =>
-        prev.titlePx !== undefined && Math.abs(prev.titlePx - titlePx) < 0.5
-          ? prev
-          : { titlePx, bodyPx },
+      setTitlePx((prev) =>
+        prev !== undefined && Math.abs(prev - nextTitlePx) < 0.5 ? prev : nextTitlePx,
       );
     };
 
@@ -220,8 +226,10 @@ function useUnifiedCardTextSizes(
     const container = containerRef.current;
     if (!container) return;
 
+    const textCol = container.querySelector<HTMLElement>("[data-card-text-col]");
     const ro = new ResizeObserver(scheduleMeasure);
     ro.observe(container);
+    if (textCol) ro.observe(textCol);
 
     const mq = window.matchMedia("(min-width: 1024px)");
     mq.addEventListener("change", scheduleMeasure);
@@ -231,9 +239,9 @@ function useUnifiedCardTextSizes(
       ro.disconnect();
       mq.removeEventListener("change", scheduleMeasure);
     };
-  }, [containerRef, measurerRef, titles]);
+  }, [containerRef, measurerRef, titles, titlesKey]);
 
-  return sizes;
+  return titlePx;
 }
 
 export interface StackingCardItem {
@@ -247,7 +255,8 @@ export interface StackingCardItem {
 
 export interface StackingCardsSectionProps extends SectionProps {
   theme?: SectionTheme;
-  eyebrow?: string;
+  heading?: string;
+  intro?: string;
   items: StackingCardItem[];
   scrollStepVh?: number;
   /** Extra scroll depth after the last card before the next section (vh) */
@@ -276,7 +285,6 @@ function StackingCard({
   reduceMotion,
   entryRevealed,
   titleSizePx,
-  bodySizePx,
 }: {
   item: StackingCardItem;
   index: number;
@@ -284,7 +292,6 @@ function StackingCard({
   reduceMotion: boolean;
   entryRevealed: boolean;
   titleSizePx?: number;
-  bodySizePx?: number;
 }) {
   const depth = Math.max(0, activeIndex - index);
   const isBuried = depth > 0;
@@ -298,16 +305,21 @@ function StackingCard({
   const isEntering = index === 0 && !entryRevealed;
 
   const animate = reduceMotion
-    ? { opacity: isVisible ? 1 : 0, y: 0, scale: 1 }
+    ? { opacity: isVisible ? 1 : 0, y: 0, scale: 1, rotate: 0 }
     : isEntering
-      ? { y: "100%", scale: 1, opacity: 0 }
+      ? { y: "100%", scale: 1, opacity: 0, rotate: 0 }
       : isFarFuture
-        ? { y: "100%", scale: 1, opacity: 0 }
+        ? { y: "100%", scale: 1, opacity: 0, rotate: 0 }
         : isNext
-          ? { y: `calc(100% - ${PEEK_PX}px)`, scale: 1, opacity: 1 }
+          ? {
+              y: `calc(100% - ${PEEK_PX}px)`,
+              scale: 1,
+              opacity: 1,
+              rotate: peekRotateDeg(index),
+            }
           : isBuried
-            ? { y: 0, scale, opacity: 1 }
-            : { y: 0, scale: 1, opacity: 1 };
+            ? { y: 0, scale, opacity: 1, rotate: 0 }
+            : { y: 0, scale: 1, opacity: 1, rotate: 0 };
 
   const transition = isEntering
     ? figmaQuickSpring
@@ -336,10 +348,14 @@ function StackingCard({
         reduceMotion
           ? { opacity: index === 0 ? 1 : 0 }
           : index === 0
-            ? { y: "100%", opacity: 0 }
+            ? { y: "100%", opacity: 0, rotate: 0 }
             : index === 1
-              ? { y: `calc(100% - ${PEEK_PX}px)`, opacity: 1 }
-              : { y: "100%", opacity: 0 }
+              ? {
+                  y: `calc(100% - ${PEEK_PX}px)`,
+                  opacity: 1,
+                  rotate: peekRotateDeg(1),
+                }
+              : { y: "100%", opacity: 0, rotate: 0 }
       }
       animate={animate}
       transition={transition}
@@ -360,7 +376,7 @@ function StackingCard({
           >
             <h2
               className={cn(
-                "w-full font-display font-bold leading-[1.0] tracking-[-0.05em]",
+                "w-full font-display font-bold leading-[1.0] tracking-[-0.05em] lg:whitespace-nowrap",
                 titleSizePx === undefined && "text-[clamp(36px,12vw,112px)]",
               )}
               style={{
@@ -372,17 +388,14 @@ function StackingCard({
             </h2>
             {item.body && (
               <p
-                className={cn(bodyLgClassName, "w-full lg:max-w-none")}
-                style={{
-                  color: bodyColor,
-                  ...(bodySizePx !== undefined ? { fontSize: bodySizePx } : {}),
-                }}
+                className={cn(bodyXlClassName, "w-full lg:max-w-none")}
+                style={{ color: bodyColor }}
               >
                 {parseBodyLinks(item.body)}
               </p>
             )}
             {item.primaryCta && (
-              <div style={cardButtonStyle(index)} className="mt-1">
+              <div style={cardButtonStyle(index)} className="mt-10 lg:mt-12">
                 <Button
                   variant="primary"
                   colorScheme="light"
@@ -429,7 +442,8 @@ function StackingCard({
 
 export function StackingCardsSection({
   theme = "light",
-  eyebrow,
+  heading,
+  intro,
   items,
   scrollStepVh = DEFAULT_SCROLL_STEP_VH,
   exitScrollVh = 0,
@@ -440,8 +454,9 @@ export function StackingCardsSection({
   const trackRef = useRef<HTMLElement>(null);
   const stackRef = useRef<HTMLDivElement>(null);
   const titleMeasurerRef = useRef<HTMLSpanElement>(null);
-  const { titlePx: titleSizePx, bodyPx: bodySizePx } = useUnifiedCardTextSizes(
-    items.map((item) => item.title),
+  const cardTitles = useMemo(() => items.map((item) => item.title), [items]);
+  const titleSizePx = useUnifiedCardTitleSize(
+    cardTitles,
     stackRef,
     titleMeasurerRef,
   );
@@ -484,10 +499,15 @@ export function StackingCardsSection({
           ...(useAnimatedTopPadding ? { paddingTop: stickyPaddingTop } : {}),
         }}
       >
-        {eyebrow && (
-          <h2 className={cn(sectionH2ClassName, "mb-6 shrink-0 text-[var(--section-text)] sm:mb-8 lg:mb-14")}>
-            {parseEmphasis(eyebrow)}
-          </h2>
+        {(heading || intro) && (
+          <TextSection
+            heading={heading}
+            body={intro}
+            headingSize="h2"
+            bodySize="xl"
+            layout="horizontal"
+            className="mb-6 shrink-0 sm:mb-8 lg:mb-14"
+          />
         )}
 
         {/* Card stack — no overflow or border-radius container; cards are plain absolute children */}
@@ -506,7 +526,6 @@ export function StackingCardsSection({
               reduceMotion={reduceMotion}
               entryRevealed={entryRevealed}
               titleSizePx={titleSizePx}
-              bodySizePx={bodySizePx}
             />
           ))}
         </div>

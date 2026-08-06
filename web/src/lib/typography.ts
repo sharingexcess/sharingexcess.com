@@ -31,6 +31,13 @@ export const bodyXlClassName = "text-base leading-[1.6] lg:text-[20px]";
 export const bodyLgClassName = "text-base leading-[1.4] lg:text-[18px]";
 export const bodyMdClassName = "text-sm leading-[1.4] lg:text-base";
 
+/** Inline *asterisk* emphasis in headings — color only; weight comes from the heading */
+export const headingEmphasisClassName = "not-italic text-[var(--section-emphasis)]";
+
+/** Inline *asterisk* emphasis in body paragraphs — bold + color; inherits size/tracking from parent */
+export const paragraphEmphasisClassName =
+  "not-italic font-bold text-[var(--section-emphasis)]";
+
 /** Stat card text variant — scales with card width; wraps at container edge */
 export const statCardTextHeaderClassName =
   "font-display text-[clamp(24px,10.8cqw,48px)] font-bold leading-[1.06] tracking-[-0.04em]";

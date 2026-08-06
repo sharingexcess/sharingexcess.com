@@ -10,13 +10,28 @@ import {
   sectionMetricSubheadingClassName,
 } from "@/lib/typography";
 import { AnimatedHeroHeading } from "@/components/ui/AnimatedHeroHeading";
+import { LiveIndicatorDot } from "@/components/ui/LiveIndicatorDot";
 import { SlotMachineNumber } from "@/components/ui/SlotMachineNumber";
-import { Button } from "./Button";
+import { Button, type ButtonProps } from "./Button";
+import type { ReactNode } from "react";
 
-function MetricNumber({ value }: { value: string }) {
+function MetricNumber({
+  value,
+  numericValue,
+  liveTickOffset,
+  onRevealComplete,
+}: {
+  value: string;
+  numericValue?: number;
+  liveTickOffset?: number;
+  onRevealComplete?: () => void;
+}) {
   return (
     <SlotMachineNumber
       value={value}
+      numericValue={numericValue}
+      liveTickOffset={liveTickOffset}
+      onRevealComplete={onRevealComplete}
       className="text-[var(--section-emphasis)]"
     />
   );
@@ -24,11 +39,19 @@ function MetricNumber({ value }: { value: string }) {
 
 export interface TextSectionProps {
   eyebrow?: string;
+  /** Pulsing kelly dot beside the eyebrow — use for live data labels */
+  eyebrowLive?: boolean;
   /** Large display numeral shown above the heading */
   metric?: string;
+  /** Live target for metric slot animation — enables tick-up after reveal */
+  metricNumericValue?: number;
+  metricLiveTickOffset?: number;
+  onMetricRevealComplete?: () => void;
   heading?: string;
   headingSize?: "h1" | "h2";
   body?: string;
+  /** Bold emphasis line rendered below body in the same paragraph block */
+  bodyEmphasis?: string;
   bodySize?: "xl" | "lg" | "md";
   primaryCta?: string;
   primaryCtaHref?: string;
@@ -50,6 +73,11 @@ export interface TextSectionProps {
   emphasis?: boolean;
   /** Card layout — secondary CTA keeps rest color on hover */
   isCard?: boolean;
+  /** Rendered below body copy — e.g. an inline donation form */
+  bodyFooter?: ReactNode;
+  /** CTA button row layout — `responsive` stacks on narrow viewports */
+  ctaLayout?: "row" | "responsive";
+  ctaSize?: ButtonProps["size"];
   className?: string;
 }
 
@@ -69,12 +97,85 @@ const bodyClasses = {
   md: bodyMdClassName,
 };
 
+function renderBodyCopy({
+  body,
+  bodyEmphasis,
+  bodySize,
+  metric,
+  emphasis = true,
+  textClassName = "text-[var(--section-text,#003619)]",
+}: {
+  body: string;
+  bodyEmphasis?: string;
+  bodySize: "xl" | "lg" | "md";
+  metric?: string;
+  emphasis?: boolean;
+  textClassName?: string;
+}) {
+  const paragraphClassName = cn(
+    metric ? "mt-0" : "mt-1 lg:mt-2",
+    bodyClasses[bodySize],
+    textClassName,
+  );
+
+  if (bodyEmphasis) {
+    return (
+      <div
+        className={cn(
+          metric ? "mt-0" : "mt-1 lg:mt-2",
+          "flex flex-col gap-3 lg:gap-4",
+        )}
+      >
+        <p className={cn(bodyClasses[bodySize], textClassName)}>
+          {parseEmphasis(body, emphasis, "paragraph")}
+        </p>
+        <p
+          className={cn(
+            bodyClasses[bodySize],
+            "font-bold text-[var(--section-emphasis)]",
+          )}
+        >
+          {parseEmphasis(bodyEmphasis, emphasis, "paragraph")}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <p className={paragraphClassName}>
+      {parseEmphasis(body, emphasis, "paragraph")}
+    </p>
+  );
+}
+
+function EyebrowRow({
+  eyebrow,
+  live,
+  centered,
+}: {
+  eyebrow: string;
+  live?: boolean;
+  centered?: boolean;
+}) {
+  return (
+    <div className={cn("flex items-center gap-2", centered && "justify-center")}>
+      {live && <LiveIndicatorDot />}
+      <p className={cn(eyebrowClassName, "text-[var(--section-text,#003619)]")}>{eyebrow}</p>
+    </div>
+  );
+}
+
 export function TextSection({
   eyebrow,
+  eyebrowLive,
   metric,
+  metricNumericValue,
+  metricLiveTickOffset,
+  onMetricRevealComplete,
   heading,
   headingSize = "h1",
   body,
+  bodyEmphasis,
   bodySize = "xl",
   primaryCta,
   primaryCtaHref,
@@ -87,6 +188,9 @@ export function TextSection({
   headingAnimation,
   emphasis = true,
   isCard = false,
+  bodyFooter,
+  ctaLayout = "responsive",
+  ctaSize = "lg",
   className,
 }: TextSectionProps) {
   const hasCtas = primaryCta || secondaryCta;
@@ -129,7 +233,10 @@ export function TextSection({
     <div
       {...(isCard ? { "data-section-card": true } : {})}
       className={cn(
-        "flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-2 lg:gap-4",
+        "flex w-full min-w-0 gap-2",
+        ctaLayout === "row"
+          ? "flex-row flex-nowrap items-stretch"
+          : "flex-col gap-3 sm:flex-row sm:flex-wrap lg:gap-4",
         isCentered && "items-stretch sm:items-center sm:justify-center",
       )}
     >
@@ -137,8 +244,12 @@ export function TextSection({
         <Button
           variant="primary"
           colorScheme={scheme}
+          size={ctaSize}
           href={primaryCtaHref}
-          className={isCentered ? "w-full sm:w-auto" : undefined}
+          className={cn(
+            ctaLayout === "row" && "min-w-0 flex-1 whitespace-nowrap",
+            isCentered && ctaLayout !== "row" && "w-full sm:w-auto",
+          )}
         >
           {primaryCta}
         </Button>
@@ -147,8 +258,12 @@ export function TextSection({
         <Button
           variant="secondary"
           colorScheme={scheme}
+          size={ctaSize}
           href={secondaryCtaHref}
-          className={isCentered ? "w-full sm:w-auto" : undefined}
+          className={cn(
+            ctaLayout === "row" && "min-w-0 flex-1 whitespace-nowrap",
+            isCentered && ctaLayout !== "row" && "w-full sm:w-auto",
+          )}
         >
           {secondaryCta}
         </Button>
@@ -160,21 +275,26 @@ export function TextSection({
     return (
       <div className={cn("flex flex-col gap-4", className)}>
         {eyebrow && (
-          <p className={cn(eyebrowClassName, "text-[var(--section-text,#003619)]")}>{eyebrow}</p>
+          <EyebrowRow eyebrow={eyebrow} live={eyebrowLive} centered={isCentered} />
         )}
         <div className="flex flex-col items-start gap-4 lg:flex-row lg:gap-8">
           {(metric || headingEl) && (
             <div className={cn("flex w-full flex-col lg:flex-1", metric ? "gap-4 lg:gap-5" : "gap-2")}>
-              {metric && <MetricNumber value={metric} />}
+              {metric && (
+                <MetricNumber
+                  value={metric}
+                  numericValue={metricNumericValue}
+                  liveTickOffset={metricLiveTickOffset}
+                  onRevealComplete={onMetricRevealComplete}
+                />
+              )}
               {headingEl}
             </div>
           )}
           <div className="flex w-full flex-col gap-4 lg:flex-1">
-            {body && (
-              <p className={cn(bodyClasses[bodySize], "text-[var(--section-text,#003619)]")}>
-                {body}
-              </p>
-            )}
+            {body &&
+              renderBodyCopy({ body, bodyEmphasis, bodySize, metric, emphasis })}
+            {bodyFooter}
             {ctaRow}
           </div>
         </div>
@@ -199,27 +319,24 @@ export function TextSection({
         )}
       >
         {eyebrow && (
-          <p className={cn(eyebrowClassName, "text-[var(--section-text,#003619)]")}>{eyebrow}</p>
+          <EyebrowRow eyebrow={eyebrow} live={eyebrowLive} centered={isCentered} />
         )}
         {metric && (
           <div className="max-sm:w-full max-sm:min-w-0">
-            <MetricNumber value={metric} />
+            <MetricNumber
+              value={metric}
+              numericValue={metricNumericValue}
+              liveTickOffset={metricLiveTickOffset}
+              onRevealComplete={onMetricRevealComplete}
+            />
           </div>
         )}
         {headingEl && (
           <div className="w-full min-w-0 max-w-full">{headingEl}</div>
         )}
-        {body && (
-          <p
-            className={cn(
-              metric ? "mt-0" : "mt-1 lg:mt-2",
-              bodyClasses[bodySize],
-              "text-[var(--section-text,#003619)]",
-            )}
-          >
-            {body}
-          </p>
-        )}
+        {body &&
+          renderBodyCopy({ body, bodyEmphasis, bodySize, metric, emphasis })}
+        {bodyFooter}
       </div>
       {ctaRow}
     </div>

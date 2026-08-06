@@ -1,4 +1,5 @@
 import { ParallaxBackground, ParallaxCover } from "@/components/ui/ParallaxBackground";
+import { DonationForm } from "@/components/donation/DonationForm";
 import {
   Sticker,
   STICKER_OVERLAP_CARD_TOP_LEFT_CLASS,
@@ -8,6 +9,7 @@ import {
 } from "@/components/ui/Sticker";
 import { TextSection } from "@/components/ui/TextSection";
 import { VideoPlaceholder } from "@/components/ui/VideoPlaceholder";
+import { ScrollAutoplayVideo } from "@/components/ui/ScrollAutoplayVideo";
 import { cn } from "@/lib/cn";
 import type { ImageFit, ImagePosition, ImageStyle, SectionContentProps } from "@/lib/types";
 import { isEmbeddableVideo } from "@/lib/toVideoEmbedSrc";
@@ -65,6 +67,10 @@ export interface TextImageSectionProps extends Omit<SectionContentProps, "body">
   stickerName?: StickerName;
   /** Used with "three-image-caption" and "three-image-stat" layouts */
   images?: ThreeImageItem[];
+  /** Embed hero donation form below body copy instead of text CTAs */
+  donationForm?: boolean;
+  /** Autoplay mp4 when scrolled into view; poster stays until playback starts */
+  videoPlayInView?: boolean;
 }
 
 /** Wider gap when multi-card grids stack in a single column on mobile */
@@ -175,6 +181,8 @@ export function TextImageSection({
   transparentBg = false,
   archBottom = false,
   roundedTop = false,
+  donationForm = false,
+  videoPlayInView = false,
 }: TextImageSectionProps) {
   const shellProps = { flushTop, flushBottom, transparentBg, archBottom, roundedTop, id };
   const isDark = sectionCardContentIsDark(isCard, cardColor, theme);
@@ -190,10 +198,15 @@ export function TextImageSection({
       headingSize={headingSize}
       body={body}
       bodySize={bodySize}
-      primaryCta={primaryCta}
+      primaryCta={donationForm ? undefined : primaryCta}
       primaryCtaHref={primaryCtaHref}
-      secondaryCta={secondaryCta}
+      secondaryCta={donationForm ? undefined : secondaryCta}
       secondaryCtaHref={secondaryCtaHref}
+      bodyFooter={
+        donationForm ? (
+          <DonationForm variant="hero" hideHeader sectionTheme={theme} />
+        ) : undefined
+      }
       buttonScheme={isDark ? "dark" : "light"}
       emphasis={!isCard}
       isCard={isCard}
@@ -282,11 +295,21 @@ export function TextImageSection({
     <ParallaxCover
       src={imageSrc}
       alt={imageAlt}
-      videoSrc={videoSrc}
+      videoSrc={videoPlayInView ? undefined : videoSrc}
       className={cn("aspect-video w-full", imageRadius)}
       smooth
     />
   ) : null;
+
+  const scrollAutoplayVideoSlot =
+    videoPlayInView && videoSrc?.trim() && imageSrc ? (
+      <ScrollAutoplayVideo
+        posterSrc={imageSrc}
+        posterAlt={imageAlt}
+        videoSrc={videoSrc}
+        className={imageRadius}
+      />
+    ) : null;
 
   const useVideoPlaceholder =
     imageStyle === "video" || Boolean(videoSrc?.trim());
@@ -304,9 +327,11 @@ export function TextImageSection({
     />
   ) : null;
 
-  const stackMediaSlot = useEmbeddableVideoPlaceholder
-    ? videoPlaceholderSlot
-    : parallaxMediaSlot;
+  const stackMediaSlot = scrollAutoplayVideoSlot
+    ? scrollAutoplayVideoSlot
+    : useEmbeddableVideoPlaceholder
+      ? videoPlaceholderSlot
+      : parallaxMediaSlot;
 
   const wrapWithSticker = (
     slot: ReactNode,
@@ -332,7 +357,10 @@ export function TextImageSection({
     );
 
   if (layout === "stack-left") {
-    const contentSlot = wrapWithSticker(stackMediaSlot, "top-center");
+    const contentSlot =
+      scrollAutoplayVideoSlot != null
+        ? stackMediaSlot
+        : wrapWithSticker(stackMediaSlot, "top-center");
 
     return (
       <SectionShell

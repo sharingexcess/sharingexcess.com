@@ -1,6 +1,7 @@
 import { useLenis } from "@/components/providers/SmoothScrollProvider";
 import { cn } from "@/lib/cn";
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "@/lib/motion";
+import { useVideoPlayback } from "@/lib/useVideoPlayback";
 import { useEffect, useRef, type RefObject } from "react";
 
 /** Light spring — softens scroll-linked shifts without noticeable lag */
@@ -94,6 +95,8 @@ export interface ParallaxBackgroundProps {
   alt: string;
   /** Optional cover video layered above `src` (poster frame) */
   videoSrc?: string;
+  /** When false, the cover video stays paused (poster shows). Defaults to true. */
+  playVideo?: boolean;
   className?: string;
   /** Total Y travel as a % of the image height (split above/below center) */
   travel?: number;
@@ -141,6 +144,7 @@ export function ParallaxBackground({
   src,
   alt,
   videoSrc,
+  playVideo = true,
   className,
   travel = 20,
   offset = ["start start", "end start"],
@@ -154,6 +158,7 @@ export function ParallaxBackground({
     smooth,
     restOffset,
   });
+  const videoRef = useVideoPlayback(playVideo);
 
   const coverClass = "absolute inset-0 size-full object-cover";
 
@@ -168,7 +173,7 @@ export function ParallaxBackground({
         )}
       >
         <img src={src} alt="" aria-hidden className={coverClass} />
-        <video autoPlay loop muted playsInline aria-hidden className={coverClass}>
+        <video ref={videoRef} loop muted playsInline aria-hidden className={coverClass}>
           <source src={videoSrc} type="video/mp4" />
         </video>
       </motion.div>

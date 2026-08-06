@@ -1,0 +1,42 @@
+---
+description: Paragraph emphasis styling — bold + color, inherit paragraph size/tracking
+globs: web/src/components/ui/TextSection.tsx,web/src/lib/parseEmphasis.tsx,web/src/lib/typography.ts,web/src/sections/HeroSection.tsx
+alwaysApply: false
+---
+
+# Paragraph emphasis
+
+When body copy uses *asterisk-wrapped* emphasis (or a dedicated emphasized paragraph line), emphasized text gets **bold weight** and **`--section-emphasis` color**. It must inherit the paragraph's font size and letter-spacing — never override tracking or text size on the `<em>`.
+
+## Tokens
+
+Use the shared classes from `@/lib/typography`:
+
+- **`paragraphEmphasisClassName`** — body paragraphs (`font-bold` + emphasis color)
+- **`headingEmphasisClassName`** — headings only (color only; weight comes from the heading)
+
+Parse inline emphasis with `parseEmphasis(text, emphasis, "paragraph")`.
+
+## Examples
+
+```tsx
+// ✅ GOOD — inline paragraph emphasis
+<p className={bodyXlClassName}>
+  {parseEmphasis("*Rescued food* reaches neighbors.", true, "paragraph")}
+</p>
+
+// ✅ GOOD — full emphasized paragraph line (HeroContentCard bodyEmphasis)
+<p className={cn(bodyClasses[bodySize], "font-bold text-[var(--section-emphasis)]")}>
+  {parseEmphasis(bodyEmphasis, emphasis, "paragraph")}
+</p>
+
+// ❌ BAD — semibold or custom tracking on emphasized paragraph text
+<em className="font-semibold tracking-[-0.01em] text-[var(--section-emphasis)]">...</em>
+
+// ❌ BAD — heading emphasis token on body copy
+{parseEmphasis(body, true, "heading")}
+```
+
+## Headings
+
+Headings keep `headingEmphasisClassName` (color only). Do not add `font-bold` to emphasized runs inside section headings — those inherit the heading's `font-medium`.

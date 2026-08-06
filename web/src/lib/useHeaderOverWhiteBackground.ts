@@ -19,12 +19,22 @@ function isDarkBackground(el: Element | null): boolean {
   return false;
 }
 
+/** Full-bleed dark heroes stay shadowless; stacked home hero uses a light intro band. */
+function suppressShadowOverHomeHero(scrollY?: number): boolean {
+  if (!isOverHomeHero(scrollY)) return false;
+
+  const hero = document.querySelector("[data-home-hero]");
+  if (!hero) return false;
+
+  return !hero.classList.contains("home-hero-donate--stacked");
+}
+
 function sampleOverWhiteBackground(
   headerBar: HTMLElement | null,
   scrollY?: number,
 ): boolean {
   if (typeof window === "undefined" || !headerBar) return false;
-  if (isOverHomeHero(scrollY)) return false;
+  if (suppressShadowOverHomeHero(scrollY)) return false;
 
   const rect = headerBar.getBoundingClientRect();
   const x = rect.left + rect.width / 2;
@@ -37,9 +47,10 @@ function sampleOverWhiteBackground(
 /** True when page content directly below the header bar is on a light/white background. */
 export function useHeaderOverWhiteBackground(
   headerBarRef: RefObject<HTMLElement | null>,
+  initialOverWhite = false,
 ): boolean {
   const lenis = useLenis();
-  const [overWhite, setOverWhite] = useState(false);
+  const [overWhite, setOverWhite] = useState(initialOverWhite);
 
   useLayoutEffect(() => {
     setOverWhite(

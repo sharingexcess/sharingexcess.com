@@ -21,7 +21,7 @@ export interface ButtonProps {
   children: React.ReactNode;
   variant?: "primary" | "secondary" | "ghost" | "tertiary";
   size?: "lg" | "md" | "sm";
-  /** Light/dark surface tokens for primary, secondary, and tertiary — ghost is reserved for photo backgrounds (e.g. home hero) */
+  /** Light/dark surface tokens for primary, secondary, and tertiary — ghost is for controls over photo/video backgrounds */
   colorScheme?: "light" | "dark";
   /** Force hover visuals (e.g. open nav dropdown parent) */
   active?: boolean;
@@ -42,7 +42,7 @@ export interface ButtonProps {
 // Secondary dark: white border + text → bright-kelly on hover (no fill)
 // Tertiary light: #00843d text only → kale on hover (no border/fill)
 // Tertiary dark: white text only → bright-kelly on hover (no border/fill)
-// Ghost (Home Secondary): Figma node 1010:1302 — liquid glass; photo backgrounds only
+// Ghost (Home Secondary / media controls): tinted dark fill over photography and video
 
 const variantClasses: Record<Exclude<NonNullable<ButtonProps["variant"]>, "ghost" | "tertiary">, string> = {
   primary:   "border-0",
@@ -218,67 +218,51 @@ function ButtonColorRipple() {
   );
 }
 
-/** Figma liquid glass — light frost; minimal blur for label legibility over photos */
-function GhostGlassLayers() {
-  const frostClass =
-    "pointer-events-none absolute inset-0 z-[1] rounded-[inherit] bg-white/[0.08] backdrop-blur-[2px]";
-  const sheenClass =
-    "pointer-events-none absolute inset-0 z-[1] rounded-[inherit] bg-gradient-to-br from-white/10 via-transparent to-black/[0.04]";
-
-  return (
-    <>
-      <span
-        aria-hidden
-        className={cn(
-          frostClass,
-          "transition-[background-color] duration-200 group-hover:bg-white/[0.10]",
-        )}
-      />
-      <span
-        aria-hidden
-        className={cn(sheenClass, "transition-opacity duration-200 group-hover:from-white/12")}
-      />
-    </>
-  );
-}
+/** Semi-transparent dark fill for ghost buttons over photography — 0.60 is the lightest alpha that keeps white text at AA (4.5:1) over white. */
+const GHOST_BG = "rgba(27, 27, 21, 0.60)";
+const GHOST_HOVER_BG = "rgba(27, 27, 21, 0.68)";
 
 const ghostShellVariants: Variants = {
   rest: {
     scale: 1,
     borderColor: "rgba(255, 255, 255, 0.45)",
-    backgroundColor: "transparent",
+    backgroundColor: GHOST_BG,
   },
   hover: {
     scale: 1.04,
     borderColor: "rgba(255, 255, 255, 0.6)",
-    backgroundColor: "transparent",
+    backgroundColor: GHOST_HOVER_BG,
     transition: {
       scale: buttonScaleSpring,
       borderColor: buttonSecondaryHoverSpring,
+      backgroundColor: buttonSecondaryHoverSpring,
     },
   },
 };
 
 /** CSS-only ghost hover when reduced motion is preferred */
 const ghostFallbackClasses =
-  "group relative isolate overflow-hidden border-2 border-white/45 bg-transparent text-white transition-[border-color] duration-200 hover:border-white/60";
+  "group relative isolate overflow-hidden border-2 border-white/45 bg-[rgba(27,27,21,0.60)] text-white transition-[border-color,background-color] duration-200 hover:border-white/60 hover:bg-[rgba(27,27,21,0.68)]";
 
 const ghostMotionClasses =
-  "group relative isolate overflow-hidden border-2 bg-transparent text-white";
+  "group relative isolate overflow-hidden border-2 text-white";
 
 const SECTION_BTN = "var(--section-btn, #00843d)";
 const SECTION_BTN_HOVER = "var(--section-btn-hover, #003619)";
 
+const SECONDARY_BG = "var(--btn-bg, transparent)";
+const SECONDARY_HOVER_BG = "var(--btn-bg-hover, var(--btn-bg, transparent))";
+
 const secondaryColorScheme = {
   light: {
-    base: "border-[var(--section-btn,#00843d)] text-[var(--section-btn,#00843d)] bg-transparent",
+    base: "border-[var(--section-btn,#00843d)] text-[var(--section-btn,#00843d)] bg-[var(--btn-bg,transparent)]",
     restBorder: SECTION_BTN,
     restColor: SECTION_BTN,
     hoverBorder: SECTION_BTN_HOVER,
     hoverColor: SECTION_BTN_HOVER,
   },
   dark: {
-    base: "border-[var(--section-btn,#ffffff)] text-[var(--section-btn,#ffffff)] bg-transparent",
+    base: "border-[var(--section-btn,#ffffff)] text-[var(--section-btn,#ffffff)] bg-[var(--btn-bg,transparent)]",
     restBorder: SECTION_BTN,
     restColor: SECTION_BTN,
     hoverBorder: SECTION_BTN_HOVER,
@@ -289,9 +273,9 @@ const secondaryColorScheme = {
 /** CSS-only hover fallback when reduced motion is preferred */
 const secondaryColorSchemeFallback = {
   light:
-    "border-[var(--section-btn,#00843d)] text-[var(--section-btn,#00843d)] bg-transparent hover:border-[var(--section-btn-hover,#003619)] hover:text-[var(--section-btn-hover,#003619)] transition-colors duration-200",
+    "border-[var(--section-btn,#00843d)] text-[var(--section-btn,#00843d)] bg-[var(--btn-bg,transparent)] hover:border-[var(--section-btn-hover,#003619)] hover:text-[var(--section-btn-hover,#003619)] hover:bg-[var(--btn-bg-hover,var(--btn-bg,transparent))] transition-colors duration-200",
   dark:
-    "border-[var(--section-btn,#ffffff)] text-[var(--section-btn,#ffffff)] bg-transparent hover:border-[var(--section-btn-hover,#00bc57)] hover:text-[var(--section-btn-hover,#00bc57)] transition-colors duration-200",
+    "border-[var(--section-btn,#ffffff)] text-[var(--section-btn,#ffffff)] bg-[var(--btn-bg,transparent)] hover:border-[var(--section-btn-hover,#00bc57)] hover:text-[var(--section-btn-hover,#00bc57)] hover:bg-[var(--btn-bg-hover,var(--btn-bg,transparent))] transition-colors duration-200",
 };
 
 /** Disabled — no Figma spec; muted neutrals, no hover/motion */
@@ -312,7 +296,7 @@ const disabledSecondaryClasses: Record<
 };
 
 const disabledGhostClasses =
-  "relative isolate overflow-hidden border-2 border-white/25 bg-transparent text-white/50";
+  "relative isolate overflow-hidden border-2 border-white/25 bg-[rgba(27,27,21,0.45)] text-white/50";
 
 const disabledTertiaryClasses: Record<NonNullable<ButtonProps["colorScheme"]>, string> = {
   light: "text-neutral-400",
@@ -330,13 +314,13 @@ const secondaryShellVariants = (
       scale: 1,
       borderColor: restBorder,
       color: restColor,
-      backgroundColor: "transparent",
+      backgroundColor: SECONDARY_BG,
     },
     hover: {
       scale: 1.04,
       borderColor: hoverBorder,
       color: hoverColor,
-      backgroundColor: "transparent",
+      backgroundColor: SECONDARY_HOVER_BG,
       transition: {
         scale: buttonSecondaryScaleSpring,
         borderColor: buttonSecondaryHoverSpring,
@@ -480,7 +464,6 @@ export function Button({
   const content = (
     <>
       {usePrimaryMotion && <ButtonColorRipple />}
-      {isGhost && !disabled && <GhostGlassLayers />}
       {useSlidingLabel ? (
         <SlidingButtonLabel
           textOutTransition={

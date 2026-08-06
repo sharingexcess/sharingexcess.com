@@ -1,4 +1,8 @@
 import type { MapHub, MapVariant } from "./types";
+import {
+  IMPACT_MAP_APPEARANCE,
+  SURPLUS_MAP_STYLE_URL,
+} from "./impactMapTheme";
 
 /** Shared Mapbox settings — mirrors the archive site's impact map. */
 export const MAPBOX_STYLE = "mapbox://styles/mapbox/dark-v11";
@@ -66,9 +70,11 @@ export const DEFAULT_MAP_HUBS: MapHub[] = [
 ];
 
 export function getMapStyleForVariant(variant: MapVariant): string {
-  return variant === "impact-clusters"
-    ? MAPBOX_STYLE
-    : MAPBOX_LIGHT_STYLE;
+  if (variant !== "impact-clusters") return MAPBOX_LIGHT_STYLE;
+
+  return IMPACT_MAP_APPEARANCE === "light"
+    ? MAPBOX_LIGHT_STYLE
+    : SURPLUS_MAP_STYLE_URL;
 }
 
 export function getMapboxAccessToken(): string {

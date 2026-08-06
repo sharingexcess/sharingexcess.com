@@ -1,4 +1,6 @@
 import { DonationForm } from "@/components/donation/DonationForm";
+import { HeroBackgroundPulses } from "@/components/ui/HeroBackgroundPulses";
+import { HeroContentCard } from "@/components/ui/HeroContentCard";
 import { Button } from "@/components/ui/Button";
 import { AnimatedHeroHeading } from "@/components/ui/AnimatedHeroHeading";
 import { ParallaxBackground } from "@/components/ui/ParallaxBackground";
@@ -7,6 +9,7 @@ import { Text } from "@/components/ui/Text";
 import { TextSection } from "@/components/ui/TextSection";
 import { useLenis } from "@/components/providers/SmoothScrollProvider";
 import { cn } from "@/lib/cn";
+import { parseEmphasis } from "@/lib/parseEmphasis";
 import type { HeroLayout, SectionContentProps } from "@/lib/types";
 import { bodyLgClassName, bodyMdClassName, bodyXlClassName } from "@/lib/typography";
 import {
@@ -19,14 +22,25 @@ import {
   useReducedMotion,
 } from "@/lib/motion";
 import { useIntroRevealed } from "@/lib/useIntroRevealed";
+import { useVideoPlayback } from "@/lib/useVideoPlayback";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { SectionShell } from "./SectionShell";
 import { sectionCardContentIsDark, sectionMediaRadiusClass } from "./sectionCardConfig";
 
 export interface HeroSectionProps extends SectionContentProps {
   layout?: HeroLayout;
+  /** White overlay card — heading, body, and CTAs over the hero video */
+  cardTitle?: string;
+  cardBody?: string;
+  cardBodySize?: "xl" | "lg" | "md";
+  cardPrimaryCta?: string;
+  cardPrimaryCtaHref?: string;
+  cardSecondaryCta?: string;
+  cardSecondaryCtaHref?: string;
   /** Photo credit or caption overlaid on subpage hero images */
   imageCaption?: string;
+  /** Supporting line under the stacked home hero heading (green intro band) */
+  introCaption?: string;
   /** Overlap a brand sticker on the hero image (stack layouts). */
   sticker?: boolean;
   /** Which sticker to show when `sticker` is true. Defaults to `free-food`. */
@@ -42,9 +56,9 @@ export interface HeroSectionProps extends SectionContentProps {
 const FIGMA_ARTBOARD_CLASS = "@container mx-auto w-full max-w-[1512px]";
 /** Standard page content width — matches SiteHeader nav bar */
 const STANDARD_CONTENT_CLASS = "mx-auto w-full max-w-[1320px] px-4 lg:px-8";
-/** Tight vertical inset around the intro headline — capped so video fills slack on tall viewports */
+/** Vertical inset around intro copy — room for display heading + CTAs without crowding the video */
 const HOME_HERO_INTRO_BAND_CLASS =
-  "box-border flex w-full flex-col items-start justify-center py-[clamp(18px,2.5vh,40px)] lg:items-center lg:py-[clamp(24px,3vh,40px)]";
+  "box-border flex w-full flex-col items-start justify-center py-[clamp(24px,4vh,56px)] lg:items-center lg:py-[clamp(32px,5vh,64px)]";
 /** Gap between multiline hero body paragraphs */
 const HOME_HERO_BODY_PARAGRAPH_GAP = "gap-3 lg:gap-4";
 /** Max width for hero donate card */
@@ -330,13 +344,18 @@ function HomeHeroBackground({
   imageAlt,
   videoSrc,
   scrollRef,
+  playVideo = true,
 }: {
   imageSrc: string;
   imageAlt: string;
   videoSrc?: string;
   /** When set, video/image scroll with parallax inside the hero pin */
   scrollRef?: RefObject<Element | null>;
+  /** When false, the cover video stays paused (poster shows). */
+  playVideo?: boolean;
 }) {
+  const videoRef = useVideoPlayback(playVideo);
+
   if (scrollRef) {
     return (
       <ParallaxBackground
@@ -344,6 +363,7 @@ function HomeHeroBackground({
         src={imageSrc}
         alt={imageAlt}
         videoSrc={videoSrc}
+        playVideo={playVideo}
         travel={16}
         offset={["start start", "end end"]}
         smooth
@@ -361,7 +381,7 @@ function HomeHeroBackground({
         className={cn(heroCoverClass, heroVideoFilterClass)}
       />
       <video
-        autoPlay
+        ref={videoRef}
         loop
         muted
         playsInline
@@ -565,10 +585,11 @@ const HOME_HERO_VIDEO_ENTER = {
 
 const HOME_STACKED_SCROLL_HEIGHT = "min-h-[240vh]";
 const HOME_STACKED_INTRO_HEADING_CLASS = cn(
-  "m-0 text-left text-se-green [text-box-trim:trim-both] [text-box-edge:cap_alphabetic] lg:text-center",
-  "text-[clamp(3rem,14vw,4.25rem)] font-medium leading-[1.06] tracking-[-0.04em] lg:text-[clamp(48px,6.35cqw,96px)]",
+  "m-0 text-left text-kale [text-box-trim:trim-both] [text-box-edge:cap_alphabetic] lg:text-center",
+  "text-[clamp(3rem,14vw,4.25rem)] font-medium leading-none tracking-[-0.04em] lg:text-[clamp(58.212px,7.701cqw,116.424px)]",
   "font-semibold tracking-[-0.05em]",
-  "[&>span]:gap-[0.1em] lg:[&>span]:gap-[0.14em]",
+  "[--section-emphasis:var(--color-se-green-base)]",
+  "[&>span]:gap-y-[0.04em] lg:[&>span]:gap-y-[0.06em]",
 );
 
 function HomeHeroIntroBand({ children }: { children: ReactNode }) {
@@ -579,34 +600,133 @@ function HomeHeroIntroBand({ children }: { children: ReactNode }) {
   );
 }
 
+const HOME_STACKED_INTRO_CAPTION_CLASS = cn(
+  "flex flex-col gap-1 text-lg leading-[1.6] lg:gap-1.5 lg:text-[22px]",
+  "text-kale lg:text-center",
+);
+/** Heading + caption read as one block — tighter internal rhythm (matches TextSection) */
+const HOME_HERO_INTRO_TEXT_GAP = "gap-5 lg:gap-6";
+/** Headline separated from supporting copy + actions */
+const HOME_HERO_INTRO_HEADLINE_GAP = "gap-6 lg:gap-8";
+/** Caption and CTAs share one column — action follows the message */
+const HOME_HERO_INTRO_COPY_COLUMN_CLASS =
+  "flex w-full max-w-2xl flex-col lg:mx-auto lg:items-center";
+const HOME_HERO_INTRO_CTA_CLASS = cn(
+  "pointer-events-auto mb-8 flex w-full flex-col gap-3 sm:mb-10 sm:w-auto sm:flex-row sm:flex-wrap sm:gap-5 lg:justify-center",
+);
+
+const HOME_HERO_INTRO_CAPTION_EMPHASIS_STYLE = {
+  "--section-emphasis": "var(--color-se-green-base)",
+} as CSSProperties;
+
 function HomeHeroIntroContent({
   title,
-  body,
-  bodySize = "xl",
+  caption,
+  primaryCta,
+  primaryCtaHref = "#",
+  secondaryCta,
+  secondaryCtaHref = "#",
+  waitForIntroReveal,
+  onRevealComplete,
+  onIntroSettled,
 }: {
   title: string;
-  body?: string;
-  bodySize?: HeroSectionProps["bodySize"];
+  caption?: string;
+  primaryCta?: string;
+  primaryCtaHref?: string;
+  secondaryCta?: string;
+  secondaryCtaHref?: string;
+  waitForIntroReveal?: boolean;
+  onRevealComplete?: () => void;
+  /** Fires after heading, caption, and CTAs have finished their enter animations */
+  onIntroSettled?: () => void;
 }) {
   const reduceMotion = useReducedMotion();
-  const [bodyVisible, setBodyVisible] = useState(reduceMotion);
+  const [captionVisible, setCaptionVisible] = useState(reduceMotion);
+  const hasCtas = Boolean(primaryCta || secondaryCta);
 
-  const bodyEl = body &&
+  useEffect(() => {
+    if (reduceMotion) onIntroSettled?.();
+  }, [onIntroSettled, reduceMotion]);
+
+  const handleRevealComplete = () => {
+    setCaptionVisible(true);
+    onRevealComplete?.();
+    if (!caption && !hasCtas) {
+      onIntroSettled?.();
+    }
+  };
+
+  const handleCaptionSettled = (definition: string) => {
+    if (definition === "visible" && !hasCtas) {
+      onIntroSettled?.();
+    }
+  };
+
+  const handleCtaSettled = () => {
+    if (captionVisible) {
+      onIntroSettled?.();
+    }
+  };
+
+  const ctaButtons = hasCtas && (
+    <>
+      {primaryCta && (
+        <Button
+          variant="primary"
+          colorScheme="light"
+          href={primaryCtaHref}
+          className="w-full sm:w-auto"
+        >
+          {primaryCta}
+        </Button>
+      )}
+      {secondaryCta && (
+        <Button
+          variant="secondary"
+          colorScheme="light"
+          href={secondaryCtaHref}
+          className="w-full sm:w-auto"
+        >
+          {secondaryCta}
+        </Button>
+      )}
+    </>
+  );
+
+  const ctaEl = ctaButtons &&
     (reduceMotion ? (
-      <p className={cn("whitespace-pre-line text-white", bodyXlClassName)}>
-        {body}
+      <div className={HOME_HERO_INTRO_CTA_CLASS}>{ctaButtons}</div>
+    ) : (
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={captionVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+        transition={{ ...heroWordSpring, delay: caption ? 0.24 : 0 }}
+        onAnimationComplete={handleCtaSettled}
+        className={HOME_HERO_INTRO_CTA_CLASS}
+      >
+        {ctaButtons}
+      </motion.div>
+    ));
+
+  const captionEl = caption &&
+    (reduceMotion ? (
+      <p className={HOME_STACKED_INTRO_CAPTION_CLASS} style={HOME_HERO_INTRO_CAPTION_EMPHASIS_STYLE}>
+        {parseEmphasis(caption, true, "paragraph")}
       </p>
     ) : (
       <motion.p
         initial="hidden"
-        animate={bodyVisible ? "visible" : "hidden"}
+        animate={captionVisible ? "visible" : "hidden"}
         variants={{
           hidden: {},
           visible: { transition: { staggerChildren: 0.12 } },
         }}
-        className={cn("text-white", bodyXlClassName)}
+        onAnimationComplete={handleCaptionSettled}
+        className={HOME_STACKED_INTRO_CAPTION_CLASS}
+        style={HOME_HERO_INTRO_CAPTION_EMPHASIS_STYLE}
       >
-        {body.split("\n").map((line, lineIndex) => (
+        {caption.split("\n").map((line, lineIndex) => (
           <motion.span
             key={lineIndex}
             variants={{
@@ -619,24 +739,30 @@ function HomeHeroIntroContent({
             }}
             className="block"
           >
-            {line}
+            {parseEmphasis(line, true, "paragraph")}
           </motion.span>
         ))}
       </motion.p>
     ));
 
   return (
-    <div className="flex w-full flex-col gap-3 lg:gap-4">
+    <div className={cn("flex w-full flex-col", HOME_HERO_INTRO_HEADLINE_GAP)} data-theme="light">
       <AnimatedHeroHeading
         title={title}
         as="h1"
         multiline
         revealDelay={homeHeroRevealDelay}
         revealStagger={homeHeroRevealStagger}
-        onRevealComplete={() => setBodyVisible(true)}
+        waitForIntroReveal={waitForIntroReveal}
+        onRevealComplete={handleRevealComplete}
         className={HOME_STACKED_INTRO_HEADING_CLASS}
       />
-      {bodyEl}
+      {(captionEl || ctaEl) && (
+        <div className={cn(HOME_HERO_INTRO_COPY_COLUMN_CLASS, HOME_HERO_INTRO_TEXT_GAP)}>
+          {captionEl}
+          {ctaEl}
+        </div>
+      )}
     </div>
   );
 }
@@ -809,6 +935,18 @@ function HomeRoundedHeroWithDonate({
   videoSrc,
   title,
   body,
+  cardTitle,
+  cardBody,
+  cardBodySize,
+  cardPrimaryCta,
+  cardPrimaryCtaHref,
+  cardSecondaryCta,
+  cardSecondaryCtaHref,
+  introCaption,
+  primaryCta,
+  primaryCtaHref = "#",
+  secondaryCta,
+  secondaryCtaHref = "#",
   pinOnScroll = true,
   className,
 }: {
@@ -818,39 +956,69 @@ function HomeRoundedHeroWithDonate({
   videoSrc?: string;
   title: string;
   body?: string;
+  introCaption?: string;
+  primaryCta?: string;
+  primaryCtaHref?: string;
+  secondaryCta?: string;
+  secondaryCtaHref?: string;
+  cardTitle?: string;
+  cardBody?: string;
+  cardBodySize?: "xl" | "lg" | "md";
+  cardPrimaryCta?: string;
+  cardPrimaryCtaHref?: string;
+  cardSecondaryCta?: string;
+  cardSecondaryCtaHref?: string;
   bodySize?: HeroSectionProps["bodySize"];
   pinOnScroll?: boolean;
   className?: string;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
   const introRef = useRef<HTMLDivElement>(null);
+  const introContentRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
   const scrollFx = pinOnScroll && !reduceMotion;
   const pageRevealed = useIntroRevealed();
   const [introRevealed, setIntroRevealed] = useState(reduceMotion);
+  const playHeroVideo = reduceMotion || pageRevealed;
+  const ripplesActive = pageRevealed;
   useHomeHeroFrameStart(sectionRef, introRef, scrollFx);
   useHomeHeroDonateScrollCssVar(sectionRef, scrollFx, (progress) => {
     if (progress > 0.02) setIntroRevealed(true);
   });
 
   useEffect(() => {
-    if (reduceMotion) setIntroRevealed(true);
+    if (reduceMotion) {
+      setIntroRevealed(true);
+    }
   }, [reduceMotion]);
 
-  const heroHeading = (
-    <AnimatedHeroHeading
+  const heroIntro = (
+    <HomeHeroIntroContent
       title={title}
-      as="h1"
-      multiline
-      revealDelay={homeHeroRevealDelay}
-      revealStagger={homeHeroRevealStagger}
+      caption={introCaption}
+      primaryCta={primaryCta}
+      primaryCtaHref={primaryCtaHref}
+      secondaryCta={secondaryCta}
+      secondaryCtaHref={secondaryCtaHref}
       waitForIntroReveal
       onRevealComplete={() => setIntroRevealed(true)}
-      className={HOME_STACKED_INTRO_HEADING_CLASS}
     />
   );
 
-  const donateForm = (
+  const overlayCard = cardTitle ? (
+    <div className={HOME_HERO_DONATE_FORM_MAX_WIDTH}>
+      <HeroContentCard
+        title={cardTitle}
+        body={cardBody}
+        bodySize={cardBodySize}
+        primaryCta={cardPrimaryCta}
+        primaryCtaHref={cardPrimaryCtaHref}
+        secondaryCta={cardSecondaryCta}
+        secondaryCtaHref={cardSecondaryCtaHref}
+        className="shadow-[0_8px_32px_rgba(0,0,0,0.24)]"
+      />
+    </div>
+  ) : (
     <div className={HOME_HERO_DONATE_FORM_MAX_WIDTH}>
       <DonationForm
         variant="hero"
@@ -866,22 +1034,36 @@ function HomeRoundedHeroWithDonate({
       <section
         id={id}
         data-home-hero
-        data-theme="dark"
-        className={cn("w-full bg-se-green-100 home-hero-donate--stacked", className)}
+        data-theme="light"
+        className={cn("w-full bg-white home-hero-donate--stacked", className)}
       >
-        <div className="flex min-h-screen w-full flex-col overflow-x-hidden pt-[var(--site-header-height)]">
-          <HomeHeroIntroBand>{heroHeading}</HomeHeroIntroBand>
+        <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden pt-[var(--site-header-height)]">
+          <HeroBackgroundPulses
+            active={ripplesActive}
+            contentMaskRef={introContentRef}
+          />
+          <div className="relative z-10">
+            <HomeHeroIntroBand>
+              <div ref={introContentRef}>{heroIntro}</div>
+            </HomeHeroIntroBand>
+          </div>
           <motion.div
-            className="relative min-h-0 flex-1 rounded-[var(--radius-xl)] -mb-[8vh]"
+            data-theme="dark"
+            className="relative z-20 min-h-0 flex-1 rounded-[var(--radius-xl)] -mb-[8vh]"
             initial={reduceMotion ? false : HOME_HERO_VIDEO_ENTER.initial}
             animate={pageRevealed ? HOME_HERO_VIDEO_ENTER.animate : HOME_HERO_VIDEO_ENTER.initial}
             transition={{ ...homeHeroVideoEnterSpring, delay: homeHeroVideoEnterDelay }}
           >
             <div className="absolute inset-0 overflow-hidden rounded-[var(--radius-xl)]">
-              <HomeHeroBackground imageSrc={imageSrc} imageAlt={imageAlt} videoSrc={videoSrc} />
+              <HomeHeroBackground
+                imageSrc={imageSrc}
+                imageAlt={imageAlt}
+                videoSrc={videoSrc}
+                playVideo={playHeroVideo}
+              />
             </div>
             <div className="absolute inset-x-0 bottom-0 z-[2] pb-4 lg:pb-[clamp(24px,4vh,48px)]">
-              <div className={STANDARD_CONTENT_CLASS}>{donateForm}</div>
+              <div className={STANDARD_CONTENT_CLASS}>{overlayCard}</div>
             </div>
           </motion.div>
         </div>
@@ -894,17 +1076,21 @@ function HomeRoundedHeroWithDonate({
       ref={sectionRef}
       id={id}
       data-home-hero
-      data-theme="dark"
+      data-theme="light"
       data-hero-intro-revealed={introRevealed || undefined}
       className={cn(
-        "home-hero-donate home-hero-donate--stacked relative z-0 bg-se-green-100",
+        "home-hero-donate home-hero-donate--stacked relative z-0 bg-white",
         HOME_STACKED_SCROLL_HEIGHT,
         "home-hero-donate--scroll-fx",
         className,
       )}
     >
       <div className="home-hero-donate__pin sticky top-0 h-screen w-full overflow-hidden">
-        <div className="absolute inset-0 bg-se-green-100" aria-hidden />
+        <div className="absolute inset-0 bg-white" aria-hidden />
+        <HeroBackgroundPulses
+          active={ripplesActive}
+          contentMaskRef={introContentRef}
+        />
 
         {/* Heading — in green space above video, video scrolls over it */}
         <div
@@ -916,12 +1102,15 @@ function HomeRoundedHeroWithDonate({
           )}
         >
           <div className={STANDARD_CONTENT_CLASS}>
-            <div className="home-hero-donate__intro-scale">{heroHeading}</div>
+            <div ref={introContentRef} className="home-hero-donate__intro-scale">
+              {heroIntro}
+            </div>
           </div>
         </div>
 
         {/* Video frame — expands from below heading to fullscreen */}
         <motion.div
+          data-theme="dark"
           className="home-hero-donate__frame home-hero-donate__frame--scroll-fx absolute z-20 overflow-hidden"
           initial={reduceMotion ? false : HOME_HERO_VIDEO_ENTER.initial}
           animate={pageRevealed ? HOME_HERO_VIDEO_ENTER.animate : HOME_HERO_VIDEO_ENTER.initial}
@@ -933,19 +1122,21 @@ function HomeRoundedHeroWithDonate({
               imageSrc={imageSrc}
               imageAlt={imageAlt}
               videoSrc={videoSrc}
+              playVideo={playHeroVideo}
             />
           </div>
         </motion.div>
 
         {/* Body + Donate — appears over fullscreen video, slides up from bottom */}
         <div
+          data-theme="dark"
           className={cn(
             "home-hero-donate__content home-hero-donate__content--scroll-fx",
             "absolute inset-x-0 bottom-0 z-30",
             "pb-4 lg:pb-[clamp(32px,5vh,72px)]",
           )}
         >
-          <div className={STANDARD_CONTENT_CLASS}>{donateForm}</div>
+          <div className={STANDARD_CONTENT_CLASS}>{overlayCard}</div>
         </div>
       </div>
     </section>
@@ -972,6 +1163,14 @@ export function HeroSection({
   primaryCtaHref = "#",
   secondaryCta,
   secondaryCtaHref = "#",
+  cardTitle,
+  cardBody,
+  cardBodySize,
+  cardPrimaryCta,
+  cardPrimaryCtaHref,
+  cardSecondaryCta,
+  cardSecondaryCtaHref,
+  introCaption,
   submitLabel = "Donate Now",
   pinOnScroll = true,
   className,
@@ -1166,6 +1365,18 @@ export function HeroSection({
         title={title}
         body={body}
         bodySize={bodySize}
+        cardTitle={cardTitle}
+        cardBody={cardBody}
+        cardBodySize={cardBodySize}
+        cardPrimaryCta={cardPrimaryCta}
+        cardPrimaryCtaHref={cardPrimaryCtaHref}
+        cardSecondaryCta={cardSecondaryCta}
+        cardSecondaryCtaHref={cardSecondaryCtaHref}
+        introCaption={introCaption}
+        primaryCta={primaryCta}
+        primaryCtaHref={primaryCtaHref}
+        secondaryCta={secondaryCta}
+        secondaryCtaHref={secondaryCtaHref}
         pinOnScroll={pinOnScroll}
         className={className}
       />

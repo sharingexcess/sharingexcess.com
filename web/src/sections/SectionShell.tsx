@@ -7,7 +7,7 @@ import {
   useTransform,
 } from "@/lib/motion";
 import { ROUND_IMAGE_SECTION_ATTR } from "@/lib/roundSectionScroll";
-import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import type { SectionProps } from "@/lib/types";
 
 /**
@@ -21,12 +21,18 @@ export function SectionArchVisual() {
   const reduceMotion = useReducedMotion();
 
   const rise = useMotionValue(ARCH_RISE);
-  const top = useTransform(rise, (v) => -v);
+  const y = useTransform(rise, (v) => -v);
   const radiusX = `${ARCH_WIDTH_VW / 2}vw`;
   const borderTopLeftRadius = useTransform(rise, (v) => `${radiusX} ${v}px`);
   const borderTopRightRadius = useTransform(rise, (v) => `${radiusX} ${v}px`);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const section = archRef.current?.closest("section");
+    section?.setAttribute("data-arch-hydrated", "");
+    return () => section?.removeAttribute("data-arch-hydrated");
+  }, []);
+
+  useLayoutEffect(() => {
     if (reduceMotion) {
       rise.set(0);
       return;
@@ -60,18 +66,18 @@ export function SectionArchVisual() {
     <div
       ref={archRef}
       aria-hidden="true"
-      className="pointer-events-none absolute inset-x-0 top-0 z-[1] overflow-x-clip"
+      className="pointer-events-none absolute inset-x-0 top-0 z-[1] hidden overflow-x-clip lg:block"
       style={{ height: ARCH_RISE + 32 }}
     >
       <motion.div
         style={{
-          top,
+          y,
           width: `${ARCH_WIDTH_VW}vw`,
           borderTopLeftRadius,
           borderTopRightRadius,
           height: ARCH_RISE + 32,
         }}
-        className="pointer-events-none absolute left-1/2 -translate-x-1/2 bg-[var(--section-bg)]"
+        className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 bg-[var(--section-bg)] will-change-[transform,border-radius]"
       />
     </div>
   );
@@ -80,40 +86,47 @@ export function SectionArchVisual() {
 /** How far (px) the arch peak rises above the section boundary at the center. */
 const ARCH_RISE = 180;
 
-/**
- * Desktop: how far (px) past the viewport bottom before the arch flattens.
- * Mobile hold scales with viewport so the arch completes within shorter sections.
- */
-const ARCH_HOLD_PX_DESKTOP = 800;
+/** Minimum scroll hold before flatten begins (desktop). */
+const ARCH_HOLD_PX_MIN = 280;
+/** Viewport fraction for hold — keeps the peak visible through the map handoff. */
+const ARCH_HOLD_VH = 0.36;
+
+/** Minimum scroll distance over which the arch eases from peak to flat (desktop). */
+const ARCH_FLATTEN_PX_MIN = 440;
+/** Viewport fraction for flatten — longer travel reads smoother against Lenis. */
+const ARCH_FLATTEN_VH = 0.62;
+
+function isArchDesktop(): boolean {
+  return typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches;
+}
 
 function getArchHoldPx(): number {
-  if (typeof window === "undefined") return ARCH_HOLD_PX_DESKTOP;
   const vh = window.innerHeight || 800;
-  return window.matchMedia("(min-width: 1024px)").matches
-    ? ARCH_HOLD_PX_DESKTOP
+  return isArchDesktop()
+    ? Math.max(ARCH_HOLD_PX_MIN, Math.round(vh * ARCH_HOLD_VH))
     : Math.round(vh * 0.35);
 }
 
-function getArchSectionPt(): number {
-  if (typeof window === "undefined") return 48;
-  return window.matchMedia("(min-width: 1024px)").matches ? 64 : 48;
+function getArchFlattenPx(): number {
+  const vh = window.innerHeight || 800;
+  return isArchDesktop()
+    ? Math.max(ARCH_FLATTEN_PX_MIN, Math.round(vh * ARCH_FLATTEN_VH))
+    : ARCH_RISE;
+}
+
+/** Zero slope at t=0 and t=1 — avoids a jerk when flatten begins after the hold. */
+function smoothstep(t: number): number {
+  return t * t * (3 - 2 * t);
 }
 
 function computeArchRise(sectionTop: number): number {
   const vh = window.innerHeight || 800;
   const scrolledPast = vh + ARCH_RISE - sectionTop;
-  const progress = Math.max(
-    0,
-    Math.min(1, (scrolledPast - getArchHoldPx()) / ARCH_FLATTEN_PX),
-  );
-  return ARCH_RISE * (1 - progress);
+  const holdPx = getArchHoldPx();
+  const flattenPx = getArchFlattenPx();
+  const t = Math.max(0, Math.min(1, (scrolledPast - holdPx) / flattenPx));
+  return ARCH_RISE * (1 - smoothstep(t));
 }
-
-/**
- * Setting this equal to ARCH_RISE keeps the arch peak stationary in the
- * viewport during the flatten phase — only the curvature changes.
- */
-const ARCH_FLATTEN_PX = ARCH_RISE;
 
 /**
  * Arch element width. Matches Figma's SHAPE node (2433 / 1512 ≈ 161vw) so the
@@ -196,10 +209,11 @@ function useRoundedTopScrollRadius(enabled: boolean) {
 
 /**
  * How far above the section boundary the content sits when the arch is fully
- * peaked. Section paddingTop (48px mobile / 64px desktop) plus this value
- * gives the total negative marginTop at full rise.
+ * peaked. The section's own paddingTop (64px from py-16) plus this value gives
+ * the total negative marginTop applied at full rise.
  */
-const ARCH_CONTENT_PULLUP = 80; // px above section boundary at full rise
+const ARCH_SECTION_PT = 64;
+const ARCH_CONTENT_PULLUP = 80;
 
 export function SectionArchRoot({
   children,
@@ -213,28 +227,23 @@ export function SectionArchRoot({
   const reduceMotion = useReducedMotion();
 
   const rise = useMotionValue(ARCH_RISE);
-  const pullMax = useMotionValue(getArchSectionPt() + ARCH_CONTENT_PULLUP);
-  const top = useTransform(rise, (v) => -v);
+  const y = useTransform(rise, (v) => -v);
   const radiusX = `${ARCH_WIDTH_VW / 2}vw`;
   const borderTopLeftRadius = useTransform(rise, (v) => `${radiusX} ${v}px`);
   const borderTopRightRadius = useTransform(rise, (v) => `${radiusX} ${v}px`);
 
-  // Pull content up into the arch when peaked; return to 0 when flat so the
-  // section's own paddingTop takes over — no position jump at either extreme.
-  const marginTop = useTransform([rise, pullMax], ([v, pull]) =>
-    Math.round(-((pull as number) * (v as number)) / ARCH_RISE),
+  const contentY = useTransform(
+    rise,
+    (v) => -((ARCH_SECTION_PT + ARCH_CONTENT_PULLUP) * v) / ARCH_RISE,
   );
 
-  useEffect(() => {
-    const syncPullMax = () => {
-      pullMax.set(getArchSectionPt() + ARCH_CONTENT_PULLUP);
-    };
-    syncPullMax();
-    window.addEventListener("resize", syncPullMax);
-    return () => window.removeEventListener("resize", syncPullMax);
-  }, [pullMax]);
+  useLayoutEffect(() => {
+    const section = sectionRef.current?.closest("section");
+    section?.setAttribute("data-arch-hydrated", "");
+    return () => section?.removeAttribute("data-arch-hydrated");
+  }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (reduceMotion) {
       rise.set(0);
       return;
@@ -270,27 +279,27 @@ export function SectionArchRoot({
       <div
         ref={sectionRef}
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 z-0 overflow-x-clip"
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 hidden overflow-x-clip lg:block"
         style={{ height: ARCH_RISE + 32 }}
       >
         <motion.div
           style={{
-            top,
+            y,
             width: `${ARCH_WIDTH_VW}vw`,
             borderTopLeftRadius,
             borderTopRightRadius,
             height: ARCH_RISE + 32,
           }}
-          className="pointer-events-none absolute left-1/2 -translate-x-1/2 bg-[var(--section-bg)]"
+          className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 bg-[var(--section-bg)] will-change-[transform,border-radius]"
         />
       </div>
 
-      {/* Content floats inside the arch dome at full rise; marginTop returns to
+      {/* Content floats inside the arch dome at full rise; translateY returns to
           0 as arch flattens so the section's paddingTop provides normal spacing */}
       <motion.div
-        style={{ marginTop }}
+        style={{ y: contentY }}
         className={cn(
-          "@container mx-auto max-w-7xl relative z-[1]",
+          "@container mx-auto max-w-7xl relative z-[1] max-lg:!translate-y-0 will-change-transform",
           contentClassName,
         )}
       >
@@ -338,6 +347,8 @@ export function SectionShell({
   flushBottom = false,
   transparentBg = false,
 }: SectionShellProps) {
+  const showArchTop = archTop;
+  const showArchBottom = archBottom; // always reserve clearance; arch animation is desktop-only
   const needsOverflowVisible = (roundImageSection || archTop) && !roundedTop;
   const {
     borderTopLeftRadius,
@@ -358,7 +369,7 @@ export function SectionShell({
     className,
   );
 
-  const shellStyle = archBottom
+  const shellStyle = showArchBottom
     ? ({ paddingBottom: `${ARCH_RISE + 140}px` } as CSSProperties)
     : undefined;
 
@@ -367,12 +378,12 @@ export function SectionShell({
     "data-section": "",
     "data-theme": theme,
     ...(roundImageSection ? { [ROUND_IMAGE_SECTION_ATTR]: "" } : undefined),
-    ...(archTop ? { "data-arch-top": "" } : undefined),
+    ...(showArchTop ? { "data-arch-top": "" } : undefined),
     className: shellClassName,
     style: shellStyle,
   };
 
-  const shellChildren = archTop ? (
+  const shellChildren = showArchTop ? (
     <SectionArchRoot contentClassName={contentClassName}>{children}</SectionArchRoot>
   ) : (
     <div className={cn("@container mx-auto max-w-7xl", contentClassName)}>{children}</div>

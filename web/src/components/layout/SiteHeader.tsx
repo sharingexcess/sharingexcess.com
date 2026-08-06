@@ -10,6 +10,7 @@ import {
   NavDropdownTrigger,
   NAV_BUTTON_STYLE,
   NAV_SURFACE_SHADOW_CLASS,
+  NAV_SURFACE_SHADOW_VISIBLE_CLASS,
 } from "@/components/layout/NavDropdown";
 import {
   homeNavEnterDelay,
@@ -34,7 +35,7 @@ export interface SiteHeaderNavLink {
   label: string;
   href: string;
   /** When set, renders as an image tile in the desktop dropdown instead of a text link */
-  featured?: Pick<NavDropdownFeatured, "imageSrc" | "imageAlt" | "arrowAccent">;
+  featured?: Pick<NavDropdownFeatured, "imageSrc" | "imageAlt" | "arrowAccent" | "imageAlign">;
   /** `stacked` — compact accordion tiles; `stacked-tall` — full-size labels with gradient scrim */
   featuredLayout?: "standard" | "stacked" | "stacked-tall";
 }
@@ -45,6 +46,8 @@ export interface NavDropdownFeatured {
   text: string;
   href?: string;
   arrowAccent?: NavDropdownArrowAccent;
+  /** Vertical crop anchor for stacked tiles — defaults to center */
+  imageAlign?: "center" | "bottom";
 }
 
 export interface SiteHeaderNavItem {
@@ -121,7 +124,7 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
         label: "For Community Organizations",
         href: "/get-involved/partners#community-orgs",
         featured: {
-          imageSrc: "/images/fall-food-featured-photo-1-1160x680.remini-enhanced_1.avif",
+          imageSrc: "/images/community-fridge.jpg",
           imageAlt: "",
           arrowAccent: "banana",
         },
@@ -173,16 +176,16 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
         label: "Our Impact",
         href: "/about/impact",
         featured: {
-          imageSrc: "/images/Screen-Shot-2023-07-17-at-6.44.52-PM_1.avif",
+          imageSrc: "/images/lettuce.jpg",
           imageAlt: "",
-          arrowAccent: "banana",
+          arrowAccent: "blueberry",
         },
       },
       {
         label: "Our Model",
         href: "/about",
         featured: {
-          imageSrc: "/images/54178994461_4d4abdca3b_k_1.avif",
+          imageSrc: "/images/SE-vest.jpg",
           imageAlt: "",
           arrowAccent: "tangerine",
         },
@@ -191,7 +194,7 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
         label: "Our Team",
         href: "/about/team",
         featured: {
-          imageSrc: "/images/team.jpg",
+          imageSrc: "/images/handoff.jpg",
           imageAlt: "",
           arrowAccent: "guava",
         },
@@ -201,9 +204,10 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
         label: "Our Financials",
         href: "/about/financials",
         featured: {
-          imageSrc: "/images/financials.jpg",
+          imageSrc: "/images/peppers.jpg",
           imageAlt: "",
-          arrowAccent: "blueberry",
+          arrowAccent: "banana",
+          imageAlign: "bottom",
         },
         featuredLayout: "stacked-tall",
       },
@@ -248,7 +252,7 @@ export function SiteHeader({
 }: SiteHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const headerBarRef = useRef<HTMLDivElement>(null);
-  const overWhiteBackground = useHeaderOverWhiteBackground(headerBarRef);
+  const overWhiteBackground = useHeaderOverWhiteBackground(headerBarRef, isHomePageProp);
   const [activeNavIndex, setActiveNavIndex] = useState<number | null>(null);
   const [hoveredNavIndex, setHoveredNavIndex] = useState<number | null>(null);
   const [isHomePage, setIsHomePage] = useState(isHomePageProp);
@@ -356,7 +360,8 @@ export function SiteHeader({
           className={cn(
             HEADER_BAR_CLASS,
             HEADER_BAR_TRANSITION,
-            overWhiteBackground && NAV_SURFACE_SHADOW_CLASS,
+            overWhiteBackground &&
+              (visible ? NAV_SURFACE_SHADOW_VISIBLE_CLASS : NAV_SURFACE_SHADOW_CLASS),
             menuOpen && "z-50",
           )}
         >

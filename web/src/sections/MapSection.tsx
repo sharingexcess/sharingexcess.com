@@ -77,6 +77,8 @@ export function MapSection({
     ? liveTitleSplit.heading
     : resolveLiveTotalLbsTitle(title, donatedWeightLbs);
   const metric = liveTitleSplit?.metric;
+  const metricNumericValue = liveTitleSplit ? donatedWeightLbs : undefined;
+  const metricLiveTickOffset = liveTitleSplit ? 5 : undefined;
   const shellProps = { flushTop, flushBottom, transparentBg, id, archBottom };
   const isDark = sectionCardContentIsDark(isCard, cardColor, theme);
   const isCircle = mapContainerShape === "circle";
@@ -85,7 +87,10 @@ export function MapSection({
   const textSection = (
     <TextSection
       eyebrow={eyebrow}
+      eyebrowLive={Boolean(liveTitleSplit)}
       metric={metric}
+      metricNumericValue={metricNumericValue}
+      metricLiveTickOffset={metricLiveTickOffset}
       heading={resolvedTitle}
       headingSize={headingSize}
       body={body}
@@ -107,7 +112,11 @@ export function MapSection({
     showLoadingLogo: mapVariant === "impact-clusters",
   } as const;
 
-  const mapMedia = <DeferredInteractiveMap className="size-full" {...mapProps} />;
+  const mapFrameInner = (className: string) => (
+    <DeferredInteractiveMap className={className} {...mapProps} />
+  );
+
+  const mapMedia = mapFrameInner("size-full");
 
   const fullWidthMap = (
     <div className="flex w-full min-w-0 flex-col gap-2">
@@ -117,7 +126,7 @@ export function MapSection({
           mapRadius,
         )}
       >
-        <DeferredInteractiveMap className="absolute inset-0" {...mapProps} />
+        {mapFrameInner("absolute inset-0")}
       </div>
       {mapCaption && (
         <p className={cn("text-center text-[var(--section-text)]", captionClassName)}>
@@ -140,7 +149,10 @@ export function MapSection({
           textSlot={
             <TextSection
               eyebrow={eyebrow}
+              eyebrowLive={Boolean(liveTitleSplit)}
               metric={metric}
+              metricNumericValue={metricNumericValue}
+              metricLiveTickOffset={metricLiveTickOffset}
               heading={resolvedTitle}
               headingSize={headingSize}
               body={body}
@@ -209,7 +221,7 @@ export function MapSection({
           mapRadius,
         )}
       >
-        <DeferredInteractiveMap className="absolute inset-0" {...mapProps} />
+        {mapFrameInner("absolute inset-0")}
       </div>
       {mapCaption && (
         <p className={cn("text-center text-[var(--section-text)]", captionClassName)}>

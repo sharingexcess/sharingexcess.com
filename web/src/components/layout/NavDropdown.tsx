@@ -15,6 +15,7 @@ import {
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import {
   PLACEHOLDER_NAV_DROPDOWN_FEATURED,
+  type NavDropdownArrowAccent,
   type NavDropdownFeatured,
   type SiteHeaderNavItem,
 } from "./SiteHeader";
@@ -35,6 +36,10 @@ export const NAV_BUTTON_CLASS = "font-normal";
 
 /** Subtle elevation when the nav or dropdown sits over a light page background. */
 export const NAV_SURFACE_SHADOW_CLASS = "shadow-[0_2px_12px_rgba(0,0,0,0.05)]";
+
+/** Slightly stronger elevation when the header bar is visible after scroll-hide. */
+export const NAV_SURFACE_SHADOW_VISIBLE_CLASS =
+  "shadow-[0_3px_16px_rgba(0,0,0,0.07)]";
 
 function ChevronDownIcon({ className }: { className?: string }) {
   return (
@@ -192,6 +197,22 @@ const featuredArrowVariants: Variants = {
   },
 };
 
+/** Hardcoded design-system fills for nav dropdown arrow buttons */
+const NAV_DROPDOWN_ARROW_ACCENT_CLASS: Record<NavDropdownArrowAccent, string> = {
+  "se-green": "bg-se-green text-white",
+  "bright-kelly": "bg-bright-kelly text-kale",
+  tangerine: "bg-tangerine text-dark-cherry",
+  banana: "bg-banana text-kale",
+  blueberry: "bg-blueberry text-kale",
+  guava: "bg-guava text-dark-cherry",
+};
+
+const DEFAULT_NAV_DROPDOWN_ARROW_ACCENT: NavDropdownArrowAccent = "se-green";
+
+function getNavDropdownArrowClass(accent?: NavDropdownArrowAccent): string {
+  return NAV_DROPDOWN_ARROW_ACCENT_CLASS[accent ?? DEFAULT_NAV_DROPDOWN_ARROW_ACCENT];
+}
+
 function NavDropdownFeaturedArrow() {
   return (
     <svg
@@ -242,7 +263,10 @@ function NavDropdownFeaturedCard({ featured, tilt, onClose }: NavDropdownFeature
       <motion.div
         aria-hidden
         variants={featuredArrowVariants}
-        className="absolute bottom-4 right-4 z-10 flex size-12 items-center justify-center rounded-full bg-white text-kale"
+        className={cn(
+          "absolute bottom-4 right-4 z-10 flex size-12 items-center justify-center rounded-full",
+          getNavDropdownArrowClass(featured.arrowAccent),
+        )}
       >
         <NavDropdownFeaturedArrow />
       </motion.div>
@@ -387,7 +411,10 @@ function NavDropdownStackedFeaturedCard({
       <img
         src={featured.imageSrc}
         alt={featured.imageAlt ?? ""}
-        className="nav-dropdown-stacked-featured-image"
+        className={cn(
+          "nav-dropdown-stacked-featured-image",
+          featured.imageAlign === "bottom" && "nav-dropdown-stacked-featured-image--bottom",
+        )}
       />
       {scrim}
       <motion.p
@@ -404,7 +431,11 @@ function NavDropdownStackedFeaturedCard({
       </motion.p>
       <motion.div
         aria-hidden
-        className="absolute bottom-4 right-4 z-10 flex size-12 items-center justify-center rounded-full bg-white text-kale"
+        variants={featuredArrowVariants}
+        className={cn(
+          "absolute bottom-4 right-4 z-10 flex size-12 items-center justify-center rounded-full",
+          getNavDropdownArrowClass(featured.arrowAccent),
+        )}
         style={{ transformOrigin: "bottom right" }}
         animate={{
           opacity: isVisible ? 1 : 0,
@@ -443,6 +474,8 @@ function NavDropdownStackedFeaturedColumn({
           imageAlt: link.featured!.imageAlt,
           text: link.label,
           href: link.href,
+          arrowAccent: link.featured!.arrowAccent,
+          imageAlign: link.featured!.imageAlign,
         };
 
         const card = (
@@ -557,6 +590,7 @@ export function NavDropdownPanel({
           imageAlt: link.featured!.imageAlt,
           text: link.label,
           href: link.href,
+          arrowAccent: link.featured!.arrowAccent,
         }}
         tilt={featuredTilt}
         onClose={onClose}
