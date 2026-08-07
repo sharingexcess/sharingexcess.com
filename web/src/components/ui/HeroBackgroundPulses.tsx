@@ -91,7 +91,7 @@ export function HeroBackgroundPulses({
       syncContentMask();
 
       if (!animating) {
-        engine.drawStatic(ctx, logicalWidth, logicalHeight);
+        engine.drawStatic(ctx, logicalWidth, logicalHeight, performance.now());
       }
     };
 
@@ -107,7 +107,7 @@ export function HeroBackgroundPulses({
       if (logicalWidth <= 0 || logicalHeight <= 0) return;
       engine.setActive(false);
       syncContentMask();
-      engine.drawStatic(ctx, logicalWidth, logicalHeight);
+      engine.drawStatic(ctx, logicalWidth, logicalHeight, performance.now());
     };
 
     const frame = (now: number) => {

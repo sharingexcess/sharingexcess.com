@@ -18,6 +18,7 @@ import {
   homeHeroRevealStagger,
   homeHeroVideoEnterDelay,
   homeHeroVideoEnterSpring,
+  homeNavEnterCompleteDelay,
   motion,
   useReducedMotion,
 } from "@/lib/motion";
@@ -979,8 +980,23 @@ function HomeRoundedHeroWithDonate({
   const scrollFx = pinOnScroll && !reduceMotion;
   const pageRevealed = useIntroRevealed();
   const [introRevealed, setIntroRevealed] = useState(reduceMotion);
+  const [ripplesActive, setRipplesActive] = useState(reduceMotion);
   const playHeroVideo = reduceMotion || pageRevealed;
-  const ripplesActive = pageRevealed;
+
+  useEffect(() => {
+    if (reduceMotion) {
+      setRipplesActive(true);
+      return;
+    }
+    if (!pageRevealed) {
+      setRipplesActive(false);
+      return;
+    }
+
+    const delayMs = homeNavEnterCompleteDelay * 1000;
+    const timer = window.setTimeout(() => setRipplesActive(true), delayMs);
+    return () => window.clearTimeout(timer);
+  }, [pageRevealed, reduceMotion]);
   useHomeHeroFrameStart(sectionRef, introRef, scrollFx);
   useHomeHeroDonateScrollCssVar(sectionRef, scrollFx, (progress) => {
     if (progress > 0.02) setIntroRevealed(true);

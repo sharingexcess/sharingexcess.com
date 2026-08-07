@@ -9,7 +9,25 @@ const BASE_GRID_DOT_RADIUS = 0.62;
 const BASE_GRID_ALPHA = 0.24;
 
 /** Draw ripple overlay above this — low enough for density, high enough to spare the base grid */
-const WAVE_DRAW_EPSILON = 0.012;
+const WAVE_DRAW_EPSILON = 0.01;
+
+/** Sparse edge sparkles — one slot per grid cell × color so bands intermingle */
+const EDGE_SPARKLE_SPARSE = 0.68;
+const EDGE_SPARKLE_MIN_RADIUS = 0.3;
+const EDGE_SPARKLE_MAX_RADIUS = 0.48;
+
+type EdgeSparkle = {
+  x: number;
+  y: number;
+  colorIndex: number;
+  phase: number;
+  twinkleSpeed: number;
+  baseRadius: number;
+  baseAlpha: number;
+};
+
+/** Per-ring peak scale — each band keeps its own color at full strength at the crest */
+const RING_PEAK_MUL = [1, 0.86, 0.7] as const;
 
 export type HalftoneRippleWave = {
   startTime: number;
@@ -50,8 +68,10 @@ type GridCell = {
   x: number;
   y: number;
   jitter: number;
-  /** (hash - 0.5) — scaled by waveSigma × fan spread when sampling */
+  /** (hash - 0.5) — radial fan when sampling the wave */
   distJitterUnit: number;
+  /** (hash - 0.5) — tangential scatter to break up ring shape at the edges */
+  tanJitterUnit: number;
 };
 
 type RippleOrigin = {
@@ -78,19 +98,19 @@ const CONTENT_MASK_FADE_OUTER = 1.42;
 const DEFAULT_OPTIONS: HalftoneRippleOptions = {
   gridSpacing: 9,
   dotMin: 0.38,
-  dotMax: 1.55,
-  baseAmp: 0.1,
-  waveSpeed: 168,
-  waveSigma: 26,
-  wavePeak: 0.92,
-  secondaryPeak: 0.36,
-  secondarySigmaMul: 1.52,
-  rippleLagSec: 0.11,
-  fadeStartRadiusMul: 0.48,
-  maxTravelMul: 0.56,
-  fadeSharpness: 1.1,
-  rippleInterval: 7200,
-  rippleStagger: 1480,
+  dotMax: 1.93,
+  baseAmp: 0.055,
+  waveSpeed: 118,
+  waveSigma: 29,
+  wavePeak: 1.14,
+  secondaryPeak: 0.44,
+  secondarySigmaMul: 1.59,
+  rippleLagSec: 0.08,
+  fadeStartRadiusMul: 0.47,
+  maxTravelMul: 0.54,
+  fadeSharpness: 1,
+  rippleInterval: 6600,
+  rippleStagger: 800,
   ringsPerRipple: 3,
 };
 
@@ -122,11 +142,11 @@ function gaussianRing(
 ): number {
   if (peak <= 0 || sigma < 1e-6) return 0;
   const d = Math.abs(dist - ringR);
-  const coreSigma = sigma * 0.5;
-  const tailSigma = sigma * 2.5;
+  const coreSigma = sigma * 0.43;
+  const tailSigma = sigma * 2.3;
   const core = Math.exp(-(d * d) / (2 * coreSigma * coreSigma));
   const tail = Math.exp(-(d * d) / (2 * tailSigma * tailSigma));
-  return (core * 0.84 + tail * 0.16) * peak;
+  return (core * 0.83 + tail * 0.17) * peak;
 }
 
 /** Subtle outer ring — soft wide band lagging behind the primary */
@@ -154,16 +174,47 @@ function gaussianShoulder(
   return Math.exp(-(d * d) / (2 * sigma * sigma)) * peak;
 }
 
-/** Map raw wave amplitude to visual size/opacity. */
+/** Used for fan scatter sampling. */
 function visualWaveAmp(waveAmp: number): number {
-  const clamped = Math.min(1, Math.max(0, waveAmp));
-  return smoothstep(0.02, 0.86, Math.pow(clamped, 0.54));
+  const clamped = Math.min(1.12, Math.max(0, waveAmp));
+  return smoothstep(0.02, 0.64, Math.pow(clamped, 0.48));
+}
+
+/**
+ * Radial variation within each band — strong crest, but outer edge stays readable.
+ */
+function ringRadialProfile(waveAmp: number): {
+  size: number;
+  opacity: number;
+  colorMix: number;
+} {
+  const a = Math.min(1.08, Math.max(0, waveAmp));
+  const band = visualWaveAmp(a);
+  const crest = smoothstep(0.38, 0.92, a);
+  return {
+    size: Math.pow(band, 1.06 + crest * 0.22),
+    opacity: 0.24 * a + 0.76 * Math.pow(a, 1.58),
+    colorMix: smoothstep(0.04, 0.28, a) * (0.82 + crest * 0.18),
+  };
+}
+
+/** Gentle fade behind the ring front. */
+function ringTrailFade(dist: number, ringR: number, sigma: number): number {
+  const behind = ringR - dist;
+  if (behind <= 0) return 1;
+  return 1 - smoothstep(0, sigma * 4.05, behind) * 0.47;
 }
 
 /** Soft outward fade near viewport edges (centered origin). */
 function radialViewportFade(x: number, y: number, width: number, height: number): number {
   const edge = Math.min(x, width - x, y * 0.85, (height - y) * 0.65);
   return smoothstep(18, 56, edge);
+}
+
+/** 0 while the band is expanding inward; ramps to 1 only near max travel. */
+function ringLateTravelT(dist: number, maxR: number): number {
+  if (maxR <= 0) return 0;
+  return smoothstep(maxR * 0.64, maxR * 0.93, dist);
 }
 
 /** Single origin — centered on hero text; rings expand outward from the copy block. */
@@ -240,9 +291,9 @@ function computeWaveFade(
   fadeSharpness: number,
 ): number {
   const softenStart = 0.64 + 0.36 * smoothstep(0, 0.2, ageSec);
-  const entranceBoost = 1 + 0.22 * Math.exp(-ageSec * 1.6);
-  const popBoost = 1 + 0.3 * Math.exp(-ageSec * 5.5);
-  const tailFade = Math.exp(-Math.max(0, ageSec - 1.35) * 0.55);
+  const entranceBoost = 1 + 0.26 * Math.exp(-ageSec * 1.6);
+  const popBoost = 1 + 0.38 * Math.exp(-ageSec * 5.5);
+  const tailFade = Math.exp(-Math.max(0, ageSec - 1.55) * 0.58);
   const fadeStartR = width * fadeStartRadiusMul;
   const maxR = width * maxTravelMul;
 
@@ -251,7 +302,12 @@ function computeWaveFade(
   }
 
   const travelT = smoothstep(fadeStartR, maxR, r1);
-  const travelFade = Math.pow(1 - travelT, fadeSharpness);
+  let travelFade = Math.pow(1 - travelT, fadeSharpness);
+  // Near max reach, hold a sparse rim instead of fading the band out completely
+  if (travelT > 0.72) {
+    const edgeHold = (1 - smoothstep(0.72, 1, travelT)) * 0.26;
+    travelFade = Math.max(travelFade, edgeHold);
+  }
   return softenStart * entranceBoost * popBoost * tailFade * travelFade;
 }
 
@@ -263,20 +319,24 @@ function resolveDotStyle(
   baseAmp: number,
   jitter: number,
 ): { radius: number; color: string; alpha: number } | null {
-  const visualAmp = visualWaveAmp(waveAmp);
-  const amp = Math.min(1, baseAmp + visualAmp);
-  if (amp < 0.018) return null;
+  const { size, opacity, colorMix } = ringRadialProfile(waveAmp);
+  if (opacity < 0.008) return null;
 
-  const radius = (dotMin + visualAmp * (dotMax - dotMin)) * jitter;
-  const brandMix =
-    colorIndex !== null ? smoothstep(0.04, 0.38, waveAmp) : 0;
+  const crestBoost = 1 + 0.34 * smoothstep(0.4, 0.9, waveAmp);
+  const sizeJitter = 0.73 + jitter * 0.54;
+  const radius =
+    (dotMin + size * (dotMax - dotMin)) *
+    sizeJitter *
+    (1 + 0.07 * smoothstep(0.4, 0.9, waveAmp));
+  const brandMix = colorIndex !== null ? colorMix : 0;
   const color =
     brandMix > 0
       ? (RIPPLE_COLORS[colorIndex] ?? RIPPLE_COLORS[0])
       : BASE_DOT_COLOR;
   const alpha =
-    (0.17 + visualAmp * 0.96 * (brandMix > 0 ? 0.76 + brandMix * 0.24 : 1)) *
-    (colorIndex === 1 && brandMix > 0 ? 1.12 : 1);
+    (0.21 + opacity * 1.32 * (brandMix > 0 ? 0.76 + brandMix * 0.24 : 0.97)) *
+    crestBoost *
+    (colorIndex === 1 && brandMix > 0 ? 1.08 : 1);
 
   return { radius, color, alpha };
 }
@@ -291,6 +351,8 @@ export class HalftoneRippleEngine {
 
   private baseCanvas: HTMLCanvasElement | null = null;
   private baseCtx: CanvasRenderingContext2D | null = null;
+  private readonly edgeSparkles: EdgeSparkle[] = [];
+  private readonly edgeSparkleKeys = new Set<string>();
 
   private logicalWidth = 0;
   private logicalHeight = 0;
@@ -299,6 +361,8 @@ export class HalftoneRippleEngine {
   private contentMask: RippleContentMask | null = null;
   private maxActiveR = 0;
   private waveCullDistSq = 0;
+  /** Edge sparkles persist until the next cycle's rings reach the perimeter again */
+  private edgeSparklesAwaitRefresh = false;
 
   constructor(options: Partial<HalftoneRippleOptions> = {}) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
@@ -308,6 +372,9 @@ export class HalftoneRippleEngine {
     if (active && !this.active) {
       this.lastRippleTime = 0;
       this.waves.length = 0;
+    }
+    if (!active) {
+      this.clearEdgeSparkles();
     }
     this.active = active;
   }
@@ -327,6 +394,74 @@ export class HalftoneRippleEngine {
 
     this.rebuildGrid();
     this.rebuildBaseCanvas();
+    this.clearEdgeSparkles();
+  }
+
+  private clearEdgeSparkles() {
+    this.edgeSparkles.length = 0;
+    this.edgeSparkleKeys.clear();
+  }
+
+  private tryAddEdgeSparkle(
+    x: number,
+    y: number,
+    colorIndex: number,
+    col: number,
+    row: number,
+  ) {
+    if (this.edgeSparklesAwaitRefresh) {
+      this.clearEdgeSparkles();
+      this.edgeSparklesAwaitRefresh = false;
+    }
+
+    if (dotHash(col, row) < EDGE_SPARKLE_SPARSE) return;
+
+    const key = `${col},${row},${colorIndex}`;
+    if (this.edgeSparkleKeys.has(key)) return;
+
+    const hashR = dotHash(col + 3, row + 5);
+    const hashA = dotHash(col + 13, row + 17);
+    const hashP = dotHash(col + 23, row + 29);
+
+    this.edgeSparkleKeys.add(key);
+    this.edgeSparkles.push({
+      x,
+      y,
+      colorIndex,
+      phase: hashP * Math.PI * 2,
+      twinkleSpeed: 1.6 + hashP * 2.8,
+      baseRadius:
+        EDGE_SPARKLE_MIN_RADIUS +
+        hashR * (EDGE_SPARKLE_MAX_RADIUS - EDGE_SPARKLE_MIN_RADIUS),
+      baseAlpha: 0.1 + hashA * 0.14,
+    });
+  }
+
+  private drawEdgeSparkles(
+    ctx: CanvasRenderingContext2D,
+    nowMs: number,
+  ) {
+    if (this.edgeSparkles.length === 0) return;
+
+    const t = nowMs / 1000;
+
+    for (const sparkle of this.edgeSparkles) {
+      const pulse = 0.5 + 0.5 * Math.sin(t * sparkle.twinkleSpeed + sparkle.phase);
+      const twinkle = 0.38 + 0.62 * pulse;
+      const radius = sparkle.baseRadius * (0.68 + 0.32 * pulse);
+      const alpha = sparkle.baseAlpha * twinkle;
+      const maskVis = contentMaskRippleVisibility(sparkle.x, sparkle.y, this.contentMask);
+
+      if (alpha * maskVis < 0.02) continue;
+
+      ctx.globalAlpha = alpha * maskVis;
+      ctx.fillStyle = RIPPLE_COLORS[sparkle.colorIndex] ?? RIPPLE_COLORS[0];
+      ctx.beginPath();
+      ctx.arc(sparkle.x, sparkle.y, radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.globalAlpha = 1;
   }
 
   private rebuildGrid() {
@@ -348,12 +483,14 @@ export class HalftoneRippleEngine {
         if (y < -gridSpacing || y > height + gridSpacing) continue;
 
         const hash = dotHash(col, row);
+        const hashTan = dotHash(col + 19.17, row + 43.61);
 
         this.grid.push({
           x,
           y,
           jitter: 0.78 + hash * 0.44,
           distJitterUnit: hash - 0.5,
+          tanJitterUnit: hashTan - 0.5,
         });
       }
     }
@@ -396,6 +533,7 @@ export class HalftoneRippleEngine {
   }
 
   spawnRipple(now: number) {
+    this.edgeSparklesAwaitRefresh = this.edgeSparkles.length > 0;
     for (let i = 0; i < this.options.ringsPerRipple; i++) {
       this.waves.push({
         startTime: now + i * this.options.rippleStagger,
@@ -496,20 +634,22 @@ export class HalftoneRippleEngine {
       return { amp: 0, colorIndex: null };
     }
 
-    let sum = 0;
+    let peakAmp = 0;
+    let sumAmp = 0;
     let bestPrimary = 0;
     let colorIndex: number | null = null;
     let colorStartTime = 0;
 
     for (const wave of this.prepared) {
-      const primary = gaussianRing(dist, wave.r1, waveSigma, wavePeak);
+      const ringPeak = wavePeak * (RING_PEAK_MUL[wave.colorIndex] ?? 0.45);
+      const primary = gaussianRing(dist, wave.r1, waveSigma, ringPeak);
       const outer = gaussianOuterRing(
         dist,
         wave.r2,
         waveSigma,
-        wavePeak * secondaryPeak,
+        ringPeak * secondaryPeak,
       );
-      const shoulderPeak = wavePeak * secondaryPeak * 0.55;
+      const shoulderPeak = ringPeak * secondaryPeak * 0.58;
       const shoulder = gaussianShoulder(
         dist,
         wave.r2,
@@ -517,12 +657,16 @@ export class HalftoneRippleEngine {
         shoulderPeak,
       );
 
-      const shoulderWeight = 1 - smoothstep(0, wavePeak * 0.68, primary);
-      const waveAmp = primary + outer + shoulder * shoulderWeight * 0.45;
-      const contrib = waveAmp * wave.fade;
-      sum += contrib;
+      const shoulderWeight = 1 - smoothstep(0, ringPeak * 0.58, primary);
+      const waveAmp =
+        primary + outer * 0.6 + shoulder * shoulderWeight * 0.46;
+      const trailFade = ringTrailFade(dist, wave.r1, waveSigma);
+      const contrib = waveAmp * wave.fade * trailFade;
 
-      const primaryContrib = primary * wave.fade;
+      peakAmp = Math.max(peakAmp, contrib);
+      sumAmp += contrib;
+
+      const primaryContrib = primary * wave.fade * trailFade;
       if (
         primaryContrib > bestPrimary ||
         (primaryContrib >= bestPrimary * 0.85 && wave.startTime > colorStartTime)
@@ -533,22 +677,24 @@ export class HalftoneRippleEngine {
       }
     }
 
-    return { amp: Math.min(1, sum), colorIndex };
+    const blended = peakAmp * 0.48 + sumAmp * 0.52;
+    return { amp: Math.min(1.15, blended), colorIndex };
   }
 
   /** Static base grid only — use before ripples are active or when animation is paused. */
-  drawStatic(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  drawStatic(ctx: CanvasRenderingContext2D, width: number, height: number, nowMs = 0) {
     ctx.clearRect(0, 0, width, height);
     if (this.baseCanvas) {
       ctx.drawImage(this.baseCanvas, 0, 0, width, height);
     }
+    this.drawEdgeSparkles(ctx, nowMs || performance.now());
   }
 
   draw(
     ctx: CanvasRenderingContext2D,
     width: number,
     height: number,
-    _now: number,
+    now: number,
   ) {
     ctx.clearRect(0, 0, width, height);
 
@@ -556,11 +702,14 @@ export class HalftoneRippleEngine {
       ctx.drawImage(this.baseCanvas, 0, 0, width, height);
     }
 
+    this.drawEdgeSparkles(ctx, now);
+
     if (!this.active || this.prepared.length === 0) {
       return;
     }
 
-    const { dotMin, dotMax, baseAmp, waveSigma } = this.options;
+    const { dotMin, dotMax, baseAmp, waveSigma, maxTravelMul, gridSpacing } = this.options;
+    const maxR = width * maxTravelMul;
 
     for (const cell of this.grid) {
       const maskVis = contentMaskRippleVisibility(cell.x, cell.y, this.contentMask);
@@ -576,16 +725,27 @@ export class HalftoneRippleEngine {
         if (distSq > this.waveCullDistSq) continue;
 
         const dist = Math.hypot(dx, dy);
+        const angle = Math.atan2(dy, dx);
+        const travelT = ringLateTravelT(dist, maxR);
+        const viewportT = (1 - radialViewportFade(cell.x, cell.y, width, height)) * travelT;
 
-        // Tight sample first (condensed core), then fan scatter grows with amplitude
         const coreSample = this.sampleWaveAmp(dist, distSq);
-        const fanSpread =
-          cell.distJitterUnit * waveSigma * (0.18 + visualWaveAmp(coreSample.amp) * 1.05);
-        const distSample = Math.max(0, dist + fanSpread);
+        const fanStrength = 0.13 + visualWaveAmp(coreSample.amp) * 0.84;
+        const baseRadial = cell.distJitterUnit * waveSigma * fanStrength;
+        const extraRadial = baseRadial * (travelT * 2.35 + viewportT * 1.05);
+        const tangSpread =
+          cell.tanJitterUnit * waveSigma * fanStrength * 0.78 * travelT;
 
-        const sample = this.sampleWaveAmp(distSample, distSq);
-        const effectiveAmp =
-          sample.amp * radialViewportFade(cell.x, cell.y, width, height);
+        const pdx = dx - Math.sin(angle) * tangSpread;
+        const pdy = dy + Math.cos(angle) * tangSpread;
+        const perturbedDist = Math.max(0, Math.hypot(pdx, pdy) + baseRadial + extraRadial);
+
+        const sample = this.sampleWaveAmp(perturbedDist, distSq);
+        const viewportFade = radialViewportFade(cell.x, cell.y, width, height);
+        const atEdge = travelT > 0.66 || viewportFade < 0.82;
+        const edgeSoft = atEdge ? 1 : 1 - travelT * 0.22;
+        const effectiveViewportFade = atEdge ? 1 : viewportFade;
+        const effectiveAmp = sample.amp * effectiveViewportFade * edgeSoft;
         if (effectiveAmp > waveAmp) {
           waveAmp = effectiveAmp;
           colorIndex = sample.colorIndex;
@@ -604,7 +764,21 @@ export class HalftoneRippleEngine {
       );
       if (!style) continue;
 
-      ctx.globalAlpha = style.alpha * maskVis;
+      const finalAlpha = style.alpha * maskVis;
+      const col = Math.floor(cell.x / gridSpacing);
+      const row = Math.floor(cell.y / gridSpacing);
+      const viewportFade = radialViewportFade(cell.x, cell.y, width, height);
+      const travelT = ringLateTravelT(
+        Math.hypot(cell.x - (this.origins[0]?.x ?? width / 2), cell.y - (this.origins[0]?.y ?? height / 2)),
+        maxR,
+      );
+      const atEdge = travelT > 0.66 || viewportFade < 0.82;
+
+      if (atEdge && colorIndex !== null) {
+        this.tryAddEdgeSparkle(cell.x, cell.y, colorIndex, col, row);
+      }
+
+      ctx.globalAlpha = finalAlpha;
       ctx.fillStyle = style.color;
       ctx.beginPath();
       ctx.arc(cell.x, cell.y, style.radius, 0, Math.PI * 2);

@@ -329,6 +329,10 @@ export const homeNavEnterSpring: Transition = {
 
 export const homeNavEnterDelay = 0.12;
 
+/** When the home nav enter spring has effectively settled (delay + visual duration). */
+export const homeNavEnterCompleteDelay =
+  homeNavEnterDelay + homeNavEnterSpring.visualDuration;
+
 /** Home page load — hero video frame rises from below */
 export const homeHeroVideoEnterSpring: Transition = {
   type: "spring",

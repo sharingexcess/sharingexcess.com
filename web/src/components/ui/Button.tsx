@@ -1,3 +1,4 @@
+import { ButtonHalftoneLayer } from "@/components/ui/ButtonHalftoneLayer";
 import { cn } from "@/lib/cn";
 import {
   buttonHoverSpring,
@@ -81,9 +82,9 @@ const primaryColorScheme = {
 } as const;
 
 const FILL_LAYERS = [
-  { offset: "15%", className: "bg-banana" },
-  { offset: "110%", className: "bg-tangerine" },
-  { offset: "220%", className: "bg-bright-kelly" },
+  { offset: "15%", color: "#ffd951" },
+  { offset: "110%", color: "#fba62f" },
+  { offset: "220%", color: "#00bc57" },
 ] as const;
 
 const fillGroupVariants: Variants = {
@@ -203,14 +204,12 @@ function ButtonColorRipple() {
       style={{ transformOrigin: "center bottom" }}
       variants={fillGroupVariants}
     >
-      {FILL_LAYERS.map(({ offset, className: layerClass }, index) => (
-        <motion.span
+      {FILL_LAYERS.map(({ offset, color }, index) => (
+        <ButtonHalftoneLayer
           key={offset}
-          className={cn(
-            "absolute left-1/2 top-0 aspect-square w-[140%] -translate-x-1/2 rounded-full",
-            layerClass,
-          )}
-          style={{ zIndex: index + 1, transformOrigin: "center center" }}
+          color={color}
+          offset={offset}
+          layerIndex={index}
           variants={circleVariants(offset, index)}
         />
       ))}
