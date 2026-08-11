@@ -42,6 +42,8 @@ export interface MapSectionProps extends Omit<SectionContentProps, "imageSrc" | 
    * not overlap this section's content.
    */
   archBottom?: boolean;
+  /** Info popover beside the eyebrow — Surplus product overview */
+  surplusInfo?: boolean;
 }
 
 export function MapSection({
@@ -70,6 +72,7 @@ export function MapSection({
   flushBottom = false,
   transparentBg = false,
   archBottom = false,
+  surplusInfo = false,
 }: MapSectionProps) {
   const donatedWeightLbs = useLiveDonatedWeight();
   const liveTitleSplit = splitLiveTotalLbsTitle(title, donatedWeightLbs);
@@ -88,6 +91,7 @@ export function MapSection({
     <TextSection
       eyebrow={eyebrow}
       eyebrowLive={Boolean(liveTitleSplit)}
+      eyebrowSurplusInfo={surplusInfo}
       metric={metric}
       metricNumericValue={metricNumericValue}
       metricLiveTickOffset={metricLiveTickOffset}
@@ -150,6 +154,7 @@ export function MapSection({
             <TextSection
               eyebrow={eyebrow}
               eyebrowLive={Boolean(liveTitleSplit)}
+              eyebrowSurplusInfo={surplusInfo}
               metric={metric}
               metricNumericValue={metricNumericValue}
               metricLiveTickOffset={metricLiveTickOffset}

@@ -120,14 +120,15 @@ function VolumeOnIcon({ size = 16 }: { size?: number }) {
 }
 
 const controlButtonClass = cn(
-  "flex size-11 items-center justify-center rounded-full",
+  "flex size-11 cursor-pointer items-center justify-center rounded-full",
   "bg-[rgba(27,27,21,0.72)] text-white backdrop-blur-sm",
   "transition-colors hover:bg-[rgba(27,27,21,0.88)]",
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
 );
 
 export interface ScrollAutoplayVideoProps {
-  posterSrc: string;
+  /** When omitted, the video's first frame is shown until playback starts. */
+  posterSrc?: string;
   posterAlt?: string;
   videoSrc: string;
   className?: string;
@@ -205,16 +206,18 @@ export function ScrollAutoplayVideo({
         onPlaying={() => setHasStarted(true)}
       />
 
-      <img
-        src={posterSrc}
-        alt={showPoster ? posterAlt : ""}
-        aria-hidden={!showPoster}
-        className={cn(
-          coverClass,
-          "transition-opacity duration-500",
-          showPoster ? "opacity-100" : "opacity-0",
-        )}
-      />
+      {posterSrc ? (
+        <img
+          src={posterSrc}
+          alt={showPoster ? posterAlt : ""}
+          aria-hidden={!showPoster}
+          className={cn(
+            coverClass,
+            "transition-opacity duration-500",
+            showPoster ? "opacity-100" : "opacity-0",
+          )}
+        />
+      ) : null}
 
       {!reduceMotion && (
         <button

@@ -302,7 +302,7 @@ export function TextImageSection({
   ) : null;
 
   const scrollAutoplayVideoSlot =
-    videoPlayInView && videoSrc?.trim() && imageSrc ? (
+    videoPlayInView && videoSrc?.trim() ? (
       <ScrollAutoplayVideo
         posterSrc={imageSrc}
         posterAlt={imageAlt}

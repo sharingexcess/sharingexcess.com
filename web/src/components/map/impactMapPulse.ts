@@ -1,6 +1,6 @@
 import type { Map } from "mapbox-gl";
 
-/** High-volume hub regions — fixed list, cycled every 1.2s (no runtime selection). */
+/** High-volume hub regions — fixed list, cycled every ~2.2s (no runtime selection). */
 export const IMPACT_PULSE_LOCATIONS = [
   { lng: -75.1652, lat: 39.9526 }, // Philadelphia
   { lng: -73.8847, lat: 40.8094 }, // Hunts Point
@@ -12,7 +12,10 @@ export const IMPACT_PULSE_LOCATIONS = [
   { lng: -95.3698, lat: 29.7604 }, // Houston
 ] as const;
 
-const PULSE_INTERVAL_MS = 1200;
+/** Must match `se-map-live-pulse` animation duration in map.css. */
+const PULSE_ANIMATION_MS = 1600;
+const PULSE_DELAY_MS = 600;
+const PULSE_INTERVAL_MS = PULSE_ANIMATION_MS + PULSE_DELAY_MS;
 
 export function startImpactMapPulse(
   map: Map,

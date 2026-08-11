@@ -15,6 +15,7 @@ const CLIENT_OPTIMIZE_DEPS = [
   "react-dom/client",
   "@astrojs/react/client.js",
   "framer-motion",
+  "mapbox-gl",
 ];
 
 /** Keep a single React build in dev — mixed prod/dev prebundles break hooks. */

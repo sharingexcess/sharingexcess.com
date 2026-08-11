@@ -248,6 +248,8 @@ export interface StackingCardItem {
   title: string;
   body?: string;
   imageSrc: string;
+  /** Optional mobile-specific image — used below the `lg` breakpoint (1024px). */
+  imageSrcMobile?: string;
   imageAlt?: string;
   primaryCta?: string;
   primaryCtaHref?: string;
@@ -412,18 +414,29 @@ function StackingCard({
           <div className="relative flex min-h-0 items-stretch p-4 pt-0 sm:p-6 sm:pt-0 lg:min-h-0 lg:p-6 xl:p-8">
             <div className="relative isolate min-h-0 flex-1 overflow-hidden rounded-[var(--radius-md)]">
               <motion.div
-                className="absolute inset-0"
+                className="absolute inset-0 origin-center"
                 initial={{ scale: IMAGE_SCALE_REST }}
                 animate={{ scale: imageScale }}
                 transition={imageTransition}
-                style={{ transformOrigin: "50% 50%" }}
               >
-                <img
-                  src={item.imageSrc}
-                  alt={item.imageAlt ?? ""}
-                  className="block h-full w-full object-cover"
-                  loading={index === 0 ? "eager" : "lazy"}
-                />
+                {item.imageSrcMobile ? (
+                  <picture className="block size-full">
+                    <source media="(min-width: 1024px)" srcSet={item.imageSrc} />
+                    <img
+                      src={item.imageSrcMobile}
+                      alt={item.imageAlt ?? ""}
+                      className="block size-full object-cover object-center"
+                      loading={index === 0 ? "eager" : "lazy"}
+                    />
+                  </picture>
+                ) : (
+                  <img
+                    src={item.imageSrc}
+                    alt={item.imageAlt ?? ""}
+                    className="block size-full object-cover object-center"
+                    loading={index === 0 ? "eager" : "lazy"}
+                  />
+                )}
               </motion.div>
               {isBuried && (
                 <div

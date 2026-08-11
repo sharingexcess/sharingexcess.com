@@ -573,6 +573,27 @@ html {
   }
 }
 
+@keyframes scroll-hint-bounce {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, 6px, 0);
+  }
+}
+
+.scroll-hint-bounce {
+  animation: scroll-hint-bounce 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-hint-bounce {
+    animation: none;
+  }
+}
+
 @keyframes live-indicator-pulse {
   0% {
     box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-bright-kelly) 65%, transparent);

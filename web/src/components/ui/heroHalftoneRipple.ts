@@ -231,7 +231,7 @@ function resolveOrigins(
   return [{ x: width / 2, y: height * 0.38 }];
 }
 
-function resolveContentMaskEllipse(mask: RippleContentMask): {
+export function resolveContentMaskEllipse(mask: RippleContentMask): {
   cx: number;
   cy: number;
   rx: number;
@@ -254,7 +254,7 @@ function resolveContentMaskEllipse(mask: RippleContentMask): {
  * Soft oval mask — 0 at center (ripples hidden), 1 outside the fade (full ripples).
  * Uses normalized ellipse distance for a smooth radial gradient at the edges.
  */
-function contentMaskRippleVisibility(
+export function contentMaskRippleVisibility(
   x: number,
   y: number,
   mask: RippleContentMask | null,

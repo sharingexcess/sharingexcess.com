@@ -1,4 +1,5 @@
 import { useLenis } from "@/components/providers/SmoothScrollProvider";
+import { ARCH_RISE, computeArchRise } from "@/lib/archScroll";
 import { cn } from "@/lib/cn";
 import {
   motion,
@@ -83,49 +84,9 @@ export function SectionArchVisual() {
   );
 }
 
-/** How far (px) the arch peak rises above the section boundary at the center. */
-const ARCH_RISE = 180;
-
-/** Minimum scroll hold before flatten begins (desktop). */
-const ARCH_HOLD_PX_MIN = 280;
-/** Viewport fraction for hold — keeps the peak visible through the map handoff. */
-const ARCH_HOLD_VH = 0.36;
-
-/** Minimum scroll distance over which the arch eases from peak to flat (desktop). */
-const ARCH_FLATTEN_PX_MIN = 440;
-/** Viewport fraction for flatten — longer travel reads smoother against Lenis. */
-const ARCH_FLATTEN_VH = 0.62;
-
-function isArchDesktop(): boolean {
-  return typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches;
-}
-
-function getArchHoldPx(): number {
-  const vh = window.innerHeight || 800;
-  return isArchDesktop()
-    ? Math.max(ARCH_HOLD_PX_MIN, Math.round(vh * ARCH_HOLD_VH))
-    : Math.round(vh * 0.35);
-}
-
-function getArchFlattenPx(): number {
-  const vh = window.innerHeight || 800;
-  return isArchDesktop()
-    ? Math.max(ARCH_FLATTEN_PX_MIN, Math.round(vh * ARCH_FLATTEN_VH))
-    : ARCH_RISE;
-}
-
 /** Zero slope at t=0 and t=1 — avoids a jerk when flatten begins after the hold. */
 function smoothstep(t: number): number {
   return t * t * (3 - 2 * t);
-}
-
-function computeArchRise(sectionTop: number): number {
-  const vh = window.innerHeight || 800;
-  const scrolledPast = vh + ARCH_RISE - sectionTop;
-  const holdPx = getArchHoldPx();
-  const flattenPx = getArchFlattenPx();
-  const t = Math.max(0, Math.min(1, (scrolledPast - holdPx) / flattenPx));
-  return ARCH_RISE * (1 - smoothstep(t));
 }
 
 /**
@@ -299,7 +260,7 @@ export function SectionArchRoot({
       <motion.div
         style={{ y: contentY }}
         className={cn(
-          "@container mx-auto max-w-7xl relative z-[1] max-lg:!translate-y-0 will-change-transform",
+          "@container mx-auto max-w-7xl relative z-[2] max-lg:!translate-y-0 will-change-transform",
           contentClassName,
         )}
       >
@@ -311,6 +272,8 @@ export function SectionArchRoot({
 
 export interface SectionShellProps extends SectionProps {
   children: ReactNode;
+  /** Full-bleed background layer — absolute inset-0, behind section content */
+  background?: ReactNode;
   as?: "section" | "div";
   contentClassName?: string;
   /** Round-image layout — enables scroll lock when aligned */
@@ -338,6 +301,7 @@ export function SectionShell({
   className,
   contentClassName,
   children,
+  background,
   as: Tag = "section",
   roundImageSection = false,
   archTop = false,
@@ -359,6 +323,7 @@ export function SectionShell({
 
   const shellClassName = cn(
     "relative px-4 text-[var(--section-text)] sm:px-6 lg:px-24",
+    background && "isolate",
     transparentBg ? "bg-transparent" : "bg-[var(--section-bg)]",
     flushTop ? "pt-0" : "pt-12 lg:pt-[var(--spacing-xxl)]",
     flushBottom ? "pb-0" : "pb-12 lg:pb-[var(--spacing-xxl)]",
@@ -383,10 +348,24 @@ export function SectionShell({
     style: shellStyle,
   };
 
+  const elevatedContentClass = cn(
+    background && "relative z-[2]",
+    contentClassName,
+  );
+
   const shellChildren = showArchTop ? (
-    <SectionArchRoot contentClassName={contentClassName}>{children}</SectionArchRoot>
+    <SectionArchRoot contentClassName={elevatedContentClass}>
+      {children}
+    </SectionArchRoot>
   ) : (
-    <div className={cn("@container mx-auto max-w-7xl", contentClassName)}>{children}</div>
+    <div
+      className={cn(
+        "@container mx-auto max-w-7xl",
+        elevatedContentClass,
+      )}
+    >
+      {children}
+    </div>
   );
 
   if (animateRoundedTop) {
@@ -400,6 +379,7 @@ export function SectionShell({
           borderTopRightRadius,
         }}
       >
+        {background}
         {shellChildren}
       </motion.section>
     );
@@ -407,6 +387,7 @@ export function SectionShell({
 
   return (
     <Tag {...shellProps}>
+      {background}
       {shellChildren}
     </Tag>
   );

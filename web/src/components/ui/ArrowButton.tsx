@@ -17,6 +17,8 @@ export interface ArrowButtonProps {
   colorScheme?: "light" | "dark";
   /** Circle diameter — default matches Figma carousel nav (75px) */
   size?: "default" | "sm";
+  /** `scale` enlarges on hover without changing colors */
+  hoverEffect?: "default" | "scale";
   /** Accessible label — required for icon-only controls */
   "aria-label": string;
   className?: string;
@@ -98,7 +100,7 @@ const disabledSecondaryClasses: Record<
 };
 
 const shellBaseClasses =
-  "inline-flex shrink-0 items-center justify-center rounded-full p-0 box-border focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--section-btn,#00843d)]";
+  "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full p-0 box-border focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--section-btn,#00843d)]";
 
 const shellSizeClasses = {
   default: "size-[75px] max-lg:size-14",
@@ -110,10 +112,39 @@ const iconSizeClasses = {
   sm: "size-6",
 } as const;
 
+const primaryScaleOnlyFallback = {
+  light:
+    "bg-[var(--section-btn-primary-bg,#00843d)] text-[var(--section-btn-primary-label,#ffffff)] transition-transform duration-300 ease-out hover:scale-[1.08]",
+  dark:
+    "bg-white text-[var(--section-btn-primary-label,#003619)] transition-transform duration-300 ease-out hover:scale-[1.08]",
+};
+
+const scaleOnlyHoverTransition = {
+  scale: { type: "tween", duration: 0.3, ease: [0.4, 0, 0.2, 1] },
+} as const;
+
 const primaryShellVariants = (
   colorScheme: keyof typeof primaryColorScheme,
+  hoverEffect: NonNullable<ArrowButtonProps["hoverEffect"]> = "default",
 ): Variants => {
   const { restBg, hoverBg, restColor, hoverColor } = primaryColorScheme[colorScheme];
+
+  if (hoverEffect === "scale") {
+    return {
+      rest: {
+        scale: 1,
+        backgroundColor: restBg,
+        color: restColor,
+        transition: scaleOnlyHoverTransition,
+      },
+      hover: {
+        scale: 1.08,
+        backgroundColor: restBg,
+        color: restColor,
+        transition: scaleOnlyHoverTransition,
+      },
+    };
+  }
 
   return {
     rest: { scale: 1, backgroundColor: restBg, color: restColor },
@@ -193,6 +224,7 @@ export function ArrowButton({
   variant = "primary",
   colorScheme = "light",
   size = "default",
+  hoverEffect = "default",
   className,
   type = "button",
   disabled,
@@ -216,7 +248,9 @@ export function ArrowButton({
       : isPrimary
         ? useMotion
           ? "border-0"
-          : primaryColorSchemeFallback[colorScheme]
+          : hoverEffect === "scale"
+            ? primaryScaleOnlyFallback[colorScheme]
+            : primaryColorSchemeFallback[colorScheme]
         : useMotion
           ? "border bg-transparent"
           : secondaryColorSchemeFallback[colorScheme],
@@ -235,7 +269,7 @@ export function ArrowButton({
         className={classes}
         variants={
           isPrimary
-            ? primaryShellVariants(colorScheme)
+            ? primaryShellVariants(colorScheme, hoverEffect)
             : secondaryShellVariants(colorScheme)
         }
         initial="rest"

@@ -1,6 +1,6 @@
 import { buildVideoEmbedUrl } from "@/lib/toVideoEmbedSrc";
 import { cn } from "@/lib/cn";
-import { useEffect, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 
 const CAPTION_SUPPRESS_MS = 8000;
 const CAPTION_SUPPRESS_INTERVAL_MS = 400;
@@ -25,6 +25,13 @@ function startYoutubePlayback(iframe: HTMLIFrameElement) {
   postYoutubeCommand(iframe, "playVideo");
 }
 
+export interface YoutubeChromelessEmbedHandle {
+  play: () => void;
+  pause: () => void;
+  mute: () => void;
+  unmute: () => void;
+}
+
 export interface YoutubeChromelessEmbedProps {
   videoSrc: string;
   title: string;
@@ -35,15 +42,40 @@ export interface YoutubeChromelessEmbedProps {
   className?: string;
 }
 
-export function YoutubeChromelessEmbed({
-  videoSrc,
-  title,
-  autoplay = false,
-  interactive = false,
-  onReady,
-  className,
-}: YoutubeChromelessEmbedProps) {
+export const YoutubeChromelessEmbed = forwardRef<
+  YoutubeChromelessEmbedHandle,
+  YoutubeChromelessEmbedProps
+>(function YoutubeChromelessEmbed(
+  {
+    videoSrc,
+    title,
+    autoplay = false,
+    interactive = false,
+    onReady,
+    className,
+  },
+  ref,
+) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    play: () => {
+      const iframe = iframeRef.current;
+      if (iframe) postYoutubeCommand(iframe, "playVideo");
+    },
+    pause: () => {
+      const iframe = iframeRef.current;
+      if (iframe) postYoutubeCommand(iframe, "pauseVideo");
+    },
+    mute: () => {
+      const iframe = iframeRef.current;
+      if (iframe) postYoutubeCommand(iframe, "mute");
+    },
+    unmute: () => {
+      const iframe = iframeRef.current;
+      if (iframe) postYoutubeCommand(iframe, "unMute");
+    },
+  }));
   const origin =
     typeof window !== "undefined" ? window.location.origin : undefined;
   const embedSrc = buildVideoEmbedUrl(videoSrc, {
@@ -85,7 +117,7 @@ export function YoutubeChromelessEmbed({
   if (!embedSrc) return null;
 
   return (
-    <div className={cn("absolute inset-0 z-[1] overflow-hidden", className)}>
+    <div className={cn("absolute inset-0 z-[1] overflow-hidden bg-white", className)}>
       <iframe
         ref={iframeRef}
         key={embedSrc}
@@ -99,6 +131,6 @@ export function YoutubeChromelessEmbed({
       />
     </div>
   );
-}
+});
 
 export default YoutubeChromelessEmbed;

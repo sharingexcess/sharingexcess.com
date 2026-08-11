@@ -11,6 +11,7 @@ import {
 } from "@/lib/typography";
 import { AnimatedHeroHeading } from "@/components/ui/AnimatedHeroHeading";
 import { LiveIndicatorDot } from "@/components/ui/LiveIndicatorDot";
+import { SurplusEyebrow } from "@/components/ui/SurplusInfoPopover";
 import { SlotMachineNumber } from "@/components/ui/SlotMachineNumber";
 import { Button, type ButtonProps } from "./Button";
 import type { ReactNode } from "react";
@@ -41,6 +42,8 @@ export interface TextSectionProps {
   eyebrow?: string;
   /** Pulsing kelly dot beside the eyebrow — use for live data labels */
   eyebrowLive?: boolean;
+  /** Split eyebrow at "Surplus" — word + info icon open the product popover */
+  eyebrowSurplusInfo?: boolean;
   /** Large display numeral shown above the heading */
   metric?: string;
   /** Live target for metric slot animation — enables tick-up after reveal */
@@ -152,15 +155,21 @@ function EyebrowRow({
   eyebrow,
   live,
   centered,
+  surplusInfo,
 }: {
   eyebrow: string;
   live?: boolean;
   centered?: boolean;
+  surplusInfo?: boolean;
 }) {
   return (
     <div className={cn("flex items-center gap-2", centered && "justify-center")}>
       {live && <LiveIndicatorDot />}
-      <p className={cn(eyebrowClassName, "text-[var(--section-text,#003619)]")}>{eyebrow}</p>
+      {surplusInfo ? (
+        <SurplusEyebrow label={eyebrow} />
+      ) : (
+        <p className={cn(eyebrowClassName, "text-[var(--section-text,#003619)]")}>{eyebrow}</p>
+      )}
     </div>
   );
 }
@@ -168,6 +177,7 @@ function EyebrowRow({
 export function TextSection({
   eyebrow,
   eyebrowLive,
+  eyebrowSurplusInfo,
   metric,
   metricNumericValue,
   metricLiveTickOffset,
@@ -275,7 +285,12 @@ export function TextSection({
     return (
       <div className={cn("flex flex-col gap-4", className)}>
         {eyebrow && (
-          <EyebrowRow eyebrow={eyebrow} live={eyebrowLive} centered={isCentered} />
+          <EyebrowRow
+            eyebrow={eyebrow}
+            live={eyebrowLive}
+            centered={isCentered}
+            surplusInfo={eyebrowSurplusInfo}
+          />
         )}
         <div className="flex flex-col items-start gap-4 lg:flex-row lg:gap-8">
           {(metric || headingEl) && (
@@ -319,7 +334,12 @@ export function TextSection({
         )}
       >
         {eyebrow && (
-          <EyebrowRow eyebrow={eyebrow} live={eyebrowLive} centered={isCentered} />
+          <EyebrowRow
+            eyebrow={eyebrow}
+            live={eyebrowLive}
+            centered={isCentered}
+            surplusInfo={eyebrowSurplusInfo}
+          />
         )}
         {metric && (
           <div className="max-sm:w-full max-sm:min-w-0">

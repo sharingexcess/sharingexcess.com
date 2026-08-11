@@ -92,6 +92,16 @@ export function getSurplusApiOrigin(): string {
   return "https://surplus-api.staging.sharingexcess.com";
 }
 
+/** Production origin — fallback when staging geojson is unavailable. */
+export const IMPACT_GEOJSON_FALLBACK_ORIGIN =
+  "https://surplus-api.sharingexcess.com";
+
 export function getImpactGeoJsonUrl(): string {
   return `${getSurplusApiOrigin()}${IMPACT_GEOJSON_PATH}`;
+}
+
+export function getImpactGeoJsonUrls(): string[] {
+  const primary = getImpactGeoJsonUrl();
+  const fallback = `${IMPACT_GEOJSON_FALLBACK_ORIGIN}${IMPACT_GEOJSON_PATH}`;
+  return primary === fallback ? [primary] : [primary, fallback];
 }

@@ -58,10 +58,8 @@ const supporterLogos = [
     secondaryCta="Give Monthly"
     secondaryCtaHref="/collective"
     imageStyle="video"
-    imageSrc="/images/headshots/evan_1.avif"
     videoSrc="/videos/wheel-two-problems.mp4"
     videoPlayInView={true}
-    imageAlt="Evan Ehlers, founder of Sharing Excess"
   />
 
   <SectionScrollHandoff
@@ -98,7 +96,8 @@ const supporterLogos = [
         {
           title: "It's measurable.",
           body: "Every pound moves through [Surplus](https://surplus.sharingexcess.com), our platform for tracking food from pickup to delivery.",
-          imageSrc: "/images/Impact-Dash.png",
+          imageSrc: "/images/its-measurable.png",
+          imageSrcMobile: "/images/its-measurable-mobile.png",
           imageAlt: "Surplus impact dashboard showing food rescue data",
           primaryCta: "Our Impact",
           primaryCtaHref: "/about/impact",
@@ -122,6 +121,7 @@ const supporterLogos = [
       layout="stack-centered"
       headingSize="h2"
       eyebrow="Live from Surplus"
+      surplusInfo
       title="{totalLbs} pounds of food rescued. And counting."
       mapVariant="impact-clusters"
       mapCaption="Over 2,000 distribution locations across 36 states"

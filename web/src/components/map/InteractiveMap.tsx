@@ -1,6 +1,7 @@
 import { cn } from "@/lib/cn";
 import { AnimatePresence } from "@/lib/motion";
-import type { LngLatBounds, Map, Marker } from "mapbox-gl";
+import mapboxgl, { type LngLatBounds, type Map, type Marker } from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 import { useCallback, useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import "./map.css";
 import { HubMarkerCard, type HubCardAnchor } from "./HubMarkerCard";
@@ -18,7 +19,7 @@ import {
   DEFAULT_MAP_HUBS,
   DEFAULT_MAP_ZOOM,
   DEFAULT_MAX_ZOOM,
-  getImpactGeoJsonUrl,
+  getImpactGeoJsonUrls,
   getMapboxAccessToken,
   getMapStyleForVariant,
   MAP_HUB_MARKER_COLOR,
@@ -26,8 +27,6 @@ import {
   STATIC_MAP_INTERACTION,
 } from "./mapConfig";
 import type { InteractiveMapProps, MapHub, MapMacroRegion } from "./types";
-
-type MapboxGL = typeof import("mapbox-gl").default;
 
 const IMPACT_SOURCE_ID = "impact-locations";
 const IMPACT_LAYER_ID = "impact-points";
@@ -47,29 +46,23 @@ const HUB_CARD_GAP = 12;
 const HUB_CARD_MAX_WIDTH = 320;
 const HUB_CARD_EDGE_PADDING = 16;
 
-let mapboxGlPromise: Promise<MapboxGL> | null = null;
-
-function loadMapboxGl(): Promise<MapboxGL> {
-  if (!mapboxGlPromise) {
-    mapboxGlPromise = Promise.all([
-      import("mapbox-gl"),
-      import("mapbox-gl/dist/mapbox-gl.css"),
-    ]).then(([mod]) => mod.default);
-  }
-  return mapboxGlPromise;
-}
-
 async function fetchImpactGeoJson(
-  url: string,
+  urls: string[],
   signal?: AbortSignal,
 ): Promise<GeoJSON.FeatureCollection | null> {
-  try {
-    const response = await fetch(url, { signal });
-    if (!response.ok) return null;
-    return (await response.json()) as GeoJSON.FeatureCollection;
-  } catch {
-    return null;
+  for (const url of urls) {
+    try {
+      const response = await fetch(url, { signal });
+      if (!response.ok) continue;
+
+      const data = (await response.json()) as GeoJSON.FeatureCollection;
+      if (data?.features?.length) return data;
+    } catch {
+      if (signal?.aborted) return null;
+    }
   }
+
+  return null;
 }
 
 type HubMarkerEntry = {
@@ -106,7 +99,6 @@ function attachHubMarkerInteractions(
 }
 
 function addHubMarker(
-  mapboxgl: MapboxGL,
   map: Map,
   hub: MapHub,
   bounds: LngLatBounds,
@@ -133,7 +125,6 @@ function addHubMarker(
 }
 
 function setupHubMarkers(
-  mapboxgl: MapboxGL,
   map: Map,
   hubs: MapHub[],
   onHubClick: (hub: MapHub) => void,
@@ -142,7 +133,7 @@ function setupHubMarkers(
   const entries: HubMarkerEntry[] = [];
 
   for (const hub of hubs) {
-    entries.push(addHubMarker(mapboxgl, map, hub, bounds, onHubClick));
+    entries.push(addHubMarker(map, hub, bounds, onHubClick));
   }
 
   if (!bounds.isEmpty()) {
@@ -246,7 +237,6 @@ function setupRegionHighlights(
 }
 
 function fitBoundsFromGeoJson(
-  mapboxgl: MapboxGL,
   map: Map,
   geojson: GeoJSON.FeatureCollection,
 ): void {
@@ -270,39 +260,10 @@ function fitBoundsFromGeoJson(
   map.setZoom(Math.min(map.getZoom() + zoomBoost, maxZoom));
 }
 
-function setupImpactMapLayers(
-  mapboxgl: MapboxGL,
-  map: Map,
-  geojsonPromise: Promise<GeoJSON.FeatureCollection | null>,
-  pulseOverlay: HTMLElement | null,
-  onMarkersReady?: () => void,
-): () => void {
-  applyImpactMapTheme(map);
+function addImpactPointLayer(map: Map, useSymbols: boolean): void {
+  if (map.getLayer(IMPACT_LAYER_ID)) return;
 
-  if (!addRecipientMarkerImage(map)) return () => {};
-
-  map.on("styleimagemissing", (event) => {
-    if (event.id === RECIPIENT_IMAGE_ID) {
-      addRecipientMarkerImage(map);
-    }
-  });
-
-  let stopPulse: (() => void) | undefined;
-
-  void (async () => {
-    const raw = await geojsonPromise;
-    if (!raw?.features?.length) {
-      onMarkersReady?.();
-      return;
-    }
-
-    const data = enrichImpactGeoJson(raw);
-
-    map.addSource(IMPACT_SOURCE_ID, {
-      type: "geojson",
-      data,
-    });
-
+  if (useSymbols) {
     map.addLayer({
       id: IMPACT_LAYER_ID,
       type: "symbol",
@@ -315,20 +276,79 @@ function setupImpactMapLayers(
         "icon-ignore-placement": true,
       },
     });
+    return;
+  }
 
-    map.on("mouseenter", IMPACT_LAYER_ID, () => {
-      map.getCanvas().style.cursor = "pointer";
-    });
-    map.on("mouseleave", IMPACT_LAYER_ID, () => {
-      map.getCanvas().style.cursor = "";
-    });
+  map.addLayer({
+    id: IMPACT_LAYER_ID,
+    type: "circle",
+    source: IMPACT_SOURCE_ID,
+    paint: {
+      "circle-color": MAP_POINT_COLOR,
+      "circle-radius": ["get", "marker_size"],
+      "circle-opacity": 0.85,
+      "circle-stroke-width": 1.5,
+      "circle-stroke-color": "#ffffff",
+    },
+  });
+}
 
-    if (pulseOverlay) {
-      stopPulse = startImpactMapPulse(map, pulseOverlay);
+function setupImpactMapLayers(
+  map: Map,
+  geojsonPromise: Promise<GeoJSON.FeatureCollection | null>,
+  pulseOverlay: HTMLElement | null,
+  onMarkersReady?: () => void,
+  isCancelled?: () => boolean,
+): () => void {
+  applyImpactMapTheme(map);
+
+  const hasMarkerImage = addRecipientMarkerImage(map);
+
+  map.on("styleimagemissing", (event) => {
+    if (event.id === RECIPIENT_IMAGE_ID) {
+      addRecipientMarkerImage(map);
     }
+  });
 
-    fitBoundsFromGeoJson(mapboxgl, map, raw);
-    onMarkersReady?.();
+  let stopPulse: (() => void) | undefined;
+
+  void (async () => {
+    try {
+      const raw = await geojsonPromise;
+      if (isCancelled?.() || !raw?.features?.length) return;
+
+      const data = enrichImpactGeoJson(raw);
+
+      if (!map.getSource(IMPACT_SOURCE_ID)) {
+        map.addSource(IMPACT_SOURCE_ID, {
+          type: "geojson",
+          data,
+        });
+      }
+
+      try {
+        addImpactPointLayer(map, hasMarkerImage);
+      } catch {
+        addImpactPointLayer(map, false);
+      }
+
+      map.on("mouseenter", IMPACT_LAYER_ID, () => {
+        map.getCanvas().style.cursor = "pointer";
+      });
+      map.on("mouseleave", IMPACT_LAYER_ID, () => {
+        map.getCanvas().style.cursor = "";
+      });
+
+      if (pulseOverlay) {
+        stopPulse = startImpactMapPulse(map, pulseOverlay);
+      }
+
+      fitBoundsFromGeoJson(map, raw);
+    } catch (error) {
+      console.warn("Impact map markers failed to load:", error);
+    } finally {
+      onMarkersReady?.();
+    }
   })();
 
   return () => stopPulse?.();
@@ -428,73 +448,79 @@ export function InteractiveMap({
     let resizeObserver: ResizeObserver | null = null;
     let stopImpactPulse: (() => void) | undefined;
 
-    const geojsonUrl = variant === "impact-clusters" ? getImpactGeoJsonUrl() : null;
+    const geojsonUrls = variant === "impact-clusters" ? getImpactGeoJsonUrls() : [];
     const geojsonPromise =
-      geojsonUrl != null
-        ? fetchImpactGeoJson(geojsonUrl, abortController.signal)
+      geojsonUrls.length > 0
+        ? fetchImpactGeoJson(geojsonUrls, abortController.signal)
         : null;
 
     const hideLoading = () => setIsLoading(false);
+    const loadingFallbackTimer =
+      showLoadingLogo
+        ? window.setTimeout(hideLoading, 12000)
+        : null;
 
-    void (async () => {
-      const mapboxgl = await loadMapboxGl();
-      if (cancelled) return;
+    mapboxgl.accessToken = accessToken;
 
-      mapboxgl.accessToken = accessToken;
+    map = new mapboxgl.Map({
+      container,
+      style: getMapStyleForVariant(variant),
+      center,
+      zoom,
+      maxZoom: variant === "hub-markers" ? 8 : maxZoom,
+      ...STATIC_MAP_INTERACTION,
+    });
 
-      map = new mapboxgl.Map({
-        container,
-        style: getMapStyleForVariant(variant),
-        center,
-        zoom,
-        maxZoom: variant === "hub-markers" ? 8 : maxZoom,
-        ...STATIC_MAP_INTERACTION,
-      });
+    mapRef.current = map;
 
-      mapRef.current = map;
+    if (showNavigation) {
+      map.addControl(new mapboxgl.NavigationControl(), "top-right");
+    }
 
-      if (showNavigation) {
-        map.addControl(new mapboxgl.NavigationControl(), "top-right");
-      }
+    const resizeMap = () => {
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => map?.resize(), 150);
+    };
 
-      const resizeMap = () => {
-        if (resizeTimer) clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => map?.resize(), 150);
-      };
+    const dismissHubCard = () => setSelectedHub(null);
 
-      const dismissHubCard = () => setSelectedHub(null);
+    map.on("load", () => {
+      resizeMap();
 
-      map.on("load", () => {
-        resizeMap();
-
-        if (variant === "impact-clusters" && geojsonPromise) {
-          stopImpactPulse = setupImpactMapLayers(
-            mapboxgl,
-            map!,
-            geojsonPromise,
-            pulseOverlayRef.current,
-            showLoadingLogo ? hideLoading : undefined,
-          );
-        } else if (variant === "hub-markers" && hubs.length > 0) {
-          hubMarkersRef.current = setupHubMarkers(mapboxgl, map!, hubs, handleHubClick);
-          map!.on("click", dismissHubCard);
-          if (showLoadingLogo) hideLoading();
-        } else if (variant === "region-highlights") {
-          void setupRegionHighlights(map!, regions ?? []).then(() => {
+      if (variant === "impact-clusters" && geojsonPromise) {
+        stopImpactPulse = setupImpactMapLayers(
+          map!,
+          geojsonPromise,
+          pulseOverlayRef.current,
+          () => {
+            if (loadingFallbackTimer) window.clearTimeout(loadingFallbackTimer);
             if (showLoadingLogo) hideLoading();
-          });
-        } else if (showLoadingLogo) {
-          hideLoading();
-        }
-      });
+          },
+          () => cancelled,
+        );
+      } else if (variant === "hub-markers" && hubs.length > 0) {
+        hubMarkersRef.current = setupHubMarkers(map!, hubs, handleHubClick);
+        map!.on("click", dismissHubCard);
+        if (loadingFallbackTimer) window.clearTimeout(loadingFallbackTimer);
+        if (showLoadingLogo) hideLoading();
+      } else if (variant === "region-highlights") {
+        void setupRegionHighlights(map!, regions ?? []).then(() => {
+          if (loadingFallbackTimer) window.clearTimeout(loadingFallbackTimer);
+          if (showLoadingLogo) hideLoading();
+        });
+      } else {
+        if (loadingFallbackTimer) window.clearTimeout(loadingFallbackTimer);
+        if (showLoadingLogo) hideLoading();
+      }
+    });
 
-      resizeObserver = new ResizeObserver(resizeMap);
-      resizeObserver.observe(container);
-    })();
+    resizeObserver = new ResizeObserver(resizeMap);
+    resizeObserver.observe(container);
 
     return () => {
       cancelled = true;
       abortController.abort();
+      if (loadingFallbackTimer) window.clearTimeout(loadingFallbackTimer);
       if (resizeTimer) clearTimeout(resizeTimer);
       resizeObserver?.disconnect();
       stopImpactPulse?.();

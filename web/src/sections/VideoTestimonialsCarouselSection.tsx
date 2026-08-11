@@ -1,7 +1,11 @@
 import { ArrowButton } from "@/components/ui/ArrowButton";
+import { DotGridEdgeShimmer } from "@/components/ui/DotGridBackgroundBlips";
 import { Sticker } from "@/components/ui/Sticker";
 import { TextSection } from "@/components/ui/TextSection";
-import { YoutubeChromelessEmbed } from "@/components/ui/YoutubeChromelessEmbed";
+import {
+  YoutubeChromelessEmbed,
+  type YoutubeChromelessEmbedHandle,
+} from "@/components/ui/YoutubeChromelessEmbed";
 import { cn } from "@/lib/cn";
 import {
   carouselSlideSpring,
@@ -45,7 +49,8 @@ const CARD_HEIGHT = 640;
 const CARD_PEEK_FRACTION = 156 / CARD_WIDTH;
 const LEFT_PEEK_X = `calc(-50% - ${CARD_PEEK_FRACTION * 100}%)`;
 const LEFT_PEEK_SCALE = 0.76;
-const DESKTOP_SLIDE_CLASS = "w-[360px]";
+const DESKTOP_SLIDE_CLASS =
+  "h-[640px] w-[360px] overflow-hidden rounded-[var(--radius-lg)] bg-white";
 
 /** Straddles the left edge of the left peek slot, halfway between top and center */
 const leftPeekStickerClassName =
@@ -82,12 +87,83 @@ function LeftPeekStickerSlot({ reduceMotion }: { reduceMotion: boolean }) {
 }
 
 const MOBILE_CARD_CLASS =
-  "group relative aspect-[9/16] w-full shrink-0 overflow-hidden rounded-[var(--radius-lg)]";
+  "group relative isolate aspect-[9/16] w-full shrink-0 overflow-hidden rounded-[var(--radius-lg)] bg-white";
 
 const DESKTOP_CARD_CLASS =
-  "group relative h-[640px] w-[360px] shrink-0 overflow-hidden rounded-[var(--radius-lg)]";
+  "group relative isolate h-full w-full shrink-0 overflow-hidden bg-white";
 
 const POSTER_CLASS = "absolute inset-0 size-full object-cover";
+
+const controlButtonClass = cn(
+  "flex size-11 cursor-pointer items-center justify-center rounded-full",
+  "bg-[rgba(27,27,21,0.72)] text-white backdrop-blur-sm",
+  "transition-colors hover:bg-[rgba(27,27,21,0.88)]",
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
+);
+
+function PlayIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M6 3L20 12L6 21V3Z"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function PauseIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor" />
+      <rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor" />
+    </svg>
+  );
+}
+
+function VolumeOffIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M11 5L6 9H3v6h3l5 4V5z"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M16 9l5 6M21 9l-5 6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function VolumeOnIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M11 5L6 9H3v6h3l5 4V5z"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M15.5 8.5a5 5 0 010 7M18 6a8.5 8.5 0 010 12"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
 
 function VideoTestimonialCard({
   item,
@@ -105,14 +181,61 @@ function VideoTestimonialCard({
   const shouldPlay = isActive && canAutoplay;
   const [isHovered, setIsHovered] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const youtubeRef = useRef<YoutubeChromelessEmbedHandle>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     setIsVideoReady(false);
     setIsHovered(false);
+    setIsPaused(false);
+    setIsMuted(true);
   }, [item.videoSrc, shouldPlay]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !isMp4) return;
+    video.muted = isMuted;
+  }, [isMuted, isMp4]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !isMp4 || !shouldPlay) return;
+
+    if (isPaused) {
+      video.pause();
+    } else {
+      void video.play().catch(() => {});
+    }
+  }, [isPaused, isMp4, shouldPlay]);
+
+  const togglePaused = () => {
+    setIsPaused((paused) => {
+      const next = !paused;
+      if (isYoutube) {
+        if (next) youtubeRef.current?.pause();
+        else youtubeRef.current?.play();
+      }
+      return next;
+    });
+  };
+
+  const toggleMuted = () => {
+    setIsMuted((muted) => {
+      const next = !muted;
+      if (isYoutube) {
+        if (next) youtubeRef.current?.mute();
+        else youtubeRef.current?.unmute();
+      }
+      return next;
+    });
+  };
 
   const showPoster =
     !isActive || !shouldPlay || ((isYoutube || isMp4) && !isVideoReady);
+
+  const showControls = isHovered && shouldPlay && isVideoReady;
 
   return (
     <div
@@ -120,54 +243,71 @@ function VideoTestimonialCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      <div aria-hidden className="absolute inset-0 z-0 bg-white" />
+
       <img
         src={item.posterSrc}
         alt={item.posterAlt ?? ""}
         className={cn(
-          isActive ? POSTER_CLASS : "size-full object-cover",
+          POSTER_CLASS,
+          "z-[1] bg-white",
           !showPoster && "hidden",
         )}
         loading={isActive ? "eager" : "lazy"}
       />
 
       {shouldPlay && isYoutube ? (
-        <>
+        <div className="absolute inset-0 z-[1] bg-white">
           <YoutubeChromelessEmbed
+            ref={youtubeRef}
             key={item.videoSrc}
             videoSrc={item.videoSrc}
             title={item.caption}
             autoplay
-            interactive={isHovered}
             onReady={() => setIsVideoReady(true)}
           />
-          {!isHovered ? (
-            <div
-              aria-hidden
-              className="absolute inset-0 z-[2] cursor-default"
-            />
-          ) : null}
-        </>
+        </div>
       ) : null}
 
       {shouldPlay && isMp4 ? (
-        <>
-          <video
-            key={item.videoSrc}
-            src={item.videoSrc}
-            autoPlay
-            muted
-            playsInline
-            controls={isHovered}
-            onLoadedData={() => setIsVideoReady(true)}
-            className={cn(POSTER_CLASS, "z-[1]")}
-          />
-          {!isHovered ? (
-            <div
-              aria-hidden
-              className="absolute inset-0 z-[2] cursor-default"
-            />
-          ) : null}
-        </>
+        <video
+          ref={videoRef}
+          key={item.videoSrc}
+          src={item.videoSrc}
+          autoPlay
+          muted
+          playsInline
+          onLoadedData={() => setIsVideoReady(true)}
+          className={cn(POSTER_CLASS, "z-[1] bg-white")}
+        />
+      ) : null}
+
+      {shouldPlay ? (
+        <div
+          aria-hidden={!isHovered}
+          className="absolute inset-0 z-[2] cursor-default"
+        />
+      ) : null}
+
+      {showControls ? (
+        <div className="absolute inset-x-0 bottom-0 z-[3] flex justify-end gap-2 p-4">
+          <button
+            type="button"
+            className={controlButtonClass}
+            aria-label={isMuted ? "Unmute video" : "Mute video"}
+            onClick={toggleMuted}
+          >
+            {isMuted ? <VolumeOnIcon /> : <VolumeOffIcon />}
+          </button>
+          <button
+            type="button"
+            className={controlButtonClass}
+            aria-label={isPaused ? "Play video" : "Pause video"}
+            onClick={togglePaused}
+          >
+            {isPaused ? <PlayIcon /> : <PauseIcon />}
+          </button>
+        </div>
       ) : null}
     </div>
   );
@@ -264,6 +404,7 @@ export function VideoTestimonialsCarouselSection({
   const reduceMotion = useReducedMotion();
   const isLgUp = useIsLgUp();
   const carouselRef = useRef<HTMLDivElement>(null);
+  const contentMaskRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(carouselRef, { once: true, amount: 0.45 });
   const canAutoplay = isInView && !reduceMotion;
   const initialIndex = Math.min(
@@ -306,12 +447,17 @@ export function VideoTestimonialsCarouselSection({
       <div
         ref={carouselRef}
         className={cn(
-          "relative mx-auto overflow-visible",
+          "relative isolate mx-auto overflow-visible",
           isLgUp
             ? "h-[640px] w-[360px]"
             : "aspect-[9/16] w-full max-w-[360px] overflow-hidden",
         )}
       >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-0 rounded-[var(--radius-lg)] bg-white"
+        />
+
         {isLgUp ? (
           <>
             <LeftPeekStickerSlot reduceMotion={reduceMotion} />
@@ -353,7 +499,10 @@ export function VideoTestimonialsCarouselSection({
                       : undefined
                   }
                 >
-                  <motion.div animate={offsetOpacity(offset, reduceMotion)}>
+                  <motion.div
+                    className="size-full"
+                    animate={offsetOpacity(offset, reduceMotion)}
+                  >
                     <VideoTestimonialCard
                       item={item}
                       isActive={isActive}
@@ -414,9 +563,9 @@ export function VideoTestimonialsCarouselSection({
     <SectionShell
       theme={theme}
       archTop={archTop}
+      background={<DotGridEdgeShimmer archTop={archTop} contentMaskRef={contentMaskRef} />}
       className={cn(
         "overflow-visible",
-        archTop && "py-12 lg:py-16",
         className,
       )}
       id={id}
@@ -424,23 +573,29 @@ export function VideoTestimonialsCarouselSection({
       flushBottom={flushBottom}
       transparentBg={transparentBg}
     >
-      <SectionLayout
-        layout="horizontal"
-        textSlot={
-          (eyebrow || title || body) ? (
-            <TextSection
-              eyebrow={eyebrow}
-              heading={title}
-              headingSize={headingSize}
-              body={body}
-              bodySize={bodySize}
-              buttonScheme={buttonScheme}
-              align="left"
-            />
-          ) : null
-        }
-        contentSlot={<div className="min-w-0 overflow-visible">{carousel}</div>}
-      />
+      <div ref={contentMaskRef}>
+        <SectionLayout
+          layout="horizontal"
+          textSlot={
+            (eyebrow || title || body) ? (
+              <TextSection
+                eyebrow={eyebrow}
+                heading={title}
+                headingSize={headingSize}
+                body={body}
+                bodySize={bodySize}
+                buttonScheme={buttonScheme}
+                align="left"
+              />
+            ) : null
+          }
+          contentSlot={
+            <div className="relative isolate z-[1] min-w-0 overflow-visible">
+              {carousel}
+            </div>
+          }
+        />
+      </div>
     </SectionShell>
   );
 }

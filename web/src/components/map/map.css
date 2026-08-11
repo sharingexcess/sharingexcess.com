@@ -94,30 +94,30 @@
 
 .se-map-live-pulse {
   position: absolute;
-  width: 4rem;
-  height: 4rem;
-  margin-left: -2rem;
-  margin-top: -2rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-left: -1.375rem;
+  margin-top: -1.375rem;
   border-radius: 50%;
-  border: 2px solid rgba(34, 197, 94, 0.85);
+  border: 1.5px solid rgba(34, 197, 94, 0.85);
   background: rgba(34, 197, 94, 0.2);
   opacity: 0;
-  transform: scale(0.7);
+  transform: scale(0.65);
   will-change: transform, opacity;
 }
 
 .se-map-live-pulse--active {
-  animation: se-map-live-pulse 1.35s ease-out forwards;
+  animation: se-map-live-pulse 1.6s ease-out forwards;
 }
 
 @keyframes se-map-live-pulse {
   0% {
-    transform: scale(0.7);
+    transform: scale(0.65);
     opacity: 0.85;
   }
 
   100% {
-    transform: scale(3.4);
+    transform: scale(2.8);
     opacity: 0;
   }
 }
