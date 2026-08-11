@@ -1,0 +1,43 @@
+---
+description: Pointer cursor on all clickable and interactive controls
+globs: web/src/**/*.{tsx,css}
+alwaysApply: false
+---
+
+# Interactive cursor affordance
+
+All clickable controls must show `cursor: pointer` on hover. Global styles in `web/src/styles/global.css` cover native elements (`button`, `a[href]`, `[role="button"]`, etc.) — do not rely on that alone for custom interactive UI.
+
+## When building interactive elements
+
+- **Native controls** — use `<button>`, `<a href>`, or appropriate `role` + keyboard handlers; global CSS applies pointer automatically.
+- **Custom click targets** — add `cursor-pointer` in Tailwind (close buttons, icon toggles, card links, carousel slides).
+- **Disabled state** — use `disabled` or `aria-disabled="true"` so global `cursor: not-allowed` applies; never leave disabled controls with pointer.
+
+```tsx
+// ✅ GOOD — close control (global CSS covers native button)
+<button
+  type="button"
+  onClick={onClose}
+  className="flex size-7 items-center justify-center rounded-full hover:bg-neutral-100"
+  aria-label="Close"
+>
+  <CloseIcon />
+</button>
+
+// ✅ GOOD — non-button interactive surface
+<div
+  role="button"
+  tabIndex={0}
+  onClick={onSelect}
+  onKeyDown={handleKeyDown}
+  className="cursor-pointer"
+>
+
+// ❌ BAD — div with only onClick, no role or cursor
+<div onClick={onClose} className="size-7 rounded-full">
+```
+
+## Covered by global CSS (no extra class needed)
+
+`a[href]`, `button`, `summary`, `label[for]`, form inputs, `[role="button"]`, `[role="link"]`, `[role="menuitem"]`, `[role="tab"]`.

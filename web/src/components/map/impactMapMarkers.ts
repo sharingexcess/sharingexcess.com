@@ -2,8 +2,10 @@ import type { Map } from "mapbox-gl";
 
 /** Matches surplus/apps/client/src/lib/mapMarkerImages.ts (recipient marker). */
 export const RECIPIENT_IMAGE_ID = "surplusMapMarkerRecipient";
+export const RECIPIENT_MUTED_IMAGE_ID = "surplusMapMarkerRecipientMuted";
 
 const MAP_MARKER_RECIPIENT_FILL = "#22c55e";
+const MAP_MARKER_MUTED_FILL = "#C9C9C9";
 const MAP_MARKER_STROKE_DARK = "#1A1A1A";
 const MAP_MARKER_STROKE_WIDTH = 0.75;
 const MAP_MARKER_IMAGE_INNER_RADIUS_PX = 10;
@@ -50,7 +52,7 @@ function lightenHexColor(hex: string, amount: number): string {
   return `#${channel(r)}${channel(g)}${channel(b)}`;
 }
 
-function drawRecipientMarkerCanvas(strokeColor: string): HTMLCanvasElement {
+function drawRecipientMarkerCanvas(fillColor: string, strokeColor: string): HTMLCanvasElement {
   const innerR = MAP_MARKER_IMAGE_INNER_RADIUS_PX * MAP_MARKER_IMAGE_PIXEL_RATIO;
   const strokeW = MAP_MARKER_STROKE_WIDTH * MAP_MARKER_IMAGE_PIXEL_RATIO;
   const outerR = innerR + strokeW;
@@ -76,11 +78,11 @@ function drawRecipientMarkerCanvas(strokeColor: string): HTMLCanvasElement {
   const gradient = ctx.createLinearGradient(center, center - innerR, center, center + innerR);
   gradient.addColorStop(
     0,
-    lightenHexColor(MAP_MARKER_RECIPIENT_FILL, MAP_MARKER_GRADIENT_TOP_LIGHTEN),
+    lightenHexColor(fillColor, MAP_MARKER_GRADIENT_TOP_LIGHTEN),
   );
   gradient.addColorStop(
     1,
-    shadeHexColor(MAP_MARKER_RECIPIENT_FILL, MAP_MARKER_GRADIENT_BOTTOM_FACTOR),
+    shadeHexColor(fillColor, MAP_MARKER_GRADIENT_BOTTOM_FACTOR),
   );
 
   ctx.beginPath();
@@ -91,17 +93,22 @@ function drawRecipientMarkerCanvas(strokeColor: string): HTMLCanvasElement {
   return canvas;
 }
 
-export function addRecipientMarkerImage(map: Map): boolean {
+function addMarkerImage(
+  map: Map,
+  imageId: string,
+  fillColor: string,
+  strokeColor: string,
+): boolean {
   try {
-    const canvas = drawRecipientMarkerCanvas(MAP_MARKER_STROKE_DARK);
+    const canvas = drawRecipientMarkerCanvas(fillColor, strokeColor);
     const ctx = canvas.getContext("2d");
     if (!ctx) return false;
 
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    if (map.hasImage(RECIPIENT_IMAGE_ID)) {
-      map.updateImage(RECIPIENT_IMAGE_ID, imageData);
+    if (map.hasImage(imageId)) {
+      map.updateImage(imageId, imageData);
     } else {
-      map.addImage(RECIPIENT_IMAGE_ID, imageData, {
+      map.addImage(imageId, imageData, {
         pixelRatio: MAP_MARKER_IMAGE_PIXEL_RATIO,
       });
     }
@@ -109,6 +116,19 @@ export function addRecipientMarkerImage(map: Map): boolean {
   } catch {
     return false;
   }
+}
+
+export function addRecipientMarkerImage(map: Map): boolean {
+  return addMarkerImage(map, RECIPIENT_IMAGE_ID, MAP_MARKER_RECIPIENT_FILL, MAP_MARKER_STROKE_DARK);
+}
+
+export function addRecipientMutedMarkerImage(map: Map): boolean {
+  return addMarkerImage(
+    map,
+    RECIPIENT_MUTED_IMAGE_ID,
+    MAP_MARKER_MUTED_FILL,
+    MAP_MARKER_STROKE_DARK,
+  );
 }
 
 function calculatePercentile(values: number[], percentile: number): number {

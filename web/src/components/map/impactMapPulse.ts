@@ -1,25 +1,34 @@
 import type { Map } from "mapbox-gl";
+import { IMPACT_MAP_GROUPS } from "./impactMapGroups";
 
-/** High-volume hub regions — fixed list, cycled every ~2.2s (no runtime selection). */
-export const IMPACT_PULSE_LOCATIONS = [
-  { lng: -75.1652, lat: 39.9526 }, // Philadelphia
-  { lng: -73.8847, lat: 40.8094 }, // Hunts Point
-  { lng: -87.6298, lat: 41.8781 }, // Chicago
-  { lng: -83.0458, lat: 42.3314 }, // Detroit
-  { lng: -118.2437, lat: 34.0522 }, // Los Angeles
-  { lng: -96.797, lat: 32.7767 }, // Dallas
-  { lng: -84.388, lat: 33.749 }, // Atlanta
-  { lng: -95.3698, lat: 29.7604 }, // Houston
-] as const;
+export interface ImpactPulseLocation {
+  lng: number;
+  lat: number;
+  groupId: string;
+}
+
+/** Hub cities with labels — kept in sync with IMPACT_MAP_GROUPS. */
+export const IMPACT_PULSE_LOCATIONS: ImpactPulseLocation[] = IMPACT_MAP_GROUPS.map(
+  (group) => ({
+    lng: group.lng,
+    lat: group.lat,
+    groupId: group.id,
+  }),
+);
 
 /** Must match `se-map-live-pulse` animation duration in map.css. */
 const PULSE_ANIMATION_MS = 1600;
 const PULSE_DELAY_MS = 600;
 const PULSE_INTERVAL_MS = PULSE_ANIMATION_MS + PULSE_DELAY_MS;
 
+export interface ImpactMapPulseCallbacks {
+  onPulseGroup?: (groupId: string | null) => void;
+}
+
 export function startImpactMapPulse(
   map: Map,
   overlay: HTMLElement,
+  callbacks: ImpactMapPulseCallbacks = {},
 ): () => void {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     return () => {};
@@ -28,6 +37,24 @@ export function startImpactMapPulse(
   let index = 0;
   let pulseEl: HTMLDivElement | null = null;
   let activeLocation = IMPACT_PULSE_LOCATIONS[0];
+  let pulseEndTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const clearPulseEndTimer = () => {
+    if (pulseEndTimer) {
+      window.clearTimeout(pulseEndTimer);
+      pulseEndTimer = null;
+    }
+  };
+
+  const notifyPulseGroup = (location: ImpactPulseLocation) => {
+    clearPulseEndTimer();
+    callbacks.onPulseGroup?.(location.groupId);
+
+    pulseEndTimer = window.setTimeout(() => {
+      callbacks.onPulseGroup?.(null);
+      pulseEndTimer = null;
+    }, PULSE_ANIMATION_MS);
+  };
 
   const syncPosition = () => {
     if (!pulseEl) return;
@@ -49,6 +76,7 @@ export function startImpactMapPulse(
     pulseEl.classList.remove("se-map-live-pulse--active");
     void pulseEl.offsetWidth;
     pulseEl.classList.add("se-map-live-pulse--active");
+    notifyPulseGroup(activeLocation);
   };
 
   firePulse();
@@ -59,6 +87,8 @@ export function startImpactMapPulse(
 
   return () => {
     window.clearInterval(interval);
+    clearPulseEndTimer();
+    callbacks.onPulseGroup?.(null);
     map.off("move", syncPosition);
     map.off("zoom", syncPosition);
     map.off("resize", syncPosition);

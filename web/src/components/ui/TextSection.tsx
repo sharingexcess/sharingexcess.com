@@ -11,6 +11,7 @@ import {
 } from "@/lib/typography";
 import { AnimatedHeroHeading } from "@/components/ui/AnimatedHeroHeading";
 import { LiveIndicatorDot } from "@/components/ui/LiveIndicatorDot";
+import { MetricEquivalentsRotator } from "@/components/ui/MetricEquivalentsRotator";
 import { SurplusEyebrow } from "@/components/ui/SurplusInfoPopover";
 import { SlotMachineNumber } from "@/components/ui/SlotMachineNumber";
 import { Button, type ButtonProps } from "./Button";
@@ -50,6 +51,8 @@ export interface TextSectionProps {
   metricNumericValue?: number;
   metricLiveTickOffset?: number;
   onMetricRevealComplete?: () => void;
+  /** Live total (lbs) for rotating impact equivalents shown below the metric */
+  metricEquivalentLbs?: number;
   heading?: string;
   headingSize?: "h1" | "h2";
   body?: string;
@@ -81,6 +84,10 @@ export interface TextSectionProps {
   /** CTA button row layout — `responsive` stacks on narrow viewports */
   ctaLayout?: "row" | "responsive";
   ctaSize?: ButtonProps["size"];
+  /** Replaces default heading typography when set — e.g. container-scaled hero card title */
+  headingClassName?: string;
+  /** Heading line wrapping — `balance` distributes lines more evenly across the width */
+  headingTextWrap?: "pretty" | "balance";
   className?: string;
 }
 
@@ -182,6 +189,7 @@ export function TextSection({
   metricNumericValue,
   metricLiveTickOffset,
   onMetricRevealComplete,
+  metricEquivalentLbs,
   heading,
   headingSize = "h1",
   body,
@@ -201,18 +209,37 @@ export function TextSection({
   bodyFooter,
   ctaLayout = "responsive",
   ctaSize = "lg",
+  headingClassName: headingClassNameOverride,
+  headingTextWrap = "pretty",
   className,
 }: TextSectionProps) {
-  const hasCtas = primaryCta || secondaryCta;
   const isCentered = align === "center";
+  const metricEquivalent =
+    metric && metricEquivalentLbs != null
+      ? (
+        <MetricEquivalentsRotator
+          totalLbs={metricEquivalentLbs}
+          className={isCentered ? "text-center" : undefined}
+        />
+      )
+      : null;
+  const hasCtas = primaryCta || secondaryCta;
+  const headingEquivalentGapClass = "gap-4 lg:gap-5";
+  const sectionCtaGapClass = metricEquivalent
+    ? "gap-4 lg:gap-6"
+    : metric
+      ? "gap-6 lg:gap-10"
+      : "gap-4 lg:gap-8";
 
   const scheme = buttonScheme === "dark" ? "dark" : "light";
-  const headingClassName = resolveHeadingClassName(headingSize, Boolean(metric));
+  const headingClassName =
+    headingClassNameOverride ?? resolveHeadingClassName(headingSize, Boolean(metric));
   const resolvedHeadingAnimation =
     headingAnimation ?? (animateHeading ? "words" : undefined);
   const headingTextClassName = cn(
     headingClassName,
-    "text-pretty whitespace-pre-line text-[var(--section-text,#003619)]",
+    headingTextWrap === "balance" ? "text-balance" : "text-pretty",
+    "whitespace-pre-line text-[var(--section-text,#003619)]",
   );
 
   const headingEl = heading ? (
@@ -303,7 +330,12 @@ export function TextSection({
                   onRevealComplete={onMetricRevealComplete}
                 />
               )}
-              {headingEl}
+              {(headingEl || metricEquivalent) && (
+                <div className={cn("flex flex-col", headingEquivalentGapClass)}>
+                  {headingEl}
+                  {metricEquivalent}
+                </div>
+              )}
             </div>
           )}
           <div className="flex w-full flex-col gap-4 lg:flex-1">
@@ -321,7 +353,7 @@ export function TextSection({
     <div
       className={cn(
         "flex w-full min-w-0 flex-col",
-        metric ? "gap-6 lg:gap-10" : "gap-4 lg:gap-8",
+        sectionCtaGapClass,
         isCentered && "items-center text-center",
         className,
       )}
@@ -351,8 +383,11 @@ export function TextSection({
             />
           </div>
         )}
-        {headingEl && (
-          <div className="w-full min-w-0 max-w-full">{headingEl}</div>
+        {(headingEl || metricEquivalent) && (
+          <div className={cn("flex w-full min-w-0 max-w-full flex-col", headingEquivalentGapClass)}>
+            {headingEl}
+            {metricEquivalent}
+          </div>
         )}
         {body &&
           renderBodyCopy({ body, bodyEmphasis, bodySize, metric, emphasis })}

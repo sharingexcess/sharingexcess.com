@@ -95,6 +95,7 @@ export function MapSection({
       metric={metric}
       metricNumericValue={metricNumericValue}
       metricLiveTickOffset={metricLiveTickOffset}
+      metricEquivalentLbs={metricNumericValue}
       heading={resolvedTitle}
       headingSize={headingSize}
       body={body}
@@ -158,6 +159,7 @@ export function MapSection({
               metric={metric}
               metricNumericValue={metricNumericValue}
               metricLiveTickOffset={metricLiveTickOffset}
+              metricEquivalentLbs={metricNumericValue}
               heading={resolvedTitle}
               headingSize={headingSize}
               body={body}

@@ -374,11 +374,11 @@ function StackingCard({
           {/* Text column — min-w-0 so long titles cannot squeeze the image below 50% */}
           <div
             data-card-text-col
-            className="flex min-w-0 flex-col justify-start gap-3 p-4 sm:p-6 lg:justify-center lg:gap-5 lg:p-14 xl:p-16"
+            className="flex min-w-0 flex-col justify-start gap-2 max-lg:px-4 max-lg:pb-4 max-lg:pt-6 sm:max-lg:px-6 sm:max-lg:pb-6 sm:max-lg:pt-8 lg:justify-center lg:gap-5 lg:p-14 xl:p-16"
           >
             <h2
               className={cn(
-                "w-full font-display font-bold leading-[1.0] tracking-[-0.05em] lg:whitespace-nowrap",
+                "w-full font-display font-bold max-lg:leading-[0.68] tracking-[-0.05em] lg:leading-[1.0] lg:whitespace-nowrap",
                 titleSizePx === undefined && "text-[clamp(36px,12vw,112px)]",
               )}
               style={{
@@ -397,7 +397,7 @@ function StackingCard({
               </p>
             )}
             {item.primaryCta && (
-              <div style={cardButtonStyle(index)} className="mt-10 lg:mt-12">
+              <div style={cardButtonStyle(index)} className="lg:mt-12">
                 <Button
                   variant="primary"
                   colorScheme="light"

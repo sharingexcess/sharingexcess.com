@@ -42,7 +42,7 @@ export function HubMarkerCard({ hub, onClose, anchor, className }: HubMarkerCard
         <div className="flex items-start justify-between gap-3">
         <h3
           id={titleId}
-          className="font-display text-lg font-bold leading-tight tracking-[-0.03em] text-[var(--color-neutral-500)]"
+          className="font-sans text-lg font-bold leading-tight tracking-[-0.03em] text-[var(--color-neutral-500)]"
         >
           {hub.name}
         </h3>

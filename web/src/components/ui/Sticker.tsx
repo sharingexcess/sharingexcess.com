@@ -39,6 +39,10 @@ export const STICKER_OVERLAP_TOP_CLASS =
 export const STICKER_OVERLAP_CARD_TOP_LEFT_CLASS =
   "pointer-events-none absolute top-3 left-4 z-20 -translate-x-1/2 -translate-y-1/2";
 
+/** Overlap the top-right corner of a card — position on a wrapper sibling, not inside the card */
+export const STICKER_OVERLAP_CARD_TOP_RIGHT_CLASS =
+  "absolute top-4 right-2 z-20 translate-x-1/2 -translate-y-[40%]";
+
 /** Centered over a media frame */
 export const STICKER_OVERLAP_CENTER_CLASS =
   "pointer-events-none absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2";

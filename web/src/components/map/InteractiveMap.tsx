@@ -2,24 +2,37 @@ import { cn } from "@/lib/cn";
 import { AnimatePresence } from "@/lib/motion";
 import mapboxgl, { type LngLatBounds, type Map, type Marker } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { useCallback, useEffect, useId, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type CSSProperties, type RefObject } from "react";
 import "./map.css";
 import { HubMarkerCard, type HubCardAnchor } from "./HubMarkerCard";
 import { createHubMarkerElement } from "./hubMarkerElement";
 import {
   addRecipientMarkerImage,
-  enrichImpactGeoJson,
+  addRecipientMutedMarkerImage,
   IMPACT_MARKER_INNER_RADIUS_PX,
   RECIPIENT_IMAGE_ID,
+  RECIPIENT_MUTED_IMAGE_ID,
 } from "./impactMapMarkers";
+import {
+  enrichImpactGeoJsonWithGroups,
+  IMPACT_MAP_GROUPS,
+  type ImpactMapGroup,
+} from "./impactMapGroups";
 import { applyImpactMapTheme } from "./impactMapTheme";
+import { setupImpactMapConnectors } from "./impactMapConnectors";
 import { startImpactMapPulse } from "./impactMapPulse";
+import {
+  setupImpactMapGroupInteractions,
+  type ImpactMapGroupInteractionController,
+  type MapOverlayAnchor,
+} from "./setupImpactMapGroupInteractions";
 import {
   DEFAULT_MAP_CENTER,
   DEFAULT_MAP_HUBS,
   DEFAULT_MAP_ZOOM,
   DEFAULT_MAX_ZOOM,
   getImpactGeoJsonUrls,
+  getImpactMapView,
   getMapboxAccessToken,
   getMapStyleForVariant,
   MAP_HUB_MARKER_COLOR,
@@ -41,10 +54,14 @@ const REGION_BORDER_WIDTH = 1.5;
 
 /** Zoom when a hub pin is selected — close enough to read the card above the marker. */
 const HUB_SELECT_ZOOM = 6;
+const GROUP_ZOOM_DURATION_MS = 600;
 const HUB_MARKER_HEIGHT = 54;
 const HUB_CARD_GAP = 12;
 const HUB_CARD_MAX_WIDTH = 320;
 const HUB_CARD_EDGE_PADDING = 16;
+/** Card bottom sits above city label + marker cluster (impact map). */
+const GROUP_CARD_ABOVE_HUB_PX = 104;
+const GROUP_CARD_ESTIMATED_HEIGHT = 176;
 
 async function fetchImpactGeoJson(
   urls: string[],
@@ -177,6 +194,27 @@ function getHubCardAnchor(
   };
 }
 
+function projectGroupCardAnchor(
+  map: Map,
+  group: ImpactMapGroup,
+  containerWidth: number,
+  containerHeight: number,
+): HubCardAnchor {
+  const point = map.project([group.lng, group.lat]);
+  const halfCard = HUB_CARD_MAX_WIDTH / 2;
+  const minX = HUB_CARD_EDGE_PADDING + halfCard;
+  const maxX = containerWidth - HUB_CARD_EDGE_PADDING - halfCard;
+  const x =
+    maxX <= minX
+      ? containerWidth / 2
+      : Math.min(maxX, Math.max(minX, point.x));
+
+  const minCardBottomY = HUB_CARD_EDGE_PADDING + GROUP_CARD_ESTIMATED_HEIGHT;
+  const y = Math.max(minCardBottomY, point.y - GROUP_CARD_ABOVE_HUB_PX);
+
+  return { x, y };
+}
+
 function setupRegionHighlights(
   map: Map,
   macroRegions: MapMacroRegion[] | undefined,
@@ -236,28 +274,9 @@ function setupRegionHighlights(
   });
 }
 
-function fitBoundsFromGeoJson(
-  map: Map,
-  geojson: GeoJSON.FeatureCollection,
-): void {
-  if (!geojson.features?.length) return;
-
-  const bounds = new mapboxgl.LngLatBounds();
-  for (const feature of geojson.features) {
-    if (feature.geometry?.type === "Point") {
-      bounds.extend(feature.geometry.coordinates as [number, number]);
-    }
-  }
-
-  if (bounds.isEmpty()) return;
-
-  const isMobile = window.matchMedia("(max-width: 1023px)").matches;
-  const padding = isMobile ? 16 : 28;
-  const maxZoom = isMobile ? 5.25 : 4.75;
-  const zoomBoost = isMobile ? 0.85 : 0.55;
-
-  map.fitBounds(bounds, { padding, maxZoom, animate: false });
-  map.setZoom(Math.min(map.getZoom() + zoomBoost, maxZoom));
+function applyImpactMapView(map: Map): void {
+  const view = getImpactMapView();
+  map.jumpTo({ center: view.center, zoom: view.zoom });
 }
 
 function addImpactPointLayer(map: Map, useSymbols: boolean): void {
@@ -286,6 +305,7 @@ function addImpactPointLayer(map: Map, useSymbols: boolean): void {
     paint: {
       "circle-color": MAP_POINT_COLOR,
       "circle-radius": ["get", "marker_size"],
+      "circle-radius-transition": { duration: 280, delay: 0 },
       "circle-opacity": 0.85,
       "circle-stroke-width": 1.5,
       "circle-stroke-color": "#ffffff",
@@ -296,54 +316,75 @@ function addImpactPointLayer(map: Map, useSymbols: boolean): void {
 function setupImpactMapLayers(
   map: Map,
   geojsonPromise: Promise<GeoJSON.FeatureCollection | null>,
-  pulseOverlay: HTMLElement | null,
+  pulseOverlayRef: RefObject<HTMLDivElement | null>,
+  groupCallbacks: {
+    onHoverGroup: (group: ImpactMapGroup | null) => void;
+    onSelectGroup: (group: ImpactMapGroup | null, anchor: MapOverlayAnchor | null) => void;
+    onPulseGroup: (groupId: string | null) => void;
+  },
+  groupInteractionsRef: RefObject<ImpactMapGroupInteractionController | null>,
+  selectedGroupIdRef: RefObject<string | null>,
   onMarkersReady?: () => void,
   isCancelled?: () => boolean,
 ): () => void {
   applyImpactMapTheme(map);
 
   const hasMarkerImage = addRecipientMarkerImage(map);
+  addRecipientMutedMarkerImage(map);
 
   map.on("styleimagemissing", (event) => {
     if (event.id === RECIPIENT_IMAGE_ID) {
       addRecipientMarkerImage(map);
     }
+    if (event.id === RECIPIENT_MUTED_IMAGE_ID) {
+      addRecipientMutedMarkerImage(map);
+    }
   });
 
   let stopPulse: (() => void) | undefined;
+  let stopConnectors: (() => void) | undefined;
+  let groupInteractions: ImpactMapGroupInteractionController | undefined;
+  let useSymbols = hasMarkerImage;
 
   void (async () => {
     try {
       const raw = await geojsonPromise;
       if (isCancelled?.() || !raw?.features?.length) return;
 
-      const data = enrichImpactGeoJson(raw);
+      const data = enrichImpactGeoJsonWithGroups(raw);
 
       if (!map.getSource(IMPACT_SOURCE_ID)) {
         map.addSource(IMPACT_SOURCE_ID, {
           type: "geojson",
           data,
+          promoteId: "id",
         });
       }
 
       try {
-        addImpactPointLayer(map, hasMarkerImage);
+        addImpactPointLayer(map, useSymbols);
       } catch {
+        useSymbols = false;
         addImpactPointLayer(map, false);
       }
 
-      map.on("mouseenter", IMPACT_LAYER_ID, () => {
-        map.getCanvas().style.cursor = "pointer";
-      });
-      map.on("mouseleave", IMPACT_LAYER_ID, () => {
-        map.getCanvas().style.cursor = "";
-      });
+      stopConnectors = setupImpactMapConnectors(map, raw);
+      groupInteractions = setupImpactMapGroupInteractions(
+        map,
+        useSymbols,
+        groupCallbacks,
+      );
+      groupInteractionsRef.current = groupInteractions;
+      groupInteractions.setSelectedGroupId(selectedGroupIdRef.current);
 
+      const pulseOverlay = pulseOverlayRef.current;
       if (pulseOverlay) {
-        stopPulse = startImpactMapPulse(map, pulseOverlay);
+        stopPulse = startImpactMapPulse(map, pulseOverlay, {
+          onPulseGroup: groupCallbacks.onPulseGroup,
+        });
       }
 
-      fitBoundsFromGeoJson(map, raw);
+      applyImpactMapView(map);
     } catch (error) {
       console.warn("Impact map markers failed to load:", error);
     } finally {
@@ -351,7 +392,12 @@ function setupImpactMapLayers(
     }
   })();
 
-  return () => stopPulse?.();
+  return () => {
+    stopPulse?.();
+    stopConnectors?.();
+    groupInteractions?.destroy();
+    groupInteractionsRef.current = null;
+  };
 }
 
 export function InteractiveMap({
@@ -369,11 +415,81 @@ export function InteractiveMap({
   const pulseOverlayRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | null>(null);
   const hubMarkersRef = useRef<HubMarkerEntry[]>([]);
+  const groupInteractionsRef = useRef<ImpactMapGroupInteractionController | null>(null);
+  const selectedGroupIdRef = useRef<string | null>(null);
   const mapId = useId().replace(/:/g, "");
   const [isLoading, setIsLoading] = useState(showLoadingLogo);
   const [selectedHub, setSelectedHub] = useState<MapHub | null>(null);
   const [cardAnchor, setCardAnchor] = useState<HubCardAnchor | null>(null);
+  const [hoveredGroup, setHoveredGroup] = useState<ImpactMapGroup | null>(null);
+  const [pulsingGroupId, setPulsingGroupId] = useState<string | null>(null);
+  const [groupLabelAnchors, setGroupLabelAnchors] = useState<Record<string, MapOverlayAnchor>>({});
+  const [selectedGroup, setSelectedGroup] = useState<ImpactMapGroup | null>(null);
+  const [groupCardAnchor, setGroupCardAnchor] = useState<MapOverlayAnchor | null>(null);
   const accessToken = getMapboxAccessToken();
+
+  const handleHoverGroup = useCallback((group: ImpactMapGroup | null) => {
+    setHoveredGroup(group);
+  }, []);
+
+  const handleGroupLabelEnter = useCallback((group: ImpactMapGroup) => {
+    groupInteractionsRef.current?.setHoveredGroupId(group.id);
+  }, []);
+
+  const handleGroupLabelLeave = useCallback(() => {
+    groupInteractionsRef.current?.setHoveredGroupId(null);
+  }, []);
+
+  const handlePulseGroup = useCallback((groupId: string | null) => {
+    setPulsingGroupId(groupId);
+  }, []);
+
+  const handleSelectGroup = useCallback(
+    (group: ImpactMapGroup | null, anchor: MapOverlayAnchor | null) => {
+      if (!group) {
+        setSelectedGroup(null);
+        setGroupCardAnchor(null);
+        return;
+      }
+
+      setSelectedGroup((prev) => {
+        if (prev?.id === group.id) {
+          setGroupCardAnchor(null);
+          return null;
+        }
+
+        setGroupCardAnchor(anchor);
+        return group;
+      });
+    },
+    [],
+  );
+
+  const handleCloseGroupCard = useCallback(() => {
+    setSelectedGroup(null);
+    setGroupCardAnchor(null);
+  }, []);
+
+  const focusImpactGroup = useCallback((group: ImpactMapGroup | null) => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (group) {
+      map.easeTo({
+        center: [group.lng, group.lat],
+        zoom: Math.max(map.getZoom(), HUB_SELECT_ZOOM),
+        duration: GROUP_ZOOM_DURATION_MS,
+      });
+      return;
+    }
+
+    const view = getImpactMapView();
+    map.easeTo({
+      center: view.center,
+      zoom: view.zoom,
+      duration: GROUP_ZOOM_DURATION_MS,
+    });
+  }, []);
 
   const centerMapOnHub = useCallback((hub: MapHub) => {
     const map = mapRef.current;
@@ -410,8 +526,87 @@ export function InteractiveMap({
   }, []);
 
   useEffect(() => {
+    selectedGroupIdRef.current = selectedGroup?.id ?? null;
+    groupInteractionsRef.current?.setSelectedGroupId(selectedGroupIdRef.current);
+  }, [selectedGroup]);
+
+  const prevSelectedGroupRef = useRef<ImpactMapGroup | null | undefined>(undefined);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || variant !== "impact-clusters" || isLoading) return;
+
+    const prev = prevSelectedGroupRef.current;
+    if (prev === undefined) {
+      prevSelectedGroupRef.current = selectedGroup;
+      return;
+    }
+
+    if (prev?.id === selectedGroup?.id) return;
+
+    prevSelectedGroupRef.current = selectedGroup;
+    focusImpactGroup(selectedGroup);
+  }, [focusImpactGroup, isLoading, selectedGroup, variant]);
+
+  useEffect(() => {
     syncHubMarkerSelection(hubMarkersRef.current, selectedHub);
   }, [selectedHub]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const container = containerRef.current;
+    if (!map || !container || !selectedGroup) {
+      setGroupCardAnchor(null);
+      return;
+    }
+
+    const syncAnchor = () => {
+      setGroupCardAnchor(
+        projectGroupCardAnchor(
+          map,
+          selectedGroup,
+          container.clientWidth,
+          container.clientHeight,
+        ),
+      );
+    };
+
+    syncAnchor();
+    map.on("move", syncAnchor);
+    map.on("zoom", syncAnchor);
+    map.on("resize", syncAnchor);
+
+    return () => {
+      map.off("move", syncAnchor);
+      map.off("zoom", syncAnchor);
+      map.off("resize", syncAnchor);
+    };
+  }, [selectedGroup]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || variant !== "impact-clusters" || isLoading) return;
+
+    const syncLabelAnchors = () => {
+      const anchors: Record<string, MapOverlayAnchor> = {};
+      for (const group of IMPACT_MAP_GROUPS) {
+        const point = map.project([group.lng, group.lat]);
+        anchors[group.id] = { x: point.x, y: point.y };
+      }
+      setGroupLabelAnchors(anchors);
+    };
+
+    syncLabelAnchors();
+    map.on("move", syncLabelAnchors);
+    map.on("zoom", syncLabelAnchors);
+    map.on("resize", syncLabelAnchors);
+
+    return () => {
+      map.off("move", syncLabelAnchors);
+      map.off("zoom", syncLabelAnchors);
+      map.off("resize", syncLabelAnchors);
+    };
+  }, [variant, isLoading]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -462,11 +657,13 @@ export function InteractiveMap({
 
     mapboxgl.accessToken = accessToken;
 
+    const impactView = variant === "impact-clusters" ? getImpactMapView() : null;
+
     map = new mapboxgl.Map({
       container,
       style: getMapStyleForVariant(variant),
-      center,
-      zoom,
+      center: impactView?.center ?? center,
+      zoom: impactView?.zoom ?? zoom,
       maxZoom: variant === "hub-markers" ? 8 : maxZoom,
       ...STATIC_MAP_INTERACTION,
     });
@@ -479,7 +676,12 @@ export function InteractiveMap({
 
     const resizeMap = () => {
       if (resizeTimer) clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => map?.resize(), 150);
+      resizeTimer = setTimeout(() => {
+        map?.resize();
+        if (variant === "impact-clusters" && map) {
+          applyImpactMapView(map);
+        }
+      }, 150);
     };
 
     const dismissHubCard = () => setSelectedHub(null);
@@ -491,7 +693,14 @@ export function InteractiveMap({
         stopImpactPulse = setupImpactMapLayers(
           map!,
           geojsonPromise,
-          pulseOverlayRef.current,
+          pulseOverlayRef,
+          {
+            onHoverGroup: handleHoverGroup,
+            onSelectGroup: handleSelectGroup,
+            onPulseGroup: handlePulseGroup,
+          },
+          groupInteractionsRef,
+          selectedGroupIdRef,
           () => {
             if (loadingFallbackTimer) window.clearTimeout(loadingFallbackTimer);
             if (showLoadingLogo) hideLoading();
@@ -524,6 +733,7 @@ export function InteractiveMap({
       if (resizeTimer) clearTimeout(resizeTimer);
       resizeObserver?.disconnect();
       stopImpactPulse?.();
+      prevSelectedGroupRef.current = undefined;
       for (const entry of hubMarkersRef.current) {
         entry.destroy();
       }
@@ -534,6 +744,12 @@ export function InteractiveMap({
   }, [
     accessToken,
     center,
+    handleGroupLabelEnter,
+    handleGroupLabelLeave,
+    handleHoverGroup,
+    handlePulseGroup,
+    handleSelectGroup,
+    focusImpactGroup,
     handleHubClick,
     hubs,
     maxZoom,
@@ -559,15 +775,52 @@ export function InteractiveMap({
 
   return (
     <div
-      className={cn("se-map", className)}
+      className={cn("se-map", hoveredGroup && "se-map--group-hover", className)}
       style={{ "--se-map-point-color": MAP_POINT_COLOR } as CSSProperties}
     >
       <div ref={containerRef} id={mapId} className="size-full" />
       {variant === "impact-clusters" && (
         <div ref={pulseOverlayRef} className="se-map-pulse-overlay" aria-hidden />
       )}
+      {variant === "impact-clusters" && (
+        <div className="se-map-overlay">
+          {IMPACT_MAP_GROUPS.map((group) => {
+            const anchor = groupLabelAnchors[group.id];
+            if (!anchor || selectedGroup?.id === group.id) return null;
+
+            const isHovered = hoveredGroup?.id === group.id;
+            const isPulsing = pulsingGroupId === group.id;
+
+            return (
+              <div
+                key={group.id}
+                className={cn(
+                  "se-map-group-label-anchor",
+                  isHovered && "se-map-group-label-anchor--hover",
+                  isPulsing && "se-map-group-label-anchor--pulse",
+                )}
+                style={{ left: anchor.x, top: anchor.y }}
+                onMouseEnter={() => handleGroupLabelEnter(group)}
+                onMouseLeave={handleGroupLabelLeave}
+              >
+                <span className="se-map-group-label">{group.name}</span>
+              </div>
+            );
+          })}
+          <AnimatePresence mode="wait">
+            {selectedGroup && groupCardAnchor && (
+              <HubMarkerCard
+                key={selectedGroup.id}
+                hub={selectedGroup}
+                anchor={groupCardAnchor}
+                onClose={handleCloseGroupCard}
+              />
+            )}
+          </AnimatePresence>
+        </div>
+      )}
       {variant === "hub-markers" && (
-        <div className="se-map-hub-overlay">
+        <div className="se-map-overlay">
           <AnimatePresence mode="wait">
             {selectedHub && cardAnchor && (
               <HubMarkerCard

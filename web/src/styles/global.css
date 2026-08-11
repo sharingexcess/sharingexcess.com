@@ -222,6 +222,36 @@ body {
   text-wrap: pretty;
 }
 
+/* Interactive affordance — pointer on all clickable controls */
+:where(
+  a[href],
+  button:not(:disabled),
+  summary,
+  label[for],
+  select:not(:disabled),
+  input[type="button"]:not(:disabled),
+  input[type="submit"]:not(:disabled),
+  input[type="reset"]:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled),
+  input[type="file"]:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="link"]:not([aria-disabled="true"]),
+  [role="menuitem"]:not([aria-disabled="true"]),
+  [role="tab"]:not([aria-disabled="true"])
+) {
+  cursor: pointer;
+}
+
+:where(
+  button:disabled,
+  select:disabled,
+  input:disabled,
+  [aria-disabled="true"]
+) {
+  cursor: not-allowed;
+}
+
 /* Balance multi-line headings; body copy inherits pretty above to avoid orphans. */
 :where(h1, h2, h3, h4, h5, h6) {
   text-wrap: balance;
@@ -267,7 +297,7 @@ html {
 
 /* Stacked rounded hero — heading above video, expand to fullscreen, body+form slide up */
 .home-hero-donate--stacked {
-  --hero-frame-start: 48vh;
+  --hero-frame-start: 54vh;
 }
 
 .home-hero-donate--stacked.home-hero-donate--scroll-fx {

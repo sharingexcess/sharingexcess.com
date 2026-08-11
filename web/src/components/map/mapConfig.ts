@@ -20,12 +20,21 @@ export const DEFAULT_MAP_CENTER: [number, number] = [-98.5795, 39.8283];
 export const DEFAULT_MAP_ZOOM = 4.25;
 export const DEFAULT_MAX_ZOOM = 9;
 
-/** Disable scroll, pinch, and keyboard zoom — map stays at the fitted viewport. */
+/** Framed continental US — Texas visible, minimal Mexico. */
+export function getImpactMapView(): { center: [number, number]; zoom: number } {
+  const isMobile = window.matchMedia("(max-width: 1023px)").matches;
+  return isMobile
+    ? { center: [-97.5, 38.25], zoom: 3.7 }
+    : { center: [-97.5, 38.75], zoom: 3.8 };
+}
+
+/** Disable scroll, pinch, pan, and keyboard zoom — map stays at the fitted viewport. */
 export const STATIC_MAP_INTERACTION = {
   scrollZoom: false,
   boxZoom: false,
   doubleClickZoom: false,
   touchZoomRotate: false,
+  dragPan: false,
   dragRotate: false,
   keyboard: false,
   attributionControl: false,

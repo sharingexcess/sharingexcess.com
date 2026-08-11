@@ -10,10 +10,12 @@ import {
   slotMachineDigitStagger,
   slotMachineFadeInDelayMs,
   slotMachineFadeInDurationMs,
+  slotMachineInViewOptions,
   useReducedMotion,
 } from "@/lib/motion";
 import { metricNumberClassName } from "@/lib/typography";
 import { useFitText } from "@/lib/useFitText";
+import { useInViewOnce } from "@/lib/useInViewOnce";
 import {
   memo,
   useCallback,
@@ -26,11 +28,6 @@ import {
 } from "react";
 
 const MOBILE_FIT_MQ = "(max-width: 639px)";
-
-const SLOT_IN_VIEW_OPTIONS: IntersectionObserverInit = {
-  rootMargin: "-45% 0px -40% 0px",
-  threshold: 0.6,
-};
 
 const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"] as const;
 
@@ -58,30 +55,6 @@ interface LockedReveal {
   revealValue: string;
   revealNumeric: number;
   targetNumeric: number;
-}
-
-/** One-shot observer — disconnects after first trigger to avoid scroll-time work. */
-function useSlotInView(ref: RefObject<Element | null>): boolean {
-  const [inView, setInView] = useState(false);
-
-  useEffect(() => {
-    if (inView) return;
-
-    const element = ref.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry?.isIntersecting) {
-        setInView(true);
-        observer.disconnect();
-      }
-    }, SLOT_IN_VIEW_OPTIONS);
-
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [inView, ref]);
-
-  return inView;
 }
 
 const SlotDigit = memo(function SlotDigit({
@@ -280,7 +253,7 @@ export function SlotMachineNumber({
   const lockedRevealRef = useRef<LockedReveal | null>(null);
   const tickTimerRef = useRef<number | null>(null);
   const revealCompleteRef = useRef(onRevealComplete);
-  const inView = useSlotInView(inViewRef);
+  const inView = useInViewOnce(inViewRef, slotMachineInViewOptions);
 
   const targetNumeric = numericValue ?? Number.parseInt(value.replace(/\D/g, ""), 10);
   const hasLiveTick =

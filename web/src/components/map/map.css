@@ -4,6 +4,10 @@
   height: 100%;
 }
 
+.se-map .mapboxgl-canvas {
+  cursor: default;
+}
+
 
 .se-map .mapboxgl-ctrl-bottom-left,
 .se-map .mapboxgl-ctrl-bottom-right {
@@ -66,12 +70,67 @@
   pointer-events: none;
 }
 
-.se-map-hub-overlay {
+.se-map-overlay {
   position: absolute;
   inset: 0;
   z-index: 3;
   pointer-events: none;
   overflow: hidden;
+}
+
+.se-map--group-hover .mapboxgl-canvas {
+  cursor: pointer;
+}
+
+.se-map-group-label-anchor {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 0.5rem));
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.se-map-group-label {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  background: var(--color-neutral-050);
+  color: var(--color-neutral-900);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(27, 27, 21, 0.14), 0 1px 3px rgba(27, 27, 21, 0.08);
+  transform-origin: center bottom;
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease;
+}
+
+.se-map-group-label-anchor--hover .se-map-group-label {
+  transform: scale(1.25);
+  box-shadow: 0 4px 16px rgba(27, 27, 21, 0.2), 0 2px 6px rgba(27, 27, 21, 0.12);
+}
+
+.se-map-group-label-anchor--pulse .se-map-group-label {
+  animation: se-map-group-label-pulse 1.6s ease-out;
+}
+
+@keyframes se-map-group-label-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(27, 27, 21, 0.14), 0 1px 3px rgba(27, 27, 21, 0.08);
+  }
+
+  18% {
+    transform: scale(1.14);
+    box-shadow: 0 4px 16px rgba(27, 27, 21, 0.2), 0 2px 6px rgba(27, 27, 21, 0.12);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(27, 27, 21, 0.14), 0 1px 3px rgba(27, 27, 21, 0.08);
+  }
 }
 
 .se-map-hub-card-anchor {
@@ -125,6 +184,14 @@
 @media (prefers-reduced-motion: reduce) {
   .se-map-live-pulse--active {
     animation: none;
+  }
+
+  .se-map-group-label-anchor--pulse .se-map-group-label {
+    animation: none;
+  }
+
+  .se-map-group-label {
+    transition: none;
   }
 }
 

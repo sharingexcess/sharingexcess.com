@@ -1,7 +1,10 @@
 import { ArrowButton } from "@/components/ui/ArrowButton";
+import { Sticker } from "@/components/ui/Sticker";
 import { TextSection } from "@/components/ui/TextSection";
 import { useLenis } from "@/components/providers/SmoothScrollProvider";
 import { cn } from "@/lib/cn";
+import { heroContentCardHeadingClassName } from "@/lib/typography";
+import { motion, statCardTiltSpring, useReducedMotion } from "@/lib/motion";
 import { useCallback, useRef, type CSSProperties } from "react";
 
 export interface HeroContentCardProps {
@@ -14,6 +17,11 @@ export interface HeroContentCardProps {
   secondaryCtaHref?: string;
   className?: string;
 }
+
+/** Space above the card so the overlapping sticker is included in parallax layout height */
+const heroCardStickerBleedClass = "sm:pt-[clamp(40px,5vw,64px)]";
+const heroCardStickerPositionClass =
+  "absolute right-5 z-30 translate-x-1/2 -translate-y-[40%] sm:top-[clamp(52px,6vw,76px)]";
 
 /** White overlay card for home hero — matches donate form shell styling. */
 export function HeroContentCard({
@@ -28,6 +36,7 @@ export function HeroContentCard({
 }: HeroContentCardProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const lenis = useLenis();
+  const reduceMotion = useReducedMotion();
   const bodyLines = body?.split("\n") ?? [];
   const mainBody = bodyLines[0]?.trim();
   const emphasisBody = bodyLines.slice(1).join("\n").trim() || undefined;
@@ -50,7 +59,7 @@ export function HeroContentCard({
   }, [lenis]);
 
   return (
-    <div ref={rootRef} className="relative mb-6">
+    <div ref={rootRef} className={cn("relative mb-6", heroCardStickerBleedClass)}>
       <div
         data-form-card="white"
         style={
@@ -60,13 +69,14 @@ export function HeroContentCard({
           } as CSSProperties
         }
         className={cn(
-          "@container flex w-full min-w-0 flex-col gap-6 rounded-[var(--radius-lg)] bg-white p-4 text-kale sm:p-6 lg:rounded-[var(--radius-xl)] lg:p-10",
+          "@container flex w-full min-w-0 flex-col gap-6 overflow-visible rounded-[var(--radius-lg)] bg-white p-4 text-kale sm:p-6 lg:rounded-[var(--radius-xl)] lg:p-10",
           className,
         )}
       >
         <TextSection
           heading={title}
-          headingSize="h2"
+          headingClassName={heroContentCardHeadingClassName}
+          headingTextWrap="balance"
           body={mainBody}
           bodyEmphasis={emphasisBody}
           bodySize={bodySize}
@@ -81,6 +91,20 @@ export function HeroContentCard({
           emphasis
         />
       </div>
+
+      <motion.div
+        className={cn(
+          heroCardStickerPositionClass,
+          "pointer-events-auto hidden aspect-[250/159] w-[clamp(95px,11.88vw,158px)] cursor-default sm:block",
+        )}
+        initial={false}
+        animate={{ rotate: 10 }}
+        whileHover={reduceMotion ? undefined : { rotate: -2 }}
+        transition={statCardTiltSpring}
+        aria-hidden
+      >
+        <Sticker name="lemon" fillContainer alt="" />
+      </motion.div>
 
       <div className="pointer-events-none absolute bottom-1.5 left-1/2 z-10 -translate-x-1/2 translate-y-[35%]">
         <div className="scroll-hint-bounce pointer-events-auto">

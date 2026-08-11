@@ -18,6 +18,10 @@ export const sectionH1ClassName =
 export const sectionH2ClassName =
   "text-[clamp(32px,7.5vw,72px)] font-medium leading-[1.06] tracking-[-0.04em] lg:text-[clamp(36px,4.76cqw,72px)]";
 
+/** Home hero overlay card — scales with card width so the heading fills mobile */
+export const heroContentCardHeadingClassName =
+  "text-[clamp(34px,12cqw,48px)] font-medium leading-[1.06] tracking-[-0.04em] lg:text-[clamp(36px,4.76cqw,72px)]";
+
 /** Section H3 — tertiary heading within sections */
 export const sectionH3ClassName =
   "text-[clamp(22px,4.5vw,40px)] font-medium leading-[1.06] tracking-[-0.04em] lg:text-[clamp(24px,2.65cqw,40px)]";

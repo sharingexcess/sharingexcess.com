@@ -368,6 +368,33 @@ export const textImageBackgroundFade: Transition = {
   ease: appleEase,
 };
 
+/** Metric equivalent rotator — fade between comparison phrases */
+export const metricEquivalentFade: Transition = {
+  duration: 0.8,
+  ease: appleEase,
+};
+
+/** Metric equivalent rotator — per-word fade-in */
+export const metricEquivalentWordFade: Transition = {
+  duration: 0.5,
+  ease: appleEase,
+};
+
+export const metricEquivalentWordVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: metricEquivalentWordFade,
+  },
+};
+
+export const metricEquivalentWordContainerVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.12, delayChildren: 0.05 },
+  },
+};
+
 /** Slot-machine metric — full reel cycles before each digit settles */
 export const slotMachineReelCycles = 2;
 
