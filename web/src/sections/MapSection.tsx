@@ -1,5 +1,5 @@
 import { TextSection } from "@/components/ui/TextSection";
-import { captionClassName } from "@/lib/typography";
+import { mapCaptionClassName } from "@/lib/typography";
 import { DeferredInteractiveMap } from "@/components/map/DeferredInteractiveMap";
 import type { MapVariant, MapHub, MapMacroRegion } from "@/components/map/types";
 import { cn } from "@/lib/cn";
@@ -134,7 +134,7 @@ export function MapSection({
         {mapFrameInner("absolute inset-0")}
       </div>
       {mapCaption && (
-        <p className={cn("text-center text-[var(--section-text)]", captionClassName)}>
+        <p className={cn("text-center text-[var(--section-text)]", mapCaptionClassName)}>
           {mapCaption}
         </p>
       )}
@@ -231,7 +231,7 @@ export function MapSection({
         {mapFrameInner("absolute inset-0")}
       </div>
       {mapCaption && (
-        <p className={cn("text-center text-[var(--section-text)]", captionClassName)}>
+        <p className={cn("text-center text-[var(--section-text)]", mapCaptionClassName)}>
           {mapCaption}
         </p>
       )}

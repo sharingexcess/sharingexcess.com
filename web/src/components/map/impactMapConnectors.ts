@@ -5,6 +5,8 @@ import { findLabelLayerBeforeId } from "./regionHighlights";
 
 const ACTIVE_SOURCE_ID = "impact-connector-active";
 const ACTIVE_LAYER_ID = "impact-connector-lines-active";
+const EXITING_SOURCE_ID = "impact-connector-exiting";
+const EXITING_LAYER_ID = "impact-connector-lines-exiting";
 const PERMANENT_LAYER_PREFIX = "impact-connector-permanent-";
 const ARC_STEPS = 48;
 const TARGET_LINE_COUNT = 20;
@@ -43,10 +45,13 @@ export interface MapConnector {
 
 const CONNECTOR_LINE_WIDTH = 2;
 const CONNECTOR_LINE_OPACITY = 0.7;
-const CONNECTOR_DRAW_MS = 2200;
-const CONNECTOR_HOLD_MS = 1400;
-const CONNECTOR_FADE_OUT_MS = 900;
-const CONNECTOR_START_DELAY_MS = 900;
+/** Full shooting-star travel time (enter → exit). */
+const CONNECTOR_TRAVEL_MS = 2100;
+/** Visible comet length as a fraction of the route. */
+const SHOOTING_STAR_TAIL = 0.42;
+/** Start the next star this far into the current travel (0–1). */
+const CONNECTOR_SPAWN_AT = 0.42;
+const CONNECTOR_START_DELAY_MS = 500;
 
 const COMPLETED_LINE_PAINT = {
   "line-color": MAP_POINT_COLOR,
@@ -249,19 +254,21 @@ function buildConnectorRoutes(geojson?: GeoJSON.FeatureCollection): MapConnector
   return routes.slice(0, TARGET_LINE_COUNT);
 }
 
-function easeOutCubic(t: number): number {
-  return 1 - (1 - t) ** 3;
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
 }
 
-function shuffleConnectors(connectors: MapConnector[]): MapConnector[] {
-  const shuffled = [...connectors];
-  for (let index = shuffled.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
-    const current = shuffled[index]!;
-    shuffled[index] = shuffled[swapIndex]!;
-    shuffled[swapIndex] = current;
+function pickNextConnector(
+  routes: MapConnector[],
+  lastId: string | null,
+): MapConnector {
+  if (routes.length === 1) return routes[0]!;
+
+  let next = routes[Math.floor(Math.random() * routes.length)]!;
+  while (next.id === lastId) {
+    next = routes[Math.floor(Math.random() * routes.length)]!;
   }
-  return shuffled;
+  return next;
 }
 
 function buildArcCoordinates(
@@ -312,14 +319,54 @@ function buildConnectorFeature(connector: MapConnector): GeoJSON.Feature<GeoJSON
   };
 }
 
-function buildLineGradient(progress: number): Expression {
+const TRANSPARENT_LINE = "rgba(0, 0, 0, 0)";
+
+function snapProgress(value: number): number {
+  return Math.round(value * 10000) / 10000;
+}
+
+/**
+ * Visible segment [start, end] along the line. Always the same expression shape
+ * so Mapbox doesn't flicker when stop values update each frame.
+ */
+function buildSegmentGradient(start: number, end: number): Expression {
+  let segmentStart = snapProgress(Math.min(1, Math.max(0, start)));
+  let segmentEnd = snapProgress(Math.min(1, Math.max(0, end)));
+  const minWidth = 0.002;
+
+  if (segmentEnd - segmentStart < minWidth) {
+    segmentEnd = snapProgress(Math.min(1, segmentStart + minWidth));
+  }
+
+  if (segmentStart < 0.0001) segmentStart = 0.0001;
+  if (segmentEnd > 0.9999) segmentEnd = 0.9999;
+  if (segmentEnd <= segmentStart) {
+    segmentEnd = snapProgress(Math.min(1, segmentStart + minWidth));
+  }
+
   return [
     "step",
     ["line-progress"],
+    TRANSPARENT_LINE,
+    segmentStart,
     MAP_POINT_COLOR,
-    progress,
-    "rgba(0, 0, 0, 0)",
+    segmentEnd,
+    TRANSPARENT_LINE,
   ];
+}
+
+/**
+ * Shooting-star window: a short comet slides along the route and flies off the end.
+ * `travel` goes 0 → 1 over the animation.
+ */
+function shootingStarWindow(travel: number, tail: number): { start: number; end: number } {
+  const head = travel * (1 + tail);
+  return { start: head - tail, end: head };
+}
+
+function buildShootingStarGradient(travel: number, tail: number): Expression {
+  const { start, end } = shootingStarWindow(travel, tail);
+  return buildSegmentGradient(start, end);
 }
 
 function permanentSourceId(index: number): string {
@@ -348,6 +395,33 @@ export function setupImpactMapConnectors(
     data: emptyCollection(),
   });
 
+  map.addSource(EXITING_SOURCE_ID, {
+    type: "geojson",
+    lineMetrics: true,
+    data: emptyCollection(),
+  });
+
+  const lineLayout = {
+    "line-cap": "round" as const,
+    "line-join": "round" as const,
+  };
+
+  map.addLayer(
+    {
+      id: EXITING_LAYER_ID,
+      type: "line",
+      source: EXITING_SOURCE_ID,
+      paint: {
+        "line-width": CONNECTOR_LINE_WIDTH,
+        "line-opacity": CONNECTOR_LINE_OPACITY,
+        "line-blur": 0.35,
+        "line-gradient": buildShootingStarGradient(0, SHOOTING_STAR_TAIL),
+      },
+      layout: lineLayout,
+    },
+    beforeId,
+  );
+
   map.addLayer(
     {
       id: ACTIVE_LAYER_ID,
@@ -356,18 +430,16 @@ export function setupImpactMapConnectors(
       paint: {
         "line-width": CONNECTOR_LINE_WIDTH,
         "line-opacity": CONNECTOR_LINE_OPACITY,
-        "line-blur": 0.25,
-        "line-gradient": buildLineGradient(0),
+        "line-blur": 0.35,
+        "line-gradient": buildShootingStarGradient(0, SHOOTING_STAR_TAIL),
       },
-      layout: {
-        "line-cap": "round",
-        "line-join": "round",
-      },
+      layout: lineLayout,
     },
     beforeId,
   );
 
   const activeSource = map.getSource(ACTIVE_SOURCE_ID) as GeoJSONSource;
+  const exitingSource = map.getSource(EXITING_SOURCE_ID) as GeoJSONSource;
   const permanentLayerIds: string[] = [];
 
   const addPermanentLine = (connector: MapConnector, index: number) => {
@@ -385,10 +457,7 @@ export function setupImpactMapConnectors(
         type: "line",
         source: sourceId,
         paint: { ...COMPLETED_LINE_PAINT },
-        layout: {
-          "line-cap": "round",
-          "line-join": "round",
-        },
+        layout: lineLayout,
       },
       beforeId,
     );
@@ -396,20 +465,18 @@ export function setupImpactMapConnectors(
     permanentLayerIds.push(layerId);
   };
 
-  const setActiveProgress = (progress: number) => {
-    map.setPaintProperty(ACTIVE_LAYER_ID, "line-gradient", buildLineGradient(progress));
+  const setSlotTravel = (layerId: string, travel: number) => {
+    if (!map.getLayer(layerId)) return;
+    map.setPaintProperty(
+      layerId,
+      "line-gradient",
+      buildShootingStarGradient(travel, SHOOTING_STAR_TAIL),
+    );
   };
 
-  const clearActiveLine = () => {
-    activeSource.setData(emptyCollection());
-    setActiveProgress(0);
-  };
-
-  const setAllOpacity = (opacity: number) => {
-    map.setPaintProperty(ACTIVE_LAYER_ID, "line-opacity", opacity);
-    for (const layerId of permanentLayerIds) {
-      map.setPaintProperty(layerId, "line-opacity", opacity);
-    }
+  const clearSlot = (slot: ConnectorSlot) => {
+    slot.source.setData(emptyCollection());
+    slot.busy = false;
   };
 
   const removePermanentLayers = () => {
@@ -424,7 +491,9 @@ export function setupImpactMapConnectors(
 
   const removeAllLayers = () => {
     if (map.getLayer(ACTIVE_LAYER_ID)) map.removeLayer(ACTIVE_LAYER_ID);
+    if (map.getLayer(EXITING_LAYER_ID)) map.removeLayer(EXITING_LAYER_ID);
     if (map.getSource(ACTIVE_SOURCE_ID)) map.removeSource(ACTIVE_SOURCE_ID);
+    if (map.getSource(EXITING_SOURCE_ID)) map.removeSource(EXITING_SOURCE_ID);
     removePermanentLayers();
   };
 
@@ -433,101 +502,140 @@ export function setupImpactMapConnectors(
       addPermanentLine(connectorRoutes[index]!, index);
     }
     if (map.getLayer(ACTIVE_LAYER_ID)) map.removeLayer(ACTIVE_LAYER_ID);
+    if (map.getLayer(EXITING_LAYER_ID)) map.removeLayer(EXITING_LAYER_ID);
     if (map.getSource(ACTIVE_SOURCE_ID)) map.removeSource(ACTIVE_SOURCE_ID);
+    if (map.getSource(EXITING_SOURCE_ID)) map.removeSource(EXITING_SOURCE_ID);
 
     return removeAllLayers;
   }
 
-  let connectorQueue = shuffleConnectors(connectorRoutes);
-  let queueIndex = 0;
-  let rafId: number | null = null;
-  let holdTimeout: ReturnType<typeof setTimeout> | null = null;
+  interface ConnectorSlot {
+    layerId: string;
+    source: GeoJSONSource;
+    busy: boolean;
+    generation: number;
+    rafId: number | null;
+  }
+
+  const slots: ConnectorSlot[] = [
+    {
+      layerId: ACTIVE_LAYER_ID,
+      source: activeSource,
+      busy: false,
+      generation: 0,
+      rafId: null,
+    },
+    {
+      layerId: EXITING_LAYER_ID,
+      source: exitingSource,
+      busy: false,
+      generation: 0,
+      rafId: null,
+    },
+  ];
+
+  let lastConnectorId: string | null = null;
+  let spawnTimeout: ReturnType<typeof setTimeout> | null = null;
   let startTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  const cancelAnimation = () => {
-    if (rafId !== null) {
-      cancelAnimationFrame(rafId);
-      rafId = null;
+  const cancelSlotAnimation = (slot: ConnectorSlot) => {
+    slot.generation += 1;
+    if (slot.rafId !== null) {
+      cancelAnimationFrame(slot.rafId);
+      slot.rafId = null;
     }
+    slot.busy = false;
   };
 
   const runTimedAnimation = (
     durationMs: number,
+    ease: (t: number) => number,
     onFrame: (progress: number) => void,
     onComplete: () => void,
+    isStopped: () => boolean,
+    assignRaf: (id: number | null) => void,
   ) => {
     const startTime = performance.now();
 
     const tick = (now: number) => {
+      if (isStopped()) {
+        assignRaf(null);
+        return;
+      }
+
       const raw = Math.min(1, (now - startTime) / durationMs);
-      onFrame(easeOutCubic(raw));
+      onFrame(ease(raw));
+
+      if (isStopped()) {
+        assignRaf(null);
+        return;
+      }
 
       if (raw < 1) {
-        rafId = requestAnimationFrame(tick);
+        assignRaf(requestAnimationFrame(tick));
       } else {
-        rafId = null;
+        assignRaf(null);
         onComplete();
       }
     };
 
-    rafId = requestAnimationFrame(tick);
+    assignRaf(requestAnimationFrame(tick));
   };
 
-  const animateFadeOut = (onComplete: () => void) => {
-    runTimedAnimation(
-      CONNECTOR_FADE_OUT_MS,
-      (progress) => setAllOpacity(CONNECTOR_LINE_OPACITY * (1 - progress)),
-      onComplete,
-    );
-  };
+  const runStarOnSlot = (slot: ConnectorSlot, connector: MapConnector) => {
+    cancelSlotAnimation(slot);
+    slot.busy = true;
+    const generation = slot.generation;
 
-  const resetCycle = () => {
-    removePermanentLayers();
-    clearActiveLine();
-    setAllOpacity(CONNECTOR_LINE_OPACITY);
-    connectorQueue = shuffleConnectors(connectorRoutes);
-    queueIndex = 0;
-    showConnector();
-  };
-
-  const showConnector = () => {
-    if (queueIndex >= connectorQueue.length) {
-      animateFadeOut(resetCycle);
-      return;
-    }
-
-    const connector = connectorQueue[queueIndex]!;
-    const permanentIndex = queueIndex;
-    queueIndex += 1;
-
-    activeSource.setData({
+    slot.source.setData({
       type: "FeatureCollection",
       features: [buildConnectorFeature(connector)],
     });
-    setActiveProgress(0);
+    setSlotTravel(slot.layerId, 0);
 
-    cancelAnimation();
     runTimedAnimation(
-      CONNECTOR_DRAW_MS,
-      (progress) => setActiveProgress(progress),
+      CONNECTOR_TRAVEL_MS,
+      easeInOutCubic,
+      (progress) => setSlotTravel(slot.layerId, progress),
       () => {
-        setActiveProgress(1);
-        addPermanentLine(connector, permanentIndex);
-        map.setPaintProperty(ACTIVE_LAYER_ID, "line-opacity", 0);
-        clearActiveLine();
-        map.setPaintProperty(ACTIVE_LAYER_ID, "line-opacity", CONNECTOR_LINE_OPACITY);
-
-        holdTimeout = setTimeout(showConnector, CONNECTOR_HOLD_MS);
+        if (slot.generation !== generation) return;
+        clearSlot(slot);
+      },
+      () => slot.generation !== generation,
+      (id) => {
+        slot.rafId = id;
       },
     );
   };
 
-  startTimeout = setTimeout(showConnector, CONNECTOR_START_DELAY_MS);
+  const findFreeSlot = (): ConnectorSlot | undefined =>
+    slots.find((slot) => !slot.busy);
+
+  const scheduleNextSpawn = () => {
+    spawnTimeout = setTimeout(spawnStar, CONNECTOR_TRAVEL_MS * CONNECTOR_SPAWN_AT);
+  };
+
+  const spawnStar = () => {
+    if (!map.getLayer(ACTIVE_LAYER_ID)) return;
+
+    const slot = findFreeSlot();
+    if (!slot) {
+      scheduleNextSpawn();
+      return;
+    }
+
+    const connector = pickNextConnector(connectorRoutes, lastConnectorId);
+    lastConnectorId = connector.id;
+    runStarOnSlot(slot, connector);
+    scheduleNextSpawn();
+  };
+
+  startTimeout = setTimeout(spawnStar, CONNECTOR_START_DELAY_MS);
 
   return () => {
     if (startTimeout) clearTimeout(startTimeout);
-    if (holdTimeout) clearTimeout(holdTimeout);
-    cancelAnimation();
+    if (spawnTimeout) clearTimeout(spawnTimeout);
+    for (const slot of slots) cancelSlotAnimation(slot);
     removeAllLayers();
   };
 }

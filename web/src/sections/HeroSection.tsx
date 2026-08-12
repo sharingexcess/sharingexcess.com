@@ -59,7 +59,7 @@ const FIGMA_ARTBOARD_CLASS = "@container mx-auto w-full max-w-[1512px]";
 const STANDARD_CONTENT_CLASS = "mx-auto w-full max-w-[1320px] px-4 lg:px-8";
 /** Vertical inset around intro copy — room for display heading + CTAs without crowding the video */
 const HOME_HERO_INTRO_BAND_CLASS =
-  "box-border flex w-full flex-col items-start justify-center py-[clamp(80px,12vh,160px)] lg:items-center lg:py-[clamp(104px,14vh,180px)]";
+  "box-border flex w-full flex-col items-start justify-center py-[clamp(72px,10vh,144px)] lg:items-center lg:py-[clamp(88px,12vh,160px)]";
 /** Gap between multiline hero body paragraphs */
 const HOME_HERO_BODY_PARAGRAPH_GAP = "gap-3 lg:gap-4";
 /** Max width for hero donate card */

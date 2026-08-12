@@ -1,10 +1,16 @@
+import seCircleLogo from "@/assets/images/se-circle.png";
 import { cn } from "@/lib/cn";
 import { AnimatePresence } from "@/lib/motion";
 import mapboxgl, { type LngLatBounds, type Map, type Marker } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { useCallback, useEffect, useId, useRef, useState, type CSSProperties, type RefObject } from "react";
+import { useCallback, useEffect, useId, useRef, useState, Fragment, type CSSProperties, type KeyboardEvent, type RefObject } from "react";
 import "./map.css";
-import { HubMarkerCard, type HubCardAnchor } from "./HubMarkerCard";
+import {
+  HubMarkerCard,
+  type HubCardAnchor,
+  HUB_MARKER_CARD_ESTIMATED_HEIGHT_PX,
+  HUB_MARKER_CARD_WIDTH_PX,
+} from "./HubMarkerCard";
 import { createHubMarkerElement } from "./hubMarkerElement";
 import {
   addRecipientMarkerImage,
@@ -26,6 +32,7 @@ import {
   type ImpactMapGroupInteractionController,
   type MapOverlayAnchor,
 } from "./setupImpactMapGroupInteractions";
+import { useImpactGroupMetrics } from "./useImpactGroupMetrics";
 import {
   DEFAULT_MAP_CENTER,
   DEFAULT_MAP_HUBS,
@@ -40,6 +47,8 @@ import {
   STATIC_MAP_INTERACTION,
 } from "./mapConfig";
 import type { InteractiveMapProps, MapHub, MapMacroRegion } from "./types";
+
+const GROUP_METRICS_PLACEHOLDER = DEFAULT_MAP_HUBS[0]?.metrics ?? [];
 
 const IMPACT_SOURCE_ID = "impact-locations";
 const IMPACT_LAYER_ID = "impact-points";
@@ -57,11 +66,11 @@ const HUB_SELECT_ZOOM = 6;
 const GROUP_ZOOM_DURATION_MS = 600;
 const HUB_MARKER_HEIGHT = 54;
 const HUB_CARD_GAP = 12;
-const HUB_CARD_MAX_WIDTH = 320;
+const HUB_CARD_MAX_WIDTH = HUB_MARKER_CARD_WIDTH_PX;
 const HUB_CARD_EDGE_PADDING = 16;
-/** Card bottom sits above city label + marker cluster (impact map). */
-const GROUP_CARD_ABOVE_HUB_PX = 104;
-const GROUP_CARD_ESTIMATED_HEIGHT = 176;
+/** Card bottom sits above marker cluster (impact map; label is hidden when selected). */
+const GROUP_CARD_ABOVE_HUB_PX = 72;
+const GROUP_CARD_ESTIMATED_HEIGHT = HUB_MARKER_CARD_ESTIMATED_HEIGHT_PX;
 
 async function fetchImpactGeoJson(
   urls: string[],
@@ -178,6 +187,7 @@ function getHubCardAnchor(
   map: Map,
   hub: MapHub,
   containerWidth: number,
+  containerHeight: number,
 ): HubCardAnchor {
   const point = map.project([hub.lng, hub.lat]);
   const halfCard = HUB_CARD_MAX_WIDTH / 2;
@@ -188,10 +198,15 @@ function getHubCardAnchor(
       ? containerWidth / 2
       : Math.min(maxX, Math.max(minX, point.x));
 
-  return {
-    x,
-    y: point.y - HUB_MARKER_HEIGHT - HUB_CARD_GAP,
-  };
+  const minCardBottomY = HUB_CARD_EDGE_PADDING + GROUP_CARD_ESTIMATED_HEIGHT;
+  const maxCardBottomY = containerHeight - HUB_CARD_EDGE_PADDING;
+  const preferredY = point.y - HUB_MARKER_HEIGHT - HUB_CARD_GAP;
+  const y =
+    maxCardBottomY <= minCardBottomY
+      ? minCardBottomY
+      : Math.min(maxCardBottomY, Math.max(minCardBottomY, preferredY));
+
+  return { x, y };
 }
 
 function projectGroupCardAnchor(
@@ -210,7 +225,12 @@ function projectGroupCardAnchor(
       : Math.min(maxX, Math.max(minX, point.x));
 
   const minCardBottomY = HUB_CARD_EDGE_PADDING + GROUP_CARD_ESTIMATED_HEIGHT;
-  const y = Math.max(minCardBottomY, point.y - GROUP_CARD_ABOVE_HUB_PX);
+  const maxCardBottomY = containerHeight - HUB_CARD_EDGE_PADDING;
+  const preferredY = point.y - GROUP_CARD_ABOVE_HUB_PX;
+  const y =
+    maxCardBottomY <= minCardBottomY
+      ? minCardBottomY
+      : Math.min(maxCardBottomY, Math.max(minCardBottomY, preferredY));
 
   return { x, y };
 }
@@ -426,6 +446,7 @@ export function InteractiveMap({
   const [groupLabelAnchors, setGroupLabelAnchors] = useState<Record<string, MapOverlayAnchor>>({});
   const [selectedGroup, setSelectedGroup] = useState<ImpactMapGroup | null>(null);
   const [groupCardAnchor, setGroupCardAnchor] = useState<MapOverlayAnchor | null>(null);
+  const impactGroupMetrics = useImpactGroupMetrics();
   const accessToken = getMapboxAccessToken();
 
   const handleHoverGroup = useCallback((group: ImpactMapGroup | null) => {
@@ -463,6 +484,37 @@ export function InteractiveMap({
       });
     },
     [],
+  );
+
+  const handleGroupClick = useCallback(
+    (group: ImpactMapGroup, event?: { stopPropagation?: () => void }) => {
+      event?.stopPropagation?.();
+
+      const map = mapRef.current;
+      const container = containerRef.current;
+      if (!map || !container) return;
+
+      handleSelectGroup(
+        group,
+        projectGroupCardAnchor(
+          map,
+          group,
+          container.clientWidth,
+          container.clientHeight,
+        ),
+      );
+    },
+    [handleSelectGroup],
+  );
+
+  const handleGroupLabelKeyDown = useCallback(
+    (group: ImpactMapGroup, event: KeyboardEvent<HTMLButtonElement>) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        handleGroupClick(group);
+      }
+    },
+    [handleGroupClick],
   );
 
   const handleCloseGroupCard = useCallback(() => {
@@ -511,7 +563,9 @@ export function InteractiveMap({
         if (prev?.name === hub.name) return null;
 
         if (map && container) {
-          setCardAnchor(getHubCardAnchor(map, hub, container.clientWidth));
+          setCardAnchor(
+            getHubCardAnchor(map, hub, container.clientWidth, container.clientHeight),
+          );
           centerMapOnHub(hub);
         }
 
@@ -617,7 +671,9 @@ export function InteractiveMap({
     }
 
     const syncAnchor = () => {
-      setCardAnchor(getHubCardAnchor(map, selectedHub, container.clientWidth));
+      setCardAnchor(
+        getHubCardAnchor(map, selectedHub, container.clientWidth, container.clientHeight),
+      );
     };
 
     syncAnchor();
@@ -746,6 +802,7 @@ export function InteractiveMap({
     center,
     handleGroupLabelEnter,
     handleGroupLabelLeave,
+    handleGroupClick,
     handleHoverGroup,
     handlePulseGroup,
     handleSelectGroup,
@@ -773,6 +830,13 @@ export function InteractiveMap({
     );
   }
 
+  const selectedGroupCard = selectedGroup
+    ? {
+        ...selectedGroup,
+        metrics: impactGroupMetrics[selectedGroup.id] ?? GROUP_METRICS_PLACEHOLDER,
+      }
+    : null;
+
   return (
     <div
       className={cn("se-map", hoveredGroup && "se-map--group-hover", className)}
@@ -792,26 +856,50 @@ export function InteractiveMap({
             const isPulsing = pulsingGroupId === group.id;
 
             return (
-              <div
-                key={group.id}
-                className={cn(
-                  "se-map-group-label-anchor",
-                  isHovered && "se-map-group-label-anchor--hover",
-                  isPulsing && "se-map-group-label-anchor--pulse",
-                )}
-                style={{ left: anchor.x, top: anchor.y }}
-                onMouseEnter={() => handleGroupLabelEnter(group)}
-                onMouseLeave={handleGroupLabelLeave}
-              >
-                <span className="se-map-group-label">{group.name}</span>
-              </div>
+              <Fragment key={group.id}>
+                <button
+                  type="button"
+                  className="se-map-group-hit-target"
+                  style={{ left: anchor.x, top: anchor.y }}
+                  aria-label={`View ${group.name} impact`}
+                  onClick={(event) => handleGroupClick(group, event)}
+                  onMouseEnter={() => handleGroupLabelEnter(group)}
+                  onMouseLeave={handleGroupLabelLeave}
+                />
+                <button
+                  type="button"
+                  className={cn(
+                    "se-map-group-label-anchor",
+                    isHovered && "se-map-group-label-anchor--hover",
+                    isPulsing && "se-map-group-label-anchor--pulse",
+                  )}
+                  style={{ left: anchor.x, top: anchor.y }}
+                  aria-label={`View ${group.name} impact`}
+                  onClick={(event) => handleGroupClick(group, event)}
+                  onMouseEnter={() => handleGroupLabelEnter(group)}
+                  onMouseLeave={handleGroupLabelLeave}
+                  onKeyDown={(event) => handleGroupLabelKeyDown(group, event)}
+                >
+                  <span className="se-map-group-label">
+                    <img
+                      src={seCircleLogo.src}
+                      alt=""
+                      className="se-map-group-label__logo"
+                      width={20}
+                      height={20}
+                      aria-hidden
+                    />
+                    <span className="se-map-group-label__text">{group.name}</span>
+                  </span>
+                </button>
+              </Fragment>
             );
           })}
           <AnimatePresence mode="wait">
-            {selectedGroup && groupCardAnchor && (
+            {selectedGroupCard && groupCardAnchor && (
               <HubMarkerCard
-                key={selectedGroup.id}
-                hub={selectedGroup}
+                key={selectedGroupCard.id}
+                hub={selectedGroupCard}
                 anchor={groupCardAnchor}
                 onClose={handleCloseGroupCard}
               />

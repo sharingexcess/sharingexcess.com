@@ -4,9 +4,14 @@ export type MapVariant =
   | "region-highlights";
 
 /** Single stat shown on the hub marker overlay card. */
+export type MapHubMetricId = "meals" | "weight" | "partners" | "emissions";
+
 export interface MapHubMetric {
+  id: MapHubMetricId;
   value: string;
   label: string;
+  /** Shown in the metric info popover when provided. */
+  tooltip?: string;
 }
 
 /** Sharing Excess operational hub — shown with branded SE pin markers. */

@@ -2,9 +2,13 @@
 export const eyebrowClassName =
   "font-display text-lg font-bold leading-[1.1] lg:text-[24px]";
 
-/** Secondary captions — map footnotes, carousel labels, etc. */
+/** Secondary captions — carousel labels, round-image credits, etc. */
 export const captionClassName =
   "text-xs leading-[1.4] italic opacity-64 lg:text-sm";
+
+/** Footnote below the interactive map */
+export const mapCaptionClassName =
+  "text-sm leading-[1.4] italic opacity-64 lg:text-base";
 
 /** Large stat figures — Foundations/Typography "Metric Number" */
 export const metricNumberClassName =

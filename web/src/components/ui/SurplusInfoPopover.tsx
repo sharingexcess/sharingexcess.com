@@ -20,13 +20,14 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-const SURPLUS_LANDING_VIDEO_SRC =
+export const SURPLUS_LANDING_VIDEO_SRC =
   "https://surplus.sharingexcess.com/landing/landing_video.mp4";
+
+export const SURPLUS_LANDING_URL = "https://surplus.sharingexcess.com/";
 
 const POPOVER_WIDTH = 640;
 const POPOVER_GAP = 10;
 const SURPLUS_LABEL = "Surplus";
-const SURPLUS_LANDING_URL = "https://surplus.sharingexcess.com/";
 
 function splitSurplusEyebrow(label: string): { prefix: string; hasSurplus: boolean } {
   const index = label.lastIndexOf(SURPLUS_LABEL);

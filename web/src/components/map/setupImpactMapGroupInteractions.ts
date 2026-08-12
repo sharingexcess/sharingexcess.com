@@ -1,6 +1,7 @@
-import type { Expression, Map, MapLayerMouseEvent, MapMouseEvent } from "mapbox-gl";
+import type { Expression, Map, MapLayerMouseEvent, MapMouseEvent, Point } from "mapbox-gl";
 import {
   getImpactGroupById,
+  IMPACT_MAP_GROUPS,
   type ImpactMapGroup,
 } from "./impactMapGroups";
 import {
@@ -12,11 +13,12 @@ import { MAP_POINT_COLOR } from "./mapConfig";
 
 export const IMPACT_POINTS_LAYER_ID = "impact-points";
 
-export const IMPACT_MARKER_HOVER_SCALE = 1.25;
 export const IMPACT_MARKER_TRANSITION_MS = 280;
 
-const HOVER_SCALE = IMPACT_MARKER_HOVER_SCALE;
 const MUTED_MARKER_COLOR = "#C9C9C9";
+const BASE_MARKER_SIZE: Expression = ["get", "marker_size"];
+/** Fallback click radius around a group center when a marker feature is not hit. */
+const GROUP_CLICK_RADIUS_PX = 52;
 
 export interface MapOverlayAnchor {
   x: number;
@@ -29,21 +31,7 @@ export interface ImpactMapGroupInteractionCallbacks {
 }
 
 export interface ImpactMapMarkerStyleState {
-  hoveredGroupId?: string | null;
   selectedGroupId?: string | null;
-}
-
-function buildMarkerSizeExpression(hoveredGroupId: string | null): Expression {
-  const baseSize: Expression = ["get", "marker_size"];
-
-  if (!hoveredGroupId) return baseSize;
-
-  return [
-    "case",
-    ["==", ["get", "group_id"], hoveredGroupId],
-    ["*", baseSize, HOVER_SCALE],
-    baseSize,
-  ];
 }
 
 function buildMarkerColorExpression(selectedGroupId: string | null): Expression {
@@ -75,14 +63,12 @@ export function syncImpactMapMarkerStyles(
 ): void {
   if (!map.getLayer(IMPACT_POINTS_LAYER_ID)) return;
 
-  const hoveredGroupId = state.hoveredGroupId ?? null;
   const selectedGroupId = state.selectedGroupId ?? null;
-  const sizeExpression = buildMarkerSizeExpression(hoveredGroupId);
 
   if (useSymbols) {
     map.setLayoutProperty(IMPACT_POINTS_LAYER_ID, "icon-size", [
       "/",
-      sizeExpression,
+      BASE_MARKER_SIZE,
       IMPACT_MARKER_INNER_RADIUS_PX,
     ]);
     map.setLayoutProperty(
@@ -93,7 +79,7 @@ export function syncImpactMapMarkerStyles(
     return;
   }
 
-  map.setPaintProperty(IMPACT_POINTS_LAYER_ID, "circle-radius", sizeExpression);
+  map.setPaintProperty(IMPACT_POINTS_LAYER_ID, "circle-radius", BASE_MARKER_SIZE);
   map.setPaintProperty(
     IMPACT_POINTS_LAYER_ID,
     "circle-color",
@@ -104,6 +90,67 @@ export function syncImpactMapMarkerStyles(
 function projectGroupAnchor(map: Map, group: ImpactMapGroup): MapOverlayAnchor {
   const point = map.project([group.lng, group.lat]);
   return { x: point.x, y: point.y };
+}
+
+function groupIdFromFeatures(features: GeoJSON.Feature[]): string | null {
+  for (const feature of features) {
+    const groupId = feature.properties?.group_id;
+    if (groupId) return String(groupId);
+  }
+  return null;
+}
+
+function findNearestImpactGroup(
+  map: Map,
+  point: Point | { x: number; y: number },
+): ImpactMapGroup | null {
+  let nearest: ImpactMapGroup | null = null;
+  let nearestDistance = Infinity;
+
+  for (const group of IMPACT_MAP_GROUPS) {
+    const projected = map.project([group.lng, group.lat]);
+    const distance = Math.hypot(projected.x - point.x, projected.y - point.y);
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearest = group;
+    }
+  }
+
+  return nearestDistance <= GROUP_CLICK_RADIUS_PX ? nearest : null;
+}
+
+function resolveGroupFromClick(
+  map: Map,
+  point: Point | { x: number; y: number },
+  features?: GeoJSON.Feature[],
+): ImpactMapGroup | null {
+  const groupId = features?.length ? groupIdFromFeatures(features) : null;
+  if (groupId) {
+    return getImpactGroupById(groupId) ?? null;
+  }
+
+  const rendered = map.queryRenderedFeatures(point, {
+    layers: [IMPACT_POINTS_LAYER_ID],
+  });
+  const renderedGroupId = groupIdFromFeatures(rendered);
+  if (renderedGroupId) {
+    return getImpactGroupById(renderedGroupId) ?? null;
+  }
+
+  return findNearestImpactGroup(map, point);
+}
+
+function selectGroupAtPoint(
+  map: Map,
+  point: Point | { x: number; y: number },
+  features: GeoJSON.Feature[] | undefined,
+  callbacks: ImpactMapGroupInteractionCallbacks,
+): boolean {
+  const group = resolveGroupFromClick(map, point, features);
+  if (!group) return false;
+
+  callbacks.onSelectGroup(group, projectGroupAnchor(map, group));
+  return true;
 }
 
 export interface ImpactMapGroupInteractionController {
@@ -121,14 +168,13 @@ export function setupImpactMapGroupInteractions(
   let selectedGroupId: string | null = null;
 
   const syncStyles = () => {
-    syncImpactMapMarkerStyles(map, useSymbols, { hoveredGroupId, selectedGroupId });
+    syncImpactMapMarkerStyles(map, useSymbols, { selectedGroupId });
   };
 
   const setHoveredGroupId = (nextId: string | null) => {
     if (hoveredGroupId === nextId) return;
 
     hoveredGroupId = nextId;
-    syncStyles();
 
     if (!nextId) {
       callbacks.onHoverGroup(null);
@@ -165,23 +211,19 @@ export function setupImpactMapGroupInteractions(
     setHoveredGroup(null);
   };
 
-  const onClick = (event: MapMouseEvent) => {
-    const features = map.queryRenderedFeatures(event.point, {
+  const onLayerClick = (event: MapLayerMouseEvent) => {
+    event.originalEvent.stopPropagation();
+    selectGroupAtPoint(map, event.point, event.features, callbacks);
+  };
+
+  const onMapClick = (event: MapMouseEvent) => {
+    const rendered = map.queryRenderedFeatures(event.point, {
       layers: [IMPACT_POINTS_LAYER_ID],
     });
+    if (rendered.length) return;
 
-    if (!features.length) {
-      callbacks.onSelectGroup(null, null);
-      return;
-    }
-
-    const groupId = features[0]?.properties?.group_id;
-    if (!groupId) return;
-
-    const group = getImpactGroupById(String(groupId));
-    if (!group) return;
-
-    callbacks.onSelectGroup(group, projectGroupAnchor(map, group));
+    if (selectGroupAtPoint(map, event.point, undefined, callbacks)) return;
+    callbacks.onSelectGroup(null, null);
   };
 
   const syncAnchors = () => {
@@ -195,7 +237,8 @@ export function setupImpactMapGroupInteractions(
 
   map.on("mousemove", IMPACT_POINTS_LAYER_ID, onMouseMove);
   map.on("mouseleave", IMPACT_POINTS_LAYER_ID, onMouseLeave);
-  map.on("click", onClick);
+  map.on("click", IMPACT_POINTS_LAYER_ID, onLayerClick);
+  map.on("click", onMapClick);
   map.on("move", syncAnchors);
   map.on("zoom", syncAnchors);
   map.on("resize", syncAnchors);
@@ -209,12 +252,12 @@ export function setupImpactMapGroupInteractions(
     destroy: () => {
       map.off("mousemove", IMPACT_POINTS_LAYER_ID, onMouseMove);
       map.off("mouseleave", IMPACT_POINTS_LAYER_ID, onMouseLeave);
-      map.off("click", onClick);
+      map.off("click", IMPACT_POINTS_LAYER_ID, onLayerClick);
+      map.off("click", onMapClick);
       map.off("move", syncAnchors);
       map.off("zoom", syncAnchors);
       map.off("resize", syncAnchors);
       syncImpactMapMarkerStyles(map, useSymbols, {
-        hoveredGroupId: null,
         selectedGroupId: null,
       });
       callbacks.onHoverGroup(null);

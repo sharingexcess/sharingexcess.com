@@ -297,7 +297,7 @@ html {
 
 /* Stacked rounded hero — heading above video, expand to fullscreen, body+form slide up */
 .home-hero-donate--stacked {
-  --hero-frame-start: 54vh;
+  --hero-frame-start: 52vh;
 }
 
 .home-hero-donate--stacked.home-hero-donate--scroll-fx {
@@ -640,6 +640,23 @@ html {
 
 .live-indicator-dot {
   animation: live-indicator-pulse 2s ease-out infinite;
+}
+
+/* Surplus landing — static dot grid (surplus.sharingexcess.com) */
+.surplus-dot-grid {
+  background-color: var(--color-neutral-000);
+  background-image: radial-gradient(
+    color-mix(in oklch, var(--color-kale) 10%, transparent) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 20px 20px;
+  background-position: 0 0;
+}
+
+@supports not (color: color-mix(in oklch, black, white)) {
+  .surplus-dot-grid {
+    background-image: radial-gradient(rgb(0 54 25 / 0.1) 1.5px, transparent 1.5px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

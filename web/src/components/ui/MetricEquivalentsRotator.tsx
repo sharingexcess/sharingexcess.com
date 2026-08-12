@@ -11,7 +11,7 @@ import {
 import { bodyMdClassName } from "@/lib/typography";
 import { useEffect, useMemo, useState } from "react";
 
-const ROTATION_INTERVAL_MS = 7000;
+const ROTATION_INTERVAL_MS = 5000;
 const WORD_GAP = "0.2em";
 
 function splitWords(text: string): string[] {

@@ -75,6 +75,8 @@ export interface TextSectionProps {
   animateHeading?: boolean;
   /** Blur-in or word-by-word heading entrance — `animateHeading` is shorthand for `"words"` */
   headingAnimation?: "words" | "blur";
+  /** When the heading reveal starts — default mount; use inView for below-the-fold sections */
+  headingRevealTrigger?: "mount" | "inView";
   /** When false, *asterisk* spans render as plain text */
   emphasis?: boolean;
   /** Card layout — secondary CTA keeps rest color on hover */
@@ -204,6 +206,7 @@ export function TextSection({
   align = "left",
   animateHeading = false,
   headingAnimation,
+  headingRevealTrigger = "mount",
   emphasis = true,
   isCard = false,
   bodyFooter,
@@ -248,6 +251,7 @@ export function TextSection({
         title={heading}
         as="p"
         emphasis={emphasis}
+        trigger={headingRevealTrigger}
         className={cn(headingClassName, "text-[var(--section-text,#003619)]")}
       />
     ) : resolvedHeadingAnimation === "blur" ? (

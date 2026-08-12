@@ -4,6 +4,7 @@ import HomeHero from "@/sections/HomeHero";
 import DonationSection from "@/sections/DonationSection";
 import LogosBannerSection from "@/sections/LogosBannerSection";
 import MapSection from "@/sections/MapSection";
+import SurplusSection from "@/sections/SurplusSection";
 import StackingCardsSection from "@/sections/StackingCardsSection";
 import SectionScrollHandoff from "@/sections/SectionScrollHandoff";
 import TextImageSection from "@/sections/TextImageSection";
@@ -120,15 +121,26 @@ const supporterLogos = [
       transparentBg
       layout="stack-centered"
       headingSize="h2"
-      eyebrow="Live from Surplus"
-      surplusInfo
+      eyebrow="Updating live, one rescue at a time."
       title="{totalLbs} pounds of food rescued since 2018. And counting."
       mapVariant="impact-clusters"
-      mapCaption="Over 2,000 distribution locations across 36 states"
+      mapCaption="Live data from Surplus app."
       primaryCta="Impact Data"
       primaryCtaHref="/about/impact"
       secondaryCta="How We Measure"
       secondaryCtaHref="https://docs.sharingexcess.com/docs/impact-measurement"
+    />
+
+    <SurplusSection client:visible
+      theme="dark"
+      transparentBg
+      videoPosition="left"
+      title="*Surplus:* the technology behind every rescue."
+      body="Surplus is the platform that *powers our food rescue network*. It tracks food from pickup to delivery, connecting drivers, donors, and food access partners *in real time*."
+      headingSize="h2"
+      bodySize="lg"
+      primaryCta="Learn more"
+      primaryCtaHref="https://surplus.sharingexcess.com/"
       archBottom
     />
   </SectionScrollHandoff>

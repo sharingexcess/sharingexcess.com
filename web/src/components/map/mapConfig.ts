@@ -42,13 +42,15 @@ export const STATIC_MAP_INTERACTION = {
 
 export const IMPACT_GEOJSON_PATH = "/public/analytics/geojson";
 
-/** Placeholder hub metrics — replace with live data on Astro pages. */
-const DEFAULT_HUB_METRICS = [
-  { value: "12M+", label: "Lorem ipsum" },
-  { value: "340", label: "Dolor sit amet" },
-  { value: "1.2K", label: "Consectetur" },
-  { value: "89", label: "Adipiscing elit" },
-] as const;
+import type { MapHubMetric } from "./types";
+
+/** Fallback hub metrics when live Surplus data is unavailable. */
+const DEFAULT_HUB_METRICS: MapHubMetric[] = [
+  { id: "meals", value: "—", label: "Meals made possible" },
+  { id: "weight", value: "—", label: "Pounds distributed through this city" },
+  { id: "partners", value: "—", label: "Charitable partners served" },
+  { id: "emissions", value: "—", label: "CO2e emissions prevented" },
+];
 
 /** Default SE operational hubs — coordinates at city / market centers. */
 export const DEFAULT_MAP_HUBS: MapHub[] = [
