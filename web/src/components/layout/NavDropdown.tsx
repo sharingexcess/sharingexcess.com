@@ -35,11 +35,11 @@ export const NAV_BUTTON_GLASS_STYLE = {
 export const NAV_BUTTON_CLASS = "font-normal";
 
 /** Subtle elevation when the nav or dropdown sits over a light page background. */
-export const NAV_SURFACE_SHADOW_CLASS = "shadow-[0_2px_12px_rgba(0,0,0,0.07)]";
+export const NAV_SURFACE_SHADOW_CLASS = "shadow-[0_2px_18px_rgba(0,0,0,0.06)]";
 
 /** Slightly stronger elevation when the header bar is visible after scroll-hide. */
 export const NAV_SURFACE_SHADOW_VISIBLE_CLASS =
-  "shadow-[0_3px_16px_rgba(0,0,0,0.09)]";
+  "shadow-[0_3px_24px_rgba(0,0,0,0.07)]";
 
 function ChevronDownIcon({ className }: { className?: string }) {
   return (

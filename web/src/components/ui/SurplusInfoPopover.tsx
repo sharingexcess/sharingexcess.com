@@ -20,8 +20,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-export const SURPLUS_LANDING_VIDEO_SRC =
-  "https://surplus.sharingexcess.com/landing/landing_video.mp4";
+export const SURPLUS_LANDING_VIDEO_SRC = "/videos/Surplus-intro.mp4";
 
 export const SURPLUS_LANDING_URL = "https://surplus.sharingexcess.com/";
 

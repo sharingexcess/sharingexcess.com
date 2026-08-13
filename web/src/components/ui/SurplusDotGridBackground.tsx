@@ -1,5 +1,6 @@
 import { cn } from "@/lib/cn";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useLenis } from "@/components/providers/SmoothScrollProvider";
+import { useLayoutEffect, useRef } from "react";
 import { SurplusDotGridEngine } from "./surplusDotGrid";
 
 export interface SurplusDotGridBackgroundProps {
@@ -9,6 +10,7 @@ export interface SurplusDotGridBackgroundProps {
 export function SurplusDotGridBackground({ className }: SurplusDotGridBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const lenis = useLenis();
 
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
@@ -21,7 +23,6 @@ export function SurplusDotGridBackground({ className }: SurplusDotGridBackground
     const engine = new SurplusDotGridEngine();
     let raf = 0;
     let running = false;
-    let isVisible = true;
     let logicalWidth = 0;
     let logicalHeight = 0;
 
@@ -44,12 +45,14 @@ export function SurplusDotGridBackground({ className }: SurplusDotGridBackground
 
     const frame = (now: number) => {
       if (!running) return;
-      engine.draw(ctx, logicalWidth, logicalHeight, now);
+      if (logicalWidth > 0 && logicalHeight > 0) {
+        engine.draw(ctx, logicalWidth, logicalHeight, now);
+      }
       raf = requestAnimationFrame(frame);
     };
 
     const start = () => {
-      if (running || !isVisible) return;
+      if (running) return;
       running = true;
       raf = requestAnimationFrame(frame);
     };
@@ -59,16 +62,6 @@ export function SurplusDotGridBackground({ className }: SurplusDotGridBackground
       cancelAnimationFrame(raf);
     };
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        isVisible = entry?.isIntersecting ?? true;
-        if (isVisible) start();
-        else stop();
-      },
-      { threshold: 0 },
-    );
-    observer.observe(container);
-
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
     resize();
@@ -76,18 +69,31 @@ export function SurplusDotGridBackground({ className }: SurplusDotGridBackground
     start();
 
     const onVisibilityChange = () => {
-      if (document.visibilityState === "visible" && isVisible) start();
+      if (document.visibilityState === "visible") start();
       else stop();
     };
     document.addEventListener("visibilitychange", onVisibilityChange);
 
+    const onScroll = () => {
+      if (logicalWidth <= 0 || logicalHeight <= 0) resize();
+    };
+    if (lenis) {
+      lenis.on("scroll", onScroll);
+    } else {
+      window.addEventListener("scroll", onScroll, { passive: true });
+    }
+
     return () => {
       stop();
-      observer.disconnect();
       resizeObserver.disconnect();
       document.removeEventListener("visibilitychange", onVisibilityChange);
+      if (lenis) {
+        lenis.off("scroll", onScroll);
+      } else {
+        window.removeEventListener("scroll", onScroll);
+      }
     };
-  }, []);
+  }, [lenis]);
 
   return (
     <div
