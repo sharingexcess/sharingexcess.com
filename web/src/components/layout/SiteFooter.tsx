@@ -144,14 +144,14 @@ export const FOOTER_NAV_SECTIONS: FooterNavSection[] = [
     title: "Get Food",
     links: [
       { label: "Find Food", href: "/find-food" },
-      { label: "For Community Organizations", href: "/get-involved/partners#community-orgs" },
+      { label: "For Community Organizations", href: "/get-involved/partner#community-orgs" },
     ],
   },
   {
     title: "Get Involved",
     links: [
       { label: "Donate Food", href: "/donate-food" },
-      { label: "For Foundations", href: "/get-involved/partners#foundations" },
+      { label: "For Foundations", href: "/get-involved/partner#foundations" },
       { label: "Give Monthly", href: "/collective" },
       { label: "Volunteer", href: "/get-involved/volunteer" },
       { label: "Fundraise", href: "/get-involved/fundraise" },

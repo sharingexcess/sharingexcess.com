@@ -85,9 +85,9 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
     label: "Get Involved",
     href: "/get-involved",
     children: [
-      { label: "For Food Businesses", href: "/get-involved/partners#food-business" },
-      { label: "For Community Organizations", href: "/get-involved/partners#community-orgs" },
-      { label: "For Foundations", href: "/get-involved/partners#foundations" },
+      { label: "For Food Businesses", href: "/get-involved/partner#food-business" },
+      { label: "For Community Organizations", href: "/get-involved/partner#community-orgs" },
+      { label: "For Foundations", href: "/get-involved/partner#foundations" },
       { label: "Give Monthly", href: "/collective" },
       { label: "Volunteer", href: "/get-involved/volunteer" },
     ],
