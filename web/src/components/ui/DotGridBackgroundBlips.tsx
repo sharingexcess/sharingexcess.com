@@ -10,6 +10,8 @@ export interface DotGridEdgeShimmerProps {
   className?: string;
   active?: boolean;
   archTop?: boolean;
+  /** Fade in/out based on scroll position — off for sections that should always show shimmer */
+  scrollReveal?: boolean;
   /** Section content — static oval is sized around this bounds */
   contentMaskRef?: RefObject<HTMLElement | null>;
 }
@@ -41,6 +43,7 @@ export function DotGridEdgeShimmer({
   className,
   active = true,
   archTop = false,
+  scrollReveal = true,
   contentMaskRef,
 }: DotGridEdgeShimmerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -90,6 +93,10 @@ export function DotGridEdgeShimmer({
     };
 
     const updateReveal = () => {
+      if (!scrollReveal) {
+        reveal = 1;
+        return;
+      }
       const section = overlay.closest("section");
       if (!section) {
         reveal = 1;
@@ -194,12 +201,14 @@ export function DotGridEdgeShimmer({
 
     resize();
 
-    if (lenis) {
-      lenis.on("scroll", onScroll);
-    } else {
-      window.addEventListener("scroll", onScroll, { passive: true });
+    if (scrollReveal) {
+      if (lenis) {
+        lenis.on("scroll", onScroll);
+      } else {
+        window.addEventListener("scroll", onScroll, { passive: true });
+      }
+      window.addEventListener("resize", onScroll);
     }
-    window.addEventListener("resize", onScroll);
 
     const io = new IntersectionObserver(
       ([entry]) => {
@@ -223,15 +232,17 @@ export function DotGridEdgeShimmer({
       stopLoop();
       ro.disconnect();
       io.disconnect();
-      if (lenis) {
-        lenis.off("scroll", onScroll);
-      } else {
-        window.removeEventListener("scroll", onScroll);
+      if (scrollReveal) {
+        if (lenis) {
+          lenis.off("scroll", onScroll);
+        } else {
+          window.removeEventListener("scroll", onScroll);
+        }
+        window.removeEventListener("resize", onScroll);
       }
-      window.removeEventListener("resize", onScroll);
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, [archTop, lenis, reduceMotion]);
+  }, [archTop, lenis, reduceMotion, scrollReveal]);
 
   if (reduceMotion) return null;
 

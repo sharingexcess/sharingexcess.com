@@ -47,6 +47,16 @@ export const ImageLeft: Story = {
   args: { imagePosition: "left", imageStyle: "square" },
 };
 
+export const DotShimmer: Story = {
+  args: {
+    theme: "dark",
+    dotShimmer: true,
+    imagePosition: "right",
+    imageStyle: "square",
+    showButtons: true,
+  },
+};
+
 export const ImageLeftVideo: Story = {
   args: {
     imagePosition: "left",

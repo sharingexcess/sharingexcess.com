@@ -33,6 +33,7 @@ export interface ButtonProps {
   /** Optional content rendered before the label — excluded from sliding label animation */
   leading?: React.ReactNode;
   href?: string;
+  target?: React.HTMLAttributeAnchorTarget;
   className?: string;
   type?: "button" | "submit";
   disabled?: boolean;
@@ -476,6 +477,7 @@ export function Button({
   wrapLabel,
   leading,
   href,
+  target,
   className,
   type = "button",
   disabled,
@@ -625,7 +627,14 @@ export function Button({
 
   if (href) {
     return (
-      <a href={href} role={role} onClick={onClick} className={classes}>
+      <a
+        href={href}
+        target={target}
+        rel={target === "_blank" ? "noopener noreferrer" : undefined}
+        role={role}
+        onClick={onClick}
+        className={classes}
+      >
         {content}
       </a>
     );

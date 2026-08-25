@@ -1,7 +1,51 @@
 ---
 import PageLayout from "@/layouts/PageLayout.astro";
 import HeroSection from "@/sections/HeroSection";
+import StackingCardsSection from "@/sections/StackingCardsSection";
 import TextImageSection from "@/sections/TextImageSection";
+
+const volunteerOpportunities = [
+  {
+    title: "Food Rescue",
+    body: "Pick up food donations from retailers, restaurants, and grocery stores. Our mobile app guides you from pickup to delivery as you collect, weigh, and transport food to nearby hunger relief organizations. Flexible and great for individuals with their own vehicle.",
+    imageSrc: "/images/Screen-Shot-2023-07-12-at-3.15.20-PM_1.avif",
+    imageAlt: "",
+    primaryCta: "Sign Up",
+    primaryCtaHref: "https://sharingexcess.vomo.org/org/sharing-excess",
+  },
+  {
+    title: "PA Produce Gleaning",
+    body: "Sort produce donations at the Philadelphia Wholesale Produce Market. Sharing Excess has rescued more than 20 million pounds of fresh produce from PWPM vendors, helping local food banks reach communities across the city. Great for individuals, teams, companies, and volunteer days!",
+    imageSrc: "/images/Screen-Shot-2023-07-12-at-3.16.37-PM_1.avif",
+    imageAlt: "",
+    primaryCta: "Sign Up",
+    primaryCtaHref: "https://sharingexcess.vomo.org/initiative/produce-sorting",
+  },
+  {
+    title: "NYC Produce Gleaning",
+    body: "Join us at the Hunts Point Produce Market in The Bronx to sort donated produce, repackage what's edible, and get it to community partners. Your help provides direct, equitable access to free, fresh produce for underserved New Yorkers. Perfect for individuals, teams, companies, and volunteer days!",
+    imageSrc: "/images/unnamed_1.avif",
+    imageAlt: "",
+    primaryCta: "Sign Up",
+    primaryCtaHref: "https://sharingexcess.vomo.org/opportunity/huntspoint",
+  },
+  {
+    title: "Pop-Up Distribution",
+    body: "Bringing free food to a neighborhood near you. Experience our iconic pop-up distributions, full of great food, good vibes, and music. Bring your friends and join the movement, perfect for groups and individuals alike.",
+    imageSrc: "/images/__DSC_0380-5_1.avif",
+    imageAlt: "",
+    primaryCta: "Sign Up",
+    primaryCtaHref: "https://sharingexcess.vomo.org/opportunity/west-philly-pop-up-food-distribution",
+  },
+  {
+    title: "Sharehouse Saturdays",
+    body: "Located in West Philly, the Sharehouse is our hub for weekend distributions. Join us packing home deliveries, moving pallets, and loading up partners for pickup. Great for individuals and small groups!",
+    imageSrc: "/images/Screen-Shot-2023-07-12-at-3.25.36-PM_1.avif",
+    imageAlt: "",
+    primaryCta: "Sign Up",
+    primaryCtaHref: "https://sharingexcess.vomo.org/opportunity/packing-and-loading-at-the-sharehouse",
+  },
+];
 ---
 
 <PageLayout
@@ -11,85 +55,49 @@ import TextImageSection from "@/sections/TextImageSection";
   <HeroSection client:visible
     layout="stack-left"
     theme="light"
-    title="Volunteer"
-    imageSrc="/images/volunteer.jpg"
+    eyebrow="Volunteer"
+    title="Our passionate *volunteers* make our mission possible."
+    imageSrc="/images/freefood-volunteer.jpg"
     imageAlt=""
+    imageObjectPosition="top"
+    imageAspect="2047 / 1365"
+    sticker={true}
+    className="!bg-se-green-100 [--section-text:var(--color-kale)] [--section-emphasis:var(--color-se-green-base)]"
   />
 
   <TextImageSection client:visible
     theme="dark"
-    title="Our passionate volunteers make our mission possible."
+    dotShimmer
     headingSize="h2"
-    body="Sharing Excess is fueled by hundreds of loving people that are dedicated to bridging the gap between food excess and scarcity. Whether you're driving, distributing food at pop-up events, or sorting produce donations, you'll make a meaningful impact while having fun. Join us and be a part of the food rescue solution today!"
+    title="Powered by People"
+    body="Sharing Excess runs on hundreds of dedicated volunteers bridging the gap between food excess and scarcity. Whether you're driving, distributing at pop-ups, or sorting donations, you'll make a real impact while having fun. Join us and be part of the solution today!"
     imageSrc="/images/20230407_PWPM_215.avif"
     imageAlt=""
     imagePosition="right"
     imageStyle="square"
     primaryCta="Sign Up to Volunteer"
     primaryCtaHref="https://sharingexcess.vomo.org/org/sharing-excess"
+    primaryCtaTarget="_blank"
+  />
+
+  <StackingCardsSection client:visible
+    theme="light"
+    heading="Available Opportunities"
+    items={volunteerOpportunities}
   />
 
   <TextImageSection client:visible
-    theme="light"
-    layout="three-image-caption"
+    theme="dark"
+    className="!bg-kale"
+    eyebrow="Have a skill that you think can help our mission?"
     headingSize="h2"
-    title="Available Opportunities"
-    body="Whether you're driving, distributing food at pop-up events, or sorting produce donations, there's a role for you."
-    images={[
-      {
-        src: "/images/Screen-Shot-2023-07-12-at-3.15.20-PM_1.avif",
-        alt: "",
-        title: "Food Rescue",
-        body: "Pick up food donations from retailers, restaurants, and grocery stores. Our mobile app will guide you from pickup to delivery. Flexible and great for individuals looking to support with their own vehicle when they can.",
-      },
-      {
-        src: "/images/Screen-Shot-2023-07-12-at-3.16.37-PM_1.avif",
-        alt: "",
-        title: "Philadelphia: Produce Gleaning",
-        body: "Sort produce donations at the Philadelphia Wholesale Produce Market. Help our team sort through boxes of produce so that local food banks and organizations can get the freshest possible produce to communities in need.",
-      },
-      {
-        src: "/images/unnamed_1.avif",
-        alt: "",
-        title: "New York: Produce Gleaning",
-        body: "Join us on-site at the Hunts Point Produce Market in The Bronx to help sort through donated produce. Your help will make a direct impact in providing equitable access to free, fresh produce for underserved communities in New York City.",
-      },
-    ]}
-    primaryCta="Sign Up"
-    primaryCtaHref="https://sharingexcess.vomo.org/org/sharing-excess"
-    secondaryCta="Philadelphia gleaning"
-    secondaryCtaHref="https://sharingexcess.vomo.org/initiative/produce-sorting"
-  />
-
-  <TextImageSection client:visible
-    theme="light"
-    layout="three-image-caption"
-    headingSize="h2"
-    title="More ways to help"
-    body="Pop-up distributions, weekend packing at the Sharehouse, and pro-bono skills are all ways to get involved."
-    images={[
-      {
-        src: "/images/__DSC_0380-5_1.avif",
-        alt: "",
-        title: "Pop-Up Distribution",
-        body: "Experience the magic of our iconic pop-up food distributions happening at various locations across the city. Bring your friends, wave a sign, and join the movement to Free Food!",
-      },
-      {
-        src: "/images/Screen-Shot-2023-07-12-at-3.25.36-PM_1.avif",
-        alt: "",
-        title: "Saturdays at the Sharehouse",
-        body: "Located in the heart of West Philly at 5109 Warren Street, the Sharehouse has been a central place for dozens of community organizations to pick up food for their Saturday distributions across the city.",
-      },
-      {
-        src: "/images/Screen-Shot-2023-07-12-at-3.28.30-PM_1.avif",
-        alt: "",
-        title: "Share your talent",
-        body: "From graphic design to event planning, marketing to photography — your talents can help us amplify our mission and make a real difference in the fight against food waste and hunger.",
-      },
-    ]}
-    primaryCta="Pop-up sign up"
-    primaryCtaHref="https://sharingexcess.vomo.org/opportunity/west-philly-pop-up-food-distribution"
-    secondaryCta="Reach out"
-    secondaryCtaHref="/contact"
+    title="Share your *talent*"
+    body="From graphic design to event planning, marketing to photography, outreach to fundraising, your talents can help us amplify our mission and make a real difference in the fight against food waste and hunger. Volunteer your talent and let your skills shine for a cause that truly matters. Let us know how you can help, or ask us what areas we could use help in!"
+    imageSrc="/images/Screen-Shot-2023-07-12-at-3.28.30-PM_1.avif"
+    imageAlt=""
+    imagePosition="left"
+    imageStyle="square"
+    primaryCta="Reach Out"
+    primaryCtaHref="/contact"
   />
 </PageLayout>

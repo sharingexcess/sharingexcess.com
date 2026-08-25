@@ -29,6 +29,10 @@ export interface DonationFormProps {
   eyebrow?: string;
   /** Hide the built-in hero card heading — use when the parent section supplies title/body */
   hideHeader?: boolean;
+  /** Replace the default hero card heading */
+  headerTitle?: string;
+  /** Hide the dynamic dollar-to-meals impact line */
+  hideMealsImpact?: boolean;
   /** Compact intro widget — narrow card, single amount row, dynamic submit label */
   compact?: boolean;
   /** Hero card surface — dark: kale / brand-green; light: white / green-100 */
@@ -521,6 +525,8 @@ function HeroDonationForm({
   defaultAmount = 20,
   eyebrow,
   hideHeader = false,
+  headerTitle,
+  hideMealsImpact = false,
   compact = false,
   embedded = false,
   formCard = "brand-green",
@@ -533,6 +539,8 @@ function HeroDonationForm({
   | "defaultAmount"
   | "eyebrow"
   | "hideHeader"
+  | "headerTitle"
+  | "hideMealsImpact"
   | "compact"
   | "embedded"
   | "formCard"
@@ -589,26 +597,33 @@ function HeroDonationForm({
             )}
             <h3
               className={cn(
-                "w-full min-w-0 font-sans text-[clamp(1.25rem,4vw,1.75rem)] font-medium leading-[1.2] tracking-[-0.03em] lg:text-[1.75rem] lg:whitespace-nowrap",
+                "w-full min-w-0 font-sans text-[clamp(1.25rem,4vw,1.75rem)] font-medium leading-[1.2] tracking-[-0.03em] lg:text-[1.75rem]",
+                !headerTitle && "lg:whitespace-nowrap",
                 isDarkFormCard ? "text-white" : "text-kale",
               )}
             >
-              The food is donated;{" "}
-              <em className={cn("not-italic", headerEmphasisClass)}>your gift moves it.</em>
-            </h3>
-            <p
-              aria-live="polite"
-              className={cn(
-                "text-base font-medium leading-snug",
-                isDarkFormCard ? "text-white/85" : "text-kale/80",
+              {headerTitle ?? (
+                <>
+                  The food is donated;{" "}
+                  <em className={cn("not-italic", headerEmphasisClass)}>your gift moves it.</em>
+                </>
               )}
-            >
-              {formatDollarAmount(selectedAmount)} ={" "}
-              <span className={cn("font-semibold", headerEmphasisClass)}>
-                {formatLargeNumber(selectedMeals)} meals
-              </span>
-              .
-            </p>
+            </h3>
+            {!hideMealsImpact && (
+              <p
+                aria-live="polite"
+                className={cn(
+                  "text-base font-medium leading-snug",
+                  isDarkFormCard ? "text-white/85" : "text-kale/80",
+                )}
+              >
+                {formatDollarAmount(selectedAmount)} ={" "}
+                <span className={cn("font-semibold", headerEmphasisClass)}>
+                  {formatLargeNumber(selectedMeals)} meals
+                </span>
+                .
+              </p>
+            )}
           </div>
         )}
 
@@ -717,7 +732,7 @@ function HeroDonationForm({
           </div>
         )}
 
-        {compact && (
+        {compact && !hideMealsImpact && (
           <p
             aria-live="polite"
             className="text-center text-base font-medium leading-snug text-kale lg:text-lg"

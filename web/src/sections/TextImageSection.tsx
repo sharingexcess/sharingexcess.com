@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/Button";
+import { DotGridEdgeShimmer } from "@/components/ui/DotGridBackgroundBlips";
 import { ParallaxBackground, ParallaxCover } from "@/components/ui/ParallaxBackground";
 import { DonationForm } from "@/components/donation/DonationForm";
 import {
@@ -13,10 +14,11 @@ import { VideoPlaceholder } from "@/components/ui/VideoPlaceholder";
 import { ScrollAutoplayVideo } from "@/components/ui/ScrollAutoplayVideo";
 import { cn } from "@/lib/cn";
 import type { ImageFit, ImagePosition, ImageStyle, SectionContentProps } from "@/lib/types";
+import { bodyLgClassName, bodyXlClassName } from "@/lib/typography";
 import { isEmbeddableVideo } from "@/lib/toVideoEmbedSrc";
 import { useRef, type ComponentProps, type CSSProperties, type ReactNode } from "react";
 import { RoundBleedLayout } from "./RoundBleedLayout";
-import { SectionShell } from "./SectionShell";
+import { SectionShell, type SectionShellProps } from "./SectionShell";
 import { SectionLayout } from "./SectionLayout";
 import {
   coerceSectionCardColor,
@@ -57,6 +59,8 @@ export interface TextImageSectionProps extends Omit<SectionContentProps, "body">
   body: string;
   /** Reserve space below for an arch transition on the next section */
   archBottom?: boolean;
+  /** Halftone dot shimmer around section content — matches Testimonials */
+  dotShimmer?: boolean;
   /** Rounded top edge for parallax handoff over a pinned hero */
   roundedTop?: boolean;
   /** Only applies to `layout="horizontal"` */
@@ -65,29 +69,66 @@ export interface TextImageSectionProps extends Omit<SectionContentProps, "body">
   imageStyle?: ImageStyle;
   /** Only applies to `layout="horizontal"` with `imageStyle="square"` or `imageStyle="video"` */
   imageFit?: ImageFit;
+  /** CSS object-position for horizontal layout image framing */
+  imageObjectPosition?: string;
   /** Overlap a brand sticker on the top-left of the image. */
   sticker?: boolean;
   /** Which sticker to show when `sticker` is true. Defaults to `free-food`. */
   stickerName?: StickerName;
   /** Used with "three-image-caption" and "three-image-stat" layouts */
   images?: ThreeImageItem[];
+  /** Caption copy size under each image in caption grid layouts */
+  imageCaptionSize?: "md" | "lg" | "xl";
   /** Embed hero donation form below body copy instead of text CTAs */
   donationForm?: boolean;
   /** Autoplay mp4 when scrolled into view; poster stays until playback starts */
   videoPlayInView?: boolean;
+  primaryCtaTarget?: React.HTMLAttributeAnchorTarget;
+  secondaryCtaTarget?: React.HTMLAttributeAnchorTarget;
 }
 
 /** Wider gap when multi-card grids stack in a single column on mobile */
 const STACKED_CARD_GRID_GAP = "gap-12 sm:gap-6";
 
+const imageCaptionBodyClassNames = {
+  md: "text-base leading-[1.4]",
+  lg: bodyLgClassName,
+  xl: bodyXlClassName,
+} as const;
+
+function TextImageSectionShell({
+  dotShimmer = false,
+  className,
+  children,
+  ...props
+}: SectionShellProps & { dotShimmer?: boolean }) {
+  const contentMaskRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <SectionShell
+      {...props}
+      background={
+        dotShimmer ? (
+          <DotGridEdgeShimmer scrollReveal={false} contentMaskRef={contentMaskRef} />
+        ) : undefined
+      }
+      className={cn(dotShimmer && "overflow-visible", className)}
+    >
+      {dotShimmer ? <div ref={contentMaskRef}>{children}</div> : children}
+    </SectionShell>
+  );
+}
+
 function ImageCaptionCard({
   img,
   imageRadius,
   buttonScheme,
+  captionSize = "md",
 }: {
   img: ThreeImageItem;
   imageRadius: string;
   buttonScheme: "light" | "dark";
+  captionSize?: keyof typeof imageCaptionBodyClassNames;
 }) {
   return (
     <div className="flex flex-col gap-3 lg:gap-5">
@@ -104,7 +145,7 @@ function ImageCaptionCard({
                 </p>
               )}
               {img.body && (
-                <p className="text-base leading-[1.4] text-[var(--section-text)]">
+                <p className={cn(imageCaptionBodyClassNames[captionSize], "text-[var(--section-text)]")}>
                   {img.body}
                 </p>
               )}
@@ -132,8 +173,10 @@ function TextImageFullImageLayout({
   bodySize,
   primaryCta,
   primaryCtaHref,
+  primaryCtaTarget,
   secondaryCta,
   secondaryCtaHref,
+  secondaryCtaTarget,
 }: Pick<
   TextImageSectionProps,
   | "className"
@@ -146,8 +189,10 @@ function TextImageFullImageLayout({
   | "bodySize"
   | "primaryCta"
   | "primaryCtaHref"
+  | "primaryCtaTarget"
   | "secondaryCta"
   | "secondaryCtaHref"
+  | "secondaryCtaTarget"
 >) {
   const scrollRef = useRef<HTMLElement>(null);
 
@@ -184,8 +229,10 @@ function TextImageFullImageLayout({
               bodySize={bodySize}
               primaryCta={primaryCta}
               primaryCtaHref={primaryCtaHref}
+              primaryCtaTarget={primaryCtaTarget}
               secondaryCta={secondaryCta}
               secondaryCtaHref={secondaryCtaHref}
+              secondaryCtaTarget={secondaryCtaTarget}
               buttonScheme="dark"
               className="relative w-full max-w-full lg:max-w-[60%]"
             />
@@ -208,17 +255,21 @@ export function TextImageSection({
   eyebrow,
   primaryCta,
   primaryCtaHref,
+  primaryCtaTarget,
   secondaryCta,
   secondaryCtaHref,
+  secondaryCtaTarget,
   imageSrc,
   imageAlt = "",
   videoSrc,
   imagePosition = "right",
   imageStyle = "square",
   imageFit = "cover",
+  imageObjectPosition = "center",
   sticker = false,
   stickerName = "free-food",
   images = [],
+  imageCaptionSize = "md",
   className,
   id,
   flushTop = false,
@@ -226,6 +277,7 @@ export function TextImageSection({
   transparentBg = false,
   archBottom = false,
   roundedTop = false,
+  dotShimmer = false,
   donationForm = false,
   videoPlayInView = false,
 }: TextImageSectionProps) {
@@ -245,8 +297,10 @@ export function TextImageSection({
       bodySize={bodySize}
       primaryCta={donationForm ? undefined : primaryCta}
       primaryCtaHref={primaryCtaHref}
+      primaryCtaTarget={primaryCtaTarget}
       secondaryCta={donationForm ? undefined : secondaryCta}
       secondaryCtaHref={secondaryCtaHref}
+      secondaryCtaTarget={secondaryCtaTarget}
       bodyFooter={
         donationForm ? (
           <DonationForm variant="hero" hideHeader sectionTheme={theme} />
@@ -276,6 +330,7 @@ export function TextImageSection({
       <img
         src={imageSrc}
         alt={imageAlt}
+        style={{ objectPosition: imageObjectPosition }}
         className={cn(
           "w-full",
           isPhotoFit ? "h-full object-cover" : "h-auto object-contain",
@@ -297,7 +352,7 @@ export function TextImageSection({
       const resolvedColor = coerceSectionCardColor(theme, cardColor);
       const interiorTheme = getSectionCardInteriorTheme(resolvedColor, theme);
       return (
-        <SectionShell theme={theme} className={className} roundImageSection {...shellProps}>
+        <TextImageSectionShell theme={theme} className={className} roundImageSection dotShimmer={dotShimmer} {...shellProps}>
           <div
             data-section-card
             data-theme={interiorTheme}
@@ -310,11 +365,11 @@ export function TextImageSection({
           >
             {roundBody}
           </div>
-        </SectionShell>
+        </TextImageSectionShell>
       );
     }
 
-    return <SectionShell theme={theme} className={className} roundImageSection {...shellProps}>{roundBody}</SectionShell>;
+    return <TextImageSectionShell theme={theme} className={className} roundImageSection dotShimmer={dotShimmer} {...shellProps}>{roundBody}</TextImageSectionShell>;
   }
 
   if (layout === "full-image") {
@@ -408,9 +463,10 @@ export function TextImageSection({
         : wrapWithSticker(stackMediaSlot, "top-center");
 
     return (
-      <SectionShell
+      <TextImageSectionShell
         theme={theme}
         className={cn(sticker && !roundedTop && "overflow-visible", className)}
+        dotShimmer={dotShimmer}
         {...shellProps}
       >
         <SectionLayout
@@ -422,13 +478,13 @@ export function TextImageSection({
           textSlot={makeTextSection({ layout: "horizontal" })}
           contentSlot={contentSlot}
         />
-      </SectionShell>
+      </TextImageSectionShell>
     );
   }
 
   if (layout === "stack-centered") {
     return (
-      <SectionShell theme={theme} className={className} {...shellProps}>
+      <TextImageSectionShell theme={theme} className={className} dotShimmer={dotShimmer} {...shellProps}>
         <SectionLayout
           layout="vertical"
           isCard={isCard}
@@ -439,13 +495,13 @@ export function TextImageSection({
           textSlot={makeTextSection({ align: "center" })}
           contentSlot={stackMediaSlot}
         />
-      </SectionShell>
+      </TextImageSectionShell>
     );
   }
 
   if (layout === "three-image-caption") {
     return (
-      <SectionShell theme={theme} className={className} {...shellProps}>
+      <TextImageSectionShell theme={theme} className={className} dotShimmer={dotShimmer} {...shellProps}>
         <SectionLayout
           layout="vertical"
           isCard={isCard}
@@ -461,18 +517,19 @@ export function TextImageSection({
                   img={img}
                   imageRadius={imageRadius}
                   buttonScheme={isDark ? "dark" : "light"}
+                  captionSize={imageCaptionSize}
                 />
               ))}
             </div>
           }
         />
-      </SectionShell>
+      </TextImageSectionShell>
     );
   }
 
   if (layout === "three-image-stat") {
     return (
-      <SectionShell theme={theme} className={className} {...shellProps}>
+      <TextImageSectionShell theme={theme} className={className} dotShimmer={dotShimmer} {...shellProps}>
         <SectionLayout
           layout="vertical"
           isCard={isCard}
@@ -518,13 +575,13 @@ export function TextImageSection({
             </div>
           }
         />
-      </SectionShell>
+      </TextImageSectionShell>
     );
   }
 
   if (layout === "four-image-caption") {
     return (
-      <SectionShell theme={theme} className={className} {...shellProps}>
+      <TextImageSectionShell theme={theme} className={className} dotShimmer={dotShimmer} {...shellProps}>
         <SectionLayout
           layout="vertical"
           isCard={isCard}
@@ -540,18 +597,19 @@ export function TextImageSection({
                   img={img}
                   imageRadius={imageRadius}
                   buttonScheme={isDark ? "dark" : "light"}
+                  captionSize={imageCaptionSize}
                 />
               ))}
             </div>
           }
         />
-      </SectionShell>
+      </TextImageSectionShell>
     );
   }
 
   if (layout === "four-image-stat") {
     return (
-      <SectionShell theme={theme} className={className} {...shellProps}>
+      <TextImageSectionShell theme={theme} className={className} dotShimmer={dotShimmer} {...shellProps}>
         <SectionLayout
           layout="vertical"
           isCard={isCard}
@@ -597,7 +655,7 @@ export function TextImageSection({
             </div>
           }
         />
-      </SectionShell>
+      </TextImageSectionShell>
     );
   }
 
@@ -606,9 +664,10 @@ export function TextImageSection({
   const imageSlot = wrapWithSticker(squareSlot);
 
   return (
-    <SectionShell
+    <TextImageSectionShell
       theme={theme}
       className={cn(sticker && !roundedTop && "overflow-visible", className)}
+      dotShimmer={dotShimmer}
       {...shellProps}
     >
       <SectionLayout
@@ -620,7 +679,7 @@ export function TextImageSection({
         textSlot={textSlot}
         contentSlot={sticker ? imageSlot : squareSlot}
       />
-    </SectionShell>
+    </TextImageSectionShell>
   );
 }
 

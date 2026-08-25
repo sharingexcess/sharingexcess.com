@@ -56,6 +56,10 @@ export interface HeroSectionProps extends SectionContentProps {
   sticker?: boolean;
   /** Which sticker to show when `sticker` is true. Defaults to `free-food`. */
   stickerName?: StickerName;
+  /** CSS object-position for subpage hero image framing */
+  imageObjectPosition?: string;
+  /** CSS aspect-ratio for the hero image frame — avoids cropping when set */
+  imageAspect?: string;
   /** @deprecated Hero donate form uses Give Now / Give Monthly — kept for Storybook controls */
   submitLabel?: string;
   /** Sticky scroll-driven fade on the home donate hero — disable for in-page donate sections */
@@ -80,7 +84,7 @@ const SUBPAGE_HERO_DONATE_FORM_MAX_WIDTH = "w-full max-w-[480px]";
 const SUBPAGE_HERO_DONATE_OVERLAP_CLASS =
   "pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center px-4 lg:px-8 translate-y-1/2";
 /** Reserve space below the image for the half of the form that sits on the section background */
-const SUBPAGE_HERO_DONATE_BLEED_CLASS = "h-[clamp(140px,18vh,220px)]";
+const SUBPAGE_HERO_DONATE_BLEED_CLASS = "h-[clamp(200px,28vh,360px)]";
 const SUBPAGE_HERO_CAPTION_CLASS =
   "flex flex-col gap-3 text-base leading-[1.4] text-white lg:gap-4 lg:text-[18px]";
 /** Intro-band donate form — compact donation widget */
@@ -307,6 +311,8 @@ function SubpageHeroImage({
   sticker,
   stickerName = "free-food",
   stickerAlign = "right",
+  objectPosition = "center",
+  imageAspect,
   isCard = false,
   className,
 }: {
@@ -317,22 +323,35 @@ function SubpageHeroImage({
   stickerName?: StickerName;
   /** Horizontal placement when `sticker` is true. Stack-centered heroes use `center`. */
   stickerAlign?: "right" | "center";
+  objectPosition?: string;
+  imageAspect?: string;
   isCard?: boolean;
   className?: string;
 }) {
   const scrollRef = useRef<HTMLElement>(null);
+  const isTopAligned = objectPosition.startsWith("top");
+  const parallaxTravel = imageAspect ? 0 : 20;
+  const parallaxRestOffset = isTopAligned && !imageAspect ? parallaxTravel / 2 : 0;
 
   return (
     <div className={cn("relative w-full", className)}>
       <figure
         ref={scrollRef}
+        style={imageAspect ? { aspectRatio: imageAspect } : undefined}
         className={cn(
           "relative w-full overflow-hidden",
           sectionMediaRadiusClass(isCard),
-          "h-[80vh]",
+          !imageAspect && "h-[80vh]",
         )}
       >
-        <ParallaxBackground scrollRef={scrollRef} src={src} alt={alt} />
+        <ParallaxBackground
+          scrollRef={scrollRef}
+          src={src}
+          alt={alt}
+          objectPosition={objectPosition}
+          travel={parallaxTravel}
+          restOffset={parallaxRestOffset}
+        />
         {caption && (
           <>
             <div
@@ -408,7 +427,10 @@ function SubpageHeroWithDonate({
           <div className={cn("pointer-events-auto", SUBPAGE_HERO_DONATE_FORM_MAX_WIDTH)}>
             <DonationForm
               variant="hero"
-              sectionTheme="dark"
+              formCard="white"
+              sectionTheme="light"
+              headerTitle="Just $20/month rescues enough food to feed an entire family for an entire year."
+              hideMealsImpact
               submitLabel={submitLabel}
               className="shadow-[0_8px_32px_rgba(0,0,0,0.24)]"
             />
@@ -1387,6 +1409,8 @@ export function HeroSection({
   imageCaption,
   sticker = false,
   stickerName = "free-food",
+  imageObjectPosition = "center",
+  imageAspect,
   primaryCta,
   primaryCtaHref = "#",
   secondaryCta,
@@ -1412,6 +1436,8 @@ export function HeroSection({
 
   const subpageShellClass =
     "pb-[48px] pt-[100px] lg:pb-[120px] lg:pt-[140px]";
+  const subpageDonateShellClass =
+    "pb-[72px] pt-[100px] lg:pb-[160px] lg:pt-[140px]";
   const stackContentGapClass = sticker
     ? "gap-12 lg:gap-24"
     : "gap-8 lg:gap-16";
@@ -1509,6 +1535,8 @@ export function HeroSection({
             caption={imageCaption}
             sticker={sticker}
             stickerName={stickerName}
+            objectPosition={imageObjectPosition}
+            imageAspect={imageAspect}
             isCard={isCard}
           />
         </div>
@@ -1553,6 +1581,8 @@ export function HeroSection({
             sticker={sticker}
             stickerName={stickerName}
             stickerAlign="center"
+            objectPosition={imageObjectPosition}
+            imageAspect={imageAspect}
             isCard={isCard}
           />
         </div>
@@ -1564,7 +1594,13 @@ export function HeroSection({
     return (
       <SectionShell
         theme={theme}
-        className={stackShellClass}
+        className={cn(
+          "px-0 py-0",
+          subpageDonateShellClass,
+          flushBottom && "pb-0 lg:pb-0",
+          sticker && "overflow-visible",
+          className,
+        )}
         contentClassName={cn(FIGMA_CONTENT_CLASS, FIGMA_INNER_PADDING)}
         id={id}
         flushTop={flushTop}

@@ -20,7 +20,7 @@ import { getSiteHeaderHeight } from "@/lib/roundSectionScroll";
 import { useInViewOnce } from "@/lib/useInViewOnce";
 import { sectionMediaRadiusClass } from "@/sections/sectionCardConfig";
 import type { ImagePosition } from "@/lib/types";
-import { bodyLgClassName, sectionH1ClassName, sectionH2ClassName } from "@/lib/typography";
+import { bodyLgClassName, eyebrowClassName, sectionH1ClassName, sectionH2ClassName, sectionH3ClassName } from "@/lib/typography";
 import {
   useCallback,
   useEffect,
@@ -128,6 +128,11 @@ function slideButtonStyle(index: number): CSSProperties {
   } as CSSProperties;
 }
 
+const carouselTitleClasses = {
+  h1: { active: sectionH1ClassName, inactive: sectionH2ClassName },
+  h2: { active: sectionH2ClassName, inactive: sectionH3ClassName },
+} as const;
+
 export interface TextImageItem {
   title: string;
   body?: string;
@@ -156,6 +161,8 @@ export interface TextImageProps {
   imageBleed?: boolean;
   /** Scroll track for bleed morph — pass the pinned section element */
   sectionRef?: RefObject<HTMLElement | null>;
+  /** Active slide title size — inactive titles are one step smaller */
+  titleSize?: "h1" | "h2";
   className?: string;
 }
 
@@ -445,6 +452,7 @@ export function TextImage({
   pinnedLayout = false,
   imageBleed = false,
   sectionRef,
+  titleSize = "h1",
   className,
 }: TextImageProps) {
   const listId = useId();
@@ -523,6 +531,7 @@ export function TextImage({
 
   const carouselLabel = eyebrow ?? "Featured stories";
   const showPauseControl = autoAdvance && !reduceMotion && items.length > 1;
+  const titleClasses = carouselTitleClasses[titleSize];
 
   const bleedLeft = imageBleed && imagePosition === "left";
   const bleedRight = imageBleed && imagePosition === "right";
@@ -581,7 +590,7 @@ export function TextImage({
                   >
                     <div className="flex flex-col gap-3">
                       <p
-                        className={sectionH1ClassName}
+                        className={titleClasses.active}
                         style={{ color: slideAccent(index).accentColor }}
                       >
                         {item.title}
@@ -632,7 +641,7 @@ export function TextImage({
                     exit={reduceMotion ? undefined : { opacity: 0 }}
                     transition={textImageTitleSpring}
                     className={cn(
-                      sectionH2ClassName,
+                      titleClasses.inactive,
                       "origin-left text-[var(--section-text)]",
                     )}
                   >
@@ -652,7 +661,7 @@ export function TextImage({
       {(eyebrow || showPauseControl) && (
         <div className="flex items-end justify-between gap-4">
           {eyebrow ? (
-            <p className="font-sans text-[24px] font-medium leading-[1.06] tracking-[-0.04em] text-[var(--section-text)]">
+            <p className={cn(eyebrowClassName, "text-[var(--section-text,#003619)]")}>
               {eyebrow}
             </p>
           ) : (

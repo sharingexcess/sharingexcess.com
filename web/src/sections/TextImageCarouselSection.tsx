@@ -32,6 +32,8 @@ export interface TextImageCarouselSectionProps extends SectionProps {
   archTop?: boolean;
   /** 50/50 split with image panel full-bleed to viewport edge */
   imageBleed?: boolean;
+  /** Active slide title size — inactive titles are one step smaller */
+  titleSize?: "h1" | "h2";
 }
 
 export function TextImageCarouselSection({
@@ -53,6 +55,7 @@ export function TextImageCarouselSection({
   transparentBg,
   archTop = false,
   imageBleed = false,
+  titleSize = "h1",
 }: TextImageCarouselSectionProps) {
   const trackRef = useRef<HTMLElement>(null);
   const lenis = useLenis();
@@ -86,6 +89,7 @@ export function TextImageCarouselSection({
       isCard={isCard}
       pinnedLayout={useScrollControl}
       imageBleed={imageBleed}
+      titleSize={titleSize}
       sectionRef={imageBleed && useScrollControl ? trackRef : undefined}
     />
   );

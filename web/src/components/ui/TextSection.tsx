@@ -41,6 +41,8 @@ function MetricNumber({
 
 /** Matches eyebrowClassName line box — keeps heading position when eyebrow is omitted */
 const EYEBROW_SLOT_MIN_HEIGHT_CLASS = "min-h-[calc(1.125rem*1.1)] lg:min-h-[calc(24px*1.1)]";
+/** Centered sections — body reads narrower than the headline (matches TextOnlySection) */
+const CENTERED_BODY_MAX_WIDTH_CLASS = "mx-auto w-full max-w-3xl";
 
 export interface TextSectionProps {
   eyebrow?: string;
@@ -68,8 +70,10 @@ export interface TextSectionProps {
   bodyEmphasisSize?: "xl" | "lg" | "md";
   primaryCta?: string;
   primaryCtaHref?: string;
+  primaryCtaTarget?: React.HTMLAttributeAnchorTarget;
   secondaryCta?: string;
   secondaryCtaHref?: string;
+  secondaryCtaTarget?: React.HTMLAttributeAnchorTarget;
   /**
    * Controls CTA button colors on the section surface.
    * "light" (default): primary + secondary (light tokens)
@@ -249,8 +253,10 @@ export function TextSection({
   bodyEmphasisSize,
   primaryCta,
   primaryCtaHref,
+  primaryCtaTarget,
   secondaryCta,
   secondaryCtaHref,
+  secondaryCtaTarget,
   buttonScheme = "light",
   layout = "vertical",
   align = "left",
@@ -345,6 +351,7 @@ export function TextSection({
           colorScheme={scheme}
           size={ctaSize}
           href={primaryCtaHref}
+          target={primaryCtaTarget}
           className={cn(
             ctaLayout === "row" && "min-w-0 flex-1 whitespace-nowrap",
             isCentered && ctaLayout !== "row" && "w-full sm:w-auto",
@@ -359,6 +366,7 @@ export function TextSection({
           colorScheme={scheme}
           size={ctaSize}
           href={secondaryCtaHref}
+          target={secondaryCtaTarget}
           className={cn(
             ctaLayout === "row" && "min-w-0 flex-1 whitespace-nowrap",
             isCentered && ctaLayout !== "row" && "w-full sm:w-auto",
@@ -400,8 +408,11 @@ export function TextSection({
             </div>
           )}
           <div className="flex w-full flex-col gap-4 lg:flex-1">
-            {body &&
-              renderBodyCopy({ body, bodyEmphasis, bodySize, bodyEmphasisSize, metric, emphasis })}
+            {body && (
+              <div className={cn(isCentered && CENTERED_BODY_MAX_WIDTH_CLASS)}>
+                {renderBodyCopy({ body, bodyEmphasis, bodySize, bodyEmphasisSize, metric, emphasis })}
+              </div>
+            )}
             {bodyFooter}
             {ctaRow}
           </div>
@@ -449,8 +460,11 @@ export function TextSection({
             {metricEquivalent}
           </div>
         )}
-        {body &&
-          renderBodyCopy({ body, bodyEmphasis, bodySize, bodyEmphasisSize, metric, emphasis })}
+        {body && (
+          <div className={cn(isCentered && CENTERED_BODY_MAX_WIDTH_CLASS)}>
+            {renderBodyCopy({ body, bodyEmphasis, bodySize, bodyEmphasisSize, metric, emphasis })}
+          </div>
+        )}
         {bodyFooter}
       </div>
       {ctaRow}

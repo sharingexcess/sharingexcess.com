@@ -459,7 +459,7 @@ export function StackingCardsSection({
   intro,
   items,
   scrollStepVh = DEFAULT_SCROLL_STEP_VH,
-  exitScrollVh = 0,
+  exitScrollVh = 50,
   transparentBg = false,
   className,
   id,
@@ -492,57 +492,62 @@ export function StackingCardsSection({
 
   return (
     <section
-      ref={trackRef}
       id={id}
       data-section=""
       data-theme={theme}
       className={cn(
         "relative overflow-visible text-[var(--section-text)]",
         transparentBg ? "bg-transparent" : "bg-[var(--section-bg)]",
+        "pt-12 pb-12 lg:pt-[var(--spacing-xxl)] lg:pb-[var(--spacing-xxl)]",
         className,
       )}
-      style={{ height: `${trackHeightVh}vh` }}
     >
-      {/* Sticky viewport — entry padding eases from 120px down to pt-10 across the lock point */}
-      <motion.div
-        className="sticky z-[1] flex flex-col px-4 pt-12 sm:px-6 lg:px-24 lg:pt-0"
-        style={{
-          top: 0,
-          height: "100svh",
-          ...(useAnimatedTopPadding ? { paddingTop: stickyPaddingTop } : {}),
-        }}
+      <div
+        ref={trackRef}
+        className="relative"
+        style={{ height: `${trackHeightVh}vh` }}
       >
-        {(heading || intro) && (
-          <TextSection
-            heading={heading}
-            body={intro}
-            headingSize="h2"
-            bodySize="xl"
-            layout="horizontal"
-            className="mb-6 shrink-0 sm:mb-8 lg:mb-14"
-          />
-        )}
-
-        {/* Card stack — no overflow or border-radius container; cards are plain absolute children */}
-        <div ref={stackRef} className="relative min-h-0 flex-1">
-          <span
-            ref={titleMeasurerRef}
-            aria-hidden
-            className="pointer-events-none invisible absolute whitespace-nowrap font-display text-[clamp(36px,12vw,112px)] font-bold leading-[1.0] tracking-[-0.05em]"
-          />
-          {items.map((item, index) => (
-            <StackingCard
-              key={`${item.title}-${index}`}
-              item={item}
-              index={index}
-              activeIndex={activeIndex}
-              reduceMotion={reduceMotion}
-              entryRevealed={entryRevealed}
-              titleSizePx={titleSizePx}
+        {/* Sticky viewport — entry padding eases from 120px down to pt-10 across the lock point */}
+        <motion.div
+          className="sticky z-[1] flex flex-col px-4 pt-12 sm:px-6 lg:px-24 lg:pt-0"
+          style={{
+            top: 0,
+            height: "100svh",
+            ...(useAnimatedTopPadding ? { paddingTop: stickyPaddingTop } : {}),
+          }}
+        >
+          {(heading || intro) && (
+            <TextSection
+              heading={heading}
+              body={intro}
+              headingSize="h2"
+              bodySize="xl"
+              layout="horizontal"
+              className="mb-6 shrink-0 sm:mb-8 lg:mb-14"
             />
-          ))}
-        </div>
-      </motion.div>
+          )}
+
+          {/* Card stack — no overflow or border-radius container; cards are plain absolute children */}
+          <div ref={stackRef} className="relative min-h-0 flex-1">
+            <span
+              ref={titleMeasurerRef}
+              aria-hidden
+              className="pointer-events-none invisible absolute whitespace-nowrap font-display text-[clamp(36px,12vw,112px)] font-bold leading-[1.0] tracking-[-0.05em]"
+            />
+            {items.map((item, index) => (
+              <StackingCard
+                key={`${item.title}-${index}`}
+                item={item}
+                index={index}
+                activeIndex={activeIndex}
+                reduceMotion={reduceMotion}
+                entryRevealed={entryRevealed}
+                titleSizePx={titleSizePx}
+              />
+            ))}
+          </div>
+        </motion.div>
+      </div>
     </section>
   );
 }
