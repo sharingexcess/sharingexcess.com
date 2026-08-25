@@ -1,0 +1,51 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import FormSection from "@/sections/FormSection";
+import HeroSection from "@/sections/HeroSection";
+import TextImageSection from "@/sections/TextImageSection";
+import TextOnlySection from "@/sections/TextOnlySection";
+---
+
+<PageLayout
+  title="Donate Food | Sharing Excess"
+  description="Donate surplus food from your business. Sharing Excess handles pickup, coordination, and receipts."
+>
+  <HeroSection client:visible
+    layout="stack-left"
+    theme="light"
+    title="Donate Food"
+    body="Do you have surplus food to donate?"
+    imageSrc="/images/donate_food.png"
+    imageAlt=""
+  />
+
+  <TextImageSection client:visible
+    theme="light"
+    title="We make donating surplus food ridiculously easy"
+    body="Whether you're looking to donate, partner, organize, or just learn more, we're looking forward to hearing from you! Sharing Excess provides transportation, coordination, donation receipts, and help accessing valuable tax benefits."
+    imageSrc="/images/Screen-Shot-2023-08-28-at-3.30.19-PM_1.avif"
+    imageAlt=""
+    imagePosition="right"
+    imageStyle="square"
+    primaryCta="Partner with us"
+    primaryCtaHref="/get-involved/partners#food-business"
+  />
+
+  <FormSection client:visible
+    variant="white"
+    layout="horizontal-card"
+    title="Business donation intake"
+    body="The legacy site includes a detailed food donation form on this page. Form integration will be wired during the next migration wave."
+  />
+
+  <TextOnlySection client:visible
+    theme="light"
+    align="center"
+    eyebrow="Additional Info"
+    headingSize="h2"
+    title="Contact details"
+    body="Email: info@sharingexcess.com · Mailing Address: 6700 Essington Avenue, Suite E207, Philadelphia, PA 19153 · Tax ID/EIN: 86-2161466"
+    primaryCta="Contact us"
+    primaryCtaHref="/contact"
+  />
+</PageLayout>

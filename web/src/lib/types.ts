@@ -89,5 +89,7 @@ export type HeroLayout =
   | "rounded-donate"
   | "stack-left"
   | "stack-centered"
+  /** Centered subpage hero with donation form overlapping the image bottom */
+  | "stack-centered-donate"
   /** Text-only placeholder during migration — no image */
   | "text";

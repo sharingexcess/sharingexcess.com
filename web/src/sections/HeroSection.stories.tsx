@@ -30,7 +30,7 @@ const meta = {
     ...sectionControlArgTypes,
     layout: {
       control: "radio",
-      options: ["full-width", "full-width-donate", "rounded", "rounded-donate", "stack-left", "stack-centered", "text"],
+      options: ["full-width", "full-width-donate", "rounded", "rounded-donate", "stack-left", "stack-centered", "stack-centered-donate", "text"],
     },
     isCard: { control: "boolean" },
     headingSize: { control: "radio", options: ["h1", "h2"] },
@@ -171,6 +171,28 @@ export const StackCentered: Story = {
   argTypes: {
     layout: { control: false },
     eyebrow: { control: false },
+  },
+};
+
+export const StackCenteredDonate: Story = {
+  args: {
+    layout: "stack-centered-donate",
+    theme: "dark",
+    title: subpageTitle,
+    body: subpageBody,
+    bodyEmphasis: "*Lorem ipsum dolor sit amet.*",
+    bodySize: "lg",
+    eyebrow: undefined,
+    showButtons: false,
+    sticker: false,
+    stickerName: "free-food",
+    submitLabel: "Primary CTA",
+  },
+  argTypes: {
+    layout: { control: false },
+    eyebrow: { control: false },
+    primaryCta: { control: false },
+    secondaryCta: { control: false },
   },
 };
 

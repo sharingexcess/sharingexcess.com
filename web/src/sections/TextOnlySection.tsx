@@ -8,6 +8,9 @@ import { sectionCardContentIsDark } from "./sectionCardConfig";
 export interface TextOnlySectionProps extends SectionContentProps {
   align?: "left" | "center";
   layout?: SectionLayoutType;
+  /** Bold emphasis line below body — e.g. a footnote */
+  bodyEmphasis?: string;
+  bodyEmphasisSize?: "xl" | "lg" | "md";
   /** Optional full-bleed background image behind the section */
   backgroundImageSrc?: string;
   backgroundImageAlt?: string;
@@ -22,6 +25,8 @@ export function TextOnlySection({
   title,
   headingSize = "h1",
   body,
+  bodyEmphasis,
+  bodyEmphasisSize,
   bodySize = "xl",
   primaryCta,
   primaryCtaHref,
@@ -43,6 +48,8 @@ export function TextOnlySection({
       heading={title}
       headingSize={headingSize}
       body={body}
+      bodyEmphasis={bodyEmphasis}
+      bodyEmphasisSize={bodyEmphasisSize}
       bodySize={bodySize}
       primaryCta={primaryCta}
       primaryCtaHref={primaryCtaHref}

@@ -39,8 +39,13 @@ function MetricNumber({
   );
 }
 
+/** Matches eyebrowClassName line box — keeps heading position when eyebrow is omitted */
+const EYEBROW_SLOT_MIN_HEIGHT_CLASS = "min-h-[calc(1.125rem*1.1)] lg:min-h-[calc(24px*1.1)]";
+
 export interface TextSectionProps {
   eyebrow?: string;
+  /** Reserve the eyebrow line box when `eyebrow` is omitted — subpage heroes */
+  reserveEyebrowSpace?: boolean;
   /** Pulsing kelly dot beside the eyebrow — use for live data labels */
   eyebrowLive?: boolean;
   /** Split eyebrow at "Surplus" — word + info icon open the product popover */
@@ -59,6 +64,8 @@ export interface TextSectionProps {
   /** Bold emphasis line rendered below body in the same paragraph block */
   bodyEmphasis?: string;
   bodySize?: "xl" | "lg" | "md";
+  /** Body size for `bodyEmphasis` when it should differ from `bodySize` */
+  bodyEmphasisSize?: "xl" | "lg" | "md";
   primaryCta?: string;
   primaryCtaHref?: string;
   secondaryCta?: string;
@@ -113,6 +120,7 @@ function renderBodyCopy({
   body,
   bodyEmphasis,
   bodySize,
+  bodyEmphasisSize,
   metric,
   emphasis = true,
   textClassName = "text-[var(--section-text,#003619)]",
@@ -120,30 +128,29 @@ function renderBodyCopy({
   body: string;
   bodyEmphasis?: string;
   bodySize: "xl" | "lg" | "md";
+  bodyEmphasisSize?: "xl" | "lg" | "md";
   metric?: string;
   emphasis?: boolean;
   textClassName?: string;
 }) {
-  const paragraphClassName = cn(
+  const bodyParagraphs = body.split("\n\n").filter((paragraph) => paragraph.trim());
+  const paragraphClassName = cn(bodyClasses[bodySize], textClassName);
+  const blockClassName = cn(
     metric ? "mt-0" : "mt-1 lg:mt-2",
-    bodyClasses[bodySize],
-    textClassName,
+    "flex flex-col gap-3 lg:gap-4",
   );
 
   if (bodyEmphasis) {
     return (
-      <div
-        className={cn(
-          metric ? "mt-0" : "mt-1 lg:mt-2",
-          "flex flex-col gap-3 lg:gap-4",
-        )}
-      >
-        <p className={cn(bodyClasses[bodySize], textClassName)}>
-          {parseEmphasis(body, emphasis, "paragraph")}
-        </p>
+      <div className={blockClassName}>
+        {bodyParagraphs.map((paragraph, index) => (
+          <p key={index} className={paragraphClassName}>
+            {parseEmphasis(paragraph, emphasis, "paragraph")}
+          </p>
+        ))}
         <p
           className={cn(
-            bodyClasses[bodySize],
+            bodyClasses[bodyEmphasisSize ?? bodySize],
             "font-bold text-[var(--section-emphasis)]",
           )}
         >
@@ -153,8 +160,20 @@ function renderBodyCopy({
     );
   }
 
+  if (bodyParagraphs.length > 1) {
+    return (
+      <div className={blockClassName}>
+        {bodyParagraphs.map((paragraph, index) => (
+          <p key={index} className={paragraphClassName}>
+            {parseEmphasis(paragraph, emphasis, "paragraph")}
+          </p>
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <p className={paragraphClassName}>
+    <p className={cn(metric ? "mt-0" : "mt-1 lg:mt-2", paragraphClassName)}>
       {parseEmphasis(body, emphasis, "paragraph")}
     </p>
   );
@@ -183,8 +202,38 @@ function EyebrowRow({
   );
 }
 
+function EyebrowSlot({
+  eyebrow,
+  reserveSpace,
+  live,
+  centered,
+  surplusInfo,
+}: {
+  eyebrow?: string;
+  reserveSpace?: boolean;
+  live?: boolean;
+  centered?: boolean;
+  surplusInfo?: boolean;
+}) {
+  if (!eyebrow && !reserveSpace) return null;
+
+  return (
+    <div className={cn(reserveSpace && EYEBROW_SLOT_MIN_HEIGHT_CLASS)}>
+      {eyebrow ? (
+        <EyebrowRow
+          eyebrow={eyebrow}
+          live={live}
+          centered={centered}
+          surplusInfo={surplusInfo}
+        />
+      ) : null}
+    </div>
+  );
+}
+
 export function TextSection({
   eyebrow,
+  reserveEyebrowSpace = false,
   eyebrowLive,
   eyebrowSurplusInfo,
   metric,
@@ -197,6 +246,7 @@ export function TextSection({
   body,
   bodyEmphasis,
   bodySize = "xl",
+  bodyEmphasisSize,
   primaryCta,
   primaryCtaHref,
   secondaryCta,
@@ -213,7 +263,7 @@ export function TextSection({
   ctaLayout = "responsive",
   ctaSize = "lg",
   headingClassName: headingClassNameOverride,
-  headingTextWrap = "pretty",
+  headingTextWrap = "balance",
   className,
 }: TextSectionProps) {
   const isCentered = align === "center";
@@ -252,7 +302,11 @@ export function TextSection({
         as="p"
         emphasis={emphasis}
         trigger={headingRevealTrigger}
-        className={cn(headingClassName, "text-[var(--section-text,#003619)]")}
+        className={cn(
+          headingClassName,
+          headingTextWrap === "balance" ? "text-balance" : "text-pretty",
+          "text-[var(--section-text,#003619)]",
+        )}
       />
     ) : resolvedHeadingAnimation === "blur" ? (
       <AnimatedHeroHeading
@@ -261,7 +315,11 @@ export function TextSection({
         emphasis={emphasis}
         reveal="blur"
         trigger="inView"
-        className={cn(headingClassName, "text-[var(--section-text,#003619)]")}
+        className={cn(
+          headingClassName,
+          headingTextWrap === "balance" ? "text-balance" : "text-pretty",
+          "text-[var(--section-text,#003619)]",
+        )}
       />
     ) : (
       <p className={headingTextClassName}>
@@ -315,14 +373,13 @@ export function TextSection({
   if (layout === "horizontal") {
     return (
       <div className={cn("flex flex-col gap-4", className)}>
-        {eyebrow && (
-          <EyebrowRow
-            eyebrow={eyebrow}
-            live={eyebrowLive}
-            centered={isCentered}
-            surplusInfo={eyebrowSurplusInfo}
-          />
-        )}
+        <EyebrowSlot
+          eyebrow={eyebrow}
+          reserveSpace={reserveEyebrowSpace}
+          live={eyebrowLive}
+          centered={isCentered}
+          surplusInfo={eyebrowSurplusInfo}
+        />
         <div className="flex flex-col items-start gap-4 lg:flex-row lg:gap-8">
           {(metric || headingEl) && (
             <div className={cn("flex w-full flex-col lg:flex-1", metric ? "gap-4 lg:gap-5" : "gap-2")}>
@@ -344,7 +401,7 @@ export function TextSection({
           )}
           <div className="flex w-full flex-col gap-4 lg:flex-1">
             {body &&
-              renderBodyCopy({ body, bodyEmphasis, bodySize, metric, emphasis })}
+              renderBodyCopy({ body, bodyEmphasis, bodySize, bodyEmphasisSize, metric, emphasis })}
             {bodyFooter}
             {ctaRow}
           </div>
@@ -369,14 +426,13 @@ export function TextSection({
           isCentered && "items-center",
         )}
       >
-        {eyebrow && (
-          <EyebrowRow
-            eyebrow={eyebrow}
-            live={eyebrowLive}
-            centered={isCentered}
-            surplusInfo={eyebrowSurplusInfo}
-          />
-        )}
+        <EyebrowSlot
+          eyebrow={eyebrow}
+          reserveSpace={reserveEyebrowSpace}
+          live={eyebrowLive}
+          centered={isCentered}
+          surplusInfo={eyebrowSurplusInfo}
+        />
         {metric && (
           <div className="max-sm:w-full max-sm:min-w-0">
             <MetricNumber
@@ -394,7 +450,7 @@ export function TextSection({
           </div>
         )}
         {body &&
-          renderBodyCopy({ body, bodyEmphasis, bodySize, metric, emphasis })}
+          renderBodyCopy({ body, bodyEmphasis, bodySize, bodyEmphasisSize, metric, emphasis })}
         {bodyFooter}
       </div>
       {ctaRow}

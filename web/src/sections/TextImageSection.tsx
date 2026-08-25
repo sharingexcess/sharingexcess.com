@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import { ParallaxBackground, ParallaxCover } from "@/components/ui/ParallaxBackground";
 import { DonationForm } from "@/components/donation/DonationForm";
 import {
@@ -40,9 +41,12 @@ export type TextImageLayout =
 export interface ThreeImageItem {
   src: string;
   alt: string;
-  /** Used with "three-image-caption" */
+  /** Used with "three-image-caption" and "four-image-caption" */
   title?: string;
   body?: string;
+  /** Optional tertiary CTA below image caption copy */
+  cta?: string;
+  ctaHref?: string;
   /** Used with "three-image-stat" */
   stat?: string;
   label?: string;
@@ -75,6 +79,47 @@ export interface TextImageSectionProps extends Omit<SectionContentProps, "body">
 
 /** Wider gap when multi-card grids stack in a single column on mobile */
 const STACKED_CARD_GRID_GAP = "gap-12 sm:gap-6";
+
+function ImageCaptionCard({
+  img,
+  imageRadius,
+  buttonScheme,
+}: {
+  img: ThreeImageItem;
+  imageRadius: string;
+  buttonScheme: "light" | "dark";
+}) {
+  return (
+    <div className="flex flex-col gap-3 lg:gap-5">
+      <div className={cn("relative aspect-[4/5] w-full overflow-hidden sm:aspect-[3/4] lg:aspect-auto lg:h-[432px]", imageRadius)}>
+        <img src={img.src} alt={img.alt} className="h-full w-full object-cover" />
+      </div>
+      {(img.title || img.body || img.cta) && (
+        <div className="flex flex-col gap-3">
+          {(img.title || img.body) && (
+            <div className="flex flex-col gap-1">
+              {img.title && (
+                <p className="text-[28px] font-semibold leading-[1.2] tracking-[-0.04em] text-[var(--section-text)]">
+                  {img.title}
+                </p>
+              )}
+              {img.body && (
+                <p className="text-base leading-[1.4] text-[var(--section-text)]">
+                  {img.body}
+                </p>
+              )}
+            </div>
+          )}
+          {img.cta && (
+            <Button variant="tertiary" colorScheme={buttonScheme} href={img.ctaHref} size="md">
+              {img.cta}
+            </Button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function TextImageFullImageLayout({
   className,
@@ -411,25 +456,12 @@ export function TextImageSection({
           contentSlot={
             <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3", STACKED_CARD_GRID_GAP)}>
               {images.map((img, i) => (
-                <div key={i} className="flex flex-col gap-3 lg:gap-5">
-                  <div className={cn("relative aspect-[4/5] w-full overflow-hidden sm:aspect-[3/4] lg:aspect-auto lg:h-[432px]", imageRadius)}>
-                    <img src={img.src} alt={img.alt} className="h-full w-full object-cover" />
-                  </div>
-                  {(img.title || img.body) && (
-                    <div className="flex flex-col gap-1">
-                      {img.title && (
-                        <p className="text-[28px] font-semibold leading-[1.2] tracking-[-0.04em] text-[var(--section-text)]">
-                          {img.title}
-                        </p>
-                      )}
-                      {img.body && (
-                        <p className="text-base leading-[1.4] text-[var(--section-text)]">
-                          {img.body}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <ImageCaptionCard
+                  key={i}
+                  img={img}
+                  imageRadius={imageRadius}
+                  buttonScheme={isDark ? "dark" : "light"}
+                />
               ))}
             </div>
           }
@@ -503,25 +535,12 @@ export function TextImageSection({
           contentSlot={
             <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4", STACKED_CARD_GRID_GAP)}>
               {images.map((img, i) => (
-                <div key={i} className="flex flex-col gap-3 lg:gap-5">
-                  <div className={cn("relative aspect-[4/5] w-full overflow-hidden sm:aspect-[3/4] lg:aspect-auto lg:h-[432px]", imageRadius)}>
-                    <img src={img.src} alt={img.alt} className="h-full w-full object-cover" />
-                  </div>
-                  {(img.title || img.body) && (
-                    <div className="flex flex-col gap-1">
-                      {img.title && (
-                        <p className="text-[28px] font-semibold leading-[1.2] tracking-[-0.04em] text-[var(--section-text)]">
-                          {img.title}
-                        </p>
-                      )}
-                      {img.body && (
-                        <p className="text-base leading-[1.4] text-[var(--section-text)]">
-                          {img.body}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <ImageCaptionCard
+                  key={i}
+                  img={img}
+                  imageRadius={imageRadius}
+                  buttonScheme={isDark ? "dark" : "light"}
+                />
               ))}
             </div>
           }

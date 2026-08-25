@@ -68,6 +68,16 @@ export default {
     format: "file",
   },
   vite: {
+    server: {
+      proxy: {
+        "/__surplus": {
+          target: "https://surplus-api.sharingexcess.com",
+          changeOrigin: true,
+          secure: true,
+          rewrite: (path) => path.replace(/^\/__surplus/, ""),
+        },
+      },
+    },
     plugins: [tailwindcss(), optimizeClientDeps()],
     optimizeDeps: {
       include: CLIENT_OPTIMIZE_DEPS,

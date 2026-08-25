@@ -1,0 +1,139 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import HeroSection from "@/sections/HeroSection";
+import LogosBannerSection from "@/sections/LogosBannerSection";
+import TextImageCarouselSection from "@/sections/TextImageCarouselSection";
+import TextImageSection from "@/sections/TextImageSection";
+import TextOnlySection from "@/sections/TextOnlySection";
+
+const chapterRoles = [
+  {
+    title: "Food Rescue",
+    body: "Rescue surplus food from local food businesses with the help of our team and technology. Track your chapter's impact, engage volunteers, and form a powerful network.",
+    imageSrc: "/images/Screen-Shot-2023-07-12-at-3.15.20-PM_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "Pop-Up Distributions",
+    body: "Organize and host food distributions on campus and in your community. We'll help you source food and set up so you can distribute and spread the word about SE.",
+    imageSrc: "/images/__DSC_0380-5_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "Meal Swipe Donations",
+    body: "Student meal swipes often go to waste. Your chapter can collect unused and donated meal swipes and redirect them to students who may be facing food insecurity on campus.",
+    imageSrc: "/images/Screen-Shot-2023-07-12-at-3.25.36-PM_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "Advocacy",
+    body: "Be a voice for food security and waste reduction. Engage in educational initiatives and work with stakeholders to create policies that ensure a sustainable and equitable food system on campus.",
+    imageSrc: "/images/Screen-Shot-2023-07-12-at-3.28.30-PM_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "Fundraising",
+    body: "Create fundraisers that support our mission and your chapter. From marathons to game nights, food drives to concerts, we encourage you to get creative — the sky is the limit!",
+    imageSrc: "/images/fundraise.jpg",
+    imageAlt: "",
+  },
+  {
+    title: "Volunteering",
+    body: "Lend a helping hand by volunteering with your chapter. Whether it's with SE or another organization, you can get people together to make meaningful local impact.",
+    imageSrc: "/images/volunteer.jpg",
+    imageAlt: "",
+  },
+];
+
+const chapterLogos = [
+  { src: "/images/Drexel-logo_1.avif", alt: "Drexel University", width: 3400, height: 900 },
+  { src: "/images/Temple_University_Logo.svg_1.avif", alt: "Temple University", width: 1280, height: 354 },
+  { src: "/images/University_of_Pittsburgh_seal.svg", alt: "University of Pittsburgh", width: 300, height: 300 },
+  { src: "/images/UniversityofPennsylvania_Vertical_RGB-2_1.avif", alt: "University of Pennsylvania", width: 914, height: 914 },
+  { src: "/images/penn-state.avif", alt: "Penn State", width: 416, height: 276 },
+  { src: "/images/rutgers-logo_1.avif", alt: "Rutgers University", width: 305, height: 305 },
+];
+
+const testimonials = [
+  {
+    title: "Temple University",
+    body: "\"Getting the opportunity to organize and work with and for my community has meant so much to me. Meeting new people and working together to come up with creative solutions for permeating problems has changed my life!\" — Olivia",
+    imageSrc: "/images/Temple-University-Emblem_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "Drexel University",
+    body: "\"I'm so thankful to have the opportunity to organize and directly help communities around me. Nothing beats being there, doing the work, seeing the impact and helping others to do the same!\" — Julie",
+    imageSrc: "/images/drexel-vertical-all_blue_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "University of Pittsburgh",
+    body: "\"The impact of a single chapter is a badge of honor, but the best part about joining the SE Family is the lasting relationships you will carry with you even after your time as a student leader has ended.\" — Jeremy",
+    imageSrc: "/images/University_of_Pittsburgh_seal.svg",
+    imageAlt: "",
+  },
+];
+---
+
+<PageLayout
+  title="Start a Sharing Excess Chapter | Expand Food Rescue in Your Community"
+  description="Start a university or community chapter to rescue surplus food and address food insecurity on campus."
+>
+  <HeroSection client:visible
+    layout="stack-centered"
+    theme="light"
+    eyebrow="University Chapters"
+    title="Started by students, driven by passion."
+    imageSrc="/images/get_involved.jpg"
+    imageAlt=""
+  />
+
+  <TextImageSection client:visible
+    theme="light"
+    eyebrow="The role of chapters"
+    title="Creating meaningful impact on campuses around the world"
+    body="Chapters play a crucial role in building food sharing networks. By volunteering, fundraising, and advocating, organizers can work with Sharing Excess to promote food security in their community. Chapters can be powered by college students, high schoolers, or everyday community heroes."
+    imageSrc="/images/MINNEAPOLIS-8_7.avif"
+    imageAlt=""
+    imagePosition="right"
+    imageStyle="square"
+  />
+
+  <TextImageCarouselSection client:visible
+    theme="dark"
+    eyebrow="What chapters do"
+    items={chapterRoles}
+    imagePosition="right"
+    advanceOnScroll={false}
+  />
+
+  <TextOnlySection client:visible
+    theme="light"
+    align="center"
+    eyebrow="Active chapters"
+    headingSize="h2"
+    title="The heartbeat of our organization"
+    body="Our active chapters bring the food rescue movement to life in communities across the globe — driving change and making a tangible impact in the fight against food waste and hunger."
+  />
+
+  <LogosBannerSection client:visible theme="light" logos={chapterLogos} />
+
+  <TextImageCarouselSection client:visible
+    theme="light"
+    eyebrow="Testimonials"
+    items={testimonials}
+    imagePosition="left"
+    advanceOnScroll={false}
+  />
+
+  <TextOnlySection client:visible
+    theme="dark"
+    align="center"
+    headingSize="h2"
+    title="Looking to start a chapter?"
+    body="Are you ready to be the driving force behind a food rescue revolution in your community? Starting a Sharing Excess chapter is your opportunity to make a lasting impact and transform your passion for reducing food waste into meaningful action."
+    primaryCta="Get in touch"
+    primaryCtaHref="/contact"
+  />
+</PageLayout>

@@ -220,10 +220,13 @@ export function StatCard(props: StatCardProps) {
       ? "text-white"
       : "group-hover:text-white"
     : color.colorHoverText;
+  // Image text cards — white circle + kale arrow; fixed tokens, not section theme
+  const imageTextArrowColorClass =
+    "text-kale transition-colors duration-[600ms]";
   const arrowColorClass = isImage
     ? showImageByDefault
-      ? cn("text-[var(--section-text)] transition-colors duration-[600ms]", color.colorHoverText)
-      : textClass
+      ? imageTextArrowColorClass
+      : cn(textClass, "group-hover:text-kale transition-colors duration-[600ms]")
     : cn(textClass, arrowHoverClass);
 
   const activeActionButtonStyle = showImageByDefault

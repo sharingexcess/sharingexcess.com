@@ -1,6 +1,14 @@
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
-import { eyebrowClassName, bodyLgClassName, bodyMdClassName, bodyXlClassName } from "@/lib/typography";
+import { parseEmphasis } from "@/lib/parseEmphasis";
+import {
+  eyebrowClassName,
+  bodyLgClassName,
+  bodyMdClassName,
+  bodyXlClassName,
+  sectionH1ClassName,
+  sectionH2ClassName,
+} from "@/lib/typography";
 import type { SectionContentProps } from "@/lib/types";
 import { LogoMarquee } from "./LogoMarquee";
 import { SectionShell } from "./SectionShell";
@@ -27,11 +35,11 @@ export interface LogosBannerSectionProps
     | "imageAlt"
     | "isCard"
     | "cardColor"
-    | "title"
-    | "headingSize"
     | "secondaryCta"
     | "secondaryCtaHref"
   > {
+  /** Optional page heading above the logo marquee */
+  title?: string;
   logos: LogoItem[];
   /** Monochrome partner lockups — matches surplus.sharingexcess.com */
   grayscale?: boolean;
@@ -45,6 +53,8 @@ export interface LogosBannerSectionProps
 export function LogosBannerSection({
   theme = "light",
   eyebrow,
+  title,
+  headingSize = "h2",
   body,
   bodySize = "lg",
   primaryCta,
@@ -58,7 +68,8 @@ export function LogosBannerSection({
   transparentBg,
 }: LogosBannerSectionProps) {
   const buttonScheme = theme === "dark" ? "dark" : "light";
-  const hasIntroText = Boolean(eyebrow?.trim() || body?.trim());
+  const headingClassName = headingSize === "h1" ? sectionH1ClassName : sectionH2ClassName;
+  const hasIntroText = Boolean(eyebrow?.trim() || title?.trim() || body?.trim());
 
   return (
     <SectionShell
@@ -70,9 +81,14 @@ export function LogosBannerSection({
     >
       <div className="flex flex-col gap-8 lg:gap-12">
         {hasIntroText && (
-          <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center lg:gap-6">
+          <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 text-center lg:gap-6">
             {eyebrow?.trim() && (
               <p className={cn(eyebrowClassName, "text-[var(--section-text)]")}>{eyebrow}</p>
+            )}
+            {title?.trim() && (
+              <h2 className={cn(headingClassName, "text-[var(--section-text)]")}>
+                {parseEmphasis(title)}
+              </h2>
             )}
             {body?.trim() && (
               <p className={cn(bodyClasses[bodySize], "text-[var(--section-text)]")}>

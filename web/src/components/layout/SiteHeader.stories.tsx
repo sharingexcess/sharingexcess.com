@@ -22,7 +22,6 @@ export const Default: Story = {
   args: {
     navItems: DEFAULT_NAV_ITEMS,
     ctaLabel: "Donate",
-    ctaHref: "/?form=donate",
   },
 };
 

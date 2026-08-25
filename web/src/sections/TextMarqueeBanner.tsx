@@ -1,8 +1,42 @@
 import { cn } from "@/lib/cn";
 import type { CSSProperties } from "react";
 
-const DEFAULT_TEXT = "LET'S FREE FOOD";
-const SEGMENT_REPEATS = 8;
+const ENGLISH = "LET'S FREE FOOD";
+
+/** Translations of the tagline — 10 most spoken US languages plus Japanese. */
+export const MARQUEE_TRANSLATIONS = [
+  "LIBEREMOS LA COMIDA", // Spanish
+  "解放食物", // Mandarin Chinese
+  "PALAYAAN NATIN ANG PAGKAIN", // Tagalog
+  "GIẢI PHÓNG THỰC PHẨM", // Vietnamese
+  "لنحرر الطعام", // Arabic
+  "LIBÉRONS LA NOURRITURE", // French
+  "음식을 해방하자", // Korean
+  "ОСВОБОДИМ ЕДУ", // Russian
+  "LASST UNS ESSEN BEFREIEN", // German
+  "ANN LIBERE MANJE A", // Haitian Creole
+  "食べ物を解放しよう", // Japanese
+] as const;
+
+/** English first, then every 4th phrase thereafter. */
+export function buildMarqueeSequence(translations: readonly string[]): string[] {
+  const sequence: string[] = [];
+
+  for (let index = 0; index < translations.length; index += 3) {
+    sequence.push(ENGLISH);
+    for (let offset = 0; offset < 3 && index + offset < translations.length; offset++) {
+      sequence.push(translations[index + offset]);
+    }
+  }
+
+  return sequence;
+}
+
+/** Repeat one full phrase cycle so wide viewports stay filled. */
+function buildMarqueeSegment(phrases: readonly string[]): string[] {
+  const repeats = Math.max(1, Math.ceil(12 / phrases.length));
+  return Array.from({ length: repeats }, () => phrases).flat();
+}
 
 const itemClassName =
   "font-display text-base font-extrabold uppercase tracking-[0.04em] sm:text-lg";
@@ -10,22 +44,34 @@ const itemClassName =
 const dotClassName = "h-1.5 w-1.5 shrink-0 rounded-full bg-current";
 
 export interface TextMarqueeBannerProps {
-  text?: string;
+  translations?: readonly string[];
   duration?: number;
   className?: string;
 }
 
 export function TextMarqueeBanner({
-  text = DEFAULT_TEXT,
+  translations = MARQUEE_TRANSLATIONS,
   duration = 30,
   className,
 }: TextMarqueeBannerProps) {
-  const segment = Array.from({ length: SEGMENT_REPEATS }, (_, index) => index);
-  const trackItems = [...segment, ...segment];
+  const sequence = buildMarqueeSequence(translations);
+  const segmentPhrases = buildMarqueeSegment(sequence);
+  const trackPhrases = [...segmentPhrases, ...segmentPhrases];
+  const loopDuration = duration * (segmentPhrases.length / 8);
 
   const trackStyle = {
-    "--marquee-duration": `${duration}s`,
+    "--marquee-duration": `${loopDuration}s`,
   } as CSSProperties;
+
+  const renderPhraseItems = (items: string[], keyPrefix: string) =>
+    items.flatMap((phrase, index) => [
+      <span key={`${keyPrefix}-text-${index}`} className="shrink-0">
+        {phrase}
+      </span>,
+      <span key={`${keyPrefix}-dot-${index}`} className={dotClassName} aria-hidden />,
+    ]);
+
+  const staticPhrases = [ENGLISH, ...translations];
 
   return (
     <div
@@ -36,16 +82,21 @@ export function TextMarqueeBanner({
     >
       <div
         className={cn(
-          "hidden items-center justify-center px-4 motion-reduce:flex",
+          "hidden flex-wrap items-center justify-center gap-x-8 gap-y-2 px-4 motion-reduce:flex",
           itemClassName,
         )}
       >
-        {text}
+        {staticPhrases.map((phrase) => (
+          <span key={phrase} className="inline-flex items-center gap-8">
+            {phrase}
+            <span className={dotClassName} aria-hidden />
+          </span>
+        ))}
       </div>
 
       <div
         className="text-marquee-viewport w-full overflow-hidden motion-reduce:hidden"
-        aria-hidden
+        aria-label={ENGLISH}
       >
         <div
           className={cn(
@@ -54,12 +105,7 @@ export function TextMarqueeBanner({
           )}
           style={trackStyle}
         >
-          {trackItems.flatMap((index) => [
-            <span key={`text-${index}`} className="shrink-0">
-              {text}
-            </span>,
-            <span key={`dot-${index}`} className={dotClassName} aria-hidden />,
-          ])}
+          {renderPhraseItems(trackPhrases, "marquee")}
         </div>
       </div>
     </div>

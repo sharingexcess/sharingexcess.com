@@ -1,0 +1,130 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import DonationSection from "@/sections/DonationSection";
+import HeroSection from "@/sections/HeroSection";
+import MapSection from "@/sections/MapSection";
+import StatsCardSection from "@/sections/StatsCardSection";
+import TextImageCarouselSection from "@/sections/TextImageCarouselSection";
+import TextImageSection from "@/sections/TextImageSection";
+
+const impactHighlights = [
+  {
+    title: "Philadelphia Wholesale Produce Market",
+    body: "Since 2021, we've partnered with the Philadelphia Wholesale Produce Market to create a full-scale surplus rescue operation. Together, we've rescued over 25 million pounds of fresh food — turning unsold food into fresh food access for communities across the region.",
+    imageSrc: "/images/53795439664_a9c383345c_c_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "Beast Philanthropy",
+    body: "In partnership with Beast Philanthropy, we've moved over 30 million pounds of food — and redefined what large-scale generosity can look like. From surprise warehouse visits to viral video moments, this collaboration continues to raise awareness and feed communities on an unprecedented scale.",
+    imageSrc: "/images/beast_cover_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "Trader Joe's",
+    body: "Every day of the week, across multiple cities and states, Trader Joe's is helping us rescue perfectly good food from going to waste. By donating fresh surplus from their stores nationwide, they're proving that corporate partnerships can be both impactful and consistent.",
+    imageSrc: "/images/53892051346_b8a9053bfe_c_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "Hunts Point Produce Market",
+    body: "In the heart of the Bronx, we've built a thriving food rescue operation at the Hunts Point Produce Market — one of the largest produce markets in the world. Since launching, we've rescued over 12 million pounds of food.",
+    imageSrc: "/images/53795193735_c9f0a0c867_3k.jpg",
+    imageAlt: "",
+  },
+  {
+    title: "Misfits Market",
+    body: "As supporters of our operation at Hunts Point, Misfits Market is helping power one of the most ambitious food rescue efforts in the country. Their support ensures that surplus food is recovered at the source — and redirected quickly to where it's needed most.",
+    imageSrc: "/images/54007168669_334d08b78e_4k_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "The Tony Robbins Foundation",
+    body: "We're proud to work with the Tony Robbins Foundation to help close the national meal gap and expand our work internationally. Their support enables us to scale our work globally and bring millions more meals to families facing hunger.",
+    imageSrc: "/images/About-us-Image-1_1920-e1525391876813-1_1.avif",
+    imageAlt: "",
+  },
+];
+---
+
+<PageLayout
+  title="Our Impact | Sharing Excess's Food Rescue Achievements"
+  description="See how Sharing Excess has distributed over 220 million pounds of food to communities across the country."
+>
+  <HeroSection client:visible
+    layout="stack-left"
+    theme="light"
+    eyebrow="Our Impact"
+    title="Increasing access to excess for everyone"
+    body="What started with extra meal swipes has grown to over 220 million pounds of food delivered to communities and organizations addressing food insecurity across over 40 states."
+    imageSrc="/images/Screen-Shot-2023-07-17-at-6.44.52-PM_1.avif"
+    imageAlt=""
+  />
+
+  <TextImageSection client:visible
+    theme="light"
+    eyebrow="Under fiscal sponsorship"
+    title="From 2018–2022, we grew under fiscal sponsorship"
+    body="From 2018-2022 Sharing Excess was under fiscal sponsorship, allowing us to start making impact while we set up our 501c3. Three cheers to the Federation of Neighborhood Centers for their guidance during this time. Financials during this period can be provided upon request."
+    imageSrc="/images/Learn-More---Financials_1.avif"
+    imageAlt=""
+    imagePosition="left"
+    imageStyle="round"
+  />
+
+  <TextImageSection client:visible
+    theme="dark"
+    layout="stack-centered"
+    eyebrow="Measuring impact"
+    title="Every pound of food we rescue is weighed and categorized"
+    body="From these numbers, we can paint a great picture of impact in terms of meals, monetary value, and environmental benefit. Over 2,000 distribution locations across 36 states. Since 2018, Sharing Excess has distributed enough surplus to feed over 10 million people across the country."
+    primaryCta="How We Measure"
+    primaryCtaHref="https://docs.sharingexcess.com/docs/impact-measurement"
+  />
+
+  <MapSection client:visible
+    theme="dark"
+    transparentBg
+    layout="scroll-expand"
+    headingSize="h2"
+    eyebrow="Live impact data"
+    title="Pounds of food distributed so far"
+    mapVariant="impact-clusters"
+    mapCaption="Live data from app.sharingexcess.com"
+    primaryCta="Impact Data"
+    primaryCtaHref="/about/impact"
+    secondaryCta="How We Measure"
+    secondaryCtaHref="https://docs.sharingexcess.com/docs/impact-measurement"
+  />
+
+  <TextImageCarouselSection client:visible
+    theme="light"
+    eyebrow="Impact highlights"
+    items={impactHighlights}
+    imagePosition="left"
+    advanceOnScroll={false}
+  />
+
+  <StatsCardSection client:visible
+    theme="dark"
+    eyebrow="Your support matters"
+    title="$1 donated can provide 10 meals to those in need"
+    stats={[
+      { value: "14.5", label: "lbs. rescued", variant: "green" },
+      { value: "12", label: "meals provided", variant: "orange" },
+      { value: "$45", label: "retail value", variant: "yellow" },
+    ]}
+    columns={3}
+    align="center"
+  />
+
+  <DonationSection client:visible
+    theme="light"
+    isCard={true}
+    cardColor="kale"
+    title="Fuel the rescue network"
+    body="Your gift moves rescued food from donors to communities in real time."
+    formPosition="left"
+    submitLabel="Donate Now"
+  />
+</PageLayout>

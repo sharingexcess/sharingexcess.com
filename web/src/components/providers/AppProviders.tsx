@@ -1,4 +1,5 @@
 import { createContext, useContext, type ReactNode } from "react";
+import { DonateOverlayProvider } from "@/components/donation/DonateOverlay";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { HomeIntroOverlay } from "@/components/transitions/HomeIntroOverlay";
 import { GsapProvider } from "./GsapProvider";
@@ -37,9 +38,11 @@ export function AppProviders({
       <ScrollInteractionContext.Provider value={scrollInteractions}>
         <SmoothScrollProvider enabled={smoothScroll}>
           <GsapProvider>
-            <HomeIntroOverlay isHomePage={isHomePage} />
-            {showHeader && <SiteHeader isHomePage={isHomePage} />}
-            {children}
+            <DonateOverlayProvider>
+              <HomeIntroOverlay isHomePage={isHomePage} />
+              {showHeader && <SiteHeader isHomePage={isHomePage} />}
+              {children}
+            </DonateOverlayProvider>
           </GsapProvider>
         </SmoothScrollProvider>
       </ScrollInteractionContext.Provider>

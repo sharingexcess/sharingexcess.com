@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   buttonHoverSpring,
   buttonLabelSpring,
@@ -27,6 +28,10 @@ export interface ButtonProps {
   active?: boolean;
   /** Plain label hover — color + scale only, no sliding duplicate text */
   simpleLabel?: boolean;
+  /** Allow wrapped labels in sliding animation — for multiline nav dropdown items */
+  wrapLabel?: boolean;
+  /** Optional content rendered before the label — excluded from sliding label animation */
+  leading?: React.ReactNode;
   href?: string;
   className?: string;
   type?: "button" | "submit";
@@ -154,7 +159,7 @@ function SlidingButtonLabel({
 }) {
   return (
     <motion.span
-      className="relative z-10 flex h-full items-center"
+      className="relative z-10 flex items-center self-center"
       variants={colorVariants}
     >
       <span className="relative overflow-hidden leading-[1.25]">
@@ -173,6 +178,74 @@ function SlidingButtonLabel({
         </motion.span>
       </span>
     </motion.span>
+  );
+}
+
+/**
+ * Multiline sliding label — two stacked copies in a measured clip so line breaks
+ * stay identical through the hover slide (absolute duplicates inherit nowrap width).
+ */
+function WrappingSlidingButtonLabel({
+  children,
+  textOutTransition,
+}: {
+  children: React.ReactNode;
+  textOutTransition: Transition;
+  textInTransition: Transition;
+}) {
+  const blockRef = useRef<HTMLSpanElement>(null);
+  const [blockHeight, setBlockHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    const el = blockRef.current;
+    if (!el) return;
+
+    const measure = () => {
+      setBlockHeight(el.offsetHeight);
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [children]);
+
+  const slideVariants = useMemo(
+    (): Variants => ({
+      rest: { y: 0 },
+      hover: {
+        y: blockHeight > 0 ? -blockHeight : 0,
+        transition: textOutTransition,
+      },
+    }),
+    [blockHeight, textOutTransition],
+  );
+
+  const labelClass =
+    "block w-full min-w-0 max-w-full whitespace-normal text-left leading-[1.35]";
+
+  return (
+    <span className="relative z-10 w-0 min-w-0 flex-1 self-center">
+      <span
+        className="relative block w-full min-w-0 overflow-hidden pr-10"
+        style={blockHeight > 0 ? { height: blockHeight } : undefined}
+      >
+        <motion.span className="flex flex-col will-change-transform" variants={slideVariants}>
+          <span ref={blockRef} className={labelClass}>
+            {children}
+          </span>
+          <span
+            aria-hidden
+            className={cn(
+              labelClass,
+              blockHeight > 0 ? undefined : "absolute inset-x-0 top-full",
+            )}
+          >
+            {children}
+          </span>
+        </motion.span>
+      </span>
+    </span>
   );
 }
 
@@ -400,6 +473,8 @@ export function Button({
   colorScheme = "light",
   active,
   simpleLabel,
+  wrapLabel,
+  leading,
   href,
   className,
   type = "button",
@@ -421,11 +496,21 @@ export function Button({
     (usePrimaryMotion || useSecondaryMotion || useGhostMotion || useTertiaryMotion) &&
     !simpleLabel;
 
+  const textOutTransition =
+    useSecondaryMotion || useTertiaryMotion
+      ? buttonSecondaryTextOutSpring
+      : buttonTextOutSpring;
+  const textInTransition =
+    useSecondaryMotion || useTertiaryMotion
+      ? buttonSecondaryTextInSpring
+      : buttonTextInSpring;
+
   const primaryScheme = primaryColorScheme[colorScheme];
   const secondaryScheme = secondaryColorScheme[colorScheme];
 
   const classes = cn(
-    "inline-flex cursor-pointer items-center justify-center box-border font-sans font-semibold whitespace-nowrap no-underline",
+    wrapLabel ? "flex w-full min-w-0 whitespace-normal" : "inline-flex whitespace-nowrap",
+    "cursor-pointer items-center justify-center box-border font-sans font-semibold no-underline",
     disabled
       ? cn(
           isGhost
@@ -464,24 +549,28 @@ export function Button({
   const content = (
     <>
       {usePrimaryMotion && <ButtonColorRipple />}
-      {useSlidingLabel ? (
+      {leading ? <span className="relative z-10 shrink-0 self-center">{leading}</span> : null}
+      {useSlidingLabel && wrapLabel ? (
+        <WrappingSlidingButtonLabel
+          textOutTransition={textOutTransition}
+          textInTransition={textInTransition}
+        >
+          {children}
+        </WrappingSlidingButtonLabel>
+      ) : useSlidingLabel ? (
         <SlidingButtonLabel
-          textOutTransition={
-            useSecondaryMotion || useTertiaryMotion
-              ? buttonSecondaryTextOutSpring
-              : buttonTextOutSpring
-          }
-          textInTransition={
-            useSecondaryMotion || useTertiaryMotion
-              ? buttonSecondaryTextInSpring
-              : buttonTextInSpring
-          }
+          textOutTransition={textOutTransition}
+          textInTransition={textInTransition}
           colorVariants={
             usePrimaryMotion ? primaryLabelColorVariants(colorScheme) : undefined
           }
         >
           {children}
         </SlidingButtonLabel>
+      ) : wrapLabel ? (
+        <span className="relative z-10 w-0 min-w-0 flex-1 self-center whitespace-normal pr-10 leading-[1.35]">
+          {children}
+        </span>
       ) : (
         <span className={cn(isGhost && "relative z-10")}>{children}</span>
       )}

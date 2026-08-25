@@ -1,0 +1,127 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import DonationSection from "@/sections/DonationSection";
+import HeroSection from "@/sections/HeroSection";
+import StatsCardSection from "@/sections/StatsCardSection";
+import TextImageCarouselSection from "@/sections/TextImageCarouselSection";
+import TextImageSection from "@/sections/TextImageSection";
+
+const wasteBarriers = [
+  {
+    title: "Transportation",
+    body: "Food can go to waste due to inefficient logistics, long transit times, and hold-ups like port delays, leading to spoilage and deterioration during transportation.",
+    imageSrc: "/images/Screen-Shot-2023-07-10-at-8.44.15-AM_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "Perceived Quality",
+    body: "Many consumers opt against imperfect-looking produce, which can lead to food waste, as aesthetically unpleasing (but perfectly good) food stays on shelves until its bad.",
+    imageSrc: "/images/Misfits_Market_Logo_01-01-1_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "Bad Timing",
+    body: "All food can go bad in the race against time. Non standardized expiration dates and limited shelf life result in food being discarded even if it is still safe to consume.",
+    imageSrc: "/images/Screen-Shot-2023-07-10-at-8.52.47-AM_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "Overproduction",
+    body: "Excess inventory can lead to food waste when there is a lack of demand or market fluctuations, especially due to seasonal and weather shifts.",
+    imageSrc: "/images/trader-joes-logo_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "Limited Storage",
+    body: "Small stock rooms, limited storage facilities or improper temperature control can accelerate food spoilage and contribute to waste.",
+    imageSrc: "/images/Warp-logo_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "Labor Shortage",
+    body: "Insufficient workforce in agriculture and food processing industries hinders the timely harvesting, processing, and distribution of food, leading to wastage.",
+    imageSrc: "/images/6052936_032620philabundance_1.avif",
+    imageAlt: "",
+  },
+];
+---
+
+<PageLayout
+  title="Understanding Food Waste | How Sharing Excess Addresses the Issue"
+  description="Nearly 40% of food is wasted in America while millions experience food insecurity. Learn how Sharing Excess makes donating surplus food easy."
+>
+  <HeroSection client:visible
+    layout="stack-centered"
+    theme="light"
+    eyebrow="World's Dumbest Problem"
+    title="The Food Waste Problem"
+    body="In America, nearly 40% of food is wasted, while two-thirds is still edible."
+    imageSrc="/images/problem.jpg"
+    imageAlt=""
+  />
+
+  <TextImageSection client:visible
+    theme="dark"
+    layout="full-image"
+    eyebrow="The scale"
+    title="90 billion potential meals lost in the United States alone"
+    body="That's more than 90 billion potential meals lost in the United States alone, yet less than 4% of that food ends up being donated to communities. This represents more than $215 billion in food value wasted. At the same time, 34 million Americans experience food insecurity annually. We're wasting more than double the amount of food needed to close the hunger gap. Sharing Excess is working hard to change that equation."
+    imageSrc="/images/diagram_1.avif"
+    imageAlt=""
+  />
+
+  <TextImageSection client:visible
+    theme="light"
+    eyebrow="Why so much waste?"
+    title="Logistical barriers can prevent edible food from reaching communities"
+    body="63% of food waste happens at the pre-consumer level of the supply chain. Donating food requires time, labor, transportation, and capacity that many food businesses don't have. For this reason, a lot of perfectly great food goes to waste instead of feeding our communities."
+    imageSrc="/images/54178994461_4d4abdca3b_k_1.avif"
+    imageAlt=""
+    imagePosition="right"
+    imageStyle="square"
+  />
+
+  <TextImageCarouselSection client:visible
+    theme="light"
+    eyebrow="Barriers"
+    items={wasteBarriers}
+    imagePosition="right"
+    advanceOnScroll={false}
+  />
+
+  <TextImageSection client:visible
+    theme="light"
+    layout="stack-left"
+    eyebrow="Our solution"
+    title="Make it as easy as possible to donate food"
+    body="Sharing Excess is built around the strategy of meeting food donors where they're at — making it as easy as possible to donate surplus food. We source food from retailers, wholesalers, distribution centers and farmers. Transportation and logistics are at the heart of what we do. We collaborate with local food banks, community organizations, and mutual aid efforts to efficiently distribute millions of pounds of surplus food throughout the nation."
+    imageSrc="/images/Saturday-Morning-Group---Presentation-Deck---7823-6_1.avif"
+    imageAlt=""
+    primaryCta="Partner With Us"
+    primaryCtaHref="/get-involved/partners"
+  />
+
+  <StatsCardSection client:visible
+    theme="dark"
+    eyebrow="Your support matters"
+    title="$1 donated = 20 pounds of food rescued & delivered"
+    body="Your donation goes a long way. $1 donated to Sharing Excess equals meaningful impact for communities and the planet."
+    stats={[
+      { value: "20", label: "lbs. rescued", variant: "green" },
+      { value: "16", label: "meals provided", variant: "orange" },
+      { value: "$57", label: "retail value", variant: "yellow" },
+    ]}
+    columns={3}
+    align="center"
+  />
+
+  <DonationSection client:visible
+    theme="light"
+    isCard={true}
+    cardColor="kale"
+    title="Help us close the meal gap"
+    body="Every dollar moves rescued food to the people who need it most."
+    formPosition="left"
+    submitLabel="Donate Now"
+  />
+</PageLayout>

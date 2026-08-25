@@ -1,0 +1,63 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import HeroSection from "@/sections/HeroSection";
+import TextImageSection from "@/sections/TextImageSection";
+import TextOnlySection from "@/sections/TextOnlySection";
+
+const values = [
+  "Lead with Why: Purpose drives every decision.",
+  "Spread Love: Sharing creates meaning.",
+  "Design for Scale: We build for global impact.",
+  "Create Constellations: Collaboration over competition.",
+  "Build Trust with Transparency: Open communication, always.",
+  "Lead with heart, drive with data: We use data with empathy.",
+  "\"We've Got This\" Attitude: We take action and figure it out.",
+];
+---
+
+<PageLayout
+  title="Careers | Sharing Excess"
+  description="Join the Sharing Excess team working to end food waste and food insecurity."
+>
+  <HeroSection client:visible
+    layout="stack-left"
+    theme="light"
+    eyebrow="Careers"
+    title="Powered by people"
+    body="Looking to get even more involved?"
+    imageSrc="/images/careers.jpg"
+    imageAlt=""
+  />
+
+  <TextImageSection client:visible
+    theme="light"
+    title="A mission with a business, not the other way around."
+    body="Are you interested in joining a fun, passionate, and innovative team working hard to end food waste and food insecurity? Look no further than team SE! We'd love to hear from you. Sharing Excess is a Philadelphia-based nonprofit on a mission to bridge the gap between excess food and food insecurity. By partnering with grocery stores, restaurants, wholesalers, and farmers, we have delivered nearly 100 million meals to a network of nonprofits, food banks, and community organizations."
+    imageSrc="/images/53881375065_d118b3b725_c_1.avif"
+    imageAlt=""
+    imagePosition="right"
+    imageStyle="square"
+  />
+
+  <TextOnlySection client:visible
+    theme="dark"
+    align="center"
+    eyebrow="Our values"
+    headingSize="h2"
+    title="What guides everything we do"
+    body={values.join(" ")}
+  />
+
+  <TextImageSection client:visible
+    theme="light"
+    eyebrow="Open roles"
+    title="Join team SE"
+    body="The legacy site embeds a live job board on this page. Reach out to learn about current openings, or send your resume to our team."
+    imageSrc="/images/53884044852_57d4a9a237_c_1.avif"
+    imageAlt=""
+    imagePosition="left"
+    imageStyle="round"
+    primaryCta="Contact us about careers"
+    primaryCtaHref="/contact"
+  />
+</PageLayout>

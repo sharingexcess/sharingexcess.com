@@ -16,6 +16,11 @@ import {
   type SocialBrandIcon,
 } from "@/components/icons/socialIcons";
 import { FooterLogoMarquee } from "@/components/layout/FooterLogoMarquee";
+import {
+  FOOTER_BRIDGE_OVERLAP_CLASS,
+  PAGE_LAST_SECTION_CLASS,
+} from "@/lib/footerOverlap";
+import { markPageLastSection } from "@/lib/markPageLastSection";
 
 export interface FooterNavSection {
   title: string;
@@ -52,6 +57,20 @@ function footerParallaxTravelPx() {
     : FOOTER_PARALLAX_TRAVEL_PX;
 }
 
+function usePageLastSectionBridge() {
+  useEffect(() => {
+    markPageLastSection();
+    document.addEventListener("astro:page-load", markPageLastSection);
+
+    return () => {
+      document.removeEventListener("astro:page-load", markPageLastSection);
+      document.querySelector("main")?.querySelectorAll(`.${PAGE_LAST_SECTION_CLASS}`).forEach((el) => {
+        el.classList.remove(PAGE_LAST_SECTION_CLASS);
+      });
+    };
+  }, []);
+}
+
 function useFooterParallaxY() {
   const footerRef = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotion();
@@ -68,8 +87,15 @@ function useFooterParallaxY() {
       const target = footerRef.current;
       if (!target) return;
 
+      const rect = target.getBoundingClientRect();
+      // Lock overlap once visible — parallax travel otherwise leaves a gap above the rounded top.
+      if (rect.top < window.innerHeight) {
+        y.set(0);
+        return;
+      }
+
       const progress = measureOffsetProgress(
-        target.getBoundingClientRect(),
+        rect,
         window.innerHeight,
         ["start end", "start 0.75"],
       );
@@ -162,7 +188,7 @@ export const FOOTER_NAV_SECTIONS: FooterNavSection[] = [
   {
     title: "About",
     links: [
-      { label: "Closing the Gap", href: "/about/problem" },
+      { label: "World's Dumbest Problem", href: "/about/problem" },
       { label: "Our Story", href: "/about#our-story" },
       { label: "Our Impact", href: "/about/impact" },
       { label: "Our Model", href: "/about" },
@@ -229,12 +255,14 @@ export function SiteFooter({
   const rightNavSections = navSections.slice(2);
   const copyrightYear = new Date().getFullYear();
   const { footerRef, y, reduceMotion } = useFooterParallaxY();
+  usePageLastSectionBridge();
 
   return (
     <footer
       ref={footerRef}
       className={cn(
-        "relative z-10 -mt-16 w-full lg:-mt-24",
+        "relative z-10 w-full",
+        FOOTER_BRIDGE_OVERLAP_CLASS,
         className,
       )}
     >

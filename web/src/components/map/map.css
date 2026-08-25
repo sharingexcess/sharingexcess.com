@@ -23,7 +23,7 @@
 .se-map-loading {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 4;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -82,28 +82,17 @@
   cursor: pointer;
 }
 
-.se-map-group-hit-target {
-  position: absolute;
-  z-index: 1;
-  width: 5rem;
-  height: 5rem;
-  transform: translate(-50%, -50%);
-  border: none;
-  padding: 0;
-  background: transparent;
-  pointer-events: auto;
-  cursor: pointer;
-}
-
 .se-map-group-label-anchor {
   position: absolute;
   z-index: 2;
+  display: inline-flex;
   transform: translate(-50%, calc(-100% - 0.5rem));
   border: none;
   padding: 0;
   background: transparent;
   pointer-events: auto;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .se-map-group-label {
@@ -173,13 +162,14 @@
 }
 
 .se-map-hub-card-anchor .se-map-hub-card {
+  width: var(--se-map-hub-card-width, min(24rem, calc(100% - 2.5rem)));
   pointer-events: auto;
 }
 
 .se-map-pulse-overlay {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
   overflow: hidden;
 }

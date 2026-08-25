@@ -13,6 +13,7 @@ export type { LogoItem } from "./LogosBannerSection";
 export { SocialMediaSection } from "./SocialMediaSection";
 export type { SocialMediaItem, SocialMediaAspect } from "./SocialMediaSection";
 export { TextOnlySection } from "./TextOnlySection";
+export { GcalSection } from "./GcalSection";
 export { DonationSection } from "./DonationSection";
 export { VideoTestimonialsCarouselSection } from "./VideoTestimonialsCarouselSection";
 export type {

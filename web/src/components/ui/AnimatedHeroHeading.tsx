@@ -20,10 +20,18 @@ import {
 import { useInViewOnce } from "@/lib/useInViewOnce";
 import { useIntroRevealed } from "@/lib/useIntroRevealed";
 import { useFitMultilineText } from "@/lib/useFitText";
-import type { CSSProperties, JSX, Ref } from "react";
+import type { CSSProperties, JSX, ReactNode, Ref } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-type WordToken = { text: string; emphasized: boolean; key: string };
+type WordToken = {
+  text: string;
+  emphasized: boolean;
+  key: string;
+  trailingPunctuation?: string;
+};
+
+/** Punctuation-only chunks after emphasis spans, e.g. "*waste*." → attach "." to "waste" */
+const PUNCTUATION_ONLY = /^[^\p{L}\p{N}\s]+$/u;
 
 const KALE_COLOR = "var(--color-kale)";
 const BRAND_GREEN_COLOR = "var(--color-se-green-base)";
@@ -106,6 +114,12 @@ function tokenizeLine(line: string, lineIndex: number, emphasis = true): WordTok
     if (!part) return;
     const emphasized = emphasis && i % 2 === 1;
     part.split(/\s+/).filter(Boolean).forEach((word) => {
+      if (PUNCTUATION_ONLY.test(word) && tokens.length > 0) {
+        const previous = tokens[tokens.length - 1];
+        previous.trailingPunctuation = `${previous.trailingPunctuation ?? ""}${word}`;
+        return;
+      }
+
       tokens.push({
         text: word,
         emphasized,
@@ -124,12 +138,16 @@ function tokenizeTitle(title: string, emphasis = true): WordToken[][] {
 }
 
 function WordContent({ token }: { token: WordToken }) {
-  if (token.emphasized) {
-    return (
-      <em className={headingEmphasisClassName}>{token.text}</em>
-    );
-  }
-  return token.text;
+  return (
+    <>
+      {token.emphasized ? (
+        <em className={headingEmphasisClassName}>{token.text}</em>
+      ) : (
+        token.text
+      )}
+      {token.trailingPunctuation}
+    </>
+  );
 }
 
 function AnimatedWords({
@@ -150,30 +168,101 @@ function AnimatedWords({
   highlightProgress?: MotionValue<number>;
 }) {
   const wordGap = compact ? "0.15em" : "0.25em";
-  return tokens.map((token, i) => {
-    const flatIndex = wordOffset + i;
+  const { leading, trailing } = splitTokensForOrphanGuard(tokens);
 
-    return (
-      <motion.span
-        key={token.key}
-        variants={wordVariants}
-        className="inline-block will-change-[transform,opacity,filter]"
-        style={i < tokens.length - 1 ? { marginRight: wordGap } : undefined}
-      >
-        {highlightProgress ? (
-          <HighlightWord
-            token={token}
-            wordIndex={flatIndex}
-            wordCount={wordCount}
-            progress={highlightProgress}
-            highlightActive={highlightActive}
-          />
-        ) : (
-          <WordContent token={token} />
-        )}
-      </motion.span>
-    );
-  });
+  const renderAnimatedGroup = (group: WordToken[], startIndex: number) =>
+    group.map((token, index) => {
+      const flatIndex = wordOffset + startIndex + index;
+
+      return (
+        <motion.span
+          key={token.key}
+          variants={wordVariants}
+          className="inline-block will-change-[transform,opacity,filter]"
+          style={index < group.length - 1 ? { marginRight: wordGap } : undefined}
+        >
+          {highlightProgress ? (
+            <HighlightWord
+              token={token}
+              wordIndex={flatIndex}
+              wordCount={wordCount}
+              progress={highlightProgress}
+              highlightActive={highlightActive}
+            />
+          ) : (
+            <WordContent token={token} />
+          )}
+        </motion.span>
+      );
+    });
+
+  return (
+    <>
+      {leading.map((token, index) => {
+        const flatIndex = wordOffset + index;
+
+        return (
+          <motion.span
+            key={token.key}
+            variants={wordVariants}
+            className="inline-block will-change-[transform,opacity,filter]"
+            style={index < leading.length - 1 || trailing ? { marginRight: wordGap } : undefined}
+          >
+            {highlightProgress ? (
+              <HighlightWord
+                token={token}
+                wordIndex={flatIndex}
+                wordCount={wordCount}
+                progress={highlightProgress}
+                highlightActive={highlightActive}
+              />
+            ) : (
+              <WordContent token={token} />
+            )}
+          </motion.span>
+        );
+      })}
+      {trailing && (
+        <span className="inline-block whitespace-nowrap">
+          {renderAnimatedGroup(trailing, leading.length)}
+        </span>
+      )}
+    </>
+  );
+}
+
+function splitTokensForOrphanGuard(tokens: WordToken[]): {
+  leading: WordToken[];
+  trailing: WordToken[] | null;
+} {
+  if (tokens.length <= 2) {
+    return { leading: [], trailing: tokens.length > 0 ? tokens : null };
+  }
+
+  return {
+    leading: tokens.slice(0, -2),
+    trailing: tokens.slice(-2),
+  };
+}
+
+function renderWordToken(
+  token: WordToken,
+  index: number,
+  tokens: WordToken[],
+  compact: boolean | undefined,
+  render: (token: WordToken) => ReactNode,
+) {
+  const wordGap = compact ? "0.15em" : "0.25em";
+
+  return (
+    <span
+      key={token.key}
+      className="inline-block"
+      style={index < tokens.length - 1 ? { marginRight: wordGap } : undefined}
+    >
+      {render(token)}
+    </span>
+  );
 }
 
 function StaticWords({
@@ -183,16 +272,22 @@ function StaticWords({
   tokens: WordToken[];
   compact?: boolean;
 }) {
-  const wordGap = compact ? "0.15em" : "0.25em";
-  return tokens.map((token, i) => (
-    <span
-      key={token.key}
-      className="inline-block"
-      style={i < tokens.length - 1 ? { marginRight: wordGap } : undefined}
-    >
-      <WordContent token={token} />
-    </span>
-  ));
+  const { leading, trailing } = splitTokensForOrphanGuard(tokens);
+
+  return (
+    <>
+      {leading.map((token, index) =>
+        renderWordToken(token, index, leading, compact, (t) => <WordContent token={t} />),
+      )}
+      {trailing && (
+        <span className="inline-block whitespace-nowrap">
+          {trailing.map((token, index) =>
+            renderWordToken(token, index, trailing, compact, (t) => <WordContent token={t} />),
+          )}
+        </span>
+      )}
+    </>
+  );
 }
 
 function WordLine({
@@ -290,6 +385,8 @@ export interface AnimatedHeroHeadingProps {
   emphasis?: boolean;
   /** Scale font size down so each nowrap line fits the container (home hero) */
   fitText?: boolean;
+  /** Upper bound (px) when fitText scales multiline headings — default 36 mobile, pass higher for desktop columns */
+  fitTextMaxSizePx?: number;
   /** Per-word motion style */
   reveal?: "slide" | "blur";
   /** When to start the reveal — mount on load, inView after scroll */
@@ -327,6 +424,7 @@ export function AnimatedHeroHeading({
   multiline = false,
   emphasis = true,
   fitText = false,
+  fitTextMaxSizePx = 36,
   reveal = "slide",
   trigger = "mount",
   revealDelay,
@@ -376,7 +474,7 @@ export function AnimatedHeroHeading({
   const shouldFitText = fitText && multiline;
   const { containerRef, fontSizePx } = useFitMultilineText(
     shouldFitText ? lines.length : 0,
-    { remeasureKey: fontsReady, maxSizePx: 36 },
+    { remeasureKey: fontsReady, maxSizePx: fitTextMaxSizePx },
   );
   const fitTextStyle =
     fontSizePx != null ? ({ fontSize: `${fontSizePx}px` } as CSSProperties) : undefined;

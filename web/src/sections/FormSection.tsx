@@ -21,6 +21,7 @@ function FormPhotoBackgroundSection({
   isCentered,
   backgroundImageSrc,
   backgroundImageAlt,
+  cardMaxWidthClass,
   card,
 }: {
   id?: string;
@@ -28,6 +29,7 @@ function FormPhotoBackgroundSection({
   isCentered: boolean;
   backgroundImageSrc: string;
   backgroundImageAlt: string;
+  cardMaxWidthClass?: string;
   card: ReactNode;
 }) {
   const scrollRef = useRef<HTMLElement>(null);
@@ -48,7 +50,9 @@ function FormPhotoBackgroundSection({
         alt={backgroundImageAlt}
       />
       <div className={cn("relative mx-auto max-w-6xl", isCentered && "flex justify-center")}>
-        <div className={cn("w-full max-w-[776px]", isCentered && "mx-auto")}>{card}</div>
+        <div className={cn("w-full max-w-[776px]", cardMaxWidthClass, isCentered && "mx-auto")}>
+          {card}
+        </div>
       </div>
     </section>
   );
@@ -218,6 +222,10 @@ export interface FormSectionProps extends Pick<
   theme?: SectionTheme;
   /** Built-in form preset — ignored when `children` is provided */
   formKind?: "contact" | "newsletter";
+  /** Vertical card only — override default `max-w-[776px]` wrapper */
+  cardMaxWidthClass?: string;
+  /** Vertical card only — extra classes on the card surface */
+  cardClassName?: string;
   children?: React.ReactNode;
   id?: string;
 }
@@ -236,6 +244,8 @@ export function FormSection({
   align = "left",
   theme = "light",
   formKind = "contact",
+  cardMaxWidthClass,
+  cardClassName,
   children,
   className,
   id,
@@ -337,6 +347,7 @@ export function FormSection({
         "rounded-[var(--radius-2xl)] p-16",
         activeStyles.card,
         glassTone && "relative overflow-hidden",
+        cardClassName,
       )}
     >
       {glassTone && <GlassDecoration tone={glassTone} />}
@@ -371,6 +382,7 @@ export function FormSection({
         isCentered={isCentered}
         backgroundImageSrc={backgroundImageSrc}
         backgroundImageAlt={backgroundImageAlt}
+        cardMaxWidthClass={cardMaxWidthClass}
         card={card}
       />
     );
@@ -380,7 +392,7 @@ export function FormSection({
     <SectionShell theme={sectionTheme} className={className} id={id}>
       {layout === "vertical-card" ? (
         <div className={cn(isCentered && "flex flex-col items-center")}>
-          <div className="w-full max-w-[776px]">{card}</div>
+          <div className={cn("w-full max-w-[776px]", cardMaxWidthClass)}>{card}</div>
         </div>
       ) : (
         card

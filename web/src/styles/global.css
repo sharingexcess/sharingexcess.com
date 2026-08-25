@@ -188,11 +188,19 @@
   --section-btn-hover: var(--color-neutral-000);
 }
 
+[data-form-card="kale"] {
+  --section-text: var(--color-neutral-000);
+  --section-emphasis: var(--color-bright-kelly);
+  --section-btn: var(--color-neutral-000);
+  --section-btn-hover: var(--color-bright-kelly);
+}
+
 [data-form-card="dark-green"] {
   --section-btn-hover: var(--color-neutral-000);
 }
 
 [data-form-card="white"],
+[data-form-card="green-100"],
 [data-form-card="banana"],
 [data-form-card="tangerine"] {
   --section-btn: var(--color-se-green-base);
@@ -259,6 +267,55 @@ body {
 
 html {
   scroll-padding-top: var(--site-header-height);
+}
+
+/*
+ * Last section → footer: extend the last section's background downward.
+ * `.page-last-section` is set by markPageLastSection (PageLayout + SiteFooter).
+ * --section-footer-gap adds space beyond normal section padding; footer only
+ * nests its rounded top by the radius amount.
+ */
+:root {
+  --section-footer-gap: 3rem;
+  --section-footer-bridge-height: calc(var(--section-footer-gap) + var(--radius-xl));
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --section-footer-gap: 5rem;
+    --section-footer-bridge-height: calc(var(--section-footer-gap) + var(--radius-2xl));
+  }
+}
+
+/* Solid sections — extra bottom padding keeps the section background color. */
+main [data-section].page-last-section {
+  padding-bottom: calc(3rem + var(--section-footer-gap)) !important;
+}
+
+@media (min-width: 1024px) {
+  main [data-section].page-last-section {
+    padding-bottom: calc(var(--spacing-xxl) + var(--section-footer-gap)) !important;
+  }
+}
+
+/* Scroll handoffs — transparent wrapper; extend fade tone via ::after. */
+.page-last-section[data-section-scroll-handoff]::after {
+  content: "";
+  display: block;
+  height: var(--section-footer-bridge-height);
+  background: var(--section-bg, var(--color-neutral-000));
+}
+
+.page-last-section[data-section-scroll-handoff][data-fade-to="dark"]::after {
+  background: var(--color-kale);
+}
+
+.page-last-section[data-section-scroll-handoff][data-fade-to="green"]::after {
+  background: var(--color-se-green-100);
+}
+
+.page-last-section[data-section-scroll-handoff][data-fade-to="light"]::after {
+  background: var(--color-neutral-000);
 }
 
 /* Home donate hero — scroll-driven fade/scale via --hero-scroll (set in JS, applied in CSS) */
@@ -346,6 +403,15 @@ html {
   will-change: transform;
 }
 
+/* Mobile — ripple canvas fills the pinned hero viewport */
+@media (max-width: 1023px) {
+  .home-hero-donate--stacked .home-hero-donate__pin > .hero-bg-pulse-overlay,
+  .home-hero-donate--stacked:not(.home-hero-donate--scroll-fx) .hero-bg-pulse-overlay {
+    height: 100dvh;
+    min-height: 100dvh;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .home-hero-donate--scroll-fx:not(.home-hero-donate--stacked) .home-hero-donate__bg-wrap,
   .home-hero-donate--scroll-fx:not(.home-hero-donate--stacked) .home-hero-donate__content {
@@ -420,13 +486,6 @@ html {
   transform: translateY(calc(-100% - 1rem));
 }
 
-@media (max-width: 1023px) {
-  .site-header-shell--hidden {
-    pointer-events: auto;
-    transform: none;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .site-header-shell {
     transition: none;
@@ -435,38 +494,6 @@ html {
 
 .site-header-offset {
   padding-top: calc(var(--site-header-height) + 3rem);
-}
-
-/* Nav dropdown featured card — explicit size so layout survives island hydration */
-.nav-dropdown-featured-shell {
-  display: block;
-  height: 240px;
-  width: 100%;
-}
-
-.nav-dropdown-stacked-featured-column {
-  height: 240px;
-  width: 100%;
-  --nav-dropdown-stacked-height: 240px;
-}
-
-/* Full-height crop — tile expansion clips/reveals; image never rescales */
-.nav-dropdown-stacked-featured-image {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: var(--nav-dropdown-stacked-height);
-  object-fit: cover;
-  object-position: center;
-  transform: translateY(-50%);
-}
-
-.nav-dropdown-stacked-featured-image--bottom {
-  top: auto;
-  bottom: 0;
-  transform: none;
-  object-position: center bottom;
 }
 
 .logos-marquee-track {

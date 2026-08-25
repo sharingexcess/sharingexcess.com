@@ -1,7 +1,12 @@
 import { Button } from "@/components/ui/Button";
 import { TextInput } from "@/components/ui/TextInput";
 import { cn } from "@/lib/cn";
-import { formatLargeNumber } from "@/lib/formatNumber";
+import { formatDollarAmount, formatLargeNumber } from "@/lib/formatNumber";
+import {
+  buttonSecondaryScaleSpring,
+  motion,
+  useReducedMotion,
+} from "@/lib/motion";
 import type { SectionTheme } from "@/lib/types";
 import { eyebrowClassName } from "@/lib/typography";
 import { SECTION_CARD_NESTED_RADIUS_CLASS } from "@/sections/sectionCardConfig";
@@ -24,22 +29,98 @@ export interface DonationFormProps {
   eyebrow?: string;
   /** Hide the built-in hero card heading — use when the parent section supplies title/body */
   hideHeader?: boolean;
-  /** Hide the built-in hero card heading — use when the parent section supplies title/body */
-  hideHeader?: boolean;
+  /** Compact intro widget — narrow card, single amount row, dynamic submit label */
+  compact?: boolean;
+  /** Hero card surface — dark: kale / brand-green; light: white / green-100 */
+  formCard?: "white" | "brand-green" | "kale" | "green-100";
   /** Parent section theme — light uses neutral-050 card fill */
   sectionTheme?: SectionTheme;
   /** Nested inside a section card — reduces corner radius for even inset */
   inCard?: boolean;
+  /** Omit card shell — controls sit flush in a parent container (e.g. donate overlay) */
+  embedded?: boolean;
   className?: string;
   onSubmit?: (data: { frequency: DonationFrequency; amount: number; currency: string }) => void;
 }
 
-const HERO_PRESETS = [
-  { amount: 20, impact: "240 meals" },
-  { amount: 60, impact: "720 meals" },
-  { amount: 120, impact: "1,440 meals" },
-  { amount: 1290, impact: "a full truckload" },
-] as const;
+const HERO_PRESET_AMOUNTS = [20, 60, 120, 1290] as const;
+
+/** Selected-state solid fills — brand base tokens (bg-banana, not bg-banana-base) */
+const HERO_AMOUNT_SELECTED_THEMES: Record<(typeof HERO_PRESET_AMOUNTS)[number], string> = {
+  20: "bg-banana text-kale",
+  60: "bg-tangerine text-kale",
+  120: "bg-blueberry text-kale",
+  1290: "bg-se-green text-white",
+};
+
+const HERO_AMOUNT_UNSELECTED_CLASS =
+  "border border-neutral-250 bg-white text-kale hover:border-[var(--section-btn-hover,#003619)] hover:text-[var(--section-btn-hover,#003619)]";
+
+const HERO_COMPACT_PILL_CLASS =
+  "flex h-9 w-full min-w-0 cursor-pointer items-center justify-center rounded-[99px] px-2.5 text-base font-semibold leading-none transition-[border-color,color] duration-200";
+
+const HERO_COMPACT_CONTROL_HEIGHT = "h-9";
+
+function CompactAmountPill({
+  children,
+  className,
+  onClick,
+  selected,
+  theme,
+  ariaPressed,
+}: {
+  children: ReactNode;
+  className?: string;
+  onClick: () => void;
+  selected: boolean;
+  theme?: string;
+  ariaPressed?: boolean;
+}) {
+  const reduceMotion = useReducedMotion();
+  const classNames = cn(
+    HERO_COMPACT_PILL_CLASS,
+    className,
+    selected && theme ? theme : HERO_AMOUNT_UNSELECTED_CLASS,
+  );
+
+  if (reduceMotion) {
+    return (
+      <button
+        type="button"
+        aria-pressed={ariaPressed ?? selected}
+        onClick={onClick}
+        className={classNames}
+      >
+        {children}
+      </button>
+    );
+  }
+
+  return (
+    <motion.button
+      type="button"
+      aria-pressed={ariaPressed ?? selected}
+      onClick={onClick}
+      className={classNames}
+      initial={{ scale: 1 }}
+      whileHover={{ scale: 1.04 }}
+      transition={{ scale: buttonSecondaryScaleSpring }}
+    >
+      {children}
+    </motion.button>
+  );
+}
+
+/** Matches donation page copy — $1 provides 12 meals. */
+const MEALS_PER_DOLLAR = 12;
+
+function heroMealsFromAmount(dollars: number): number {
+  return Math.round(Math.max(0, dollars) * MEALS_PER_DOLLAR);
+}
+
+function getHeroSelectedAmount(amount: number): number {
+  return Math.max(0, amount);
+}
 
 function HeartIcon({ className }: { className?: string }) {
   return (
@@ -74,29 +155,80 @@ function ChevronDownIcon({ className }: { className?: string }) {
   );
 }
 
-function ToggleButton({
-  selected,
-  onClick,
-  children,
+function FrequencyToggleGroup({
+  frequency,
+  onFrequencyChange,
+  onBrandGreen,
+  onceLabel = "Give Now",
+  monthlyLabel = "Give Monthly",
+  compactLight = false,
+  compact = false,
 }: {
-  selected: boolean;
-  onClick: () => void;
-  children: ReactNode;
+  frequency: DonationFrequency;
+  onFrequencyChange: (frequency: DonationFrequency) => void;
+  onBrandGreen: boolean;
+  onceLabel?: string;
+  monthlyLabel?: string;
+  /** White intro widget — green-100 sliding pill, kale labels */
+  compactLight?: boolean;
+  compact?: boolean;
 }) {
+  const segments: { id: DonationFrequency; label: string }[] = [
+    { id: "one-time", label: onceLabel },
+    { id: "monthly", label: monthlyLabel },
+  ];
+
+  const useGreen100Indicator = compactLight && !onBrandGreen;
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={selected}
+    <div
+      role="group"
+      aria-label="Donation frequency"
       className={cn(
-        "flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-3xl border px-4 py-3 text-base font-semibold leading-none transition-colors lg:rounded-full",
-        selected
-          ? "border-kale bg-se-green-100 text-kale"
-          : "border-neutral-250 bg-white text-kale hover:border-neutral-300",
+        "relative grid w-full grid-cols-2 rounded-[99px] p-0.5",
+        onBrandGreen ? "border border-white/30 bg-white/10" : "border border-neutral-250 bg-white",
       )}
     >
-      {children}
-    </button>
+      <div
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 w-[calc(50%-0.125rem)] rounded-[99px] transition-transform duration-200 ease-out",
+          onBrandGreen
+            ? "bg-white"
+            : useGreen100Indicator
+              ? "bg-se-green-100"
+              : "bg-[var(--section-btn-primary-bg,#00843d)]",
+          frequency === "monthly" && "translate-x-full",
+        )}
+      />
+      {segments.map((segment) => {
+        const selected = frequency === segment.id;
+
+        return (
+          <button
+            key={segment.id}
+            type="button"
+            aria-pressed={selected}
+            onClick={() => onFrequencyChange(segment.id)}
+            className={cn(
+              "relative z-10 flex cursor-pointer items-center justify-center rounded-[99px] border-0 bg-transparent px-2.5 font-semibold leading-none transition-colors",
+              compact ? cn(HERO_COMPACT_CONTROL_HEIGHT, "text-base") : "h-9 px-3 text-sm lg:h-[45px] lg:py-0",
+              selected
+                ? onBrandGreen
+                  ? "text-[var(--section-btn-primary-label,#003619)]"
+                  : useGreen100Indicator
+                    ? "text-kale"
+                    : "text-[var(--section-btn-primary-label,#ffffff)]"
+                : onBrandGreen
+                  ? "text-white/85 hover:text-white"
+                  : "text-kale/70 hover:text-kale",
+            )}
+          >
+            {segment.label}
+          </button>
+        );
+      })}
+    </div>
   );
 }
 
@@ -126,87 +258,150 @@ function AmountButton({
   );
 }
 
-/** Per-index accent themes for the hero preset buttons (green → banana → tangerine → blueberry) */
-const HERO_BUTTON_THEMES = [
-  {
-    selected: "border-kale bg-se-green-100 text-kale",
-    impact: "text-kale",
-  },
-  {
-    selected: "border-banana-700 bg-banana-100 text-banana-700",
-    impact: "text-banana-700",
-  },
-  {
-    selected: "border-tangerine-700 bg-tangerine-100 text-tangerine-700",
-    impact: "text-tangerine-700",
-  },
-  {
-    selected: "border-blueberry-700 bg-blueberry-100 text-blueberry-700",
-    impact: "text-blueberry-700",
-  },
-] as const;
+const HERO_AMOUNT_PILL_CLASS = "w-auto shrink-0";
 
-function ImpactAmountButton({
+function HeroAmountPill({
   amount,
-  impact,
   selected,
   onClick,
-  colorIndex = 0,
+  onBrandGreen,
+  compact = false,
+  className,
 }: {
   amount: number;
-  impact?: string;
   selected: boolean;
   onClick: () => void;
-  colorIndex?: number;
+  onBrandGreen: boolean;
+  compact?: boolean;
+  className?: string;
 }) {
   const formattedAmount =
     amount >= 1000 ? formatLargeNumber(amount) : String(amount);
 
-  const theme = HERO_BUTTON_THEMES[colorIndex % HERO_BUTTON_THEMES.length];
+  if (compact && !onBrandGreen) {
+    const theme =
+      HERO_AMOUNT_SELECTED_THEMES[amount as (typeof HERO_PRESET_AMOUNTS)[number]];
+
+    return (
+      <CompactAmountPill
+        selected={selected}
+        theme={selected ? theme : undefined}
+        className={className}
+        onClick={onClick}
+      >
+        ${formattedAmount}
+      </CompactAmountPill>
+    );
+  }
+
+  const colorScheme = onBrandGreen ? "dark" : "light";
 
   return (
-    <button
+    <Button
       type="button"
-      onClick={onClick}
+      variant={selected ? "primary" : "secondary"}
+      colorScheme={colorScheme}
+      size="sm"
+      simpleLabel
       aria-pressed={selected}
-      className={cn(
-        "flex cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border px-2 py-2.5 transition-colors sm:px-3 sm:py-3",
-        selected
-          ? theme.selected
-          : "border-neutral-250 bg-white text-kale hover:border-neutral-300",
-      )}
+      onClick={onClick}
+      className={cn(HERO_AMOUNT_PILL_CLASS, className, !onBrandGreen && !selected && "bg-white")}
     >
-      <span className="text-sm font-semibold leading-none sm:text-base">
-        ${formattedAmount}
-      </span>
-      {impact && (
-        <span
-          className={cn(
-            "text-center text-xs font-medium leading-tight",
-            selected ? theme.impact : "text-kale/70",
-          )}
-        >
-          {impact}
-        </span>
-      )}
-    </button>
+      ${formattedAmount}
+    </Button>
   );
 }
 
-function OtherAmountInput({
+function HeroOtherAmountInput({
   selected,
   value,
   onFocus,
   onChange,
+  onBrandGreen,
+  compact = false,
+  className,
 }: {
   selected: boolean;
   value: string;
   onFocus: () => void;
   onChange: (value: string) => void;
+  onBrandGreen: boolean;
+  compact?: boolean;
+  className?: string;
 }) {
+  if (compact && !onBrandGreen) {
+    if (!selected) {
+      return (
+        <CompactAmountPill
+          selected={false}
+          ariaPressed={false}
+          className={className}
+          onClick={onFocus}
+        >
+          $ Other
+        </CompactAmountPill>
+      );
+    }
+
+    return (
+      <label className={cn("relative flex w-full min-w-0 items-center", HERO_COMPACT_CONTROL_HEIGHT, className)}>
+        <span className="pointer-events-none absolute left-3 z-10 text-base font-semibold leading-none text-kale/70">
+          $
+        </span>
+        <TextInput
+          type="number"
+          min={1}
+          step={1}
+          value={value}
+          placeholder="Other"
+          autoFocus
+          onFocus={onFocus}
+          onChange={(event) => onChange(event.target.value)}
+          aria-label="Custom donation amount"
+          theme="onWhite"
+          className={cn(
+            "h-full w-full min-w-0 rounded-[99px] py-0 pl-7 pr-2 text-base font-semibold leading-none",
+            "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+          )}
+        />
+      </label>
+    );
+  }
+
+  const colorScheme = onBrandGreen ? "dark" : "light";
+
+  if (!selected) {
+    return (
+      <Button
+        type="button"
+        variant="secondary"
+        colorScheme={colorScheme}
+        size="sm"
+        simpleLabel
+        aria-pressed={false}
+        onClick={onFocus}
+        className={cn(HERO_AMOUNT_PILL_CLASS, className, !onBrandGreen && "bg-white")}
+      >
+        $ Other
+      </Button>
+    );
+  }
+
   return (
-    <label className="relative flex h-full w-full min-w-0 items-center">
-      <span className="pointer-events-none absolute left-4 z-10 text-base font-semibold leading-none text-kale/70">
+    <label
+      className={cn(
+        "relative inline-flex h-11 w-full min-w-0 items-center lg:h-[45px]",
+        className,
+      )}
+    >
+      <span
+        className={cn(
+          "pointer-events-none absolute left-4 z-10 text-sm font-semibold leading-none lg:text-base",
+          onBrandGreen
+            ? "text-[var(--section-btn-primary-label,#003619)]"
+            : "text-[var(--section-btn-primary-label,#ffffff)]",
+        )}
+      >
         $
       </span>
       <TextInput
@@ -215,19 +410,46 @@ function OtherAmountInput({
         step={1}
         value={value}
         placeholder="Other"
+        autoFocus
         onFocus={onFocus}
         onChange={(event) => onChange(event.target.value)}
         aria-label="Custom donation amount"
-        theme="onWhite"
+        theme={onBrandGreen ? "onColor" : "onWhite"}
         className={cn(
-          "h-full rounded-2xl pl-8 font-semibold leading-none placeholder:text-kale/70",
-          selected
-            ? "border-kale bg-se-green-100 focus:border-kale"
-            : "border-neutral-250 bg-white",
+          "h-full w-full min-w-0 rounded-[99px] pl-8 pr-4 text-sm font-semibold leading-none lg:text-base",
+          onBrandGreen
+            ? "border-0 bg-white text-[var(--section-btn-primary-label,#003619)] placeholder:text-[var(--section-btn-primary-label,#003619)]/60 focus:border-0"
+            : "border-0 bg-[var(--section-btn-primary-bg,#00843d)] text-[var(--section-btn-primary-label,#ffffff)] placeholder:text-[var(--section-btn-primary-label,#ffffff)]/70 focus:border-0",
           "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
         )}
       />
     </label>
+  );
+}
+
+function ToggleButton({
+  selected,
+  onClick,
+  children,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      className={cn(
+        "flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-3xl border px-4 py-3 text-base font-semibold leading-none transition-colors lg:rounded-full",
+        selected
+          ? "border-kale bg-se-green-100 text-kale"
+          : "border-neutral-250 bg-white text-kale hover:border-neutral-300",
+      )}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -240,25 +462,50 @@ function DonationFormShell({
   children,
   onSubmit,
   formCard,
+  compact = false,
+  embedded = false,
 }: {
   sectionTheme: SectionTheme;
   inCard: boolean;
   className?: string;
   children: ReactNode;
   onSubmit?: (event: React.FormEvent) => void;
-  /** White/nested form cards reset button tokens inside dark sections */
-  formCard?: "white";
+  /** Form card tone — drives button tokens via `data-form-card` in global.css */
+  formCard?: "white" | "brand-green" | "kale" | "green-100";
+  /** Tight card inset — overrides default shell padding at all breakpoints */
+  compact?: boolean;
+  embedded?: boolean;
 }) {
   return (
     <form
       onSubmit={onSubmit}
       data-form-card={formCard}
       className={cn(
-        "@container flex w-full min-w-0 flex-col gap-6 p-4 text-kale sm:p-6 lg:p-10",
-        inCard
-          ? SECTION_CARD_NESTED_RADIUS_CLASS
-          : "rounded-[var(--radius-lg)] lg:rounded-[var(--radius-xl)]",
-        sectionTheme === "light" ? "bg-neutral-050" : "bg-white",
+        "@container flex w-full min-w-0 flex-col",
+        embedded
+          ? "gap-4 text-kale"
+          : cn(
+              compact ? "p-4 sm:p-4 lg:p-5" : "gap-6 p-4 sm:p-6 lg:p-10",
+              compact
+                ? "rounded-[var(--radius-md)] lg:rounded-[var(--radius-lg)]"
+                : inCard
+                  ? SECTION_CARD_NESTED_RADIUS_CLASS
+                  : "rounded-[var(--radius-lg)] lg:rounded-[var(--radius-xl)]",
+              formCard === "brand-green"
+                ? "bg-se-green text-white"
+                : formCard === "kale"
+                  ? "bg-kale text-white"
+                  : formCard === "green-100"
+                    ? "bg-se-green-100 text-kale"
+                    : cn(
+                        "text-kale",
+                        formCard === "white"
+                          ? "bg-white"
+                          : sectionTheme === "light"
+                            ? "bg-neutral-050"
+                            : "bg-white",
+                      ),
+            ),
         className,
       )}
     >
@@ -274,109 +521,224 @@ function HeroDonationForm({
   defaultAmount = 20,
   eyebrow,
   hideHeader = false,
+  compact = false,
+  embedded = false,
+  formCard = "brand-green",
   onSubmit,
 }: Pick<
   DonationFormProps,
-  "sectionTheme" | "inCard" | "className" | "defaultAmount" | "eyebrow" | "hideHeader" | "onSubmit"
+  | "sectionTheme"
+  | "inCard"
+  | "className"
+  | "defaultAmount"
+  | "eyebrow"
+  | "hideHeader"
+  | "compact"
+  | "embedded"
+  | "formCard"
+  | "onSubmit"
 >) {
+  const [frequency, setFrequency] = useState<DonationFrequency>("one-time");
   const [amount, setAmount] = useState(defaultAmount);
-  const [isOther, setIsOther] = useState(false);
+  const [isCustomAmount, setIsCustomAmount] = useState(false);
   const [customAmount, setCustomAmount] = useState("");
+  const isDarkFormCard = formCard === "brand-green" || formCard === "kale";
+  const buttonScheme = isDarkFormCard ? "dark" : "light";
+  const selectedAmount = getHeroSelectedAmount(
+    isCustomAmount ? Number(customAmount) || amount : amount,
+  );
+  const selectedMeals = heroMealsFromAmount(selectedAmount);
+  const headerEmphasisClass = isDarkFormCard ? "text-bright-kelly" : "text-se-green-base";
 
-  const handleGive = (frequency: DonationFrequency) => {
-    const donationAmount = isOther ? Number(customAmount) || 0 : amount;
-    onSubmit?.({ frequency, amount: donationAmount, currency: "USD" });
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    onSubmit?.({ frequency, amount: selectedAmount, currency: "USD" });
   };
+
+  const dynamicSubmitLabel =
+    frequency === "monthly"
+      ? `Give ${formatDollarAmount(selectedAmount)} Monthly`
+      : `Give ${formatDollarAmount(selectedAmount)} Now`;
 
   return (
     <DonationFormShell
       sectionTheme={sectionTheme ?? "dark"}
       inCard={inCard ?? false}
-      className={className}
-      formCard="white"
+      compact={compact}
+      embedded={embedded}
+      className={cn(
+        !embedded && compact && "border border-neutral-250",
+        !embedded && !compact && "gap-4 p-4 sm:p-5 lg:p-6",
+        className,
+      )}
+      formCard={formCard}
+      onSubmit={handleSubmit}
     >
-      <div className="flex w-full min-w-0 flex-col gap-6">
+      <div className={cn("flex w-full min-w-0 flex-col", compact ? "gap-3" : "gap-4")}>
         {!hideHeader && (
-          <div className="flex w-full min-w-0 flex-col gap-2">
-            {eyebrow && (
-              <p className={cn(eyebrowClassName, "text-kale")}>{eyebrow}</p>
+          <div
+            className={cn(
+              "flex w-full min-w-0 flex-col gap-1.5",
+              !isDarkFormCard && "items-center text-center",
             )}
-            <h3 className="w-full min-w-0 font-sans text-[clamp(1.875rem,10cqw,3rem)] font-medium leading-[1.12] tracking-[-0.04em] text-kale">
+          >
+            {eyebrow && (
+              <p className={cn(eyebrowClassName, isDarkFormCard ? "text-white/80" : "text-kale/70")}>
+                {eyebrow}
+              </p>
+            )}
+            <h3
+              className={cn(
+                "w-full min-w-0 font-sans text-[clamp(1.25rem,4vw,1.75rem)] font-medium leading-[1.2] tracking-[-0.03em] lg:text-[1.75rem] lg:whitespace-nowrap",
+                isDarkFormCard ? "text-white" : "text-kale",
+              )}
+            >
               The food is donated;{" "}
-              <em className="not-italic text-se-green">your gift moves it.</em>
+              <em className={cn("not-italic", headerEmphasisClass)}>your gift moves it.</em>
             </h3>
+            <p
+              aria-live="polite"
+              className={cn(
+                "text-base font-medium leading-snug",
+                isDarkFormCard ? "text-white/85" : "text-kale/80",
+              )}
+            >
+              {formatDollarAmount(selectedAmount)} ={" "}
+              <span className={cn("font-semibold", headerEmphasisClass)}>
+                {formatLargeNumber(selectedMeals)} meals
+              </span>
+              .
+            </p>
           </div>
         )}
 
-        <div className="grid w-full grid-cols-3 gap-2 sm:gap-3">
-          {HERO_PRESETS.slice(0, 3).map((preset, i) => (
-            <ImpactAmountButton
-              key={preset.amount}
-              amount={preset.amount}
-              impact={preset.impact}
-              selected={!isOther && amount === preset.amount}
-              colorIndex={i}
-              onClick={() => {
-                setIsOther(false);
-                setCustomAmount("");
-                setAmount(preset.amount);
-              }}
-            />
-          ))}
-        </div>
+        <FrequencyToggleGroup
+          frequency={frequency}
+          onFrequencyChange={setFrequency}
+          onBrandGreen={isDarkFormCard}
+          compactLight={compact && !isDarkFormCard}
+          compact={compact}
+        />
 
-        <div className="grid w-full grid-cols-3 gap-2 sm:gap-3">
-          <ImpactAmountButton
-            amount={HERO_PRESETS[3].amount}
-            impact={HERO_PRESETS[3].impact}
-            selected={!isOther && amount === HERO_PRESETS[3].amount}
-            colorIndex={3}
-            onClick={() => {
-              setIsOther(false);
-              setCustomAmount("");
-              setAmount(HERO_PRESETS[3].amount);
-            }}
-          />
-          <div className="col-span-2 min-w-0">
-            <OtherAmountInput
-              selected={isOther}
-              value={customAmount}
-              onFocus={() => {
-                if (!isOther) {
+        {compact ? (
+          <div className="grid grid-cols-3 gap-1">
+            {HERO_PRESET_AMOUNTS.slice(0, 3).map((presetAmount) => (
+              <HeroAmountPill
+                key={presetAmount}
+                amount={presetAmount}
+                selected={!isCustomAmount && amount === presetAmount}
+                onBrandGreen={isDarkFormCard}
+                compact
+                onClick={() => {
+                  setIsCustomAmount(false);
                   setCustomAmount("");
-                }
-                setIsOther(true);
-              }}
-              onChange={(value) => {
-                setIsOther(true);
-                setCustomAmount(value);
+                  setAmount(presetAmount);
+                }}
+              />
+            ))}
+            <HeroAmountPill
+              amount={HERO_PRESET_AMOUNTS[3]}
+              selected={!isCustomAmount && amount === HERO_PRESET_AMOUNTS[3]}
+              onBrandGreen={isDarkFormCard}
+              compact
+              onClick={() => {
+                setIsCustomAmount(false);
+                setCustomAmount("");
+                setAmount(HERO_PRESET_AMOUNTS[3]);
               }}
             />
+            <div className="col-span-2 min-w-0">
+              <HeroOtherAmountInput
+                selected={isCustomAmount}
+                value={customAmount}
+                onBrandGreen={isDarkFormCard}
+                compact
+                className="w-full"
+                onFocus={() => {
+                  if (!isCustomAmount) {
+                    setCustomAmount("");
+                  }
+                  setIsCustomAmount(true);
+                }}
+                onChange={(value) => {
+                  setIsCustomAmount(true);
+                  setCustomAmount(value);
+                  setAmount(Number(value) || 0);
+                }}
+              />
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+            {HERO_PRESET_AMOUNTS.slice(0, 3).map((presetAmount) => (
+              <HeroAmountPill
+                key={presetAmount}
+                amount={presetAmount}
+                selected={!isCustomAmount && amount === presetAmount}
+                onBrandGreen={isDarkFormCard}
+                className="w-full"
+                onClick={() => {
+                  setIsCustomAmount(false);
+                  setCustomAmount("");
+                  setAmount(presetAmount);
+                }}
+              />
+            ))}
+            <HeroAmountPill
+              amount={HERO_PRESET_AMOUNTS[3]}
+              selected={!isCustomAmount && amount === HERO_PRESET_AMOUNTS[3]}
+              onBrandGreen={isDarkFormCard}
+              className="w-full"
+              onClick={() => {
+                setIsCustomAmount(false);
+                setCustomAmount("");
+                setAmount(HERO_PRESET_AMOUNTS[3]);
+              }}
+            />
+            <div className="col-span-2 min-w-0">
+              <HeroOtherAmountInput
+                selected={isCustomAmount}
+                value={customAmount}
+                onBrandGreen={isDarkFormCard}
+                className="w-full"
+                onFocus={() => {
+                  if (!isCustomAmount) {
+                    setCustomAmount("");
+                  }
+                  setIsCustomAmount(true);
+                }}
+                onChange={(value) => {
+                  setIsCustomAmount(true);
+                  setCustomAmount(value);
+                  setAmount(Number(value) || 0);
+                }}
+              />
+            </div>
+          </div>
+        )}
 
-        <div className="flex gap-3">
-          <Button
-            type="button"
-            variant="primary"
-            colorScheme="light"
-            size="md"
-            className="flex-1 rounded-2xl"
-            onClick={() => handleGive("one-time")}
+        {compact && (
+          <p
+            aria-live="polite"
+            className="text-center text-base font-medium leading-snug text-kale lg:text-lg"
           >
-            Give Now
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            colorScheme="light"
-            size="md"
-            className="flex-1 rounded-2xl"
-            onClick={() => handleGive("monthly")}
-          >
-            Give Monthly
-          </Button>
-        </div>
+            {formatDollarAmount(selectedAmount)} ={" "}
+            <span className="font-semibold text-se-green">
+              {formatLargeNumber(selectedMeals)} meals
+            </span>
+            .
+          </p>
+        )}
+
+        <Button
+          type="submit"
+          variant="primary"
+          colorScheme={buttonScheme}
+          size="md"
+          className="w-full"
+        >
+          {compact ? dynamicSubmitLabel : frequency === "monthly" ? "Give Monthly" : "Give Now"}
+        </Button>
       </div>
     </DonationFormShell>
   );

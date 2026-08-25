@@ -1,16 +1,46 @@
+import { cn } from "@/lib/cn";
 import { useReducedMotion } from "@/lib/motion";
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
+import { HeroMobileViewportShimmerEngine } from "./heroMobileViewportShimmer";
 import {
   HalftoneRippleEngine,
+  type HalftoneRippleViewportProfile,
   type RippleContentMask,
+  type RippleOrigin,
 } from "./heroHalftoneRipple";
 import "./heroBackgroundPulse.css";
+
+function resolveHeroRippleViewportProfile(
+  overlay: HTMLElement,
+): HalftoneRippleViewportProfile {
+  const isStackedHomeHero = Boolean(overlay.closest(".home-hero-donate--stacked"));
+  const isMobile = window.matchMedia("(max-width: 1023px)").matches;
+  return isStackedHomeHero && isMobile ? "mobile-hero" : "default";
+}
+
+function isMobileHeroShimmer(overlay: HTMLElement): boolean {
+  return resolveHeroRippleViewportProfile(overlay) === "mobile-hero";
+}
 
 export interface HeroBackgroundPulsesProps {
   /** When false, only the faint base grid shows — ripples start once this turns true */
   active?: boolean;
+  /** Mobile shimmer — fades the overlay in once hero intro content has settled */
+  entered?: boolean;
   /** Hero intro content — ripples are masked inside this element's bounds */
   contentMaskRef?: RefObject<HTMLElement | null>;
+  /** Desktop ripples only — ignored on mobile shimmer */
+  rippleOriginRef?: RefObject<HTMLElement | null>;
+}
+
+function resolveRippleOrigin(
+  _overlay: HTMLElement,
+  _originEl: HTMLElement | null,
+  profile: HalftoneRippleViewportProfile,
+): RippleOrigin | null {
+  // Mobile uses viewport shimmer; desktop ripples emit from the content mask center.
+  if (profile !== "default") return null;
+  return null;
 }
 
 function resolveContentMask(
@@ -24,6 +54,24 @@ function resolveContentMask(
 
   if (contentRect.width <= 0 || contentRect.height <= 0) return null;
 
+  const isMobileTextMask = Boolean(
+    contentEl.hasAttribute("data-hero-text-mask") &&
+      window.matchMedia("(max-width: 1023px)").matches,
+  );
+
+  if (isMobileTextMask) {
+    const inflateX = 30;
+    const inflateYTop = 12;
+    const inflateYBottom = 10;
+
+    return {
+      left: contentRect.left - overlayRect.left - inflateX,
+      top: contentRect.top - overlayRect.top - inflateYTop,
+      right: contentRect.right - overlayRect.left + inflateX,
+      bottom: contentRect.bottom - overlayRect.top + inflateYBottom,
+    };
+  }
+
   return {
     left: contentRect.left - overlayRect.left,
     top: contentRect.top - overlayRect.top,
@@ -34,17 +82,33 @@ function resolveContentMask(
 
 export function HeroBackgroundPulses({
   active = true,
+  entered = true,
   contentMaskRef,
+  rippleOriginRef,
 }: HeroBackgroundPulsesProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef(active);
   const contentMaskRefRef = useRef(contentMaskRef);
+  const rippleOriginRefRef = useRef(rippleOriginRef);
   const syncPlaybackRef = useRef<(() => void) | null>(null);
   const reduceMotion = useReducedMotion();
+  const [mobileShimmer, setMobileShimmer] = useState(false);
 
   activeRef.current = active;
   contentMaskRefRef.current = contentMaskRef;
+  rippleOriginRefRef.current = rippleOriginRef;
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const update = () => {
+      const overlay = overlayRef.current;
+      setMobileShimmer(Boolean(overlay && isMobileHeroShimmer(overlay)));
+    };
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   useEffect(() => {
     syncPlaybackRef.current?.();
@@ -60,7 +124,10 @@ export function HeroBackgroundPulses({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const engine = new HalftoneRippleEngine();
+    const useShimmer = isMobileHeroShimmer(overlay);
+    const shimmerEngine = useShimmer ? new HeroMobileViewportShimmerEngine() : null;
+    const rippleEngine = useShimmer ? null : new HalftoneRippleEngine();
+
     let raf = 0;
     let running = true;
     let animating = false;
@@ -69,12 +136,30 @@ export function HeroBackgroundPulses({
     let logicalWidth = 0;
     let logicalHeight = 0;
 
-    const syncContentMask = () => {
+    const syncMask = () => {
       const mask = resolveContentMask(
         overlay,
         contentMaskRefRef.current?.current ?? null,
       );
-      engine.setContentMask(mask);
+      if (shimmerEngine) {
+        shimmerEngine.setContentMask(mask);
+        return;
+      }
+      rippleEngine?.setContentMask(mask);
+    };
+
+    const syncRippleState = () => {
+      if (!rippleEngine) return;
+      const profile = resolveHeroRippleViewportProfile(overlay);
+      rippleEngine.setViewportProfile(profile);
+      syncMask();
+      rippleEngine.setRippleOrigin(
+        resolveRippleOrigin(
+          overlay,
+          rippleOriginRefRef.current?.current ?? null,
+          profile,
+        ),
+      );
     };
 
     const resize = () => {
@@ -87,12 +172,29 @@ export function HeroBackgroundPulses({
       canvas.style.width = `${logicalWidth}px`;
       canvas.style.height = `${logicalHeight}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      engine.rebuild(logicalWidth, logicalHeight, dpr);
-      syncContentMask();
+
+      if (shimmerEngine) {
+        shimmerEngine.rebuild(logicalWidth, logicalHeight, dpr);
+        syncMask();
+      } else if (rippleEngine) {
+        rippleEngine.rebuild(logicalWidth, logicalHeight, dpr);
+        syncRippleState();
+      }
 
       if (!animating) {
-        engine.drawStatic(ctx, logicalWidth, logicalHeight, performance.now());
+        drawIdle(performance.now());
       }
+    };
+
+    const drawIdle = (now: number) => {
+      if (logicalWidth <= 0 || logicalHeight <= 0) return;
+      if (shimmerEngine) {
+        shimmerEngine.drawStatic(ctx, logicalWidth, logicalHeight);
+        return;
+      }
+      rippleEngine?.setActive(false);
+      syncRippleState();
+      rippleEngine?.drawStatic(ctx, logicalWidth, logicalHeight, now);
     };
 
     const stopLoop = () => {
@@ -103,13 +205,6 @@ export function HeroBackgroundPulses({
       }
     };
 
-    const drawStatic = () => {
-      if (logicalWidth <= 0 || logicalHeight <= 0) return;
-      engine.setActive(false);
-      syncContentMask();
-      engine.drawStatic(ctx, logicalWidth, logicalHeight, performance.now());
-    };
-
     const frame = (now: number) => {
       if (!running) return;
 
@@ -118,36 +213,46 @@ export function HeroBackgroundPulses({
         return;
       }
 
-      if (!activeRef.current) {
-        stopLoop();
-        drawStatic();
+      if (shimmerEngine) {
+        shimmerEngine.draw(ctx, logicalWidth, logicalHeight, now, activeRef.current);
+        raf = requestAnimationFrame(frame);
         return;
       }
 
-      syncContentMask();
-      engine.setActive(true);
-      engine.tick(now, logicalWidth, logicalHeight);
-      engine.draw(ctx, logicalWidth, logicalHeight, now);
+      if (!rippleEngine) return;
+
+      if (!activeRef.current) {
+        stopLoop();
+        drawIdle(now);
+        return;
+      }
+
+      syncRippleState();
+      rippleEngine.setActive(true);
+      rippleEngine.tick(now, logicalWidth, logicalHeight);
+      rippleEngine.draw(ctx, logicalWidth, logicalHeight, now);
       raf = requestAnimationFrame(frame);
     };
 
     const startLoop = () => {
       if (!running || animating) return;
-      if (!isIntersecting || !isDocVisible || !activeRef.current) return;
+      if (!isIntersecting || !isDocVisible) return;
       if (logicalWidth <= 0 || logicalHeight <= 0) return;
+      if (!activeRef.current) return;
 
       animating = true;
       raf = requestAnimationFrame(frame);
     };
 
     const syncPlayback = () => {
-      if (activeRef.current && isIntersecting && isDocVisible) {
+      if (isIntersecting && isDocVisible && activeRef.current) {
         startLoop();
-      } else {
-        stopLoop();
-        if (isIntersecting && isDocVisible) {
-          drawStatic();
-        }
+        return;
+      }
+
+      stopLoop();
+      if (isIntersecting && isDocVisible && !shimmerEngine) {
+        drawIdle(performance.now());
       }
     };
 
@@ -157,6 +262,11 @@ export function HeroBackgroundPulses({
     const contentEl = contentMaskRefRef.current?.current;
     if (contentEl) {
       ro.observe(contentEl);
+    }
+
+    const originEl = rippleOriginRefRef.current?.current;
+    if (originEl) {
+      ro.observe(originEl);
     }
 
     resize();
@@ -187,12 +297,20 @@ export function HeroBackgroundPulses({
       io.disconnect();
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, [reduceMotion]);
+  }, [mobileShimmer, reduceMotion]);
 
   if (reduceMotion) return null;
 
   return (
-    <div ref={overlayRef} className="hero-bg-pulse-overlay" aria-hidden>
+    <div
+      ref={overlayRef}
+      className={cn(
+        "hero-bg-pulse-overlay",
+        mobileShimmer && "hero-bg-pulse-overlay--mobile-enter",
+        mobileShimmer && entered && "is-entered",
+      )}
+      aria-hidden
+    >
       <canvas ref={canvasRef} className="hero-bg-pulse-canvas" />
     </div>
   );

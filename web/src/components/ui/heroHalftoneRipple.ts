@@ -79,6 +79,8 @@ type RippleOrigin = {
   y: number;
 };
 
+export type { RippleOrigin };
+
 export type RippleContentMask = {
   left: number;
   top: number;
@@ -211,6 +213,22 @@ function radialViewportFade(x: number, y: number, width: number, height: number)
   return smoothstep(18, 56, edge);
 }
 
+/** Mobile home hero — ripples fill the full viewport height. */
+function radialViewportFadeMobileHero(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): number {
+  const edge = Math.min(x, width - x, y, height - y);
+  return smoothstep(8, 32, edge);
+}
+
+export type HalftoneRippleViewportProfile = "default" | "mobile-hero";
+
+/** Stretch wave fronts vertically on portrait heroes so rings read taller than wide. */
+const MOBILE_HERO_RIPPLE_RY_STRETCH = 1.48;
+
 /** 0 while the band is expanding inward; ramps to 1 only near max travel. */
 function ringLateTravelT(dist: number, maxR: number): number {
   if (maxR <= 0) return 0;
@@ -222,16 +240,29 @@ function resolveOrigins(
   width: number,
   height: number,
   mask: RippleContentMask | null,
+  profile: HalftoneRippleViewportProfile = "default",
+  originOverride?: RippleOrigin | null,
 ): RippleOrigin[] {
+  if (originOverride) {
+    return [originOverride];
+  }
+
   if (mask) {
-    const { cx, cy } = resolveContentMaskEllipse(mask);
+    const { cx, cy } = resolveContentMaskEllipse(mask, profile);
     return [{ x: cx, y: cy }];
+  }
+
+  if (profile === "mobile-hero") {
+    return [{ x: width / 2, y: height / 2 }];
   }
 
   return [{ x: width / 2, y: height * 0.38 }];
 }
 
-export function resolveContentMaskEllipse(mask: RippleContentMask): {
+export function resolveContentMaskEllipse(
+  mask: RippleContentMask,
+  profile: HalftoneRippleViewportProfile = "default",
+): {
   cx: number;
   cy: number;
   rx: number;
@@ -241,6 +272,15 @@ export function resolveContentMaskEllipse(mask: RippleContentMask): {
   const cy = (mask.top + mask.bottom) * 0.5;
   const halfW = (mask.right - mask.left) * 0.5;
   const halfH = (mask.bottom - mask.top) * 0.5;
+
+  if (profile === "mobile-hero") {
+    return {
+      cx,
+      cy,
+      rx: halfW + CONTENT_MASK_PAD_X * 0.36,
+      ry: halfH + CONTENT_MASK_PAD_Y * 0.18 + halfH * CONTENT_MASK_RY_STRETCH * 0.14,
+    };
+  }
 
   return {
     cx,
@@ -258,10 +298,11 @@ export function contentMaskRippleVisibility(
   x: number,
   y: number,
   mask: RippleContentMask | null,
+  profile: HalftoneRippleViewportProfile = "default",
 ): number {
   if (!mask) return 1;
 
-  const { cx, cy, rx, ry } = resolveContentMaskEllipse(mask);
+  const { cx, cy, rx, ry } = resolveContentMaskEllipse(mask, profile);
   if (rx <= 0 || ry <= 0) return 1;
 
   const nx = (x - cx) / rx;
@@ -359,6 +400,8 @@ export class HalftoneRippleEngine {
   private dpr = 1;
   private origins: RippleOrigin[] = [];
   private contentMask: RippleContentMask | null = null;
+  private rippleOriginOverride: RippleOrigin | null = null;
+  private viewportProfile: HalftoneRippleViewportProfile = "default";
   private maxActiveR = 0;
   private waveCullDistSq = 0;
   /** Edge sparkles persist until the next cycle's rings reach the perimeter again */
@@ -366,6 +409,72 @@ export class HalftoneRippleEngine {
 
   constructor(options: Partial<HalftoneRippleOptions> = {}) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
+  }
+
+  setViewportProfile(profile: HalftoneRippleViewportProfile) {
+    if (this.viewportProfile === profile) return;
+    this.viewportProfile = profile;
+    this.rebuildBaseCanvas();
+    this.syncOrigins();
+  }
+
+  setRippleOrigin(origin: RippleOrigin | null) {
+    if (
+      origin?.x === this.rippleOriginOverride?.x &&
+      origin?.y === this.rippleOriginOverride?.y
+    ) {
+      return;
+    }
+    this.rippleOriginOverride = origin;
+    this.syncOrigins();
+  }
+
+  private syncOrigins() {
+    this.origins = resolveOrigins(
+      this.logicalWidth,
+      this.logicalHeight,
+      this.contentMask,
+      this.viewportProfile,
+      this.rippleOriginOverride,
+    );
+  }
+
+  private viewportFade(x: number, y: number, width: number, height: number): number {
+    if (this.viewportProfile === "mobile-hero") {
+      return radialViewportFadeMobileHero(x, y, width, height);
+    }
+    return radialViewportFade(x, y, width, height);
+  }
+
+  private waveDistance(dx: number, dy: number): number {
+    if (this.viewportProfile === "mobile-hero") {
+      return Math.hypot(dx, dy / MOBILE_HERO_RIPPLE_RY_STRETCH);
+    }
+    return Math.hypot(dx, dy);
+  }
+
+  private resolveMaxRadius(width: number, height: number): number {
+    const { maxTravelMul } = this.options;
+    const originReach = Math.max(
+      ...this.origins.map((origin) => maxReachFromOrigin(origin, width, height)),
+      1,
+    );
+
+    if (this.viewportProfile === "mobile-hero") {
+      return originReach * 1.06;
+    }
+
+    const reachCap = width * maxTravelMul;
+    return Math.min(originReach * 1.15, reachCap);
+  }
+
+  private maskVisibility(x: number, y: number): number {
+    return contentMaskRippleVisibility(
+      x,
+      y,
+      this.contentMask,
+      this.viewportProfile,
+    );
   }
 
   setActive(active: boolean) {
@@ -381,8 +490,8 @@ export class HalftoneRippleEngine {
 
   setContentMask(mask: RippleContentMask | null) {
     this.contentMask = mask;
-    this.origins = resolveOrigins(this.logicalWidth, this.logicalHeight, mask);
     this.rebuildBaseCanvas();
+    this.syncOrigins();
   }
 
   /** Rebuild precomputed grid + cached base layer (call on resize). */
@@ -390,7 +499,7 @@ export class HalftoneRippleEngine {
     this.logicalWidth = width;
     this.logicalHeight = height;
     this.dpr = dpr;
-    this.origins = resolveOrigins(width, height, this.contentMask);
+    this.syncOrigins();
 
     this.rebuildGrid();
     this.rebuildBaseCanvas();
@@ -450,7 +559,7 @@ export class HalftoneRippleEngine {
       const twinkle = 0.38 + 0.62 * pulse;
       const radius = sparkle.baseRadius * (0.68 + 0.32 * pulse);
       const alpha = sparkle.baseAlpha * twinkle;
-      const maskVis = contentMaskRippleVisibility(sparkle.x, sparkle.y, this.contentMask);
+      const maskVis = this.maskVisibility(sparkle.x, sparkle.y);
 
       if (alpha * maskVis < 0.02) continue;
 
@@ -517,7 +626,7 @@ export class HalftoneRippleEngine {
     ctx.fillStyle = BASE_DOT_COLOR;
 
     for (const cell of this.grid) {
-      const maskVis = contentMaskRippleVisibility(cell.x, cell.y, this.contentMask);
+      const maskVis = this.maskVisibility(cell.x, cell.y);
       if (maskVis < 0.008) continue;
 
       const radius = BASE_GRID_DOT_RADIUS * cell.jitter;
@@ -549,20 +658,15 @@ export class HalftoneRippleEngine {
       rippleLagSec,
       rippleStagger,
       waveSigma,
-      maxTravelMul,
       fadeStartRadiusMul,
       fadeSharpness,
     } = this.options;
 
-    const reachCap = width * maxTravelMul;
-    const maxR =
-      Math.min(
-        Math.max(
-          ...this.origins.map((origin) => maxReachFromOrigin(origin, width, height)),
-          1,
-        ) * 1.15,
-        reachCap,
-      );
+    const maxR = this.resolveMaxRadius(width, height);
+    const travelMul =
+      this.viewportProfile === "mobile-hero"
+        ? maxR / Math.max(width, 1)
+        : this.options.maxTravelMul;
     const maxAgeMs =
       (maxR / waveSpeed) * 1000 * 1.15 +
       rippleStagger * this.options.ringsPerRipple +
@@ -585,7 +689,7 @@ export class HalftoneRippleEngine {
         r1,
         width,
         fadeStartRadiusMul,
-        maxTravelMul,
+        travelMul,
         fadeSharpness,
       );
       if (fade < 0.005) continue;
@@ -708,11 +812,11 @@ export class HalftoneRippleEngine {
       return;
     }
 
-    const { dotMin, dotMax, baseAmp, waveSigma, maxTravelMul, gridSpacing } = this.options;
-    const maxR = width * maxTravelMul;
+    const { dotMin, dotMax, baseAmp, waveSigma, gridSpacing } = this.options;
+    const maxR = this.resolveMaxRadius(width, height);
 
     for (const cell of this.grid) {
-      const maskVis = contentMaskRippleVisibility(cell.x, cell.y, this.contentMask);
+      const maskVis = this.maskVisibility(cell.x, cell.y);
       if (maskVis < 0.008) continue;
 
       let waveAmp = 0;
@@ -724,10 +828,10 @@ export class HalftoneRippleEngine {
         const distSq = dx * dx + dy * dy;
         if (distSq > this.waveCullDistSq) continue;
 
-        const dist = Math.hypot(dx, dy);
+        const dist = this.waveDistance(dx, dy);
         const angle = Math.atan2(dy, dx);
         const travelT = ringLateTravelT(dist, maxR);
-        const viewportT = (1 - radialViewportFade(cell.x, cell.y, width, height)) * travelT;
+        const viewportT = (1 - this.viewportFade(cell.x, cell.y, width, height)) * travelT;
 
         const coreSample = this.sampleWaveAmp(dist, distSq);
         const fanStrength = 0.13 + visualWaveAmp(coreSample.amp) * 0.84;
@@ -741,7 +845,7 @@ export class HalftoneRippleEngine {
         const perturbedDist = Math.max(0, Math.hypot(pdx, pdy) + baseRadial + extraRadial);
 
         const sample = this.sampleWaveAmp(perturbedDist, distSq);
-        const viewportFade = radialViewportFade(cell.x, cell.y, width, height);
+        const viewportFade = this.viewportFade(cell.x, cell.y, width, height);
         const atEdge = travelT > 0.66 || viewportFade < 0.82;
         const edgeSoft = atEdge ? 1 : 1 - travelT * 0.22;
         const effectiveViewportFade = atEdge ? 1 : viewportFade;
@@ -767,9 +871,12 @@ export class HalftoneRippleEngine {
       const finalAlpha = style.alpha * maskVis;
       const col = Math.floor(cell.x / gridSpacing);
       const row = Math.floor(cell.y / gridSpacing);
-      const viewportFade = radialViewportFade(cell.x, cell.y, width, height);
+      const viewportFade = this.viewportFade(cell.x, cell.y, width, height);
       const travelT = ringLateTravelT(
-        Math.hypot(cell.x - (this.origins[0]?.x ?? width / 2), cell.y - (this.origins[0]?.y ?? height / 2)),
+        this.waveDistance(
+          cell.x - (this.origins[0]?.x ?? width / 2),
+          cell.y - (this.origins[0]?.y ?? height / 2),
+        ),
         maxR,
       );
       const atEdge = travelT > 0.66 || viewportFade < 0.82;

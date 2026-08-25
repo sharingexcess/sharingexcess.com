@@ -1,11 +1,16 @@
 import { TextSection } from "@/components/ui/TextSection";
-import { mapCaptionClassName } from "@/lib/typography";
+import { useParallaxScrollStyle } from "@/components/ui/ParallaxBackground";
+import { useScrollInteractionsEnabled } from "@/components/providers/AppProviders";
 import { DeferredInteractiveMap } from "@/components/map/DeferredInteractiveMap";
-import type { MapVariant, MapHub, MapMacroRegion } from "@/components/map/types";
+import type { InteractiveMapProps, MapVariant, MapHub, MapMacroRegion } from "@/components/map/types";
+import { mapCaptionClassName } from "@/lib/typography";
 import { cn } from "@/lib/cn";
+import { motion, useReducedMotion, useScroll, useTransform } from "@/lib/motion";
 import { resolveLiveTotalLbsTitle, splitLiveTotalLbsTitle } from "@/lib/resolveLiveTotalLbsTitle";
 import type { ImagePosition, SectionContentProps } from "@/lib/types";
 import { useLiveDonatedWeight } from "@/lib/useLiveDonatedWeight";
+import { useRef, type ReactNode } from "react";
+import { useMapStageScrollSnap, MAP_STAGE_LINGER_SVH } from "@/lib/useMapStageScrollSnap";
 import { RoundBleedLayout } from "./RoundBleedLayout";
 import { SectionShell } from "./SectionShell";
 import { SectionLayout } from "./SectionLayout";
@@ -19,11 +24,119 @@ import {
   sectionCardContentIsDark,
 } from "./sectionCardConfig";
 
-export type MapLayout = "horizontal" | "stack-centered";
+const MAP_REVEAL_CONTENT_CLASS = "mx-auto w-full max-w-[1320px] px-4 lg:px-8";
+const MAP_PARALLAX_TRAVEL = 12;
+const MAP_INTRO_PARALLAX_Y = 28;
+
+interface MapScrollExpandSectionProps {
+  theme: MapSectionProps["theme"];
+  id?: string;
+  className?: string;
+  intro: ReactNode;
+  mapCaption?: string;
+  mapProps: InteractiveMapProps;
+}
+
+function MapScrollExpandSection({
+  theme,
+  id,
+  className,
+  intro,
+  mapCaption,
+  mapProps,
+}: MapScrollExpandSectionProps) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
+  const scrollInteractions = useScrollInteractionsEnabled();
+  const parallaxEnabled = scrollInteractions && !reduceMotion;
+  const stickyEnabled = parallaxEnabled;
+
+  useMapStageScrollSnap(pinRef, stageRef, stickyEnabled);
+
+  const { style: mapParallaxStyle } = useParallaxScrollStyle(stageRef, {
+    travel: MAP_PARALLAX_TRAVEL,
+    offset: ["start end", "end start"],
+    smooth: true,
+  });
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "start center"],
+  });
+  const introY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    parallaxEnabled ? [MAP_INTRO_PARALLAX_Y, 0] : [0, 0],
+  );
+
+  return (
+    <section
+      ref={sectionRef}
+      id={id}
+      data-section=""
+      data-theme={theme}
+      className={cn("impact-map-reveal relative z-0 bg-transparent", className)}
+    >
+      <motion.div
+        style={{ y: introY }}
+        className="will-change-transform pt-12 pb-10 lg:pt-[var(--spacing-xxl)] lg:pb-16"
+      >
+        <div className={MAP_REVEAL_CONTENT_CLASS}>
+          <div className="mx-auto w-full min-w-0 max-w-3xl">{intro}</div>
+        </div>
+      </motion.div>
+
+      <div
+        ref={pinRef}
+        data-map-stage-pin=""
+        className="relative left-1/2 w-screen max-w-none -translate-x-1/2"
+        style={
+          stickyEnabled
+            ? ({ height: `calc(100svh + ${MAP_STAGE_LINGER_SVH}svh)` } as const)
+            : undefined
+        }
+      >
+        <div
+          ref={stageRef}
+          className={cn(
+            "h-[100svh] min-h-[28rem] w-full overflow-hidden bg-[var(--section-surface)]",
+            stickyEnabled && "sticky top-0",
+          )}
+        >
+          <motion.div
+            style={parallaxEnabled ? mapParallaxStyle : undefined}
+            className={cn(
+              "absolute left-0 w-full",
+              !parallaxEnabled && "inset-0 size-full",
+              parallaxEnabled && "h-full",
+            )}
+          >
+            <DeferredInteractiveMap className="size-full" {...mapProps} />
+          </motion.div>
+        </div>
+      </div>
+
+      {mapCaption && (
+        <p
+          className={cn(
+            "pb-12 pt-4 text-center text-[var(--section-text)] lg:pb-[var(--spacing-xxl)]",
+            mapCaptionClassName,
+          )}
+        >
+          {mapCaption}
+        </p>
+      )}
+    </section>
+  );
+}
+
+export type MapLayout = "horizontal" | "stack-centered" | "scroll-expand";
 export type MapContainerShape = "rounded" | "circle";
 
 export interface MapSectionProps extends Omit<SectionContentProps, "imageSrc" | "imageAlt"> {
-  /** Vertical stack with centered text (like TextImage stack-centered) or side-by-side */
+  /** Full-bleed impact map with intro copy above — home page layout */
   layout?: MapLayout;
   /** Which side the map appears on at lg+ — mirrors TextImage imagePosition */
   mapPosition?: ImagePosition;
@@ -141,6 +254,43 @@ export function MapSection({
     </div>
   );
 
+  const centeredTextSection = (
+    <TextSection
+      eyebrow={eyebrow}
+      eyebrowLive={Boolean(liveTitleSplit)}
+      eyebrowSurplusInfo={surplusInfo}
+      metric={metric}
+      metricNumericValue={metricNumericValue}
+      metricLiveTickOffset={metricLiveTickOffset}
+      metricEquivalentLbs={metricNumericValue}
+      heading={resolvedTitle}
+      headingSize={headingSize}
+      body={body}
+      bodySize={bodySize}
+      primaryCta={primaryCta}
+      primaryCtaHref={primaryCtaHref}
+      secondaryCta={secondaryCta}
+      secondaryCtaHref={secondaryCtaHref}
+      buttonScheme={isDark ? "dark" : "light"}
+      emphasis={!isCard}
+      isCard={isCard}
+      align="center"
+    />
+  );
+
+  if (layout === "scroll-expand") {
+    return (
+      <MapScrollExpandSection
+        theme={theme}
+        id={id}
+        className={className}
+        intro={centeredTextSection}
+        mapCaption={mapCaption}
+        mapProps={{ ...mapProps, viewportFit: "fill" }}
+      />
+    );
+  }
+
   if (layout === "stack-centered") {
     return (
       <SectionShell theme={theme} className={className} {...shellProps}>
@@ -151,29 +301,7 @@ export function MapSection({
           sectionTheme={theme}
           centered
           textSlotClassName="w-full min-w-0 max-w-3xl"
-          textSlot={
-            <TextSection
-              eyebrow={eyebrow}
-              eyebrowLive={Boolean(liveTitleSplit)}
-              eyebrowSurplusInfo={surplusInfo}
-              metric={metric}
-              metricNumericValue={metricNumericValue}
-              metricLiveTickOffset={metricLiveTickOffset}
-              metricEquivalentLbs={metricNumericValue}
-              heading={resolvedTitle}
-              headingSize={headingSize}
-              body={body}
-              bodySize={bodySize}
-              primaryCta={primaryCta}
-              primaryCtaHref={primaryCtaHref}
-              secondaryCta={secondaryCta}
-              secondaryCtaHref={secondaryCtaHref}
-              buttonScheme={isDark ? "dark" : "light"}
-              emphasis={!isCard}
-              isCard={isCard}
-              align="center"
-            />
-          }
+          textSlot={centeredTextSection}
           contentSlot={fullWidthMap}
         />
       </SectionShell>

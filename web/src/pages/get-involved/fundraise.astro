@@ -1,0 +1,66 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import HeroSection from "@/sections/HeroSection";
+import TextImageSection from "@/sections/TextImageSection";
+
+const steps = [
+  {
+    src: "/images/fundraise.avif",
+    alt: "",
+    title: "1. Get Started",
+    body: "Starting your fundraising campaign is as easy as the click of a button. Anybody can launch a Sharing Excess fundraiser, and every dollar donated allows us to rescue about 20 pounds of surplus food.",
+  },
+  {
+    src: "/images/fundraise.jpg",
+    alt: "",
+    title: "2. Customize",
+    body: "You can upload a profile photo, set a unique fundraising goal, and add a personalized message for your fundraiser. Remember, no goal is too small — $100 allows us to feed 1600 people!",
+  },
+  {
+    src: "/images/MINNEAPOLIS-8_7.avif",
+    alt: "",
+    title: "3. Share",
+    body: "Time to spread the word! Share your fundraiser on social media and send out emails and texts to all your friends and family. Track your progress, and get ready to celebrate meeting your fundraising goal.",
+  },
+];
+---
+
+<PageLayout
+  title="Start a Fundraiser | Sharing Excess"
+  description="Launch a peer fundraising campaign to support Sharing Excess food rescue efforts."
+>
+  <HeroSection client:visible
+    layout="stack-left"
+    theme="light"
+    title="Start a fundraiser"
+    body="Bring your community together to support Sharing Excess"
+    imageSrc="/images/fundraise.jpg"
+    imageAlt=""
+  />
+
+  <TextImageSection client:visible
+    theme="light"
+    layout="three-image-caption"
+    headingSize="h2"
+    title="How it works"
+    body="Peer fundraising helps us rescue more food and reach more communities."
+    images={steps}
+    primaryCta="Start your fundraiser"
+    primaryCtaHref="/contact"
+    secondaryCta="Give monthly instead"
+    secondaryCtaHref="/collective"
+  />
+
+  <TextImageSection client:visible
+    theme="dark"
+    eyebrow="Fundraise Up"
+    title="Launch your campaign"
+    body="The legacy site embeds a Fundraise Up peer-to-peer widget on this page. Use the contact form to get a personalized fundraiser link, or donate directly while we wire the embed."
+    imageSrc="/images/20230407_PWPM_215.avif"
+    imageAlt=""
+    imagePosition="right"
+    imageStyle="square"
+    primaryCta="Contact us to start"
+    primaryCtaHref="/contact"
+  />
+</PageLayout>

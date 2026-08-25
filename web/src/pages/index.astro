@@ -5,7 +5,6 @@ import DonationSection from "@/sections/DonationSection";
 import LogosBannerSection from "@/sections/LogosBannerSection";
 import MapSection from "@/sections/MapSection";
 import SurplusSection from "@/sections/SurplusSection";
-import StackingCardsSection from "@/sections/StackingCardsSection";
 import SectionScrollHandoff from "@/sections/SectionScrollHandoff";
 import TextImageSection from "@/sections/TextImageSection";
 import TextMarqueeBanner from "@/sections/TextMarqueeBanner";
@@ -31,11 +30,8 @@ const supporterLogos = [
 >
   <HomeHero client:visible
     title={"Rescuing Food,\n*Feeding Communities*"}
-    introCaption="We rescue *over 2 million pounds* of surplus every week and move it to communities nationwide."
-    primaryCta="Donate Surplus Food"
-    primaryCtaHref="/get-involved/partner"
-    secondaryCta="Find Food"
-    secondaryCtaHref="/find-food"
+    introCaption="We rescue *over 2 million pounds* of surplus every week.\nThe food is donated; *your gift moves it*."
+    introDonationForm={true}
     cardTitle={"There is more than enough food to\u00A0feed *everyone on\u00A0Earth*."}
     cardBody={"America wastes 40% of its food every year, while 47 million people go hungry.\nWe built the network to close this gap."}
     imageSrc="/images/community-people.jpg"
@@ -66,60 +62,13 @@ const supporterLogos = [
   <SectionScrollHandoff
     client:visible
     className="relative z-[11]"
-    fadeFrom="light"
+    fadeFrom="dark"
     fadeTo="dark"
-    fadeStartVh={405}
-    fadeEndVh={440}
   >
-    <StackingCardsSection client:visible
-      theme="light"
-      transparentBg
-      exitScrollVh={50}
-      heading="*Food rescue* creates access to excess."
-      intro="We built a network of 2,200+ partners to move fresh, healthy food where it's needed most. Here's why it works."
-      items={[
-        {
-          title: "It's free.",
-          body: "Every pound we deliver is donated. Dollars fund trucks, not food.",
-          imageSrc: "/images/handoff.jpg",
-          imageAlt: "SE volunteer handing boxes of food to a community member",
-          primaryCta: "Our Financials",
-          primaryCtaHref: "/about/financials",
-        },
-        {
-          title: "It's fast.",
-          body: "Rescued and delivered while it's still fresh, often same-day.",
-          imageSrc: "/images/truck-driver.jpg",
-          imageAlt: "SE truck driver ready for a food rescue run",
-          primaryCta: "Our Model",
-          primaryCtaHref: "/about",
-        },
-        {
-          title: "It's measurable.",
-          body: "Every pound moves through [Surplus](https://surplus.sharingexcess.com), our platform for tracking food from pickup to delivery.",
-          imageSrc: "/images/its-measurable.png",
-          imageSrcMobile: "/images/its-measurable-mobile.png",
-          imageAlt: "Surplus impact dashboard showing food rescue data",
-          primaryCta: "Our Impact",
-          primaryCtaHref: "/about/impact",
-        },
-        {
-          title: "It's everywhere.",
-          body: "2,000+ distribution sites across 36 states.",
-          imageSrc: "/images/Jul2026-ImpactMap.png",
-          imageAlt: "Map showing Sharing Excess distribution sites across the US",
-          primaryCta: "Our Impact",
-          primaryCtaHref: "/about/impact",
-        },
-      ]}
-    />
-
-    <div aria-hidden class="h-[15vh] min-h-[120px]" />
-
-    <MapSection client:visible
+    <MapSection client:load
       theme="dark"
       transparentBg
-      layout="stack-centered"
+      layout="scroll-expand"
       headingSize="h2"
       eyebrow="Updating live, one rescue at a time."
       title="{totalLbs} pounds of food rescued since 2018. And counting."
@@ -174,7 +123,7 @@ const supporterLogos = [
     ]}
   />
 
-  <SectionScrollHandoff client:visible fadeFrom="light" fadeTo="green" fadeStart={0.04} fadeEnd={0.2} extendForFooter>
+  <SectionScrollHandoff client:visible fadeFrom="light" fadeTo="green" fadeStart={0.04} fadeEnd={0.2}>
     <LogosBannerSection client:visible
       theme="light"
       transparentBg

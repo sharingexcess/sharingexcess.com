@@ -17,3 +17,10 @@ const { title, description, canonical } = Astro.props;
   </main>
   <SiteFooter client:load />
 </BaseLayout>
+
+<script>
+  import { markPageLastSection } from "@/lib/markPageLastSection";
+
+  markPageLastSection();
+  document.addEventListener("astro:page-load", markPageLastSection);
+</script>

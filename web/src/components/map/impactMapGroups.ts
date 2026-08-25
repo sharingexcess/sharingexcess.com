@@ -8,10 +8,19 @@ export interface ImpactMapGroupBounds {
   north: number;
 }
 
+export interface ImpactMapGroupLabelOffset {
+  x: number;
+  y: number;
+}
+
 export interface ImpactMapGroup extends MapHub {
   id: string;
   /** Points inside these bounds are always assigned to this group. */
   regionBounds?: ImpactMapGroupBounds;
+  /** Screen-space nudge so nearby hub labels do not overlap. */
+  labelOffset?: ImpactMapGroupLabelOffset;
+  /** Higher values render above other labels (click priority). */
+  labelStackPriority?: number;
 }
 
 /** Clickable metro groups on the impact distribution map. */
@@ -47,14 +56,31 @@ export const IMPACT_MAP_GROUPS: ImpactMapGroup[] = [
     name: "Philadelphia",
     lng: -75.1652,
     lat: 39.9526,
+    labelStackPriority: 10,
   },
   {
     id: "nyc",
     name: "NYC",
     lng: -73.95,
     lat: 40.75,
+    labelStackPriority: 1,
   },
 ];
+
+/** Groups ordered for overlay rendering — lower priority first, higher on top. */
+export const IMPACT_MAP_GROUPS_BY_STACK = [...IMPACT_MAP_GROUPS].sort(
+  (a, b) => (a.labelStackPriority ?? 0) - (b.labelStackPriority ?? 0),
+);
+
+/** Auto-tour playback order — Philly first, then remaining hubs. */
+export const IMPACT_MAP_TOUR_GROUP_IDS = [
+  "philadelphia",
+  "nyc",
+  "detroit",
+  "chicago",
+  "los-angeles",
+  "mcallen",
+] as const;
 
 /** Max distance from a group center for a point to belong to that group. */
 export const IMPACT_GROUP_ASSIGNMENT_MAX_KM = 70;
@@ -63,6 +89,28 @@ const GROUP_BY_ID = new Map(IMPACT_MAP_GROUPS.map((group) => [group.id, group]))
 
 export function getImpactGroupById(id: string): ImpactMapGroup | undefined {
   return GROUP_BY_ID.get(id);
+}
+
+export const IMPACT_MAP_TOUR_GROUPS: ImpactMapGroup[] = IMPACT_MAP_TOUR_GROUP_IDS.flatMap(
+  (id) => {
+    const group = getImpactGroupById(id);
+    return group ? [group] : [];
+  },
+);
+
+export interface ImpactMapScreenAnchor {
+  x: number;
+  y: number;
+}
+
+/** Project a group hub to screen space, including any label offset. */
+export function projectImpactGroupLabelAnchor(
+  map: { project: (lngLat: [number, number]) => { x: number; y: number } },
+  group: ImpactMapGroup,
+): ImpactMapScreenAnchor {
+  const point = map.project([group.lng, group.lat]);
+  const offset = group.labelOffset ?? { x: 0, y: 0 };
+  return { x: point.x + offset.x, y: point.y + offset.y };
 }
 
 function haversineKm(lng1: number, lat1: number, lng2: number, lat2: number): number {

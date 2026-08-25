@@ -1,0 +1,99 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import DonationSection from "@/sections/DonationSection";
+import HeroSection from "@/sections/HeroSection";
+import LogosBannerSection from "@/sections/LogosBannerSection";
+import StatsCardSection from "@/sections/StatsCardSection";
+import TextImageSection from "@/sections/TextImageSection";
+import TextOnlySection from "@/sections/TextOnlySection";
+
+const accreditationLogos = [
+  { src: "/images/candid_platinum.avif", alt: "Candid Platinum Transparency" },
+  { src: "/images/1ftp_Primary_Horizontal_Black-1_1.avif", alt: "1% for the Planet" },
+  { src: "/images/Four-Star-Rating-Badge---Full-Color_1.avif", alt: "Charity Navigator Four Star Rating" },
+  { src: "/images/guidestar.svg", alt: "GuideStar" },
+];
+---
+
+<PageLayout
+  title="Our Financials | Sharing Excess"
+  description="Explore Sharing Excess financial transparency, annual reports, and how we allocate donor support."
+>
+  <HeroSection client:visible
+    layout="stack-left"
+    theme="light"
+    eyebrow="Financials"
+    title="Financial transparency and accountability"
+    imageSrc="/images/financials.jpg"
+    imageAlt=""
+  />
+
+  <TextImageSection client:visible
+    theme="light"
+    eyebrow="Under fiscal sponsorship"
+    title="From 2018–2022, we grew under fiscal sponsorship"
+    body="From 2018-2022 Sharing Excess was under fiscal sponsorship, allowing us to start making impact while we set up our 501c3. Three cheers to the Federation of Neighborhood Centers for their guidance during this time. Financials during this period can be provided upon request."
+    imageSrc="/images/IMG_931.avif"
+    imageAlt=""
+    imagePosition="right"
+    imageStyle="round"
+  />
+
+  <TextImageSection client:visible
+    theme="dark"
+    eyebrow="Our commitment"
+    title="We're a lean team that makes the most out of every dollar donated"
+    body="At Sharing Excess we are committed to effectively managing our resources for maximum impact. Explore our financials to see how we allocate funds and put your support directly towards feeding communities and fighting food waste."
+    imageSrc="/images/Vector_1.avif"
+    imageAlt=""
+    imagePosition="left"
+    imageStyle="square"
+  />
+
+  <StatsCardSection client:visible
+    theme="light"
+    eyebrow="Return on investment"
+    title="More than 15X return on investment for every dollar donated"
+    body="Since 2018, Sharing Excess has turned $25 million in funding from 2,500 generous donors into an astounding $375 million worth of retail food cost savings for communities and families in need."
+    stats={[
+      { value: "15X", label: "return on every dollar", variant: "green" },
+      { value: "$25M", label: "in funding received", variant: "yellow" },
+      { value: "$375M", label: "in retail food value delivered", variant: "orange" },
+    ]}
+    columns={3}
+    align="center"
+  />
+
+  <LogosBannerSection client:visible theme="light" logos={accreditationLogos} />
+
+  <TextOnlySection client:visible
+    theme="light"
+    align="center"
+    eyebrow="Resources + Documents"
+    headingSize="h2"
+    title="Annual reports & tax filings"
+    body="2024: Annual Report (/documents/2024-Annual-Report.pdf) · 990 (/documents/Sharing-Excess-2024-Form-990.pdf) · 2025 Annual Report (/documents/Sharing-Excess-2025-Annual-Report.pdf). Earlier reports and 990s are available on request. Nonprofit Tax ID/EIN: 86-2161466."
+    primaryCta="Contact for documents"
+    primaryCtaHref="/contact"
+  />
+
+  <TextOnlySection client:visible
+    theme="light"
+    align="center"
+    headingSize="h2"
+    title="More ways to donate"
+    body="Send a check to 6700 Essington Ave, Suite E207, Philadelphia PA 19153. We accept stock donations via our Vanguard account (Account No. 58625959, DTC code 0062, Account Name: Sharing Excess Inc)."
+    primaryCta="Give Monthly"
+    primaryCtaHref="/collective"
+    secondaryCta="Start a Fundraiser"
+    secondaryCtaHref="/get-involved/fundraise"
+  />
+
+  <DonationSection client:visible
+    theme="dark"
+    title="Your donation is a strategic investment"
+    body="We guarantee 100% of your contribution is deployed with financial accountability to secure our mission's success."
+    formPosition="left"
+    submitLabel="Donate Now"
+  />
+</PageLayout>

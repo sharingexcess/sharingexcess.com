@@ -4,14 +4,20 @@ import { HeroContentCard } from "@/components/ui/HeroContentCard";
 import { Button } from "@/components/ui/Button";
 import { AnimatedHeroHeading } from "@/components/ui/AnimatedHeroHeading";
 import { ParallaxBackground } from "@/components/ui/ParallaxBackground";
-import { Sticker, STICKER_OVERLAP_TOP_CLASS, STICKER_SIZE_CLASS, type StickerName } from "@/components/ui/Sticker";
+import {
+  Sticker,
+  STICKER_OVERLAP_TOP_CENTER_EDGE_CLASS,
+  STICKER_OVERLAP_TOP_CLASS,
+  STICKER_SIZE_CLASS,
+  type StickerName,
+} from "@/components/ui/Sticker";
 import { Text } from "@/components/ui/Text";
 import { TextSection } from "@/components/ui/TextSection";
 import { useLenis } from "@/components/providers/SmoothScrollProvider";
 import { cn } from "@/lib/cn";
 import { parseEmphasis } from "@/lib/parseEmphasis";
 import type { HeroLayout, SectionContentProps } from "@/lib/types";
-import { bodyLgClassName, bodyMdClassName, bodyXlClassName } from "@/lib/typography";
+import { bodyLgClassName, bodyMdClassName, bodyXlClassName, eyebrowClassName } from "@/lib/typography";
 import {
   heroWordSpring,
   homeHeroRevealDelay,
@@ -24,7 +30,7 @@ import {
 } from "@/lib/motion";
 import { useIntroRevealed } from "@/lib/useIntroRevealed";
 import { useVideoPlayback } from "@/lib/useVideoPlayback";
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, useState, useCallback, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { SectionShell } from "./SectionShell";
 import { sectionCardContentIsDark, sectionMediaRadiusClass } from "./sectionCardConfig";
 
@@ -40,8 +46,12 @@ export interface HeroSectionProps extends SectionContentProps {
   cardSecondaryCtaHref?: string;
   /** Photo credit or caption overlaid on subpage hero images */
   imageCaption?: string;
+  /** Emphasized closing line below hero body copy */
+  bodyEmphasis?: string;
   /** Supporting line under the stacked home hero heading (green intro band) */
   introCaption?: string;
+  /** Embed hero donation form below intro caption instead of text CTAs */
+  introDonationForm?: boolean;
   /** Overlap a brand sticker on the hero image (stack layouts). */
   sticker?: boolean;
   /** Which sticker to show when `sticker` is true. Defaults to `free-food`. */
@@ -57,13 +67,24 @@ export interface HeroSectionProps extends SectionContentProps {
 const FIGMA_ARTBOARD_CLASS = "@container mx-auto w-full max-w-[1512px]";
 /** Standard page content width — matches SiteHeader nav bar */
 const STANDARD_CONTENT_CLASS = "mx-auto w-full max-w-[1320px] px-4 lg:px-8";
-/** Vertical inset around intro copy — room for display heading + CTAs without crowding the video */
+/** Vertical inset around intro copy — anchored toward the nav, room for heading + form */
 const HOME_HERO_INTRO_BAND_CLASS =
-  "box-border flex w-full flex-col items-start justify-center py-[clamp(72px,10vh,144px)] lg:items-center lg:py-[clamp(88px,12vh,160px)]";
+  "box-border flex w-full flex-col items-start justify-start pt-[clamp(12px,2.5vh,32px)] pb-[clamp(32px,5vh,64px)] lg:items-center lg:pt-[clamp(16px,3vh,40px)] lg:pb-[clamp(40px,6vh,72px)]";
 /** Gap between multiline hero body paragraphs */
 const HOME_HERO_BODY_PARAGRAPH_GAP = "gap-3 lg:gap-4";
-/** Max width for hero donate card */
+/** Max width for hero donate card over video */
 const HOME_HERO_DONATE_FORM_MAX_WIDTH = "w-full max-w-[480px]";
+/** Centered subpage hero donate form — overlaps image bottom edge */
+const SUBPAGE_HERO_DONATE_FORM_MAX_WIDTH = "w-full max-w-[480px]";
+/** Anchor form bottom to image bottom, then shift down 50% — half on image, half on section bg */
+const SUBPAGE_HERO_DONATE_OVERLAP_CLASS =
+  "pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center px-4 lg:px-8 translate-y-1/2";
+/** Reserve space below the image for the half of the form that sits on the section background */
+const SUBPAGE_HERO_DONATE_BLEED_CLASS = "h-[clamp(140px,18vh,220px)]";
+const SUBPAGE_HERO_CAPTION_CLASS =
+  "flex flex-col gap-3 text-base leading-[1.4] text-white lg:gap-4 lg:text-[18px]";
+/** Intro-band donate form — compact donation widget */
+const HOME_HERO_INTRO_FORM_MAX_WIDTH = "w-full max-w-[400px]";
 const FIGMA_CONTENT_CLASS = "max-w-[1512px]";
 /** Figma space/7xl — equal padding on all sides of hero text containers */
 const FIGMA_PADDING = "p-[clamp(24px,6.35cqw,96px)]";
@@ -285,6 +306,7 @@ function SubpageHeroImage({
   caption,
   sticker,
   stickerName = "free-food",
+  stickerAlign = "right",
   isCard = false,
   className,
 }: {
@@ -293,6 +315,8 @@ function SubpageHeroImage({
   caption?: string;
   sticker?: boolean;
   stickerName?: StickerName;
+  /** Horizontal placement when `sticker` is true. Stack-centered heroes use `center`. */
+  stickerAlign?: "right" | "center";
   isCard?: boolean;
   className?: string;
 }) {
@@ -319,19 +343,79 @@ function SubpageHeroImage({
               )}
             />
             <figcaption className="absolute inset-x-0 bottom-0 p-[clamp(24px,4.23cqw,64px)]">
-              <p className="text-sm leading-[1.4] text-white">{caption}</p>
+              <div
+                className={SUBPAGE_HERO_CAPTION_CLASS}
+                style={
+                  { "--section-emphasis": "var(--color-neutral-000)" } as CSSProperties
+                }
+              >
+                {caption.split("\n").map((line, lineIndex) => (
+                  <p key={lineIndex}>
+                    {parseEmphasis(line, true, "paragraph")}
+                  </p>
+                ))}
+              </div>
             </figcaption>
           </>
         )}
       </figure>
       {sticker && (
         <div
-          className={cn(STICKER_OVERLAP_TOP_CLASS, STICKER_SIZE_CLASS)}
+          className={cn(
+            stickerAlign === "center"
+              ? STICKER_OVERLAP_TOP_CENTER_EDGE_CLASS
+              : STICKER_OVERLAP_TOP_CLASS,
+            STICKER_SIZE_CLASS,
+          )}
           aria-hidden
         >
           <Sticker name={stickerName} fillContainer alt="" />
         </div>
       )}
+    </div>
+  );
+}
+
+function SubpageHeroWithDonate({
+  src,
+  alt,
+  sticker,
+  stickerName = "free-food",
+  submitLabel = "Donate Now",
+  isCard = false,
+  className,
+}: {
+  src: string;
+  alt: string;
+  sticker?: boolean;
+  stickerName?: StickerName;
+  submitLabel?: string;
+  isCard?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={cn("relative w-full", className)}>
+      <div className="relative w-full">
+        <SubpageHeroImage
+          src={src}
+          alt={alt}
+          sticker={sticker}
+          stickerName={stickerName}
+          stickerAlign="center"
+          isCard={isCard}
+        />
+        <div className={SUBPAGE_HERO_DONATE_OVERLAP_CLASS}>
+          <div className={cn("pointer-events-auto", SUBPAGE_HERO_DONATE_FORM_MAX_WIDTH)}>
+            <DonationForm
+              variant="hero"
+              sectionTheme="dark"
+              submitLabel={submitLabel}
+              className="shadow-[0_8px_32px_rgba(0,0,0,0.24)]"
+            />
+          </div>
+        </div>
+      </div>
+      <div aria-hidden className={SUBPAGE_HERO_DONATE_BLEED_CLASS} />
     </div>
   );
 }
@@ -586,8 +670,9 @@ const HOME_HERO_VIDEO_ENTER = {
 
 const HOME_STACKED_SCROLL_HEIGHT = "min-h-[240vh]";
 const HOME_STACKED_INTRO_HEADING_CLASS = cn(
-  "m-0 text-left text-kale [text-box-trim:trim-both] [text-box-edge:cap_alphabetic] lg:text-center",
-  "text-[clamp(3rem,14vw,4.25rem)] font-medium leading-none tracking-[-0.04em] lg:text-[clamp(58.212px,7.701cqw,116.424px)]",
+  "m-0 w-full min-w-0 text-left text-kale [text-box-trim:trim-both] [text-box-edge:cap_alphabetic] lg:text-center",
+  // Mobile: scale down so "Feeding Communities" fits at 320px (nowrap orphan guard)
+  "text-[clamp(1.625rem,8.5vw,3.5rem)] font-medium leading-none tracking-[-0.04em] lg:text-[clamp(58.212px,7.701cqw,116.424px)]",
   "font-semibold tracking-[-0.05em]",
   "[--section-emphasis:var(--color-se-green-base)]",
   "[&>span]:gap-y-[0.04em] lg:[&>span]:gap-y-[0.06em]",
@@ -605,15 +690,33 @@ const HOME_STACKED_INTRO_CAPTION_CLASS = cn(
   "flex flex-col gap-1 text-lg leading-[1.6] lg:gap-1.5 lg:text-[22px]",
   "text-kale lg:text-center",
 );
+/** Mobile-only: scale intro heading so nowrap lines fit down to 320px */
+function useMobileHeroFitText() {
+  const [enabled, setEnabled] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const update = () => setEnabled(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  return enabled;
+}
 /** Heading + caption read as one block — tighter internal rhythm (matches TextSection) */
 const HOME_HERO_INTRO_TEXT_GAP = "gap-5 lg:gap-6";
 /** Headline separated from supporting copy + actions */
 const HOME_HERO_INTRO_HEADLINE_GAP = "gap-6 lg:gap-8";
-/** Caption and CTAs share one column — action follows the message */
-const HOME_HERO_INTRO_COPY_COLUMN_CLASS =
-  "flex w-full max-w-2xl flex-col lg:mx-auto lg:items-center";
 const HOME_HERO_INTRO_CTA_CLASS = cn(
   "pointer-events-auto mb-8 flex w-full flex-col gap-3 sm:mb-10 sm:w-auto sm:flex-row sm:flex-wrap sm:gap-5 lg:justify-center",
+);
+const HOME_HERO_INTRO_FORM_CLASS = cn(
+  "pointer-events-auto mb-5 w-full sm:mb-6",
+  HOME_HERO_INTRO_FORM_MAX_WIDTH,
+  "lg:mx-auto",
 );
 
 const HOME_HERO_INTRO_CAPTION_EMPHASIS_STYLE = {
@@ -627,6 +730,9 @@ function HomeHeroIntroContent({
   primaryCtaHref = "#",
   secondaryCta,
   secondaryCtaHref = "#",
+  introDonationForm = false,
+  textMaskRef,
+  donateModuleRef,
   waitForIntroReveal,
   onRevealComplete,
   onIntroSettled,
@@ -637,14 +743,19 @@ function HomeHeroIntroContent({
   primaryCtaHref?: string;
   secondaryCta?: string;
   secondaryCtaHref?: string;
+  introDonationForm?: boolean;
+  textMaskRef?: RefObject<HTMLDivElement | null>;
+  donateModuleRef?: RefObject<HTMLDivElement | null>;
   waitForIntroReveal?: boolean;
   onRevealComplete?: () => void;
   /** Fires after heading, caption, and CTAs have finished their enter animations */
   onIntroSettled?: () => void;
 }) {
   const reduceMotion = useReducedMotion();
+  const fitHeadingText = useMobileHeroFitText();
   const [captionVisible, setCaptionVisible] = useState(reduceMotion);
   const hasCtas = Boolean(primaryCta || secondaryCta);
+  const hasActions = hasCtas || introDonationForm;
 
   useEffect(() => {
     if (reduceMotion) onIntroSettled?.();
@@ -653,18 +764,18 @@ function HomeHeroIntroContent({
   const handleRevealComplete = () => {
     setCaptionVisible(true);
     onRevealComplete?.();
-    if (!caption && !hasCtas) {
+    if (!caption && !hasActions) {
       onIntroSettled?.();
     }
   };
 
   const handleCaptionSettled = (definition: string) => {
-    if (definition === "visible" && !hasCtas) {
+    if (definition === "visible" && !hasActions) {
       onIntroSettled?.();
     }
   };
 
-  const handleCtaSettled = () => {
+  const handleActionSettled = () => {
     if (captionVisible) {
       onIntroSettled?.();
     }
@@ -703,12 +814,51 @@ function HomeHeroIntroContent({
         initial={{ opacity: 0, y: 24 }}
         animate={captionVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
         transition={{ ...heroWordSpring, delay: caption ? 0.24 : 0 }}
-        onAnimationComplete={handleCtaSettled}
+        onAnimationComplete={handleActionSettled}
         className={HOME_HERO_INTRO_CTA_CLASS}
       >
         {ctaButtons}
       </motion.div>
     ));
+
+  const donateFormEl = introDonationForm &&
+    (reduceMotion ? (
+      <div
+        ref={donateModuleRef}
+        data-hero-donate-module=""
+        className={HOME_HERO_INTRO_FORM_CLASS}
+      >
+        <DonationForm
+          variant="hero"
+          formCard="white"
+          sectionTheme="light"
+          hideHeader
+          compact
+          className="shadow-[0_4px_24px_rgba(0,0,0,0.08)]"
+        />
+      </div>
+    ) : (
+      <motion.div
+        ref={donateModuleRef}
+        data-hero-donate-module=""
+        initial={{ opacity: 0, y: 24 }}
+        animate={captionVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+        transition={{ ...heroWordSpring, delay: caption ? 0.24 : 0 }}
+        onAnimationComplete={handleActionSettled}
+        className={HOME_HERO_INTRO_FORM_CLASS}
+      >
+        <DonationForm
+          variant="hero"
+          formCard="white"
+          sectionTheme="light"
+          hideHeader
+          compact
+          className="shadow-[0_4px_24px_rgba(0,0,0,0.08)]"
+        />
+      </motion.div>
+    ));
+
+  const actionEl = introDonationForm ? donateFormEl : ctaEl;
 
   const captionEl = caption &&
     (reduceMotion ? (
@@ -748,20 +898,43 @@ function HomeHeroIntroContent({
 
   return (
     <div className={cn("flex w-full flex-col", HOME_HERO_INTRO_HEADLINE_GAP)} data-theme="light">
-      <AnimatedHeroHeading
-        title={title}
-        as="h1"
-        multiline
-        revealDelay={homeHeroRevealDelay}
-        revealStagger={homeHeroRevealStagger}
-        waitForIntroReveal={waitForIntroReveal}
-        onRevealComplete={handleRevealComplete}
-        className={HOME_STACKED_INTRO_HEADING_CLASS}
-      />
-      {(captionEl || ctaEl) && (
-        <div className={cn(HOME_HERO_INTRO_COPY_COLUMN_CLASS, HOME_HERO_INTRO_TEXT_GAP)}>
-          {captionEl}
-          {ctaEl}
+      <div
+        ref={textMaskRef}
+        data-hero-text-mask=""
+        className={cn("flex w-full flex-col", HOME_HERO_INTRO_HEADLINE_GAP)}
+      >
+        <AnimatedHeroHeading
+          title={title}
+          as="h1"
+          multiline
+          fitText={fitHeadingText}
+          fitTextMaxSizePx={56}
+          revealDelay={homeHeroRevealDelay}
+          revealStagger={homeHeroRevealStagger}
+          waitForIntroReveal={waitForIntroReveal}
+          onRevealComplete={handleRevealComplete}
+          className={HOME_STACKED_INTRO_HEADING_CLASS}
+        />
+        {captionEl && (
+          <div
+            className={cn(
+              "flex w-full max-w-2xl flex-col lg:mx-auto lg:items-center",
+              HOME_HERO_INTRO_TEXT_GAP,
+            )}
+          >
+            {captionEl}
+          </div>
+        )}
+      </div>
+      {actionEl && (
+        <div
+          className={cn(
+            "flex w-full max-w-2xl flex-col lg:mx-auto lg:items-center",
+            HOME_HERO_INTRO_TEXT_GAP,
+            captionEl && "-mt-1 lg:-mt-1",
+          )}
+        >
+          {actionEl}
         </div>
       )}
     </div>
@@ -929,6 +1102,22 @@ function HomeRoundedHero({
   );
 }
 
+function useMobileHeroViewport() {
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  return isMobile;
+}
+
 function HomeRoundedHeroWithDonate({
   id,
   imageSrc,
@@ -948,6 +1137,7 @@ function HomeRoundedHeroWithDonate({
   primaryCtaHref = "#",
   secondaryCta,
   secondaryCtaHref = "#",
+  introDonationForm = false,
   pinOnScroll = true,
   className,
 }: {
@@ -962,6 +1152,7 @@ function HomeRoundedHeroWithDonate({
   primaryCtaHref?: string;
   secondaryCta?: string;
   secondaryCtaHref?: string;
+  introDonationForm?: boolean;
   cardTitle?: string;
   cardBody?: string;
   cardBodySize?: "xl" | "lg" | "md";
@@ -976,16 +1167,25 @@ function HomeRoundedHeroWithDonate({
   const sectionRef = useRef<HTMLElement>(null);
   const introRef = useRef<HTMLDivElement>(null);
   const introContentRef = useRef<HTMLDivElement>(null);
+  const introTextMaskRef = useRef<HTMLDivElement>(null);
+  const introDonateModuleRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
   const scrollFx = pinOnScroll && !reduceMotion;
   const pageRevealed = useIntroRevealed();
+  const isMobileViewport = useMobileHeroViewport();
   const [introRevealed, setIntroRevealed] = useState(reduceMotion);
   const [ripplesActive, setRipplesActive] = useState(reduceMotion);
+  const [mobileDotsEntered, setMobileDotsEntered] = useState(reduceMotion);
   const playHeroVideo = reduceMotion || pageRevealed;
 
+  const handleIntroSettled = useCallback(() => {
+    if (isMobileViewport) {
+      setMobileDotsEntered(true);
+    }
+  }, [isMobileViewport]);
+
   useEffect(() => {
-    if (reduceMotion) {
-      setRipplesActive(true);
+    if (reduceMotion || isMobileViewport) {
       return;
     }
     if (!pageRevealed) {
@@ -996,7 +1196,7 @@ function HomeRoundedHeroWithDonate({
     const delayMs = homeNavEnterCompleteDelay * 1000;
     const timer = window.setTimeout(() => setRipplesActive(true), delayMs);
     return () => window.clearTimeout(timer);
-  }, [pageRevealed, reduceMotion]);
+  }, [isMobileViewport, pageRevealed, reduceMotion]);
   useHomeHeroFrameStart(sectionRef, introRef, scrollFx);
   useHomeHeroDonateScrollCssVar(sectionRef, scrollFx, (progress) => {
     if (progress > 0.02) setIntroRevealed(true);
@@ -1016,10 +1216,17 @@ function HomeRoundedHeroWithDonate({
       primaryCtaHref={primaryCtaHref}
       secondaryCta={secondaryCta}
       secondaryCtaHref={secondaryCtaHref}
+      introDonationForm={introDonationForm}
+      textMaskRef={introTextMaskRef}
+      donateModuleRef={introDonateModuleRef}
       waitForIntroReveal
       onRevealComplete={() => setIntroRevealed(true)}
+      onIntroSettled={handleIntroSettled}
     />
   );
+
+  const pulseActive = isMobileViewport ? mobileDotsEntered : ripplesActive;
+  const pulseEntered = isMobileViewport ? mobileDotsEntered : true;
 
   const overlayCard = cardTitle ? (
     <div className={HOME_HERO_DONATE_FORM_MAX_WIDTH}>
@@ -1055,8 +1262,10 @@ function HomeRoundedHeroWithDonate({
       >
         <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden pt-[var(--site-header-height)]">
           <HeroBackgroundPulses
-            active={ripplesActive}
-            contentMaskRef={introContentRef}
+            active={pulseActive}
+            entered={pulseEntered}
+            contentMaskRef={introTextMaskRef}
+            rippleOriginRef={introDonationForm ? introDonateModuleRef : undefined}
           />
           <div className="relative z-10">
             <HomeHeroIntroBand>
@@ -1104,8 +1313,10 @@ function HomeRoundedHeroWithDonate({
       <div className="home-hero-donate__pin sticky top-0 h-screen w-full overflow-hidden">
         <div className="absolute inset-0 bg-white" aria-hidden />
         <HeroBackgroundPulses
-          active={ripplesActive}
-          contentMaskRef={introContentRef}
+          active={pulseActive}
+          entered={pulseEntered}
+          contentMaskRef={introTextMaskRef}
+          rippleOriginRef={introDonationForm ? introDonateModuleRef : undefined}
         />
 
         {/* Heading — in green space above video, video scrolls over it */}
@@ -1169,6 +1380,7 @@ export function HeroSection({
   headingSize = "h1",
   body,
   bodySize = "md",
+  bodyEmphasis,
   imageSrc,
   imageAlt = "",
   videoSrc,
@@ -1187,6 +1399,7 @@ export function HeroSection({
   cardSecondaryCta,
   cardSecondaryCtaHref,
   introCaption,
+  introDonationForm = false,
   submitLabel = "Donate Now",
   pinOnScroll = true,
   className,
@@ -1199,6 +1412,9 @@ export function HeroSection({
 
   const subpageShellClass =
     "pb-[48px] pt-[100px] lg:pb-[120px] lg:pt-[140px]";
+  const stackContentGapClass = sticker
+    ? "gap-12 lg:gap-24"
+    : "gap-8 lg:gap-16";
   const stackShellClass = cn(
     "px-0 py-0",
     subpageShellClass,
@@ -1222,6 +1438,11 @@ export function HeroSection({
         transparentBg={transparentBg}
       >
         <div className="flex flex-col gap-8">
+          {eyebrow ? (
+            <p className={cn(eyebrowClassName, "text-[var(--section-text,#003619)]")}>{eyebrow}</p>
+          ) : (
+            <div aria-hidden className="min-h-[calc(1.125rem*1.1)] lg:min-h-[calc(24px*1.1)]" />
+          )}
           <AnimatedHeroHeading
             title={title}
             as={heroHeadingTag(heroHeadingLevel[headingSize])}
@@ -1264,9 +1485,10 @@ export function HeroSection({
         flushBottom={flushBottom}
         transparentBg={transparentBg}
       >
-        <div className="flex flex-col gap-8 lg:gap-16">
+        <div className={cn("flex flex-col", stackContentGapClass)}>
           <TextSection
             eyebrow={eyebrow}
+            reserveEyebrowSpace
             heading={title}
             headingSize={headingSize}
             animateHeading
@@ -1305,9 +1527,10 @@ export function HeroSection({
         flushBottom={flushBottom}
         transparentBg={transparentBg}
       >
-        <div className="flex flex-col gap-24">
+        <div className={cn("flex flex-col", stackContentGapClass)}>
           <TextSection
             eyebrow={eyebrow}
+            reserveEyebrowSpace
             heading={title}
             headingSize={headingSize}
             animateHeading
@@ -1321,7 +1544,7 @@ export function HeroSection({
             secondaryCtaHref={secondaryCtaHref}
             buttonScheme={sectionCardContentIsDark(isCard, cardColor, theme) ? "dark" : "light"}
             align="center"
-            className="w-full px-0 lg:px-[336px]"
+            className="w-full"
           />
           <SubpageHeroImage
             src={imageSrc}
@@ -1329,6 +1552,51 @@ export function HeroSection({
             caption={imageCaption}
             sticker={sticker}
             stickerName={stickerName}
+            stickerAlign="center"
+            isCard={isCard}
+          />
+        </div>
+      </SectionShell>
+    );
+  }
+
+  if (resolvedLayout === "stack-centered-donate") {
+    return (
+      <SectionShell
+        theme={theme}
+        className={stackShellClass}
+        contentClassName={cn(FIGMA_CONTENT_CLASS, FIGMA_INNER_PADDING)}
+        id={id}
+        flushTop={flushTop}
+        flushBottom={flushBottom}
+        transparentBg={transparentBg}
+      >
+        <div className={cn("flex flex-col", stackContentGapClass)}>
+          <TextSection
+            eyebrow={eyebrow}
+            reserveEyebrowSpace
+            heading={title}
+            headingSize={headingSize}
+            animateHeading
+            emphasis={!isCard}
+            isCard={isCard}
+            body={body}
+            bodyEmphasis={bodyEmphasis}
+            bodySize={bodySize}
+            primaryCta={primaryCta}
+            primaryCtaHref={primaryCtaHref}
+            secondaryCta={secondaryCta}
+            secondaryCtaHref={secondaryCtaHref}
+            buttonScheme={sectionCardContentIsDark(isCard, cardColor, theme) ? "dark" : "light"}
+            align="center"
+            className="w-full"
+          />
+          <SubpageHeroWithDonate
+            src={imageSrc}
+            alt={imageAlt}
+            sticker={sticker}
+            stickerName={stickerName}
+            submitLabel={submitLabel}
             isCard={isCard}
           />
         </div>
@@ -1389,6 +1657,7 @@ export function HeroSection({
         cardSecondaryCta={cardSecondaryCta}
         cardSecondaryCtaHref={cardSecondaryCtaHref}
         introCaption={introCaption}
+        introDonationForm={introDonationForm}
         primaryCta={primaryCta}
         primaryCtaHref={primaryCtaHref}
         secondaryCta={secondaryCta}

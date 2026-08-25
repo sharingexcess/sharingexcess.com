@@ -4,7 +4,7 @@ import type { LogoItem } from "./LogosBannerSection";
 
 const logoImageClassName = (grayscale: boolean) =>
   cn(
-    "h-[64px] w-auto max-w-[300px] shrink-0 object-contain transition-[filter] duration-300",
+    "h-16 w-auto max-w-[320px] shrink-0 object-contain transition-[filter] duration-300 lg:h-32",
     grayscale && "grayscale hover:grayscale-0",
   );
 

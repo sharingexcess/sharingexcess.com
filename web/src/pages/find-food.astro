@@ -1,0 +1,84 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import GcalSection from "@/sections/GcalSection";
+import HeroSection from "@/sections/HeroSection";
+import StatsCardSection from "@/sections/StatsCardSection";
+import TextImageSection from "@/sections/TextImageSection";
+
+const calendarEmbed =
+  "https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=America%2FNew_York&showPrint=0&showTitle=0&showCalendars=0&src=Y19kNDM5NzQ2NDlkYmJhYTg2OTliMzU4M2M4YWE4NDc3MzdhZWNkYTQ1MzkyMDJjNDIzNDcxMjgyZWVkZDQ0YmJjQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20&color=%234285F4";
+
+const getInvolvedCards = [
+  {
+    value: "Volunteer Opportunities",
+    label: "Volunteer at a pop-up.",
+    type: "image" as const,
+    variant: "green" as const,
+    tilt: "tiltLeft" as const,
+    imageSrc: "/images/__DSC_0380-5_1.avif",
+    href: "/get-involved/volunteer",
+  },
+  {
+    value: "Contact Us",
+    label: "Sponsor a pop-up or ask us any questions.",
+    type: "image" as const,
+    variant: "yellow" as const,
+    tilt: "tiltRight" as const,
+    imageSrc: "/images/54007168669_334d08b78e_4k_1.avif",
+    href: "mailto:community@sharingexcess.com",
+  },
+];
+---
+
+<PageLayout
+  title="Find Food: Local Distributions + Pop-ups | Sharing Excess"
+  description="Find free food distributions and pop-up events near you. No sign-up or ID required."
+>
+  <HeroSection client:visible
+    layout="stack-left"
+    theme="light"
+    eyebrow="Find Food"
+    title="Free, fresh produce near you."
+    imageSrc="/images/mangoes.jpg"
+    imageAlt=""
+    sticker={true}
+    className="!bg-banana-200 [--section-text:var(--color-kale)] [--section-emphasis:var(--color-se-green-base)]"
+  />
+
+  <GcalSection client:visible
+    theme="light"
+    align="center"
+    eyebrow="Find a Sharing Excess Distribution"
+    headingSize="h2"
+    title="Pop-up Distribution Calendar"
+    bodySize="lg"
+    body="We partner with local organizations and businesses to bring rescued produce directly to the community - no sign-up or ID required! All events are free and open to the public. Food is first come, first serve."
+    note="Note: Events may occasionally be canceled due to inclement weather - please check the calendar on the day of; if an event is no longer listed, it will not be taking place."
+    embedUrl={calendarEmbed}
+  />
+
+  <TextImageSection client:visible
+    theme="light"
+    isCard={true}
+    cardColor="brand-green"
+    headingSize="h2"
+    title="Looking for more food available near you?"
+    body="While many resources are available, we recommend our partner Lemontree for finding available pantries and food centers in an array of American cities."
+    imageSrc="/images/peppers.jpg"
+    imageAlt=""
+    imagePosition="left"
+    imageStyle="square"
+    primaryCta="Visit Lemontree"
+    primaryCtaHref="https://foodhelpline.org"
+  />
+
+  <StatsCardSection client:visible
+    theme="dark"
+    columns={2}
+    contentVariant="text"
+    headingSize="h2"
+    align="center"
+    title="Want to get involved?"
+    stats={getInvolvedCards}
+  />
+</PageLayout>

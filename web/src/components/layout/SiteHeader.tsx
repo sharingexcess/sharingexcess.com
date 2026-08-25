@@ -1,3 +1,4 @@
+import { useDonateOverlay } from "@/components/donation/DonateOverlay";
 import { cn } from "@/lib/cn";
 import { isHomePagePath } from "@/lib/isHomePagePath";
 import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
@@ -19,7 +20,7 @@ import {
   useReducedMotion,
 } from "@/lib/motion";
 import { useIntroRevealed } from "@/lib/useIntroRevealed";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useHeaderOverWhiteBackground } from "@/lib/useHeaderOverWhiteBackground";
 
 /** Design-system accent for nav dropdown arrow buttons — hardcoded per card, not derived from images */
@@ -96,8 +97,7 @@ export interface SiteHeaderProps {
   secondaryCtaLabel?: string;
   secondaryCtaHref?: string;
   ctaLabel?: string;
-  ctaHref?: string;
-  /** Server-known home route — enables scroll-hide and hero sizing on first paint */
+  /** Server-known home route — enables hero sizing and home-only nav enter animation on first paint */
   isHomePage?: boolean;
 }
 
@@ -221,7 +221,7 @@ export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
     },
   },
   {
-    label: "Closing the Gap",
+    label: "World's Dumbest Problem",
     href: "/about/problem",
   },
 ];
@@ -247,10 +247,13 @@ export function SiteHeader({
   secondaryCtaLabel = "Log In",
   secondaryCtaHref = "https://app.sharingexcess.com/sign-in",
   ctaLabel = "Donate",
-  ctaHref = "/?form=donate",
   isHomePage: isHomePageProp = false,
 }: SiteHeaderProps) {
+  const { openDonateOverlay } = useDonateOverlay();
   const [menuOpen, setMenuOpen] = useState(false);
+  const headerContainerRef = useRef<HTMLDivElement>(null);
+  const navItemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [dropdownAnchorLeft, setDropdownAnchorLeft] = useState(0);
   const headerBarRef = useRef<HTMLDivElement>(null);
   const overWhiteBackground = useHeaderOverWhiteBackground(headerBarRef, isHomePageProp);
   const [activeNavIndex, setActiveNavIndex] = useState<number | null>(null);
@@ -259,8 +262,8 @@ export function SiteHeader({
   const reduceMotion = useReducedMotion();
   const introRevealed = useIntroRevealed();
   const [homeEnterKey, setHomeEnterKey] = useState(0);
-  const scrollVisible = useHideOnScroll({ enabled: isHomePage });
-  const visible = isHomePage ? scrollVisible || menuOpen : true;
+  const scrollVisible = useHideOnScroll();
+  const visible = scrollVisible || menuOpen;
   const animateHomeNav = isHomePage && !reduceMotion && introRevealed;
   const homeNavEnter = isHomePage && !reduceMotion;
 
@@ -284,6 +287,21 @@ export function SiteHeader({
     document.addEventListener("astro:after-swap", replayHomeEnter);
     return () => document.removeEventListener("astro:after-swap", replayHomeEnter);
   }, [reduceMotion]);
+
+  const syncDropdownAnchor = useCallback((index: number) => {
+    const navItem = navItemRefs.current[index];
+    const container = headerContainerRef.current;
+    if (!navItem || !container) return;
+
+    const itemRect = navItem.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    setDropdownAnchorLeft(itemRect.left - containerRect.left);
+  }, []);
+
+  useLayoutEffect(() => {
+    if (activeNavIndex === null) return;
+    syncDropdownAnchor(activeNavIndex);
+  }, [activeNavIndex, visible, menuOpen, syncDropdownAnchor]);
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const toggleMenu = useCallback(() => setMenuOpen((open) => !open), []);
@@ -336,6 +354,7 @@ export function SiteHeader({
       inert={headerInteractive ? undefined : true}
     >
       <div
+        ref={headerContainerRef}
         className={cn(
           "relative z-10 mx-auto w-full",
           HEADER_BAR_TRANSITION,
@@ -394,6 +413,9 @@ export function SiteHeader({
             {navItems.map((item, index) => (
               <div
                 key={index}
+                ref={(element) => {
+                  navItemRefs.current[index] = element;
+                }}
                 className={cn(
                   "transition-opacity duration-200",
                   focusedNavIndex !== null && focusedNavIndex !== index && "opacity-50",
@@ -401,6 +423,7 @@ export function SiteHeader({
                 onMouseEnter={() => {
                   setHoveredNavIndex(index);
                   if ((item.children?.length ?? 0) > 0) {
+                    syncDropdownAnchor(index);
                     setActiveNavIndex(index);
                   } else {
                     closeNavDropdown();
@@ -430,7 +453,10 @@ export function SiteHeader({
               variant="primary"
               size="sm"
               colorScheme="light"
-              href={ctaHref}
+              onClick={() => {
+                closeNavDropdown();
+                openDonateOverlay();
+              }}
             >
               {ctaLabel}
             </Button>
@@ -453,6 +479,7 @@ export function SiteHeader({
           onClose={closeNavDropdown}
           showSecondaryFeatured={showSecondaryFeatured}
           overWhiteBackground={overWhiteBackground}
+          anchorLeft={dropdownAnchorLeft}
         />
       </div>
 
@@ -462,7 +489,7 @@ export function SiteHeader({
         secondaryCtaLabel={secondaryCtaLabel}
         secondaryCtaHref={secondaryCtaHref}
         ctaLabel={ctaLabel}
-        ctaHref={ctaHref}
+        onDonateClick={openDonateOverlay}
         onClose={closeMenu}
         panelId={MOBILE_NAV_ID}
       />

@@ -1,0 +1,140 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import HeroSection from "@/sections/HeroSection";
+import TextImageSection from "@/sections/TextImageSection";
+import TextOnlySection from "@/sections/TextOnlySection";
+
+const leadership = [
+  {
+    src: "/images/headshots/evan_1.avif",
+    alt: "Evan Ehlers",
+    title: "Evan Ehlers",
+    body: "Founder & CEO",
+  },
+  {
+    src: "/images/headshots/499189247_18508996399014715_7167200363432539733_n.jpg",
+    alt: "Victoria Wilson",
+    title: "Victoria Wilson",
+    body: "Chief Operating Officer",
+  },
+  {
+    src: "/images/headshots/53795386469_40a6b3198c_c_1.avif",
+    alt: "Nourhan Ibrahim",
+    title: "Nourhan Ibrahim",
+    body: "Chief Program Officer",
+  },
+  {
+    src: "/images/headshots/sarah_1.avif",
+    alt: "Sarah DiPasquale",
+    title: "Sarah DiPasquale",
+    body: "Chief Technology Officer",
+  },
+  {
+    src: "/images/headshots/Headshot-Ryan-McHenry.jpg",
+    alt: "Ryan McHenry",
+    title: "Ryan McHenry",
+    body: "Head of Strategy & Revenue",
+  },
+  {
+    src: "/images/headshots/54334243555_9925fb92c7_k_1.avif",
+    alt: "Diane Wilde Olcott",
+    title: "Diane Wilde Olcott",
+    body: "Head of Food System Advocacy",
+  },
+];
+
+const programLeads = [
+  {
+    src: "/images/headshots/53881392250_5608b1f918_k_1.avif",
+    alt: "Anne Swanson",
+    title: "Anne Swanson",
+    body: "Strategic Partnerships Director",
+  },
+  {
+    src: "/images/headshots/Headshot-Mike.jpeg",
+    alt: "Mike Meyer",
+    title: "Mike Meyer",
+    body: "Wholesale Market Operations Director",
+  },
+  {
+    src: "/images/headshots/53795074016_9247995bee_c_1.avif",
+    alt: "Kim Sears",
+    title: "Kim Sears",
+    body: "Detroit Program Director",
+  },
+  {
+    src: "/images/headshots/kit-headshot.png",
+    alt: "Kit Riggs",
+    title: "Kit Riggs",
+    body: "New York Program Director",
+  },
+  {
+    src: "/images/headshots/1680280764724.jpg",
+    alt: "Chad Techner",
+    title: "Chad Techner",
+    body: "Philadelphia Program Director",
+  },
+  {
+    src: "/images/headshots/53904116183_0fdd8e6957_k_1.avif",
+    alt: "Miranda Potmesil",
+    title: "Miranda Potmesil",
+    body: "Food Sourcing Manager",
+  },
+];
+---
+
+<PageLayout
+  title="Our Team | Sharing Excess"
+  description="Meet the leadership and team behind Sharing Excess's national food rescue mission."
+>
+  <HeroSection client:visible
+    layout="stack-left"
+    theme="light"
+    eyebrow="Our Team"
+    title="Meet the crew behind the mission."
+    imageSrc="/images/team.jpg"
+    imageAlt=""
+  />
+
+  <TextImageSection client:visible
+    theme="light"
+    eyebrow="Who we are"
+    title="One of the fastest-growing food rescue organizations in America"
+    body="Sharing Excess is built on a simple but powerful mission: to reduce food waste through scalable and sustainable solutions. What started as a grassroots movement now operates across the country — moving nearly 2 million pounds of food every week to thousands of community partners nationwide. Our work is visionary, impactful, and deeply human."
+    imageSrc="/images/IMG_9113.avif"
+    imageAlt=""
+    imagePosition="right"
+    imageStyle="square"
+  />
+
+  <TextImageSection client:visible
+    theme="dark"
+    layout="three-image-caption"
+    eyebrow="Our Leadership"
+    headingSize="h2"
+    title="Executive team"
+    body="The leaders guiding Sharing Excess's growth and impact."
+    images={leadership}
+  />
+
+  <TextImageSection client:visible
+    theme="light"
+    layout="three-image-caption"
+    headingSize="h2"
+    title="Program & operations leads"
+    body="Regional directors and operations managers powering rescues across the country."
+    images={programLeads}
+  />
+
+  <TextOnlySection client:visible
+    theme="light"
+    align="center"
+    headingSize="h2"
+    title="Join the team"
+    body="We're always looking for passionate people to help end food waste and food insecurity."
+    primaryCta="View Careers"
+    primaryCtaHref="/get-involved/careers"
+    secondaryCta="Contact Us"
+    secondaryCtaHref="/contact"
+  />
+</PageLayout>

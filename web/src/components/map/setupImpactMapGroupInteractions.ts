@@ -2,6 +2,7 @@ import type { Expression, Map, MapLayerMouseEvent, MapMouseEvent, Point } from "
 import {
   getImpactGroupById,
   IMPACT_MAP_GROUPS,
+  projectImpactGroupLabelAnchor,
   type ImpactMapGroup,
 } from "./impactMapGroups";
 import {
@@ -18,7 +19,7 @@ export const IMPACT_MARKER_TRANSITION_MS = 280;
 const MUTED_MARKER_COLOR = "#C9C9C9";
 const BASE_MARKER_SIZE: Expression = ["get", "marker_size"];
 /** Fallback click radius around a group center when a marker feature is not hit. */
-const GROUP_CLICK_RADIUS_PX = 52;
+const GROUP_CLICK_RADIUS_PX = 32;
 
 export interface MapOverlayAnchor {
   x: number;
@@ -88,8 +89,7 @@ export function syncImpactMapMarkerStyles(
 }
 
 function projectGroupAnchor(map: Map, group: ImpactMapGroup): MapOverlayAnchor {
-  const point = map.project([group.lng, group.lat]);
-  return { x: point.x, y: point.y };
+  return projectImpactGroupLabelAnchor(map, group);
 }
 
 function groupIdFromFeatures(features: GeoJSON.Feature[]): string | null {
@@ -100,6 +100,9 @@ function groupIdFromFeatures(features: GeoJSON.Feature[]): string | null {
   return null;
 }
 
+/** When two hubs are equally close, prefer the higher stack priority (e.g. Philadelphia over NYC). */
+const GROUP_CLICK_TIE_BREAK_PX = 4;
+
 function findNearestImpactGroup(
   map: Map,
   point: Point | { x: number; y: number },
@@ -108,15 +111,24 @@ function findNearestImpactGroup(
   let nearestDistance = Infinity;
 
   for (const group of IMPACT_MAP_GROUPS) {
-    const projected = map.project([group.lng, group.lat]);
+    const projected = projectImpactGroupLabelAnchor(map, group);
     const distance = Math.hypot(projected.x - point.x, projected.y - point.y);
-    if (distance < nearestDistance) {
+    if (distance > GROUP_CLICK_RADIUS_PX) continue;
+
+    const priority = group.labelStackPriority ?? 0;
+    const nearestPriority = nearest?.labelStackPriority ?? -Infinity;
+    const isCloser = distance < nearestDistance - GROUP_CLICK_TIE_BREAK_PX;
+    const isTiedButHigherPriority =
+      Math.abs(distance - nearestDistance) <= GROUP_CLICK_TIE_BREAK_PX &&
+      priority > nearestPriority;
+
+    if (!nearest || isCloser || isTiedButHigherPriority) {
       nearestDistance = distance;
       nearest = group;
     }
   }
 
-  return nearestDistance <= GROUP_CLICK_RADIUS_PX ? nearest : null;
+  return nearest;
 }
 
 function resolveGroupFromClick(

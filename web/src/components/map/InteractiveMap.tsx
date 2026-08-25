@@ -1,15 +1,20 @@
-import seCircleLogo from "@/assets/images/se-circle.png";
 import { cn } from "@/lib/cn";
-import { AnimatePresence } from "@/lib/motion";
+import { AnimatePresence, useReducedMotion } from "@/lib/motion";
 import mapboxgl, { type LngLatBounds, type Map, type Marker } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { useCallback, useEffect, useId, useRef, useState, Fragment, type CSSProperties, type KeyboardEvent, type RefObject } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent, type RefObject } from "react";
 import "./map.css";
 import {
   HubMarkerCard,
   type HubCardAnchor,
-  HUB_MARKER_CARD_ESTIMATED_HEIGHT_PX,
-  HUB_MARKER_CARD_WIDTH_PX,
+  getHubCardEdgePaddingPx,
+  getHubCardMapCenterOffsetPx,
+  getHubMarkerCardEstimatedHeightPx,
+  getHubMarkerCardWidthPx,
+  getPinnedHubCardAnchor,
+  HUB_CARD_MARKER_GAP_PX,
+  isMobileHubCardLayout,
+  syncHubCardLayoutCssVars,
 } from "./HubMarkerCard";
 import { createHubMarkerElement } from "./hubMarkerElement";
 import {
@@ -22,6 +27,9 @@ import {
 import {
   enrichImpactGeoJsonWithGroups,
   IMPACT_MAP_GROUPS,
+  IMPACT_MAP_GROUPS_BY_STACK,
+  IMPACT_MAP_TOUR_GROUPS,
+  projectImpactGroupLabelAnchor,
   type ImpactMapGroup,
 } from "./impactMapGroups";
 import { applyImpactMapTheme } from "./impactMapTheme";
@@ -33,12 +41,14 @@ import {
   type MapOverlayAnchor,
 } from "./setupImpactMapGroupInteractions";
 import { useImpactGroupMetrics } from "./useImpactGroupMetrics";
+import { useImpactMapLocationTour } from "./useImpactMapLocationTour";
 import {
   DEFAULT_MAP_CENTER,
   DEFAULT_MAP_HUBS,
   DEFAULT_MAP_ZOOM,
   DEFAULT_MAX_ZOOM,
   getImpactGeoJsonUrls,
+  applyImpactMapViewport,
   getImpactMapView,
   getMapboxAccessToken,
   getMapStyleForVariant,
@@ -46,7 +56,7 @@ import {
   MAP_POINT_COLOR,
   STATIC_MAP_INTERACTION,
 } from "./mapConfig";
-import type { InteractiveMapProps, MapHub, MapMacroRegion } from "./types";
+import type { ImpactMapViewportFit, InteractiveMapProps, MapHub, MapMacroRegion } from "./types";
 
 const GROUP_METRICS_PLACEHOLDER = DEFAULT_MAP_HUBS[0]?.metrics ?? [];
 
@@ -66,11 +76,34 @@ const HUB_SELECT_ZOOM = 6;
 const GROUP_ZOOM_DURATION_MS = 600;
 const HUB_MARKER_HEIGHT = 54;
 const HUB_CARD_GAP = 12;
-const HUB_CARD_MAX_WIDTH = HUB_MARKER_CARD_WIDTH_PX;
-const HUB_CARD_EDGE_PADDING = 16;
-/** Card bottom sits above marker cluster (impact map; label is hidden when selected). */
-const GROUP_CARD_ABOVE_HUB_PX = 72;
-const GROUP_CARD_ESTIMATED_HEIGHT = HUB_MARKER_CARD_ESTIMATED_HEIGHT_PX;
+
+function clampHubCardAnchorX(
+  pointX: number,
+  containerWidth: number,
+  cardWidth: number,
+  edgePadding: number,
+): number {
+  const halfCard = cardWidth / 2;
+  const minX = edgePadding + halfCard;
+  const maxX = containerWidth - edgePadding - halfCard;
+
+  return maxX <= minX ? containerWidth / 2 : Math.min(maxX, Math.max(minX, pointX));
+}
+
+function clampHubCardAnchorY(
+  preferredY: number,
+  containerHeight: number,
+  topPadding: number,
+  bottomPadding: number,
+  estimatedHeight: number,
+): number {
+  const minCardBottomY = topPadding + estimatedHeight;
+  const maxCardBottomY = containerHeight - bottomPadding;
+
+  return maxCardBottomY <= minCardBottomY
+    ? minCardBottomY
+    : Math.min(maxCardBottomY, Math.max(minCardBottomY, preferredY));
+}
 
 async function fetchImpactGeoJson(
   urls: string[],
@@ -189,22 +222,22 @@ function getHubCardAnchor(
   containerWidth: number,
   containerHeight: number,
 ): HubCardAnchor {
-  const point = map.project([hub.lng, hub.lat]);
-  const halfCard = HUB_CARD_MAX_WIDTH / 2;
-  const minX = HUB_CARD_EDGE_PADDING + halfCard;
-  const maxX = containerWidth - HUB_CARD_EDGE_PADDING - halfCard;
-  const x =
-    maxX <= minX
-      ? containerWidth / 2
-      : Math.min(maxX, Math.max(minX, point.x));
+  if (isMobileHubCardLayout(containerWidth)) {
+    return getPinnedHubCardAnchor(containerWidth);
+  }
 
-  const minCardBottomY = HUB_CARD_EDGE_PADDING + GROUP_CARD_ESTIMATED_HEIGHT;
-  const maxCardBottomY = containerHeight - HUB_CARD_EDGE_PADDING;
+  const point = map.project([hub.lng, hub.lat]);
+  const edgePadding = getHubCardEdgePaddingPx(containerWidth);
+  const cardWidth = getHubMarkerCardWidthPx(containerWidth);
+  const x = clampHubCardAnchorX(point.x, containerWidth, cardWidth, edgePadding);
   const preferredY = point.y - HUB_MARKER_HEIGHT - HUB_CARD_GAP;
-  const y =
-    maxCardBottomY <= minCardBottomY
-      ? minCardBottomY
-      : Math.min(maxCardBottomY, Math.max(minCardBottomY, preferredY));
+  const y = clampHubCardAnchorY(
+    preferredY,
+    containerHeight,
+    edgePadding,
+    edgePadding,
+    getHubMarkerCardEstimatedHeightPx(containerWidth),
+  );
 
   return { x, y };
 }
@@ -215,22 +248,22 @@ function projectGroupCardAnchor(
   containerWidth: number,
   containerHeight: number,
 ): HubCardAnchor {
-  const point = map.project([group.lng, group.lat]);
-  const halfCard = HUB_CARD_MAX_WIDTH / 2;
-  const minX = HUB_CARD_EDGE_PADDING + halfCard;
-  const maxX = containerWidth - HUB_CARD_EDGE_PADDING - halfCard;
-  const x =
-    maxX <= minX
-      ? containerWidth / 2
-      : Math.min(maxX, Math.max(minX, point.x));
+  if (isMobileHubCardLayout(containerWidth)) {
+    return getPinnedHubCardAnchor(containerWidth);
+  }
 
-  const minCardBottomY = HUB_CARD_EDGE_PADDING + GROUP_CARD_ESTIMATED_HEIGHT;
-  const maxCardBottomY = containerHeight - HUB_CARD_EDGE_PADDING;
-  const preferredY = point.y - GROUP_CARD_ABOVE_HUB_PX;
-  const y =
-    maxCardBottomY <= minCardBottomY
-      ? minCardBottomY
-      : Math.min(maxCardBottomY, Math.max(minCardBottomY, preferredY));
+  const point = projectImpactGroupLabelAnchor(map, group);
+  const edgePadding = getHubCardEdgePaddingPx(containerWidth);
+  const cardWidth = getHubMarkerCardWidthPx(containerWidth);
+  const x = clampHubCardAnchorX(point.x, containerWidth, cardWidth, edgePadding);
+  const preferredY = point.y - HUB_CARD_MARKER_GAP_PX;
+  const y = clampHubCardAnchorY(
+    preferredY,
+    containerHeight,
+    edgePadding,
+    edgePadding,
+    getHubMarkerCardEstimatedHeightPx(containerWidth),
+  );
 
   return { x, y };
 }
@@ -294,11 +327,6 @@ function setupRegionHighlights(
   });
 }
 
-function applyImpactMapView(map: Map): void {
-  const view = getImpactMapView();
-  map.jumpTo({ center: view.center, zoom: view.zoom });
-}
-
 function addImpactPointLayer(map: Map, useSymbols: boolean): void {
   if (map.getLayer(IMPACT_LAYER_ID)) return;
 
@@ -344,8 +372,10 @@ function setupImpactMapLayers(
   },
   groupInteractionsRef: RefObject<ImpactMapGroupInteractionController | null>,
   selectedGroupIdRef: RefObject<string | null>,
+  impactGeoJsonRef: RefObject<GeoJSON.FeatureCollection | null>,
   onMarkersReady?: () => void,
   isCancelled?: () => boolean,
+  viewportFit: ImpactMapViewportFit = "framed",
 ): () => void {
   applyImpactMapTheme(map);
 
@@ -365,6 +395,21 @@ function setupImpactMapLayers(
   let stopConnectors: (() => void) | undefined;
   let groupInteractions: ImpactMapGroupInteractionController | undefined;
   let useSymbols = hasMarkerImage;
+
+  const pulseOverlay = pulseOverlayRef.current;
+  if (pulseOverlay) {
+    stopPulse = startImpactMapPulse(map, pulseOverlay, {
+      onPulseGroup: groupCallbacks.onPulseGroup,
+    });
+  }
+
+  try {
+    stopConnectors = setupImpactMapConnectors(map);
+  } catch (error) {
+    console.warn("Impact map connectors failed to start:", error);
+  }
+
+  applyImpactMapViewport(map, viewportFit);
 
   void (async () => {
     try {
@@ -388,7 +433,6 @@ function setupImpactMapLayers(
         addImpactPointLayer(map, false);
       }
 
-      stopConnectors = setupImpactMapConnectors(map, raw);
       groupInteractions = setupImpactMapGroupInteractions(
         map,
         useSymbols,
@@ -397,14 +441,8 @@ function setupImpactMapLayers(
       groupInteractionsRef.current = groupInteractions;
       groupInteractions.setSelectedGroupId(selectedGroupIdRef.current);
 
-      const pulseOverlay = pulseOverlayRef.current;
-      if (pulseOverlay) {
-        stopPulse = startImpactMapPulse(map, pulseOverlay, {
-          onPulseGroup: groupCallbacks.onPulseGroup,
-        });
-      }
-
-      applyImpactMapView(map);
+      impactGeoJsonRef.current = raw;
+      applyImpactMapViewport(map, viewportFit, raw);
     } catch (error) {
       console.warn("Impact map markers failed to load:", error);
     } finally {
@@ -430,13 +468,19 @@ export function InteractiveMap({
   regions,
   maxZoom = DEFAULT_MAX_ZOOM,
   showNavigation = false,
+  onReady,
+  viewportFit = "framed",
+  locationTour = true,
 }: InteractiveMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const mapShellRef = useRef<HTMLDivElement>(null);
   const pulseOverlayRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | null>(null);
   const hubMarkersRef = useRef<HubMarkerEntry[]>([]);
   const groupInteractionsRef = useRef<ImpactMapGroupInteractionController | null>(null);
   const selectedGroupIdRef = useRef<string | null>(null);
+  const impactGeoJsonRef = useRef<GeoJSON.FeatureCollection | null>(null);
+  const readyCalledRef = useRef(false);
   const mapId = useId().replace(/:/g, "");
   const [isLoading, setIsLoading] = useState(showLoadingLogo);
   const [selectedHub, setSelectedHub] = useState<MapHub | null>(null);
@@ -448,6 +492,38 @@ export function InteractiveMap({
   const [groupCardAnchor, setGroupCardAnchor] = useState<MapOverlayAnchor | null>(null);
   const impactGroupMetrics = useImpactGroupMetrics();
   const accessToken = getMapboxAccessToken();
+  const reduceMotion = useReducedMotion();
+  const tourEnabled =
+    variant === "impact-clusters" && locationTour && !reduceMotion;
+
+  const selectImpactGroup = useCallback((group: ImpactMapGroup | null) => {
+    if (!group) {
+      setSelectedGroup(null);
+      setGroupCardAnchor(null);
+      return;
+    }
+
+    const map = mapRef.current;
+    const container = containerRef.current;
+    if (!map || !container) return;
+
+    setGroupCardAnchor(
+      projectGroupCardAnchor(
+        map,
+        group,
+        container.clientWidth,
+        container.clientHeight,
+      ),
+    );
+    setSelectedGroup(group);
+  }, []);
+
+  const { pauseTour } = useImpactMapLocationTour({
+    enabled: tourEnabled,
+    groups: IMPACT_MAP_TOUR_GROUPS,
+    isReady: variant === "impact-clusters" && !isLoading,
+    onSelectGroup: selectImpactGroup,
+  });
 
   const handleHoverGroup = useCallback((group: ImpactMapGroup | null) => {
     setHoveredGroup(group);
@@ -467,6 +543,8 @@ export function InteractiveMap({
 
   const handleSelectGroup = useCallback(
     (group: ImpactMapGroup | null, anchor: MapOverlayAnchor | null) => {
+      pauseTour();
+
       if (!group) {
         setSelectedGroup(null);
         setGroupCardAnchor(null);
@@ -483,11 +561,12 @@ export function InteractiveMap({
         return group;
       });
     },
-    [],
+    [pauseTour],
   );
 
   const handleGroupClick = useCallback(
     (group: ImpactMapGroup, event?: { stopPropagation?: () => void }) => {
+      pauseTour();
       event?.stopPropagation?.();
 
       const map = mapRef.current;
@@ -504,7 +583,7 @@ export function InteractiveMap({
         ),
       );
     },
-    [handleSelectGroup],
+    [handleSelectGroup, pauseTour],
   );
 
   const handleGroupLabelKeyDown = useCallback(
@@ -518,39 +597,51 @@ export function InteractiveMap({
   );
 
   const handleCloseGroupCard = useCallback(() => {
+    pauseTour();
     setSelectedGroup(null);
     setGroupCardAnchor(null);
-  }, []);
+  }, [pauseTour]);
 
   const focusImpactGroup = useCallback((group: ImpactMapGroup | null) => {
     const map = mapRef.current;
+    const container = containerRef.current;
     if (!map) return;
 
     if (group) {
+      const offsetY = container
+        ? getHubCardMapCenterOffsetPx(container.clientWidth, container.clientHeight)
+        : 0;
+
       map.easeTo({
         center: [group.lng, group.lat],
         zoom: Math.max(map.getZoom(), HUB_SELECT_ZOOM),
         duration: GROUP_ZOOM_DURATION_MS,
+        offset: [0, offsetY],
       });
       return;
     }
 
-    const view = getImpactMapView();
-    map.easeTo({
-      center: view.center,
-      zoom: view.zoom,
-      duration: GROUP_ZOOM_DURATION_MS,
-    });
-  }, []);
+    if (viewportFit === "fill") {
+      applyImpactMapViewport(map, "fill", impactGeoJsonRef.current);
+    } else {
+      applyImpactMapViewport(map, "framed", impactGeoJsonRef.current);
+    }
+  }, [viewportFit]);
 
   const centerMapOnHub = useCallback((hub: MapHub) => {
     const map = mapRef.current;
+    const container = containerRef.current;
     if (!map) return;
+
+    const offsetY = container
+      ? getHubCardMapCenterOffsetPx(container.clientWidth, container.clientHeight)
+      : 0;
 
     map.easeTo({
       center: [hub.lng, hub.lat],
       zoom: Math.max(map.getZoom(), HUB_SELECT_ZOOM),
       duration: 600,
+      offset: [0, offsetY],
     });
   }, []);
 
@@ -644,8 +735,7 @@ export function InteractiveMap({
     const syncLabelAnchors = () => {
       const anchors: Record<string, MapOverlayAnchor> = {};
       for (const group of IMPACT_MAP_GROUPS) {
-        const point = map.project([group.lng, group.lat]);
-        anchors[group.id] = { x: point.x, y: point.y };
+        anchors[group.id] = projectImpactGroupLabelAnchor(map, group);
       }
       setGroupLabelAnchors(anchors);
     };
@@ -690,6 +780,25 @@ export function InteractiveMap({
 
   useEffect(() => {
     const container = containerRef.current;
+    const shell = mapShellRef.current;
+    if (!container || !shell) return;
+
+    const syncLayout = () => {
+      syncHubCardLayoutCssVars(shell, container.clientWidth);
+    };
+
+    syncLayout();
+
+    const resizeObserver = new ResizeObserver(syncLayout);
+    resizeObserver.observe(container);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const container = containerRef.current;
     if (!container || !accessToken) return;
 
     const abortController = new AbortController();
@@ -705,7 +814,13 @@ export function InteractiveMap({
         ? fetchImpactGeoJson(geojsonUrls, abortController.signal)
         : null;
 
-    const hideLoading = () => setIsLoading(false);
+    const hideLoading = () => {
+      setIsLoading(false);
+      if (!readyCalledRef.current) {
+        readyCalledRef.current = true;
+        onReady?.();
+      }
+    };
     const loadingFallbackTimer =
       showLoadingLogo
         ? window.setTimeout(hideLoading, 12000)
@@ -735,7 +850,7 @@ export function InteractiveMap({
       resizeTimer = setTimeout(() => {
         map?.resize();
         if (variant === "impact-clusters" && map) {
-          applyImpactMapView(map);
+          applyImpactMapViewport(map, viewportFit, impactGeoJsonRef.current);
         }
       }, 150);
     };
@@ -743,6 +858,9 @@ export function InteractiveMap({
     const dismissHubCard = () => setSelectedHub(null);
 
     map.on("load", () => {
+      if (variant === "impact-clusters" && viewportFit === "fill") {
+        applyImpactMapViewport(map!, "fill");
+      }
       resizeMap();
 
       if (variant === "impact-clusters" && geojsonPromise) {
@@ -757,25 +875,27 @@ export function InteractiveMap({
           },
           groupInteractionsRef,
           selectedGroupIdRef,
+          impactGeoJsonRef,
           () => {
             if (loadingFallbackTimer) window.clearTimeout(loadingFallbackTimer);
-            if (showLoadingLogo) hideLoading();
+            hideLoading();
           },
           () => cancelled,
+          viewportFit,
         );
       } else if (variant === "hub-markers" && hubs.length > 0) {
         hubMarkersRef.current = setupHubMarkers(map!, hubs, handleHubClick);
         map!.on("click", dismissHubCard);
         if (loadingFallbackTimer) window.clearTimeout(loadingFallbackTimer);
-        if (showLoadingLogo) hideLoading();
+        hideLoading();
       } else if (variant === "region-highlights") {
         void setupRegionHighlights(map!, regions ?? []).then(() => {
           if (loadingFallbackTimer) window.clearTimeout(loadingFallbackTimer);
-          if (showLoadingLogo) hideLoading();
+          hideLoading();
         });
       } else {
         if (loadingFallbackTimer) window.clearTimeout(loadingFallbackTimer);
-        if (showLoadingLogo) hideLoading();
+        hideLoading();
       }
     });
 
@@ -789,6 +909,7 @@ export function InteractiveMap({
       if (resizeTimer) clearTimeout(resizeTimer);
       resizeObserver?.disconnect();
       stopImpactPulse?.();
+      impactGeoJsonRef.current = null;
       prevSelectedGroupRef.current = undefined;
       for (const entry of hubMarkersRef.current) {
         entry.destroy();
@@ -813,6 +934,8 @@ export function InteractiveMap({
     regions,
     showLoadingLogo,
     showNavigation,
+    onReady,
+    viewportFit,
     variant,
     zoom,
   ]);
@@ -839,6 +962,7 @@ export function InteractiveMap({
 
   return (
     <div
+      ref={mapShellRef}
       className={cn("se-map", hoveredGroup && "se-map--group-hover", className)}
       style={{ "--se-map-point-color": MAP_POINT_COLOR } as CSSProperties}
     >
@@ -848,51 +972,42 @@ export function InteractiveMap({
       )}
       {variant === "impact-clusters" && (
         <div className="se-map-overlay">
-          {IMPACT_MAP_GROUPS.map((group) => {
+          {IMPACT_MAP_GROUPS_BY_STACK.map((group) => {
             const anchor = groupLabelAnchors[group.id];
             if (!anchor || selectedGroup?.id === group.id) return null;
 
             const isHovered = hoveredGroup?.id === group.id;
             const isPulsing = pulsingGroupId === group.id;
+            const stackZIndex = group.labelStackPriority ?? 0;
 
             return (
-              <Fragment key={group.id}>
-                <button
-                  type="button"
-                  className="se-map-group-hit-target"
-                  style={{ left: anchor.x, top: anchor.y }}
-                  aria-label={`View ${group.name} impact`}
-                  onClick={(event) => handleGroupClick(group, event)}
-                  onMouseEnter={() => handleGroupLabelEnter(group)}
-                  onMouseLeave={handleGroupLabelLeave}
-                />
-                <button
-                  type="button"
-                  className={cn(
-                    "se-map-group-label-anchor",
-                    isHovered && "se-map-group-label-anchor--hover",
-                    isPulsing && "se-map-group-label-anchor--pulse",
-                  )}
-                  style={{ left: anchor.x, top: anchor.y }}
-                  aria-label={`View ${group.name} impact`}
-                  onClick={(event) => handleGroupClick(group, event)}
-                  onMouseEnter={() => handleGroupLabelEnter(group)}
-                  onMouseLeave={handleGroupLabelLeave}
-                  onKeyDown={(event) => handleGroupLabelKeyDown(group, event)}
-                >
-                  <span className="se-map-group-label">
-                    <img
-                      src={seCircleLogo.src}
-                      alt=""
-                      className="se-map-group-label__logo"
-                      width={20}
-                      height={20}
-                      aria-hidden
-                    />
-                    <span className="se-map-group-label__text">{group.name}</span>
-                  </span>
-                </button>
-              </Fragment>
+              <button
+                key={group.id}
+                type="button"
+                className={cn(
+                  "se-map-group-label-anchor",
+                  isHovered && "se-map-group-label-anchor--hover",
+                  isPulsing && "se-map-group-label-anchor--pulse",
+                )}
+                style={{ left: anchor.x, top: anchor.y, zIndex: stackZIndex }}
+                aria-label={`View ${group.name} impact`}
+                onClick={(event) => handleGroupClick(group, event)}
+                onMouseEnter={() => handleGroupLabelEnter(group)}
+                onMouseLeave={handleGroupLabelLeave}
+                onKeyDown={(event) => handleGroupLabelKeyDown(group, event)}
+              >
+                <span className="se-map-group-label">
+                  <img
+                    src="/images/se-circle.png"
+                    alt=""
+                    className="se-map-group-label__logo"
+                    width={20}
+                    height={20}
+                    aria-hidden
+                  />
+                  <span className="se-map-group-label__text">{group.name}</span>
+                </span>
+              </button>
             );
           })}
           <AnimatePresence mode="wait">

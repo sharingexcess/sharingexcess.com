@@ -5,7 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.stories.@(js|jsx|ts|tsx)"],
-  staticDirs: ["../../public", "../public"],
+  staticDirs: ["../../public"],
   addons: ["@storybook/addon-docs", "@storybook/addon-a11y"],
   framework: {
     name: "@storybook-astro/framework",
@@ -16,6 +16,16 @@ const config: StorybookConfig = {
   async viteFinal(config) {
     const { mergeConfig } = await import("vite");
     return mergeConfig(config, {
+      server: {
+        proxy: {
+          "/__surplus": {
+            target: "https://surplus-api.sharingexcess.com",
+            changeOrigin: true,
+            secure: true,
+            rewrite: (path) => path.replace(/^\/__surplus/, ""),
+          },
+        },
+      },
       plugins: [tailwindcss()],
       optimizeDeps: {
         exclude: [

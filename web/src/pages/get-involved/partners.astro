@@ -1,0 +1,140 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import HeroSection from "@/sections/HeroSection";
+import LogosBannerSection from "@/sections/LogosBannerSection";
+import TextImageCarouselSection from "@/sections/TextImageCarouselSection";
+import TextImageSection from "@/sections/TextImageSection";
+import TextOnlySection from "@/sections/TextOnlySection";
+
+const foodBusinessLogos = [
+  { src: "/images/trader-joes-logo_1.avif", alt: "Trader Joe's" },
+  { src: "/images/The_Giant_Company_logo.svg_1.avif", alt: "The Giant Company" },
+  { src: "/images/usda-symbol.svg", alt: "USDA" },
+  { src: "/images/Target_logo.avif", alt: "Target" },
+  { src: "/images/Misfits_Market_Logo_01-01-1_1.avif", alt: "Misfits Market" },
+];
+
+const communityLogos = [
+  { src: "/images/share-food-program-logo.svg", alt: "Share Food Program" },
+  { src: "/images/Feeding-PA-Logo.svg", alt: "Feeding PA" },
+  { src: "/images/YMCA-Logo_1.avif", alt: "YMCA" },
+  { src: "/images/SFP_1.avif", alt: "Sharing Food Philadelphia" },
+];
+
+const impactHighlights = [
+  {
+    title: "Philadelphia Wholesale Produce Market",
+    body: "Since 2021, we've partnered with the Philadelphia Wholesale Produce Market to create a full-scale surplus rescue operation. Together, we've rescued over 25 million pounds of fresh food.",
+    imageSrc: "/images/53795439664_a9c383345c_c_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "Beast Philanthropy",
+    body: "In partnership with Beast Philanthropy, we've moved over 30 million pounds of food — redefining what large-scale generosity can look like.",
+    imageSrc: "/images/beast_cover_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "Trader Joe's",
+    body: "Every day of the week, across multiple cities and states, Trader Joe's is helping us rescue perfectly good food from going to waste.",
+    imageSrc: "/images/53892051346_b8a9053bfe_c_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "Hunts Point Produce Market",
+    body: "In the Bronx, we've rescued over 12 million pounds of food at one of the largest produce markets in the world.",
+    imageSrc: "/images/53795193735_c9f0a0c867_3k.jpg",
+    imageAlt: "",
+  },
+  {
+    title: "Misfits Market",
+    body: "Misfits Market helps power one of the most ambitious food rescue efforts in the country at Hunts Point.",
+    imageSrc: "/images/54007168669_334d08b78e_4k_1.avif",
+    imageAlt: "",
+  },
+  {
+    title: "The Tony Robbins Foundation",
+    body: "Their support enables us to scale our work globally and bring millions more meals to families facing hunger.",
+    imageSrc: "/images/About-us-Image-1_1920-e1525391876813-1_1.avif",
+    imageAlt: "",
+  },
+];
+---
+
+<PageLayout
+  title="Partner with Sharing Excess | Food Rescue for Businesses"
+  description="Sharing Excess makes it easy for food businesses, community organizations, and foundations to donate surplus food."
+>
+  <HeroSection client:visible
+    layout="stack-left"
+    theme="light"
+    title="Partner with us"
+    imageSrc="/images/partner_1.avif"
+    imageAlt=""
+  />
+
+  <TextImageSection client:visible
+    id="food-business"
+    theme="light"
+    eyebrow="Food Businesses"
+    title="Have food to donate? Let us help!"
+    body="Sharing Excess makes it ridiculously easy for any business to donate food. We provide the transportation, coordination, donation receipts, and even help you access valuable tax benefits. Make the most of your food so nothing ever has to go to waste — just give us a shout and we'll handle the rest."
+    imageSrc="/images/Screen-Shot-2023-07-17-at-8.32.35-PM_1.avif"
+    imageAlt=""
+    imagePosition="right"
+    imageStyle="square"
+    primaryCta="Get in touch"
+    primaryCtaHref="/contact"
+  />
+
+  <LogosBannerSection client:visible theme="light" logos={foodBusinessLogos} />
+
+  <TextImageSection client:visible
+    id="community-orgs"
+    theme="dark"
+    eyebrow="Food Banks & Community Orgs"
+    title="Get access to regular pickups + deliveries"
+    body="We partner closely with food banks and community organizations to solve the most expensive and labor-intensive tasks of food rescue. Let Sharing Excess take care of sourcing and delivery so you can focus on the most important part — getting food into the hands of those who need it most."
+    imageSrc="/images/Screen-Shot-2023-07-17-at-8.32.43-PM_1.avif"
+    imageAlt=""
+    imagePosition="left"
+    imageStyle="square"
+    primaryCta="Contact our team"
+    primaryCtaHref="/contact"
+  />
+
+  <LogosBannerSection client:visible theme="dark" logos={communityLogos} />
+
+  <TextImageSection client:visible
+    theme="light"
+    eyebrow="Corporate Partners"
+    title="Make an impact in your local community"
+    body="Sharing Excess is supported by incredible companies that are just as committed to serving their community as they are doing business. Whether it's through volunteering, sponsoring events, fundraising, or spreading awareness, your contribution matters and we can't wait to team up."
+    imageSrc="/images/Screen-Shot-2023-07-17-at-8.32.21-PM_1.avif"
+    imageAlt=""
+    imagePosition="right"
+    imageStyle="square"
+    primaryCta="Reach out to the team"
+    primaryCtaHref="/contact"
+  />
+
+  <TextOnlySection client:visible
+    id="foundations"
+    theme="light"
+    align="center"
+    eyebrow="Foundations and Donors"
+    headingSize="h2"
+    title="We are supported by some of the world's greatest philanthropists"
+    body="Behind our mission's success stands an extraordinary network of funders that believe in our bold vision of a world that has solved hunger and food waste. If you're looking for a scrappy, innovative, and highly collaborative organization with a track record of cost-efficient impact... look no further."
+    primaryCta="Contact Us"
+    primaryCtaHref="/contact"
+  />
+
+  <TextImageCarouselSection client:visible
+    theme="dark"
+    eyebrow="Impact highlights"
+    items={impactHighlights}
+    imagePosition="left"
+    advanceOnScroll={false}
+  />
+</PageLayout>

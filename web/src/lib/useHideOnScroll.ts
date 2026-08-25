@@ -6,7 +6,7 @@ export interface UseHideOnScrollOptions {
   threshold?: number;
   /** Ignore direction changes smaller than this (px) */
   deltaThreshold?: number;
-  /** When false the header always stays visible (e.g. inner pages). */
+  /** When false the header always stays visible (e.g. Storybook previews). */
   enabled?: boolean;
 }
 

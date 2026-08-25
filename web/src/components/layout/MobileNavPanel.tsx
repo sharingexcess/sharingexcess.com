@@ -102,7 +102,7 @@ export interface MobileNavPanelProps {
   secondaryCtaLabel: string;
   secondaryCtaHref: string;
   ctaLabel: string;
-  ctaHref: string;
+  onDonateClick: () => void;
   onClose: () => void;
   panelId: string;
 }
@@ -181,7 +181,7 @@ export function MobileNavPanel({
   secondaryCtaLabel,
   secondaryCtaHref,
   ctaLabel,
-  ctaHref,
+  onDonateClick,
   onClose,
   panelId,
 }: MobileNavPanelProps) {
@@ -258,7 +258,10 @@ export function MobileNavPanel({
               <Button variant="secondary" size="lg" href={secondaryCtaHref} className="min-w-0 flex-1">
                 {secondaryCtaLabel}
               </Button>
-              <Button variant="primary" size="lg" href={ctaHref} className="min-w-0 flex-1">
+              <Button variant="primary" size="lg" className="min-w-0 flex-1" onClick={() => {
+                onDonateClick();
+                onClose();
+              }}>
                 {ctaLabel}
               </Button>
             </motion.div>

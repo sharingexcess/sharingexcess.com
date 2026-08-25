@@ -1,0 +1,123 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import HeroSection from "@/sections/HeroSection";
+import TextImageCarouselSection from "@/sections/TextImageCarouselSection";
+
+const articles = [
+  {
+    title: "How a Philly-based nonprofit is helping feed those in need",
+    body: "6ABC — November 7, 2025. More than a third of all food produced in the U.S. goes to waste. Sharing Excess is working to change that and helping get food to those in need.",
+    imageSrc: "/images/Screenshot-2026-01-09-at-3.22.05-PM.png",
+    imageAlt: "",
+    primaryCta: "Read More",
+    primaryCtaHref: "https://6abc.com/videoClip/18127796/",
+  },
+  {
+    title: "Philly-based nonprofit launches food-mapping website as SNAP benefits pause",
+    body: "PhillyVoice — November 3, 2025. Sharing Excess has launched a website mapping free food locations to support people facing food insecurity.",
+    imageSrc: "/images/philabundance-community-kitchen-philadelphia-2025-10-30-768x512.avif",
+    imageAlt: "",
+    primaryCta: "Read More",
+    primaryCtaHref: "https://www.phillyvoice.com/drexel-graduate-sharing-excess-expansion-federal-cuts/",
+  },
+  {
+    title: "A Partnership for Food Security in Philadelphia",
+    body: "Philadelphia Inquirer — 2025 Changemaker Spotlight. Evan Ehlers partnered with Bank of America's Jim Dever to expand hunger relief work.",
+    imageSrc: "/images/TENHQPOJCNGP7KXQ76MPDBHI2Y.avif",
+    imageAlt: "",
+    primaryCta: "Read More",
+    primaryCtaHref: "https://www.inquirer.com/philly-first/changemaker-spotlight/bank-of-america-sharing-excess-changemaker-spotlight-evan-ehlers-jim-dever-20251114.html",
+  },
+  {
+    title: "An Inside Look Into One of America's Largest Food Rescue Programs",
+    body: "Pew — June 11, 2025. Evan Ehlers takes us behind the scenes at the Philadelphia Wholesale Produce Market.",
+    imageSrc: "/images/Screenshot-2026-01-09-at-3.25.29-PM.png",
+    imageAlt: "",
+    primaryCta: "Watch on YouTube",
+    primaryCtaHref: "https://www.youtube.com/watch?v=SwIApsMqQrk",
+  },
+  {
+    title: "The Case for Taking Food Rescue Seriously",
+    body: "PFMA — November 3, 2025. If we rescued even ten percent of what we throw away, we could theoretically end hunger in the United States.",
+    imageSrc: "/images/54891330261_56d7e29b14_c.jpg",
+    imageAlt: "",
+    primaryCta: "Read More",
+    primaryCtaHref: "https://www.pfma.org/news-blog/the-case-for-taking-food-rescue-seriously/",
+  },
+  {
+    title: "Turning Surplus Food into Millions of Meals",
+    body: "Pew Charitable Trusts — March 14, 2025. Evan Ehlers shares how Sharing Excess is solving the world's dumbest problem.",
+    imageSrc: "/images/Ep153_MainWebImage.png",
+    imageAlt: "",
+    primaryCta: "Read More",
+    primaryCtaHref: "https://www.pew.org/en/research-and-analysis/articles/2025/03/14/turning-surplus-food-into-millions-of-meals",
+  },
+  {
+    title: "Food rescue nonprofit faces 'tornado scenario' with federal funding cuts",
+    body: "PhillyVoice — June 23, 2025. Sharing Excess has established over 2,000 distribution sites across 36 states.",
+    imageSrc: "/images/sharing_excess.2e16d0ba.fill-735x490.jpg",
+    imageAlt: "",
+    primaryCta: "Read More",
+    primaryCtaHref: "https://www.phillyvoice.com/drexel-graduate-sharing-excess-expansion-federal-cuts/",
+  },
+  {
+    title: "Sharing Excess is connecting those who have extra food with those who need more",
+    body: "6ABC — February 2025. Connecting surplus food with communities in need.",
+    imageSrc: "/images/Screenshot-2025-02-10-at-2.56.00-PM_1.avif",
+    imageAlt: "",
+    primaryCta: "Read More",
+    primaryCtaHref: "https://6abc.com/post/sharing-excess-is-connecting-have-extra-food-need-more/15568320/",
+  },
+  {
+    title: "So You Want to Start a Nonprofit to End Food Scarcity",
+    body: "Inside Philanthropy. Guidance for founders tackling food insecurity.",
+    imageSrc: "/images/Screen-Shot-2023-07-17-at-6.44.52-PM_1.avif",
+    imageAlt: "",
+    primaryCta: "Read More",
+    primaryCtaHref: "https://www.insidephilanthropy.com/home/so-you-want-to-start-a-nonprofit-to-end-food-scarcity",
+  },
+  {
+    title: "How Philadelphia nonprofit Sharing Excess is feeding the community",
+    body: "CBS News Philadelphia. Eliminating food waste while feeding the community.",
+    imageSrc: "/images/about.png",
+    imageAlt: "",
+    primaryCta: "Read More",
+    primaryCtaHref: "https://www.cbsnews.com/philadelphia/news/how-philadelphia-nonprofit-sharing-excess-is-feeding-the-community-and-eliminating-food-waste/",
+  },
+  {
+    title: "Mt. Joy Partners with Sharing Excess for Nationwide Canned Food Drive Tour",
+    body: "Grateful Web — Concert tour food drive partnership.",
+    imageSrc: "/images/MINNEAPOLIS-8_7.avif",
+    imageAlt: "",
+    primaryCta: "Read More",
+    primaryCtaHref: "https://www.gratefulweb.com/articles/mt-joy-partners-sharing-excess-nationwide-canned-food-drive-tour",
+  },
+  {
+    title: "Community Food Projects Program Feeding Philadelphia",
+    body: "USDA NIFA — Federal program supporting Philadelphia food access.",
+    imageSrc: "/images/usda-symbol.svg",
+    imageAlt: "",
+    primaryCta: "Read More",
+    primaryCtaHref: "https://www.nifa.usda.gov/about-nifa/blogs/community-food-projects-program-feeding-philadelphia",
+  },
+];
+---
+
+<PageLayout
+  title="SE Food Rescue in the News | Sharing Excess"
+  description="Press coverage and news about Sharing Excess food rescue work across the country."
+>
+  <HeroSection client:visible
+    theme="dark"
+    title="In the news"
+    body="Press coverage celebrating our partners, volunteers, and the communities we serve."
+  />
+
+  <TextImageCarouselSection client:visible
+    theme="light"
+    items={articles}
+    imagePosition="left"
+    advanceOnScroll={false}
+    autoAdvance={false}
+  />
+</PageLayout>

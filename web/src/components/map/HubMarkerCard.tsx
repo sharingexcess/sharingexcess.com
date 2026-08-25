@@ -15,11 +15,82 @@ export interface HubMarkerCardProps {
   className?: string;
 }
 
-/** Matches `w-[min(100vw,24rem)]` — keep in sync with InteractiveMap card positioning. */
+/** Max card width at lg+ — keep in sync with InteractiveMap card positioning. */
 export const HUB_MARKER_CARD_WIDTH_PX = 384;
 
 /** Title + 2×2 metric grid — keep in sync with InteractiveMap card positioning. */
 export const HUB_MARKER_CARD_ESTIMATED_HEIGHT_PX = 260;
+export const HUB_MARKER_CARD_ESTIMATED_HEIGHT_MOBILE_PX = 320;
+
+export const HUB_CARD_EDGE_PADDING_PX = 16;
+export const HUB_CARD_EDGE_PADDING_MOBILE_PX = 20;
+/** Card floats this far above the hub label on desktop. */
+export const HUB_CARD_MARKER_GAP_PX = 72;
+/** Selected-city cluster spread above the hub at mobile select zoom (~6). */
+const HUB_CARD_CLUSTER_NORTH_SPREAD_MOBILE_PX = 88;
+const HUB_CARD_MOBILE_BREAKPOINT_PX = 768;
+
+export function isMobileHubCardLayout(containerWidth: number): boolean {
+  return containerWidth < HUB_CARD_MOBILE_BREAKPOINT_PX;
+}
+
+export function getHubCardEdgePaddingPx(containerWidth: number): number {
+  return isMobileHubCardLayout(containerWidth)
+    ? HUB_CARD_EDGE_PADDING_MOBILE_PX
+    : HUB_CARD_EDGE_PADDING_PX;
+}
+
+export function getHubMarkerCardEstimatedHeightPx(containerWidth: number): number {
+  return isMobileHubCardLayout(containerWidth)
+    ? HUB_MARKER_CARD_ESTIMATED_HEIGHT_MOBILE_PX
+    : HUB_MARKER_CARD_ESTIMATED_HEIGHT_PX;
+}
+
+/** Mobile: pin card below the top inset, centered horizontally. */
+export function getPinnedHubCardAnchor(containerWidth: number): HubCardAnchor {
+  const edgePadding = getHubCardEdgePaddingPx(containerWidth);
+  const cardHeight = getHubMarkerCardEstimatedHeightPx(containerWidth);
+
+  return {
+    x: containerWidth / 2,
+    y: edgePadding + cardHeight,
+  };
+}
+
+/** Shift the map center down on mobile so the pinned card clears highlighted points. */
+export function getHubCardMapCenterOffsetPx(
+  containerWidth: number,
+  containerHeight: number,
+): number {
+  if (!isMobileHubCardLayout(containerWidth)) return 0;
+
+  const edgePadding = getHubCardEdgePaddingPx(containerWidth);
+  const cardHeight = getHubMarkerCardEstimatedHeightPx(containerWidth);
+  const cardBottomY = edgePadding + cardHeight;
+  const hubTargetY =
+    cardBottomY + edgePadding + HUB_CARD_CLUSTER_NORTH_SPREAD_MOBILE_PX;
+
+  return Math.max(0, Math.round(hubTargetY - containerHeight / 2));
+}
+
+/** Inset card width for the map overlay — matches `--se-map-hub-card-width`. */
+export function getHubMarkerCardWidthPx(containerWidth: number): number {
+  const edgePadding = getHubCardEdgePaddingPx(containerWidth);
+  return Math.min(
+    HUB_MARKER_CARD_WIDTH_PX,
+    Math.max(0, containerWidth - edgePadding * 2),
+  );
+}
+
+export function syncHubCardLayoutCssVars(
+  shell: HTMLElement,
+  containerWidth: number,
+): void {
+  shell.style.setProperty(
+    "--se-map-hub-card-width",
+    `${getHubMarkerCardWidthPx(containerWidth)}px`,
+  );
+}
 
 function hubTitleId(name: string): string {
   return `hub-card-title-${name.replace(/\s+/g, "-").toLowerCase()}`;
@@ -90,7 +161,7 @@ export function HubMarkerCard({ hub, onClose, anchor, className }: HubMarkerCard
         aria-modal="true"
         aria-labelledby={titleId}
         className={cn(
-          "se-map-hub-card w-[min(100vw,24rem)] rounded-[var(--radius-xl)] bg-white p-5 shadow-[0_8px_32px_rgba(27,27,21,0.18)]",
+          "se-map-hub-card rounded-[var(--radius-xl)] bg-white p-5 shadow-[0_8px_32px_rgba(27,27,21,0.18)]",
           className,
         )}
       >

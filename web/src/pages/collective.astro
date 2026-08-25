@@ -1,0 +1,93 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import HeroSection from "@/sections/HeroSection";
+import TextImageSection from "@/sections/TextImageSection";
+import VideoTestimonialsCarouselSection from "@/sections/VideoTestimonialsCarouselSection";
+
+const collectiveHeroBody = `Access to food is much more than a basic human need. It's the foundation for improved health, dignity, and community strength. Where nutritious food flows, neighborhoods flourish.
+
+Yet, every day, millions of pounds of perfectly good food go to waste while families go hungry. It doesn't have to be this way.`;
+
+const collectiveHeroBodyEmphasis =
+  "*Just $20/month rescues enough food to feed an entire family for an entire year.*";
+
+const foodInsecurityBody = `Many are working families who must choose between paying rent and buying groceries, or parents who skip meals so their children can eat. Meanwhile, 140 billion pounds of perfectly good food gets thrown away every year — enough to feed every food-insecure person in America twice over.
+
+When you join The Collective, you're investing in the dignity and well-being of families in your own community. Families have access to fresh, nutritious food. Children get the fuel they need to learn and grow. Parents can focus on work instead of worrying about the next meal. Communities grow stronger. That's the power of collective action.`;
+---
+
+<PageLayout
+  title="The Collective | Sharing Excess Monthly Donor Club"
+  description="Join The Collective — a community of monthly donors rescuing fresh food for neighborhoods nationwide."
+>
+  <HeroSection client:visible
+    layout="stack-centered-donate"
+    theme="dark"
+    eyebrow="The Collective"
+    title="Give people fresh and healthy food every month"
+    body={collectiveHeroBody}
+    bodyEmphasis={collectiveHeroBodyEmphasis}
+    bodySize="lg"
+    imageSrc="/images/54223502100_0f55433c56_3k.jpg"
+    imageAlt=""
+    submitLabel="Join The Collective"
+  />
+
+  <TextImageSection client:visible
+    layout="full-image"
+    title="The Collective helps bring fresh food to more than 10 million people nationwide."
+    body="Individual actions become collective impact. When people come together with a shared mission, we can move mountains (or in our case, tons of rescued food)."
+    imageSrc="/images/peppers.jpg"
+    imageAlt=""
+  />
+
+  <TextImageSection client:visible
+    theme="light"
+    layout="three-image-caption"
+    headingSize="h2"
+    title="Join the community that's feeding entire neighborhoods with fresh and healthy rescued food."
+    body="The Collective is a community of people who believe that fresh, healthy food should be accessible to everyone — and who take monthly action to make that vision a reality."
+    images={[
+      {
+        src: "/images/peppers.jpg",
+        alt: "",
+        body: "Your gift rescues food that would otherwise go to waste.",
+      },
+      {
+        src: "/images/tomatoes.jpg",
+        alt: "",
+        body: "Feed families in your community with fresh, nutritious meals.",
+      },
+      {
+        src: "/images/oranges.jpg",
+        alt: "",
+        body: "Build a stronger, more resilient food system for everyone.",
+      },
+    ]}
+  />
+
+  <VideoTestimonialsCarouselSection client:load
+    theme="light"
+    eyebrow="Access to food changes everything."
+    title="47 million Americans live with food insecurity."
+    body={foodInsecurityBody}
+    headingSize="h2"
+    items={[
+      {
+        posterSrc: "https://i.ytimg.com/vi/rBza6eJcFrU/hqdefault.jpg",
+        posterAlt: "",
+        videoSrc: "https://www.youtube.com/shorts/rBza6eJcFrU",
+        caption: "Endang, Bethany Church",
+      },
+    ]}
+  />
+
+  <TextImageSection client:visible
+    theme="light"
+    imagePosition="left"
+    title="Join The Collective"
+    body="For the cost of a cup of coffee, you can change lives. Just $20 a month rescues enough food to feed a family for a year. Members get virtual Q&As, facility tours, and quarterly impact reports showing your collective power in action. Choose your impact and join today."
+    imageSrc="/images/peppers.jpg"
+    imageAlt=""
+  />
+</PageLayout>

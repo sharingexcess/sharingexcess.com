@@ -1,0 +1,118 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import HeroSection from "@/sections/HeroSection";
+import LogosBannerSection from "@/sections/LogosBannerSection";
+import TextImageSection from "@/sections/TextImageSection";
+
+const chapterLogos = [
+  { src: "/images/Drexel-logo_1.avif", alt: "Drexel University", width: 3400, height: 900 },
+  { src: "/images/UniversityofPennsylvania_Vertical_RGB-2_1.avif", alt: "University of Pennsylvania", width: 914, height: 914 },
+  { src: "/images/Temple_University_Logo.svg_1.avif", alt: "Temple University", width: 1280, height: 354 },
+  { src: "/images/st-joseph_1.avif", alt: "St. Joseph's University", width: 222, height: 227 },
+  { src: "/images/University_of_Pittsburgh_seal.svg", alt: "University of Pittsburgh", width: 300, height: 300 },
+  { src: "/images/thomas-jefferson-university-logo_1.avif", alt: "Thomas Jefferson University", width: 560, height: 546 },
+  { src: "/images/penn-state.avif", alt: "Penn State", width: 416, height: 276 },
+  { src: "/images/rutgers-logo_1.avif", alt: "Rutgers University", width: 305, height: 305 },
+];
+---
+
+<PageLayout
+  title="Get Involved | Sharing Excess"
+  description="Partner, volunteer, start a chapter, or fundraise with Sharing Excess to fight food waste and hunger."
+>
+  <HeroSection client:visible
+    layout="stack-centered"
+    theme="dark"
+    eyebrow="Get Involved"
+    title="Let's work together to *share food* and *reduce waste*."
+    imageSrc="/images/get_involved.jpg"
+    imageAlt=""
+    sticker={true}
+    stickerName="waste-less"
+  />
+
+  <TextImageSection client:visible
+    theme="light"
+    layout="four-image-caption"
+    eyebrow="Partner"
+    headingSize="h2"
+    title="Ways to collaborate"
+    body="Together, we can achieve so much more. By becoming a partner with Sharing Excess, you'll collaborate in our mission to reduce food waste and nourish communities."
+    images={[
+      {
+        src: "/images/Screen-Shot-2023-07-17-at-8.32.35-PM_1.avif",
+        alt: "",
+        title: "Food Businesses",
+        body: "Donate surplus food — we handle transportation, coordination, and receipts.",
+        cta: "Learn more",
+        ctaHref: "/get-involved/partners#food-business",
+      },
+      {
+        src: "/images/Screen-Shot-2023-07-17-at-8.32.43-PM_1.avif",
+        alt: "",
+        title: "Community Organizations",
+        body: "Get access to regular pickups and deliveries from our rescue network.",
+        cta: "Learn more",
+        ctaHref: "/get-involved/partners#community-orgs",
+      },
+      {
+        src: "/images/Screen-Shot-2023-07-17-at-8.32.21-PM_1.avif",
+        alt: "",
+        title: "Corporate Partners",
+        body: "Volunteer, sponsor events, fundraise, or spread awareness in your community.",
+        cta: "Learn more",
+        ctaHref: "/get-involved/partners",
+      },
+      {
+        src: "/images/About-us-Image-1_1920-e1525391876813-1_1.avif",
+        alt: "",
+        title: "Foundations",
+        body: "Fund scalable food rescue and join a network of bold philanthropists.",
+        cta: "Learn more",
+        ctaHref: "/get-involved/partners#foundations",
+      },
+    ]}
+    primaryCta="Partner With Us"
+    primaryCtaHref="/get-involved/partners"
+  />
+
+  <TextImageSection client:visible
+    theme="dark"
+    className="!bg-se-green"
+    eyebrow="Volunteer"
+    title="Give back with Sharing Excess"
+    body="As a Sharing Excess volunteer, you'll have the opportunity to help close the gap between excess and scarcity. Join our vibrant community of food rescue champions and connect with others who share a passion for their community!"
+    imageSrc="/images/MINNEAPOLIS-8_7.avif"
+    imageAlt=""
+    imagePosition="right"
+    imageStyle="square"
+    primaryCta="View Volunteer Opportunities"
+    primaryCtaHref="/get-involved/volunteer"
+  />
+
+  <LogosBannerSection client:visible
+    theme="light"
+    eyebrow="Start a University Chapter"
+    title="Empowering the *next generation* of change-makers."
+    body="Become a catalyst for change by starting a Sharing Excess University Chapter on your campus. Lead your peers to get involved, rescue surplus food, and create innovative solutions to address food insecurity in your local community."
+    primaryCta="Learn More"
+    primaryCtaHref="/get-involved/chapters"
+    logos={chapterLogos}
+    grayscale={false}
+  />
+
+  <TextImageSection client:visible
+    theme="dark"
+    className="!bg-kale"
+    eyebrow="Fundraise"
+    headingSize="h2"
+    title="Get creative and raise funds for Sharing Excess"
+    body="Whether it's a charity run, a bake sale, or a creative online campaign, your fundraising initiative will make a significant difference in fighting food waste and feeding communities in need."
+    imageSrc="/images/tiny53773705268_2142c75c5e_k.jpg"
+    imageAlt=""
+    imagePosition="right"
+    imageStyle="square"
+    primaryCta="Start a Fundraiser"
+    primaryCtaHref="/get-involved/fundraise"
+  />
+</PageLayout>

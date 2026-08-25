@@ -51,6 +51,10 @@ export const STICKER_OVERLAP_CENTER_CLASS =
 export const STICKER_OVERLAP_TOP_CENTER_CLASS =
   "pointer-events-none absolute left-1/2 top-3 z-20 -translate-x-1/2 -translate-y-1/2";
 
+/** Centered on the top edge of a full-width hero image (stack-centered) */
+export const STICKER_OVERLAP_TOP_CENTER_EDGE_CLASS =
+  "pointer-events-none absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2";
+
 /** Centered in the gutter between the 2nd and 3rd cards of a 3-up stat grid */
 export const STICKER_BETWEEN_STAT_CARDS_CLASS =
   "pointer-events-none absolute z-20 left-1/2 top-[calc(864px+4.5rem)] -translate-x-1/2 -translate-y-1/2 sm:left-[calc(66.666667%+0.25rem)] sm:top-0";

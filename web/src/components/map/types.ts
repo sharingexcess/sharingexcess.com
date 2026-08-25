@@ -31,6 +31,8 @@ export interface MapMacroRegion {
   fillColor?: string;
 }
 
+export type ImpactMapViewportFit = "framed" | "fill";
+
 export interface InteractiveMapProps {
   variant: MapVariant;
   className?: string;
@@ -44,4 +46,10 @@ export interface InteractiveMapProps {
   regions?: MapMacroRegion[];
   maxZoom?: number;
   showNavigation?: boolean;
+  /** Fires once when tiles/markers are ready and the loading overlay is dismissed */
+  onReady?: () => void;
+  /** Impact clusters — `fill` uses mercator + fitBounds for full-bleed map stages */
+  viewportFit?: ImpactMapViewportFit;
+  /** Impact clusters — auto-cycle through hub cards (default on) */
+  locationTour?: boolean;
 }
