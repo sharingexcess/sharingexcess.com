@@ -94,6 +94,8 @@ export interface TextSectionProps {
   isCard?: boolean;
   /** Rendered below body copy — e.g. an inline donation form */
   bodyFooter?: ReactNode;
+  /** Horizontal layout — rendered below the heading in the left column */
+  headingFooter?: ReactNode;
   /** CTA button row layout — `responsive` stacks on narrow viewports */
   ctaLayout?: "row" | "responsive";
   ctaSize?: ButtonProps["size"];
@@ -266,6 +268,7 @@ export function TextSection({
   emphasis = true,
   isCard = false,
   bodyFooter,
+  headingFooter,
   ctaLayout = "responsive",
   ctaSize = "lg",
   headingClassName: headingClassNameOverride,
@@ -405,6 +408,7 @@ export function TextSection({
                   {metricEquivalent}
                 </div>
               )}
+              {headingFooter}
             </div>
           )}
           <div className="flex w-full flex-col gap-4 lg:flex-1">

@@ -149,6 +149,13 @@
   --arch-radius-x: 81vw;
 }
 
+/* Reserve clearance below a section so the next section's arch can rise (desktop only). */
+@media (min-width: 1024px) {
+  [data-arch-bottom] {
+    padding-bottom: 320px; /* ARCH_RISE (180) + 140 — mirrors SectionShell.tsx */
+  }
+}
+
 @media (min-width: 1024px) {
   [data-arch-top]:not([data-arch-hydrated])::before {
     content: "";
@@ -336,20 +343,72 @@ main [data-section].page-last-section {
   background-image: linear-gradient(180deg, transparent 52%, rgba(24, 24, 27, 0.64));
 }
 
+@media (max-width: 1023px) {
+  .home-hero-donate__bg-wrap::after {
+    background-image: linear-gradient(
+      180deg,
+      transparent 28%,
+      rgba(24, 24, 27, 0.42) 52%,
+      rgba(24, 24, 27, 0.72) 100%
+    );
+  }
+}
+
 /* Full-width overlay hero (legacy layout) */
-.home-hero-donate--scroll-fx:not(.home-hero-donate--stacked) .home-hero-donate__bg-wrap {
+.home-hero-donate--scroll-fx:not(.home-hero-donate--stacked):not(.home-hero-bridge) .home-hero-donate__bg-wrap {
   transform: scale(calc(1.1 - 0.1 * var(--hero-scroll)));
   transform-origin: center center;
   will-change: transform;
   contain: layout paint;
 }
 
-.home-hero-donate--scroll-fx:not(.home-hero-donate--stacked) .home-hero-donate__content {
+.home-hero-donate--scroll-fx:not(.home-hero-donate--stacked):not(.home-hero-bridge) .home-hero-donate__content {
   --hero-content-t: min(1, calc(var(--hero-scroll) / 0.55));
   opacity: calc(1 - var(--hero-content-t));
-  transform: scale(calc(1 - 0.1 * var(--hero-content-t)));
+  transform: translateY(calc(-10vh * var(--hero-content-t)))
+    scale(calc(1 - 0.06 * var(--hero-content-t)));
   transform-origin: bottom center;
   will-change: transform, opacity;
+}
+
+/* Home hero → white statement scroll bridge */
+.home-hero-bridge {
+  --hero-content-phase: 0;
+  --hero-video-blur: 0;
+  --bridge-white-opacity: 0;
+  --statement-rise: 0;
+  --bridge-shimmer-opacity: 0;
+}
+
+.home-hero-bridge__shimmer {
+  opacity: var(--bridge-shimmer-opacity);
+}
+
+.home-hero-bridge__statement {
+  transform: translateY(calc(12vh * (1 - var(--statement-rise))));
+  will-change: transform;
+}
+
+.home-hero-bridge__white {
+  opacity: var(--bridge-white-opacity);
+}
+
+.home-hero-bridge .home-hero-bridge__bg video,
+.home-hero-bridge .home-hero-bridge__bg img {
+  filter: saturate(1.35) blur(calc(var(--hero-video-blur) * 1px));
+}
+
+.home-hero-bridge .home-hero-bridge__hero-layer {
+  opacity: calc(1 - var(--hero-content-phase));
+  transform: translateY(calc(-14vh * var(--hero-content-phase)));
+  transform-origin: bottom center;
+  will-change: transform, opacity;
+}
+
+.home-hero-bridge .home-hero-donate__content {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
 }
 
 /* Stacked rounded hero — heading above video, expand to fullscreen, body+form slide up */
@@ -406,18 +465,38 @@ main [data-section].page-last-section {
 /* Mobile — ripple canvas fills the pinned hero viewport */
 @media (max-width: 1023px) {
   .home-hero-donate--stacked .home-hero-donate__pin > .hero-bg-pulse-overlay,
-  .home-hero-donate--stacked:not(.home-hero-donate--scroll-fx) .hero-bg-pulse-overlay {
+  .home-hero-donate--stacked:not(.home-hero-donate--scroll-fx) .hero-bg-pulse-overlay,
+  .home-hero-bridge__shimmer .hero-bg-pulse-overlay {
     height: 100dvh;
     min-height: 100dvh;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-hero-donate--scroll-fx:not(.home-hero-donate--stacked) .home-hero-donate__bg-wrap,
-  .home-hero-donate--scroll-fx:not(.home-hero-donate--stacked) .home-hero-donate__content {
+  .home-hero-donate--scroll-fx:not(.home-hero-donate--stacked):not(.home-hero-bridge) .home-hero-donate__bg-wrap,
+  .home-hero-donate--scroll-fx:not(.home-hero-donate--stacked):not(.home-hero-bridge) .home-hero-donate__content,
+  .home-hero-bridge .home-hero-bridge__hero-layer {
     transform: none;
     opacity: 1;
     will-change: auto;
+  }
+
+  .home-hero-bridge__statement {
+    transform: none;
+    will-change: auto;
+  }
+
+  .home-hero-bridge__white {
+    opacity: 1;
+  }
+
+  .home-hero-bridge__shimmer {
+    opacity: 1;
+  }
+
+  .home-hero-bridge .home-hero-bridge__bg video,
+  .home-hero-bridge .home-hero-bridge__bg img {
+    filter: saturate(1.35);
   }
 
   .home-hero-donate--stacked .home-hero-donate__intro--scroll-fx,

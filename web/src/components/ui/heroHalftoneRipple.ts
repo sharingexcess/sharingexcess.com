@@ -224,7 +224,11 @@ function radialViewportFadeMobileHero(
   return smoothstep(8, 32, edge);
 }
 
-export type HalftoneRippleViewportProfile = "default" | "mobile-hero";
+export type HalftoneRippleViewportProfile =
+  | "default"
+  | "mobile-hero"
+  | "mobile-round"
+  | "full-bleed";
 
 /** Stretch wave fronts vertically on portrait heroes so rings read taller than wide. */
 const MOBILE_HERO_RIPPLE_RY_STRETCH = 1.48;
@@ -282,6 +286,23 @@ export function resolveContentMaskEllipse(
     };
   }
 
+  if (profile === "mobile-round") {
+    const radius = Math.max(halfW, halfH) + CONTENT_MASK_PAD_X * 0.34;
+    return { cx, cy, rx: radius, ry: radius };
+  }
+
+  if (profile === "full-bleed") {
+    return {
+      cx,
+      cy,
+      rx: halfW * 0.88 + CONTENT_MASK_PAD_X * 0.35,
+      ry:
+        halfH * 0.88 +
+        CONTENT_MASK_PAD_Y * 0.35 +
+        halfH * CONTENT_MASK_RY_STRETCH * 0.35,
+    };
+  }
+
   return {
     cx,
     cy,
@@ -308,7 +329,9 @@ export function contentMaskRippleVisibility(
   const nx = (x - cx) / rx;
   const ny = (y - cy) / ry;
   const t = Math.hypot(nx, ny);
-  const fade = smoothstep(CONTENT_MASK_FADE_INNER, CONTENT_MASK_FADE_OUTER, t);
+  const fadeOuter =
+    profile === "full-bleed" ? CONTENT_MASK_FADE_OUTER * 1.12 : CONTENT_MASK_FADE_OUTER;
+  const fade = smoothstep(CONTENT_MASK_FADE_INNER, fadeOuter, t);
   // Smootherstep — gentler ramp through the fade band
   return fade * fade * (3 - 2 * fade);
 }

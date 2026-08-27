@@ -1,4 +1,6 @@
 /** How far (px) the arch peak rises above the section boundary at the center. */
+import { useEffect, useState } from "react";
+
 export const ARCH_RISE = 180;
 
 const ARCH_HOLD_PX_MIN = 280;
@@ -17,6 +19,21 @@ function smoothstepRange(edge0: number, edge1: number, x: number): number {
 
 function isArchDesktop(): boolean {
   return typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches;
+}
+
+/** Match arch scroll/padding behavior to desktop breakpoints. */
+export function useArchDesktop() {
+  const [desktop, setDesktop] = useState(isArchDesktop);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const update = () => setDesktop(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  return desktop;
 }
 
 function getArchHoldPx(vh: number): number {

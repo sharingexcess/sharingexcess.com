@@ -50,6 +50,8 @@ export interface HeroSectionProps extends SectionContentProps {
   bodyEmphasis?: string;
   /** Supporting line under the stacked home hero heading (green intro band) */
   introCaption?: string;
+  /** Shorter body copy for max-lg viewports — falls back to `body` when omitted */
+  bodyMobile?: string;
   /** Embed hero donation form below intro caption instead of text CTAs */
   introDonationForm?: boolean;
   /** Overlap a brand sticker on the hero image (stack layouts). */
@@ -75,7 +77,7 @@ const STANDARD_CONTENT_CLASS = "mx-auto w-full max-w-[1320px] px-4 lg:px-8";
 const HOME_HERO_INTRO_BAND_CLASS =
   "box-border flex w-full flex-col items-start justify-start pt-[clamp(12px,2.5vh,32px)] pb-[clamp(32px,5vh,64px)] lg:items-center lg:pt-[clamp(16px,3vh,40px)] lg:pb-[clamp(40px,6vh,72px)]";
 /** Gap between multiline hero body paragraphs */
-const HOME_HERO_BODY_PARAGRAPH_GAP = "gap-3 lg:gap-4";
+const HOME_HERO_BODY_PARAGRAPH_GAP = "max-lg:gap-1.5 lg:gap-4";
 /** Max width for hero donate card over video */
 const HOME_HERO_DONATE_FORM_MAX_WIDTH = "w-full max-w-[480px]";
 /** Centered subpage hero donate form — overlaps image bottom edge */
@@ -111,6 +113,9 @@ const heroHeadingLevel: Record<"h1" | "h2", 1 | 2 | 3> = { h1: 2, h2: 3 };
 
 const heroHeadingClasses = {
   home: "font-medium max-lg:hyphens-none max-lg:break-normal max-lg:text-[clamp(3rem,14vw,3.75rem)] max-lg:leading-[1.06] max-lg:tracking-[-0.04em] lg:text-[clamp(64px,7.94cqw,120px)] lg:leading-none lg:tracking-[-0.05em]",
+  /** Full-width home hero with side donate — bolder than h2, smaller than full home */
+  homeDonate:
+    "font-semibold max-lg:hyphens-none max-lg:break-normal max-lg:text-[clamp(2rem,8.25vw,2.75rem)] max-lg:leading-[1.08] max-lg:tracking-[-0.04em] lg:text-[clamp(52px,5.5cqw,80px)] lg:leading-[1.04] lg:tracking-[-0.045em]",
   h1: "text-[clamp(48px,6.35cqw,96px)] font-medium leading-[1.06] tracking-[-0.04em]",
   h2: "text-[clamp(40px,4.76cqw,72px)] font-medium leading-[1.06] tracking-[-0.04em]",
 };
@@ -126,7 +131,7 @@ const HOME_HERO_TOP_GRADIENT =
 const HOME_HERO_GRADIENT_HEIGHT = "h-[clamp(260px,48vh,420px)]";
 const HOME_HERO_TOP_GRADIENT_HEIGHT = "h-[clamp(120px,20vh,200px)]";
 
-function HomeHeroGradients({
+export function HomeHeroGradients({
   bottomHeightClass = HOME_HERO_GRADIENT_HEIGHT,
   showTopGradient = false,
   showBottomGradient = true,
@@ -166,14 +171,31 @@ function heroHeadingTag(level: 1 | 2 | 3): "h1" | "h2" | "h3" {
 }
 
 const heroHomeBodyClasses = {
-  xl: cn(bodyXlClassName, "text-white"),
-  lg: cn(bodyLgClassName, "text-white"),
-  md: cn(bodyMdClassName, "text-white"),
+  xl: cn(bodyXlClassName, "max-lg:leading-[1.4] text-white"),
+  lg: cn(bodyLgClassName, "max-lg:leading-[1.35] text-white"),
+  md: cn(bodyMdClassName, "max-lg:leading-[1.35] text-white"),
 };
+
+function useMobileHeroViewport() {
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  return isMobile;
+}
 
 function HeroHomeContent({
   title,
   body,
+  bodyMobile,
   bodySize = "xl",
   primaryCta,
   primaryCtaHref = "#",
@@ -183,11 +205,15 @@ function HeroHomeContent({
   showButtons = true,
   headingAs = "h1",
   headingClassName,
+  waitForIntroReveal = false,
+  simultaneousReveal = false,
+  onBodyRevealComplete,
   className,
 }: Pick<
   HeroSectionProps,
   | "title"
   | "body"
+  | "bodyMobile"
   | "bodySize"
   | "primaryCta"
   | "primaryCtaHref"
@@ -200,9 +226,44 @@ function HeroHomeContent({
   showButtons?: boolean;
   headingAs?: "h1" | "h2";
   headingClassName?: string;
+  waitForIntroReveal?: boolean;
+  /** Mobile hero — reveal heading, body, and siblings in one beat (no word stagger) */
+  simultaneousReveal?: boolean;
+  /** Fires after body enter animation — or immediately when there is no body */
+  onBodyRevealComplete?: () => void;
 }) {
   const reduceMotion = useReducedMotion();
+  const isMobileViewport = useMobileHeroViewport();
+  const resolvedBody = isMobileViewport && bodyMobile ? bodyMobile : body;
   const [bodyVisible, setBodyVisible] = useState(reduceMotion);
+
+  const handleHeadingRevealStart = () => {
+    if (simultaneousReveal) {
+      setBodyVisible(true);
+      onBodyRevealComplete?.();
+    }
+  };
+
+  const handleHeadingRevealComplete = () => {
+    if (!simultaneousReveal) {
+      setBodyVisible(true);
+    }
+    if (!resolvedBody) {
+      onBodyRevealComplete?.();
+    }
+  };
+
+  const handleBodyAnimationComplete = (definition: string) => {
+    if (definition === "visible" && !simultaneousReveal) {
+      onBodyRevealComplete?.();
+    }
+  };
+
+  useEffect(() => {
+    if (reduceMotion) {
+      onBodyRevealComplete?.();
+    }
+  }, [onBodyRevealComplete, reduceMotion]);
 
   return (
     <div
@@ -216,10 +277,22 @@ function HeroHomeContent({
         title={title}
         as={headingAs}
         multiline
-        onRevealComplete={() => setBodyVisible(true)}
+        revealDelay={
+          waitForIntroReveal && !simultaneousReveal ? homeHeroRevealDelay : undefined
+        }
+        revealStagger={
+          waitForIntroReveal
+            ? simultaneousReveal
+              ? 0
+              : homeHeroRevealStagger
+            : undefined
+        }
+        waitForIntroReveal={waitForIntroReveal}
+        onRevealStart={handleHeadingRevealStart}
+        onRevealComplete={handleHeadingRevealComplete}
         className={cn("w-full text-white", headingClassName ?? heroHeadingClasses.home)}
       />
-      {body &&
+      {resolvedBody &&
         (reduceMotion ? (
           <div
             className={cn(
@@ -229,7 +302,7 @@ function HeroHomeContent({
               "text-white",
             )}
           >
-            {body.split("\n").map((line, lineIndex) => (
+            {resolvedBody.split("\n").map((line, lineIndex) => (
               <p key={lineIndex}>{line}</p>
             ))}
           </div>
@@ -240,17 +313,19 @@ function HeroHomeContent({
             variants={{
               hidden: {},
               visible: {
-                transition: { staggerChildren: 0.12 },
+                transition: { staggerChildren: simultaneousReveal ? 0 : 0.12 },
               },
             }}
+            onAnimationComplete={handleBodyAnimationComplete}
             className={cn(
               "flex flex-col",
               HOME_HERO_BODY_PARAGRAPH_GAP,
               heroHomeBodyClasses[bodySize],
               "text-white",
+              simultaneousReveal && !bodyVisible && "invisible",
             )}
           >
-            {body.split("\n").map((line, lineIndex) => (
+            {resolvedBody.split("\n").map((line, lineIndex) => (
               <motion.p
                 key={lineIndex}
                 variants={{
@@ -446,7 +521,7 @@ const heroCoverClass = "absolute inset-0 size-full object-cover";
 /** Slight lift so hero footage reads brighter and more vivid under the gradient overlay */
 const heroVideoFilterClass = "brightness-[1.1] saturate-[1.3]";
 
-function HomeHeroBackground({
+export function HomeHeroBackground({
   imageSrc,
   imageAlt,
   videoSrc,
@@ -963,39 +1038,74 @@ function HomeHeroIntroContent({
   );
 }
 
-function HomeHeroDonateContent({
+export function HomeHeroDonateContent({
   title,
   body,
+  bodyMobile,
   bodySize,
 }: {
   title: string;
   body?: string;
+  bodyMobile?: string;
   bodySize?: HeroSectionProps["bodySize"];
 }) {
+  const reduceMotion = useReducedMotion();
+  const isMobileViewport = useMobileHeroViewport();
+  const simultaneousReveal = isMobileViewport && !reduceMotion;
+  const [donateVisible, setDonateVisible] = useState(reduceMotion);
+
   return (
     <div
       className={cn(
         FIGMA_ARTBOARD_CLASS,
         HOME_HERO_PADDING,
-        "flex w-full flex-col items-start gap-8 pb-[clamp(16px,4.23cqw,56px)] lg:flex-row lg:items-end lg:justify-between lg:gap-16",
+        "flex w-full flex-col items-start gap-4 max-lg:pb-3 pb-[clamp(16px,4.23cqw,56px)] lg:flex-row lg:items-end lg:justify-between lg:gap-8 xl:gap-12",
       )}
     >
       <HeroHomeContent
         title={title}
         body={body}
+        bodyMobile={bodyMobile}
         bodySize={bodySize}
         showButtons={false}
-        headingAs="h2"
-        headingClassName={heroHeadingClasses.h2}
+        headingAs="h1"
+        headingClassName={heroHeadingClasses.homeDonate}
+        waitForIntroReveal
+        simultaneousReveal={simultaneousReveal}
+        onBodyRevealComplete={() => setDonateVisible(true)}
         constrainWidth={false}
-        className="w-full max-w-[min(915px,60.55cqw)] max-lg:max-w-none lg:w-auto lg:shrink-0"
+        className="w-full min-w-0 flex-1 max-lg:gap-1.5 gap-3 max-lg:max-w-full lg:max-w-[min(720px,calc(100%-512px))]"
       />
       <div className="w-full min-w-0 max-w-[480px] shrink-0 self-stretch">
-        <DonationForm
-          variant="hero"
-          sectionTheme="dark"
-          className="shadow-[0_8px_32px_rgba(0,0,0,0.24)]"
-        />
+        {reduceMotion ? (
+          <DonationForm
+            variant="hero"
+            formCard="white"
+            sectionTheme="light"
+            coloredAmounts
+            mobileTight
+            className="shadow-[0_8px_32px_rgba(0,0,0,0.24)]"
+          />
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={donateVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+            transition={heroWordSpring}
+            className={cn(
+              "w-full",
+              simultaneousReveal && !donateVisible && "invisible",
+            )}
+          >
+            <DonationForm
+              variant="hero"
+              formCard="white"
+              sectionTheme="light"
+              coloredAmounts
+              mobileTight
+              className="shadow-[0_8px_32px_rgba(0,0,0,0.24)]"
+            />
+          </motion.div>
+        )}
       </div>
     </div>
   );
@@ -1122,22 +1232,6 @@ function HomeRoundedHero({
       </div>
     </section>
   );
-}
-
-function useMobileHeroViewport() {
-  const [isMobile, setIsMobile] = useState(
-    () => typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches,
-  );
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 1023px)");
-    const update = () => setIsMobile(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-
-  return isMobile;
 }
 
 function HomeRoundedHeroWithDonate({

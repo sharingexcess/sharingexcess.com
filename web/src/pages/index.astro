@@ -1,6 +1,6 @@
 ---
 import PageLayout from "@/layouts/PageLayout.astro";
-import HomeHero from "@/sections/HomeHero";
+import HomeHeroStatementBridge from "@/sections/HomeHeroStatementBridge";
 import DonationSection from "@/sections/DonationSection";
 import LogosBannerSection from "@/sections/LogosBannerSection";
 import MapSection from "@/sections/MapSection";
@@ -28,15 +28,17 @@ const supporterLogos = [
   title="Sharing Excess | National Food Rescue Nonprofit"
   description="Sharing Excess rescues and distributes more than 2,000,000 lbs. of food every week in partnership with grocers, wholesalers, and farmers."
 >
-  <HomeHero client:visible
+  <HomeHeroStatementBridge client:visible
     title={"Rescuing Food,\n*Feeding Communities*"}
-    introCaption="We rescue *over 2 million pounds* of surplus every week.\nThe food is donated; *your gift moves it*."
-    introDonationForm={true}
-    cardTitle={"There is more than enough food to\u00A0feed *everyone on\u00A0Earth*."}
-    cardBody={"America wastes 40% of its food every year, while 47 million people go hungry.\nWe built the network to close this gap."}
+    body="We rescue over 2 million pounds of surplus every week and move it to communities nationwide."
+    bodyMobile="We rescue over 2 million pounds of surplus every week."
+    bodySize="xl"
     imageSrc="/images/community-people.jpg"
     imageAlt=""
     videoSrc="/videos/Website%20Sizzle-08-2026.mp4"
+    header="There is more than enough food to feed *everyone on Earth*."
+    caption="America wastes 40% of its food every year, while 47 million people go hungry."
+    emphasis="We've built the network to close this gap."
   />
 
   <TextMarqueeBanner client:visible />
@@ -44,16 +46,17 @@ const supporterLogos = [
   <TextImageSection client:visible
     className="relative z-10"
     theme="dark"
-    layout="stack-left"
-    eyebrow="The barrier isn't food supply. It's access."
-    title="The food is donated; *your gift moves it*."
-    body="Grocery stores, farms, and distributors generate more than they can use. Food rescue is the system that gets it to your neighbors instead of the landfill."
+    layout="stack-dual-media"
+    eyebrow="How it works"
+    title="We make it *easy* to donate fresh food."
+    body="Businesses donate. We do the rest. Our team uses tech-enabled logistics to coordinate transportation and delivery every step of the way, so fresh food moves fast, before it goes to waste."
     headingSize="h2"
     bodySize="xl"
-    primaryCta="Give Now"
+    primaryCta="Donate Surplus Food"
     primaryCtaHref="#donate"
-    secondaryCta="Give Monthly"
-    secondaryCtaHref="/collective"
+    secondaryCta="Find Food"
+    secondaryCtaHref="/find-food"
+    imageSrc="/videos/wheel-two-problems-poster.jpg"
     imageStyle="video"
     videoSrc="/videos/wheel-two-problems.mp4"
     videoPlayInView={true}

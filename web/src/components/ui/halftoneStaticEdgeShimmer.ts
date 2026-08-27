@@ -2,12 +2,23 @@ import {
   RIPPLE_COLORS,
   contentMaskRippleVisibility,
   resolveContentMaskEllipse,
+  type HalftoneRippleViewportProfile,
   type RippleContentMask,
 } from "./heroHalftoneRipple";
 
-const BASE_DOT_COLOR = "#69b57b";
+const DEFAULT_BASE_DOT_COLOR = "#69b57b";
 const BASE_GRID_DOT_RADIUS = 0.62;
 const BASE_GRID_ALPHA = 0.24;
+
+/** Green-heavy palette for bridge shimmer — multicolor, weighted toward green */
+export const WEIGHTED_EDGE_SHIMMER_COLORS = [
+  "#00bc57", // bright-kelly
+  "#00843d", // se-green
+  "#69b57b", // se-green-300
+  "#00bc57", // extra green weight
+  "#ffd951", // banana-base
+  "#fba62f", // tangerine-base
+] as const;
 
 type GridCell = {
   x: number;
@@ -30,6 +41,9 @@ export type HalftoneStaticEdgeShimmerOptions = {
   /** Traveling shimmer around the oval perimeter */
   angularWaveSpeed: number;
   angularWavePeaks: number;
+  rippleColors?: readonly string[];
+  baseDotColor?: string;
+  viewportProfile?: HalftoneRippleViewportProfile;
 };
 
 const DEFAULT_OPTIONS: HalftoneStaticEdgeShimmerOptions = {
@@ -58,10 +72,11 @@ function normalizedEllipseT(
   x: number,
   y: number,
   mask: RippleContentMask | null,
+  profile: HalftoneRippleViewportProfile = "default",
 ): number {
   if (!mask) return 1;
 
-  const { cx, cy, rx, ry } = resolveContentMaskEllipse(mask);
+  const { cx, cy, rx, ry } = resolveContentMaskEllipse(mask, profile);
   if (rx <= 0 || ry <= 0) return 1;
 
   const nx = (x - cx) / rx;
@@ -69,25 +84,47 @@ function normalizedEllipseT(
   return Math.hypot(nx, ny);
 }
 
-function edgeBandWeight(t: number, center: number, sigma: number): number {
+function edgeBandWeight(
+  t: number,
+  center: number,
+  sigma: number,
+  profile: HalftoneRippleViewportProfile = "default",
+): number {
   if (sigma <= 0) return 0;
   const d = (t - center) / sigma;
   const gauss = Math.exp(-0.5 * d * d);
+  if (profile === "full-bleed") {
+    return gauss * smoothstep(0.52, 0.92, t);
+  }
+  if (profile === "mobile-round") {
+    return gauss * smoothstep(0.56, 0.9, t);
+  }
   return gauss * smoothstep(0.62, 0.88, t);
 }
 
 export class HalftoneStaticEdgeShimmerEngine {
   private readonly options: HalftoneStaticEdgeShimmerOptions;
+  private readonly rippleColors: readonly string[];
+  private readonly baseDotColor: string;
   private readonly grid: GridCell[] = [];
   private baseCanvas: HTMLCanvasElement | null = null;
   private baseCtx: CanvasRenderingContext2D | null = null;
   private contentMask: RippleContentMask | null = null;
+  private viewportProfile: HalftoneRippleViewportProfile = "default";
   private logicalWidth = 0;
   private logicalHeight = 0;
   private dpr = 1;
 
   constructor(options: Partial<HalftoneStaticEdgeShimmerOptions> = {}) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
+    this.rippleColors = this.options.rippleColors ?? RIPPLE_COLORS;
+    this.baseDotColor = this.options.baseDotColor ?? DEFAULT_BASE_DOT_COLOR;
+    this.viewportProfile = this.options.viewportProfile ?? "default";
+  }
+
+  setViewportProfile(profile: HalftoneRippleViewportProfile) {
+    this.viewportProfile = profile;
+    this.rebuildBaseCanvas();
   }
 
   setContentMask(mask: RippleContentMask | null) {
@@ -108,6 +145,7 @@ export class HalftoneStaticEdgeShimmerEngine {
     const { logicalWidth: width, logicalHeight: height } = this;
     const cols = Math.ceil(width / gridSpacing) + 2;
     const rows = Math.ceil(height / gridSpacing) + 2;
+    const colorCount = this.rippleColors.length;
 
     this.grid.length = 0;
 
@@ -129,7 +167,7 @@ export class HalftoneStaticEdgeShimmerEngine {
           x,
           y,
           jitter: 0.78 + hash * 0.44,
-          colorIndex: Math.floor(hash * RIPPLE_COLORS.length) % RIPPLE_COLORS.length,
+          colorIndex: Math.floor(hash * colorCount) % colorCount,
           phase: hashP * Math.PI * 2,
           twinkleSpeed:
             this.options.twinkleSpeedMin +
@@ -156,10 +194,15 @@ export class HalftoneStaticEdgeShimmerEngine {
     this.baseCtx = ctx;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = BASE_DOT_COLOR;
+    ctx.fillStyle = this.baseDotColor;
 
     for (const cell of this.grid) {
-      const maskVis = contentMaskRippleVisibility(cell.x, cell.y, this.contentMask);
+      const maskVis = contentMaskRippleVisibility(
+        cell.x,
+        cell.y,
+        this.contentMask,
+        this.viewportProfile,
+      );
       if (maskVis < 0.008) continue;
 
       const radius = BASE_GRID_DOT_RADIUS * cell.jitter;
@@ -199,16 +242,17 @@ export class HalftoneStaticEdgeShimmerEngine {
     } = this.options;
     const tSec = nowMs / 1000;
     const mask = this.contentMask;
+    const profile = this.viewportProfile;
 
     for (const cell of this.grid) {
-      const maskVis = contentMaskRippleVisibility(cell.x, cell.y, mask);
+      const maskVis = contentMaskRippleVisibility(cell.x, cell.y, mask, profile);
       if (maskVis < 0.008) continue;
 
-      const ellipseT = normalizedEllipseT(cell.x, cell.y, mask);
-      const band = edgeBandWeight(ellipseT, edgeBandCenter, edgeBandSigma);
+      const ellipseT = normalizedEllipseT(cell.x, cell.y, mask, profile);
+      const band = edgeBandWeight(ellipseT, edgeBandCenter, edgeBandSigma, profile);
       if (band < 0.04 || !mask) continue;
 
-      const { cx, cy, rx, ry } = resolveContentMaskEllipse(mask);
+      const { cx, cy, rx, ry } = resolveContentMaskEllipse(mask, profile);
       const nx = (cell.x - cx) / Math.max(rx, 1);
       const ny = (cell.y - cy) / Math.max(ry, 1);
       const angle = Math.atan2(ny, nx);
@@ -228,7 +272,7 @@ export class HalftoneStaticEdgeShimmerEngine {
       const alpha = (0.28 + amp * 0.62) * maskVis * reveal;
 
       ctx.globalAlpha = alpha;
-      ctx.fillStyle = RIPPLE_COLORS[cell.colorIndex] ?? RIPPLE_COLORS[0];
+      ctx.fillStyle = this.rippleColors[cell.colorIndex] ?? this.rippleColors[0];
       ctx.beginPath();
       ctx.arc(cell.x, cell.y, radius, 0, Math.PI * 2);
       ctx.fill();

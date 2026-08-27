@@ -1,6 +1,8 @@
 import { useLenis } from "@/components/providers/SmoothScrollProvider";
 import { scrollProgressInTrack } from "@/lib/useScrollDrivenIndex";
 import { cn } from "@/lib/cn";
+import { headingEmphasisClassName } from "@/lib/typography";
+import { parseEmphasis } from "@/lib/parseEmphasis";
 import {
   motion,
   useMotionTemplate,
@@ -11,11 +13,72 @@ import {
 } from "@/lib/motion";
 import { useEffect, useMemo, type JSX, type RefObject } from "react";
 
-const MAX_BLUR_PX = 16;
-const MIN_OPACITY = 0.28;
+const DEFAULT_MAX_BLUR_PX = 16;
+const DEFAULT_MIN_OPACITY = 0.28;
+
+const TRAILING_PUNCTUATION = /^[.,!?;:…]+$/;
+
+function mergeTrailingPunctuation(
+  entries: { word: string; emphasized: boolean }[],
+): { word: string; emphasized: boolean }[] {
+  const merged: { word: string; emphasized: boolean }[] = [];
+
+  for (const entry of entries) {
+    const trimmed = entry.word.trim();
+    if (!trimmed) continue;
+
+    if (TRAILING_PUNCTUATION.test(trimmed) && merged.length > 0) {
+      merged[merged.length - 1].word += trimmed;
+      continue;
+    }
+
+    merged.push({ word: trimmed, emphasized: entry.emphasized });
+  }
+
+  return merged;
+}
 
 function tokenize(text: string): string[] {
-  return text.split(/\s+/).filter(Boolean);
+  return tokenizeWithEmphasis(text).map((entry) => entry.word);
+}
+
+function tokenizeWithEmphasis(text: string): { word: string; emphasized: boolean }[] {
+  const result: { word: string; emphasized: boolean }[] = [];
+  const parts = text.split(/(\*[^*]+\*)/g);
+
+  for (const part of parts) {
+    if (!part) continue;
+
+    if (part.startsWith("*") && part.endsWith("*")) {
+      const inner = part.slice(1, -1);
+      for (const word of inner.split(/\s+/).filter(Boolean)) {
+        result.push({ word, emphasized: true });
+      }
+      continue;
+    }
+
+    for (const word of part.split(/\s+/).filter(Boolean)) {
+      result.push({ word, emphasized: false });
+    }
+  }
+
+  return mergeTrailingPunctuation(result);
+}
+
+function splitWordEntriesForOrphanGuard(
+  entries: { word: string; emphasized: boolean }[],
+): {
+  leading: { word: string; emphasized: boolean }[];
+  trailing: { word: string; emphasized: boolean }[] | null;
+} {
+  if (entries.length <= 2) {
+    return { leading: [], trailing: entries.length > 0 ? entries : null };
+  }
+
+  return {
+    leading: entries.slice(0, -2),
+    trailing: entries.slice(-2),
+  };
 }
 
 function useScrollRevealProgress(
@@ -24,6 +87,7 @@ function useScrollRevealProgress(
   blurStart = 0,
   /** Section scroll depth (0–1) where word blur finishes */
   blurEnd = 1,
+  animationFraction?: number,
 ) {
   const reduceMotion = useReducedMotion();
   const lenis = useLenis();
@@ -39,7 +103,11 @@ function useScrollRevealProgress(
       const target = scrollRef.current;
       if (!target) return;
 
-      const trackProgress = scrollProgressInTrack(target);
+      const rawProgress = scrollProgressInTrack(target);
+      const trackProgress =
+        animationFraction != null && animationFraction < 1
+          ? Math.min(1, rawProgress / animationFraction)
+          : rawProgress;
       const blurRange = blurEnd - blurStart;
       const blurProgress =
         blurRange <= 0
@@ -67,7 +135,7 @@ function useScrollRevealProgress(
         window.removeEventListener("resize", update);
       }
     };
-  }, [blurEnd, blurStart, lenis, progress, reduceMotion, scrollRef]);
+  }, [animationFraction, blurEnd, blurStart, lenis, progress, reduceMotion, scrollRef]);
 
   return { progress, reduceMotion };
 }
@@ -85,26 +153,35 @@ function ScrollBlurWord({
   index,
   totalWords,
   progress,
+  maxBlurPx = DEFAULT_MAX_BLUR_PX,
+  minOpacity = DEFAULT_MIN_OPACITY,
+  emphasized = false,
 }: {
   word: string;
   index: number;
   totalWords: number;
   progress: MotionValue<number>;
+  maxBlurPx?: number;
+  minOpacity?: number;
+  emphasized?: boolean;
 }) {
   const blurPx = useTransform(progress, (value) => {
     const amount = wordRevealAmount(value, index, totalWords);
-    return (1 - amount) * MAX_BLUR_PX;
+    return (1 - amount) * maxBlurPx;
   });
   const filter = useMotionTemplate`blur(${blurPx}px)`;
   const opacity = useTransform(progress, (value) => {
     const amount = wordRevealAmount(value, index, totalWords);
-    return MIN_OPACITY + (1 - MIN_OPACITY) * amount;
+    return minOpacity + (1 - minOpacity) * amount;
   });
 
   return (
     <motion.span
       style={{ filter, opacity }}
-      className="inline-block will-change-[opacity,filter]"
+      className={cn(
+        "inline-block will-change-[opacity,filter]",
+        emphasized && headingEmphasisClassName,
+      )}
     >
       {word}
     </motion.span>
@@ -122,6 +199,14 @@ export interface ScrollBlurWordsProps {
   /** Shared progress — pass when multiple blocks share one scroll track */
   progress?: MotionValue<number>;
   reduceMotion?: boolean;
+  /** Starting blur radius (px) before each word resolves */
+  maxBlurPx?: number;
+  /** Opacity floor before each word resolves — use 0 for full fade-in */
+  minOpacity?: number;
+  /** Parse *asterisk* spans for heading emphasis color */
+  emphasis?: boolean;
+  /** Keep the last two words on one line — avoids single-word orphans */
+  orphanGuard?: boolean;
 }
 
 /** Word-by-word blur resolve driven by scroll progress */
@@ -133,31 +218,70 @@ export function ScrollBlurWords({
   className,
   progress,
   reduceMotion = false,
+  maxBlurPx = DEFAULT_MAX_BLUR_PX,
+  minOpacity = DEFAULT_MIN_OPACITY,
+  emphasis = false,
+  orphanGuard = false,
 }: ScrollBlurWordsProps) {
-  const words = useMemo(() => tokenize(text), [text]);
+  const wordEntries = useMemo(
+    () => (emphasis ? tokenizeWithEmphasis(text) : tokenize(text).map((word) => ({ word, emphasized: false }))),
+    [emphasis, text],
+  );
+  const { leading, trailing } = orphanGuard
+    ? splitWordEntriesForOrphanGuard(wordEntries)
+    : { leading: wordEntries, trailing: null };
+
+  const renderWord = (
+    entry: { word: string; emphasized: boolean },
+    wordIndex: number,
+  ) => (
+    <ScrollBlurWord
+      word={entry.word}
+      index={wordIndex}
+      totalWords={totalWords}
+      progress={progress}
+      maxBlurPx={maxBlurPx}
+      minOpacity={minOpacity}
+      emphasized={entry.emphasized}
+    />
+  );
 
   if (reduceMotion || !progress) {
-    return <Tag className={className}>{text}</Tag>;
+    return (
+      <Tag className={className}>
+        {emphasis ? parseEmphasis(text) : text.replace(/\*([^*]+)\*/g, "$1")}
+      </Tag>
+    );
   }
 
   return (
-    <Tag className={cn("text-pretty", className)} aria-label={text}>
-      {words.map((word, i) => {
+    <Tag className={cn("text-pretty", className)} aria-label={text.replace(/\*/g, "")}>
+      {leading.map((entry, i) => {
         const wordIndex = startIndex + i;
-        const isLast = i === words.length - 1;
+        const isLastInLeading = i === leading.length - 1;
 
         return (
-          <span key={`${wordIndex}-${word}`}>
-            <ScrollBlurWord
-              word={word}
-              index={wordIndex}
-              totalWords={totalWords}
-              progress={progress}
-            />
-            {!isLast && "\u00A0"}
+          <span key={`${wordIndex}-${entry.word}`}>
+            {renderWord(entry, wordIndex)}
+            {!isLastInLeading || trailing ? "\u00A0" : null}
           </span>
         );
       })}
+      {trailing && (
+        <span className="inline-block whitespace-nowrap">
+          {trailing.map((entry, i) => {
+            const wordIndex = startIndex + leading.length + i;
+            const isLast = i === trailing.length - 1;
+
+            return (
+              <span key={`${wordIndex}-${entry.word}`}>
+                {renderWord(entry, wordIndex)}
+                {!isLast && "\u00A0"}
+              </span>
+            );
+          })}
+        </span>
+      )}
     </Tag>
   );
 }

@@ -27,6 +27,8 @@ export interface SectionLayoutProps {
   centered?: boolean;
   /** Vertical layout — wrapper class for the text slot (default max-w-[60%]) */
   textSlotClassName?: string;
+  /** Vertical layout — gap between text and content slots */
+  verticalGapClassName?: string;
   className?: string;
 }
 
@@ -40,6 +42,7 @@ export function SectionLayout({
   reverse = false,
   centered = false,
   textSlotClassName = "w-full lg:max-w-[60%]",
+  verticalGapClassName = "gap-10 lg:gap-16",
   className,
 }: SectionLayoutProps) {
   const isHorizontal = layout === "horizontal";
@@ -55,7 +58,7 @@ export function SectionLayout({
       <div>{contentSlot}</div>
     </div>
   ) : (
-    <div className={cn("flex flex-col gap-10 lg:gap-16", centered && "items-center")}>
+    <div className={cn("flex flex-col", verticalGapClassName, centered && "items-center")}>
       {textSlot && (
         <div className={cn(centered && "min-w-0", textSlotClassName)}>{textSlot}</div>
       )}

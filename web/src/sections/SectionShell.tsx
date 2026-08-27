@@ -1,5 +1,5 @@
 import { useLenis } from "@/components/providers/SmoothScrollProvider";
-import { ARCH_RISE, computeArchRise } from "@/lib/archScroll";
+import { ARCH_RISE, computeArchRise, useArchDesktop } from "@/lib/archScroll";
 import { cn } from "@/lib/cn";
 import {
   motion,
@@ -8,7 +8,7 @@ import {
   useTransform,
 } from "@/lib/motion";
 import { ROUND_IMAGE_SECTION_ATTR } from "@/lib/roundSectionScroll";
-import { useEffect, useLayoutEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import type { SectionProps } from "@/lib/types";
 
 /**
@@ -20,6 +20,8 @@ export function SectionArchVisual() {
   const archRef = useRef<HTMLDivElement>(null);
   const lenis = useLenis();
   const reduceMotion = useReducedMotion();
+  const archDesktop = useArchDesktop();
+  const archEnabled = archDesktop && !reduceMotion;
 
   const rise = useMotionValue(ARCH_RISE);
   const y = useTransform(rise, (v) => -v);
@@ -34,12 +36,16 @@ export function SectionArchVisual() {
   }, []);
 
   useLayoutEffect(() => {
-    if (reduceMotion) {
+    if (!archEnabled) {
       rise.set(0);
       return;
     }
 
     const update = () => {
+      if (!archDesktop) {
+        rise.set(0);
+        return;
+      }
       const section = archRef.current?.closest("section");
       if (!section) return;
       rise.set(computeArchRise(section.getBoundingClientRect().top));
@@ -61,7 +67,7 @@ export function SectionArchVisual() {
       }
       window.removeEventListener("resize", update);
     };
-  }, [lenis, reduceMotion, rise]);
+  }, [archDesktop, archEnabled, lenis, rise]);
 
   return (
     <div
@@ -186,6 +192,8 @@ export function SectionArchRoot({
   const sectionRef = useRef<HTMLDivElement>(null);
   const lenis = useLenis();
   const reduceMotion = useReducedMotion();
+  const archDesktop = useArchDesktop();
+  const archEnabled = archDesktop && !reduceMotion;
 
   const rise = useMotionValue(ARCH_RISE);
   const y = useTransform(rise, (v) => -v);
@@ -205,12 +213,16 @@ export function SectionArchRoot({
   }, []);
 
   useLayoutEffect(() => {
-    if (reduceMotion) {
+    if (!archEnabled) {
       rise.set(0);
       return;
     }
 
     const update = () => {
+      if (!archDesktop) {
+        rise.set(0);
+        return;
+      }
       const section = sectionRef.current?.closest("section");
       if (!section) return;
       rise.set(computeArchRise(section.getBoundingClientRect().top));
@@ -232,7 +244,13 @@ export function SectionArchRoot({
       }
       window.removeEventListener("resize", update);
     };
-  }, [lenis, reduceMotion, rise]);
+  }, [archDesktop, archEnabled, lenis, rise]);
+
+  const contentClass = cn(
+    "@container mx-auto max-w-7xl relative z-[2]",
+    archEnabled && "will-change-transform",
+    contentClassName,
+  );
 
   return (
     <>
@@ -257,15 +275,13 @@ export function SectionArchRoot({
 
       {/* Content floats inside the arch dome at full rise; translateY returns to
           0 as arch flattens so the section's paddingTop provides normal spacing */}
-      <motion.div
-        style={{ y: contentY }}
-        className={cn(
-          "@container mx-auto max-w-7xl relative z-[2] max-lg:!translate-y-0 will-change-transform",
-          contentClassName,
-        )}
-      >
-        {children}
-      </motion.div>
+      {archEnabled ? (
+        <motion.div style={{ y: contentY }} className={contentClass}>
+          {children}
+        </motion.div>
+      ) : (
+        <div className={contentClass}>{children}</div>
+      )}
     </>
   );
 }
@@ -330,13 +346,9 @@ export function SectionShell({
     roundedTop &&
       !animateRoundedTop &&
       "rounded-t-[var(--radius-xl)] lg:rounded-t-[var(--radius-2xl)]",
-    needsOverflowVisible ? "overflow-visible" : "overflow-hidden",
+    needsOverflowVisible ? "max-lg:overflow-hidden lg:overflow-visible" : "overflow-hidden",
     className,
   );
-
-  const shellStyle = showArchBottom
-    ? ({ paddingBottom: `${ARCH_RISE + 140}px` } as CSSProperties)
-    : undefined;
 
   const shellProps = {
     id,
@@ -344,8 +356,8 @@ export function SectionShell({
     "data-theme": theme,
     ...(roundImageSection ? { [ROUND_IMAGE_SECTION_ATTR]: "" } : undefined),
     ...(showArchTop ? { "data-arch-top": "" } : undefined),
+    ...(showArchBottom ? { "data-arch-bottom": "" } : undefined),
     className: shellClassName,
-    style: shellStyle,
   };
 
   const elevatedContentClass = cn(
@@ -374,7 +386,6 @@ export function SectionShell({
         ref={sectionRef}
         {...shellProps}
         style={{
-          ...shellStyle,
           borderTopLeftRadius,
           borderTopRightRadius,
         }}

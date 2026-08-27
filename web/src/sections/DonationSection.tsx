@@ -27,7 +27,7 @@ export function DonationSection({
   bodySize = "lg",
   eyebrow,
   formPosition = "left",
-  submitLabel = "Make a donation",
+  submitLabel,
   children,
   className,
   id,
@@ -54,7 +54,12 @@ export function DonationSection({
     ? getSectionCardInteriorTheme(resolvedCardColor, theme)
     : theme;
   const formSlot = children ?? (
-    <DonationForm submitLabel={submitLabel} sectionTheme={formSectionTheme} inCard={isCard} />
+    <DonationForm
+      submitLabel={submitLabel}
+      hideHeader
+      sectionTheme={formSectionTheme}
+      inCard={isCard}
+    />
   );
 
   return (

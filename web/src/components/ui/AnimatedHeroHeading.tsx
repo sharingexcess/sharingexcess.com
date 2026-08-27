@@ -223,7 +223,7 @@ function AnimatedWords({
         );
       })}
       {trailing && (
-        <span className="inline-block whitespace-nowrap">
+        <span className="inline max-lg:whitespace-normal lg:inline-block lg:whitespace-nowrap">
           {renderAnimatedGroup(trailing, leading.length)}
         </span>
       )}
@@ -280,7 +280,7 @@ function StaticWords({
         renderWordToken(token, index, leading, compact, (t) => <WordContent token={t} />),
       )}
       {trailing && (
-        <span className="inline-block whitespace-nowrap">
+        <span className="inline max-lg:whitespace-normal lg:inline-block lg:whitespace-nowrap">
           {trailing.map((token, index) =>
             renderWordToken(token, index, trailing, compact, (t) => <WordContent token={t} />),
           )}

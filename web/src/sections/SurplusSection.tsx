@@ -13,8 +13,25 @@ import {
   SURPLUS_LANDING_VIDEO_SRC,
 } from "@/components/ui/SurplusInfoPopover";
 import type { ImagePosition, SectionContentProps } from "@/lib/types";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SectionShell } from "./SectionShell";
+
+function useIsLgUp() {
+  const [isLgUp, setIsLgUp] = useState(() =>
+    typeof window !== "undefined"
+      ? window.matchMedia("(min-width: 1024px)").matches
+      : false,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const onChange = () => setIsLgUp(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  return isLgUp;
+}
 
 export interface SurplusSectionProps extends Omit<SectionContentProps, "imageSrc" | "imageAlt"> {
   body: string;
@@ -50,6 +67,8 @@ export function SurplusSection({
 }: SurplusSectionProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
+  const isLgUp = useIsLgUp();
+  const scrollParallax = isLgUp && !reduceMotion;
   const { scrollYProgress } = useScroll({
     target: cardRef,
     offset: CARD_REVEAL_OFFSET,
@@ -57,40 +76,26 @@ export function SurplusSection({
   const y = useTransform(
     scrollYProgress,
     [0, 0.75, 1],
-    reduceMotion ? [0, 0, 0] : [CARD_REVEAL_Y, 8, 0],
+    scrollParallax ? [CARD_REVEAL_Y, 8, 0] : [0, 0, 0],
   );
   const scale = useTransform(
     scrollYProgress,
     [0, 0.45, 0.82, 1],
-    reduceMotion ? [1, 1, 1, 1] : [CARD_REVEAL_SCALE, 0.91, 0.97, 1],
+    scrollParallax ? [CARD_REVEAL_SCALE, 0.91, 0.97, 1] : [1, 1, 1, 1],
   );
   const opacity = useTransform(
     scrollYProgress,
     [0, 0.55, 1],
-    reduceMotion ? [1, 1, 1] : [0.72, 0.95, 1],
+    scrollParallax ? [0.72, 0.95, 1] : [1, 1, 1],
   );
 
-  return (
-    <SectionShell
-      theme={theme}
-      archBottom={archBottom}
-      transparentBg={transparentBg}
-      className={className}
-      id={id}
-      flushTop={flushTop}
-      flushBottom={flushBottom}
-    >
-      <motion.div
-        ref={cardRef}
-        style={{ y, scale, opacity }}
-        className="origin-bottom will-change-transform"
-      >
+  const cardBody = (
         <div
           data-theme="light"
           data-form-card="white"
           className={cn(
-            "relative w-full min-w-0 overflow-hidden rounded-[var(--radius-lg)] p-4 text-kale sm:p-6 lg:rounded-[var(--radius-xl)] lg:p-10",
-            reduceMotion ? "surplus-dot-grid" : "bg-white",
+            "relative isolate w-full min-w-0 overflow-hidden rounded-[var(--radius-lg)] bg-white p-4 text-kale sm:p-6 lg:rounded-[var(--radius-xl)] lg:p-10",
+            reduceMotion && "surplus-dot-grid",
           )}
         >
           {!reduceMotion && <SurplusDotGridBackground />}
@@ -131,7 +136,29 @@ export function SurplusSection({
             </div>
           </div>
         </div>
-      </motion.div>
+  );
+
+  return (
+    <SectionShell
+      theme={theme}
+      archBottom={archBottom}
+      transparentBg={transparentBg}
+      className={className}
+      id={id}
+      flushTop={flushTop}
+      flushBottom={flushBottom}
+    >
+      {scrollParallax ? (
+        <motion.div
+          ref={cardRef}
+          style={{ y, scale, opacity }}
+          className="origin-bottom will-change-transform"
+        >
+          {cardBody}
+        </motion.div>
+      ) : (
+        <div ref={cardRef}>{cardBody}</div>
+      )}
     </SectionShell>
   );
 }

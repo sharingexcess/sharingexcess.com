@@ -10,6 +10,7 @@ import {
   type StickerName,
 } from "@/components/ui/Sticker";
 import { TextSection } from "@/components/ui/TextSection";
+import { RescueProcessAnimation } from "@/components/animation/RescueProcessAnimation";
 import { VideoPlaceholder } from "@/components/ui/VideoPlaceholder";
 import { ScrollAutoplayVideo } from "@/components/ui/ScrollAutoplayVideo";
 import { cn } from "@/lib/cn";
@@ -33,6 +34,7 @@ import {
 export type TextImageLayout =
   | "horizontal"
   | "stack-left"
+  | "stack-dual-media"
   | "stack-centered"
   | "full-image"
   | "three-image-caption"
@@ -455,6 +457,63 @@ export function TextImageSection({
     ) : (
       slot
     );
+
+  if (layout === "stack-dual-media") {
+    const videoSlot =
+      scrollAutoplayVideoSlot != null ? (
+        <ScrollAutoplayVideo
+          posterSrc={imageSrc}
+          posterAlt={imageAlt}
+          videoSrc={videoSrc!}
+          className={imageRadius}
+        />
+      ) : imageSrc ? (
+        <div className={cn("aspect-video w-full overflow-hidden", imageRadius)}>
+          <img
+            src={imageSrc}
+            alt={imageAlt}
+            style={{ objectPosition: imageObjectPosition }}
+            className="size-full object-cover"
+          />
+        </div>
+      ) : null;
+
+    const rescueAnimationClassName = "mx-0 w-full max-w-full md:w-full";
+
+    return (
+      <TextImageSectionShell
+        theme={theme}
+        className={className}
+        dotShimmer={dotShimmer}
+        {...shellProps}
+      >
+        <SectionLayout
+          layout="vertical"
+          isCard={isCard}
+          cardColor={cardColor}
+          sectionTheme={theme}
+          textSlotClassName="w-full"
+          verticalGapClassName="gap-6 lg:gap-8"
+          textSlot={makeTextSection({
+            layout: "horizontal",
+            headingFooter: (
+              <div className="hidden w-full pt-2 lg:block">
+                <RescueProcessAnimation className={rescueAnimationClassName} />
+              </div>
+            ),
+          })}
+          contentSlot={
+            <div className="flex w-full flex-col gap-4">
+              <div className="lg:hidden">
+                <RescueProcessAnimation className={rescueAnimationClassName} />
+              </div>
+              <div className={cn("w-full overflow-hidden", imageRadius)}>{videoSlot}</div>
+            </div>
+          }
+        />
+      </TextImageSectionShell>
+    );
+  }
 
   if (layout === "stack-left") {
     const contentSlot =

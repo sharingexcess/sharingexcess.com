@@ -16,12 +16,13 @@ export type DonationFrequency = "one-time" | "monthly";
 export type DonationFormVariant = "default" | "hero";
 
 export interface DonationFormProps {
-  /** Preset amount options shown in the grid — `default` variant only */
+  /** @deprecated Default variant now uses hero presets ($20 / $60 / $120 / $1,290) */
   presetAmounts?: number[];
   /** Initial selected preset amount */
   defaultAmount?: number;
   /** Initial frequency toggle — `default` variant only */
   defaultFrequency?: DonationFrequency;
+  /** @deprecated Submit button uses dynamic "Give $N Now / Monthly" labels */
   submitLabel?: string;
   /** Home hero donate card — impact presets with Give Now / Give Monthly CTAs */
   variant?: DonationFormVariant;
@@ -35,12 +36,18 @@ export interface DonationFormProps {
   hideMealsImpact?: boolean;
   /** Compact intro widget — narrow card, single amount row, dynamic submit label */
   compact?: boolean;
+  /** Tighter mobile sizing for hero overlay donate card (max-lg only) */
+  mobileTight?: boolean;
+  /** White hero card — per-amount color fills (banana, tangerine, etc.) without compact layout */
+  coloredAmounts?: boolean;
   /** Hero card surface — dark: kale / brand-green; light: white / green-100 */
   formCard?: "white" | "brand-green" | "kale" | "green-100";
   /** Parent section theme — light uses neutral-050 card fill */
   sectionTheme?: SectionTheme;
   /** Nested inside a section card — reduces corner radius for even inset */
   inCard?: boolean;
+  /** Looser gap between amount pills — default variant / DonationSection */
+  relaxedAmountGrid?: boolean;
   /** Omit card shell — controls sit flush in a parent container (e.g. donate overlay) */
   embedded?: boolean;
   className?: string;
@@ -51,10 +58,10 @@ const HERO_PRESET_AMOUNTS = [20, 60, 120, 1290] as const;
 
 /** Selected-state solid fills — brand base tokens (bg-banana, not bg-banana-base) */
 const HERO_AMOUNT_SELECTED_THEMES: Record<(typeof HERO_PRESET_AMOUNTS)[number], string> = {
-  20: "bg-banana text-kale",
-  60: "bg-tangerine text-kale",
-  120: "bg-blueberry text-kale",
-  1290: "bg-se-green text-white",
+  20: "border-0 bg-banana text-kale",
+  60: "border-0 bg-tangerine text-kale",
+  120: "border-0 bg-blueberry text-kale",
+  1290: "border-0 bg-se-green text-white",
 };
 
 const HERO_AMOUNT_UNSELECTED_CLASS =
@@ -64,6 +71,12 @@ const HERO_COMPACT_PILL_CLASS =
   "flex h-9 w-full min-w-0 cursor-pointer items-center justify-center rounded-[99px] px-2.5 text-base font-semibold leading-none transition-[border-color,color] duration-200";
 
 const HERO_COMPACT_CONTROL_HEIGHT = "h-9";
+
+/** Matches preset amount pills — keep Other control in sync */
+const HERO_AMOUNT_CONTROL_HEIGHT = "h-11 lg:h-[45px]";
+
+const HERO_AMOUNT_PILL_BASE_CLASS =
+  "flex w-full min-w-0 cursor-pointer items-center justify-center rounded-3xl px-4 text-base font-semibold leading-none transition-[border-color,color,background-color] duration-200 lg:rounded-full";
 
 function CompactAmountPill({
   children,
@@ -126,39 +139,6 @@ function getHeroSelectedAmount(amount: number): number {
   return Math.max(0, amount);
 }
 
-function HeartIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 24 24"
-      fill="none"
-      className={cn("size-4 shrink-0", className)}
-    >
-      <path
-        d="M11 14H13C13.5304 14 14.0391 13.7893 14.4142 13.4142C14.7893 13.0391 15 12.5304 15 12C15 11.4696 14.7893 10.9609 14.4142 10.5858C14.0391 10.2107 13.5304 10 13 10H10C9.4 10 8.9 10.2 8.6 10.6L3 16M7 20L8.6 18.6C8.9 18.2 9.4 18 10 18H14C15.1 18 16.1 17.6 16.8 16.8L21.4 12.4C21.7859 12.0353 22.0111 11.5323 22.0261 11.0016C22.0411 10.4708 21.8447 9.95589 21.48 9.57C21.1153 9.18411 20.6123 8.95889 20.0816 8.94389C19.5508 8.92889 19.0359 9.12533 18.65 9.49L14.45 13.39M2 15L8 21M19.5 8.5C20.2 7.8 21 6.9 21 5.8C21.0699 5.18893 20.9314 4.57216 20.6069 4.04964C20.2825 3.52712 19.7911 3.12947 19.2124 2.92114C18.6337 2.71281 18.0016 2.706 17.4185 2.90182C16.8355 3.09763 16.3356 3.4846 16 4C15.643 3.52458 15.143 3.17613 14.5735 3.00578C14.0039 2.83544 13.3947 2.85219 12.8353 3.05356C12.2759 3.25494 11.7958 3.63034 11.4655 4.12465C11.1352 4.61896 10.972 5.20614 11 5.8C11 7 11.8 7.8 12.5 8.6L16 12L19.5 8.5Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function ChevronDownIcon({ className }: { className?: string }) {
-  return (
-    <svg aria-hidden viewBox="0 0 16 16" fill="none" className={cn("size-3 shrink-0", className)}>
-      <path
-        d="M4 6L8 10L12 6"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 function FrequencyToggleGroup({
   frequency,
   onFrequencyChange,
@@ -167,6 +147,7 @@ function FrequencyToggleGroup({
   monthlyLabel = "Give Monthly",
   compactLight = false,
   compact = false,
+  mobileTight = false,
 }: {
   frequency: DonationFrequency;
   onFrequencyChange: (frequency: DonationFrequency) => void;
@@ -176,6 +157,7 @@ function FrequencyToggleGroup({
   /** White intro widget — green-100 sliding pill, kale labels */
   compactLight?: boolean;
   compact?: boolean;
+  mobileTight?: boolean;
 }) {
   const segments: { id: DonationFrequency; label: string }[] = [
     { id: "one-time", label: onceLabel },
@@ -216,7 +198,12 @@ function FrequencyToggleGroup({
             onClick={() => onFrequencyChange(segment.id)}
             className={cn(
               "relative z-10 flex cursor-pointer items-center justify-center rounded-[99px] border-0 bg-transparent px-2.5 font-semibold leading-none transition-colors",
-              compact ? cn(HERO_COMPACT_CONTROL_HEIGHT, "text-base") : "h-9 px-3 text-sm lg:h-[45px] lg:py-0",
+              compact
+                ? cn(HERO_COMPACT_CONTROL_HEIGHT, "text-base")
+                : cn(
+                    "h-9 px-3 text-sm lg:h-[45px] lg:py-0",
+                    mobileTight && "max-lg:h-8 max-lg:px-2 max-lg:text-xs",
+                  ),
               selected
                 ? onBrandGreen
                   ? "text-[var(--section-btn-primary-label,#003619)]"
@@ -236,32 +223,6 @@ function FrequencyToggleGroup({
   );
 }
 
-function AmountButton({
-  amount,
-  selected,
-  onClick,
-}: {
-  amount: number;
-  selected: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={selected}
-      className={cn(
-        "cursor-pointer rounded-3xl border px-4 py-3 text-base font-semibold leading-none transition-colors lg:rounded-full",
-        selected
-          ? "border-kale bg-se-green-100 text-kale"
-          : "border-neutral-250 bg-white text-kale hover:border-neutral-300",
-      )}
-    >
-      ${amount}
-    </button>
-  );
-}
-
 const HERO_AMOUNT_PILL_CLASS = "w-auto shrink-0";
 
 function HeroAmountPill({
@@ -270,6 +231,8 @@ function HeroAmountPill({
   onClick,
   onBrandGreen,
   compact = false,
+  coloredPillStyle = false,
+  mobileTight = false,
   className,
 }: {
   amount: number;
@@ -277,24 +240,45 @@ function HeroAmountPill({
   onClick: () => void;
   onBrandGreen: boolean;
   compact?: boolean;
+  coloredPillStyle?: boolean;
+  mobileTight?: boolean;
   className?: string;
 }) {
   const formattedAmount =
     amount >= 1000 ? formatLargeNumber(amount) : String(amount);
 
-  if (compact && !onBrandGreen) {
+  if (coloredPillStyle) {
     const theme =
       HERO_AMOUNT_SELECTED_THEMES[amount as (typeof HERO_PRESET_AMOUNTS)[number]];
 
+    if (compact) {
+      return (
+        <CompactAmountPill
+          selected={selected}
+          theme={selected ? theme : undefined}
+          className={className}
+          onClick={onClick}
+        >
+          ${formattedAmount}
+        </CompactAmountPill>
+      );
+    }
+
     return (
-      <CompactAmountPill
-        selected={selected}
-        theme={selected ? theme : undefined}
-        className={className}
+      <button
+        type="button"
+        aria-pressed={selected}
         onClick={onClick}
+        className={cn(
+          HERO_AMOUNT_PILL_BASE_CLASS,
+          HERO_AMOUNT_CONTROL_HEIGHT,
+          mobileTight && "max-lg:h-10 max-lg:px-3 max-lg:text-sm",
+          selected && theme ? theme : HERO_AMOUNT_UNSELECTED_CLASS,
+          className,
+        )}
       >
         ${formattedAmount}
-      </CompactAmountPill>
+      </button>
     );
   }
 
@@ -323,6 +307,8 @@ function HeroOtherAmountInput({
   onChange,
   onBrandGreen,
   compact = false,
+  coloredPillStyle = false,
+  mobileTight = false,
   className,
 }: {
   selected: boolean;
@@ -331,25 +317,64 @@ function HeroOtherAmountInput({
   onChange: (value: string) => void;
   onBrandGreen: boolean;
   compact?: boolean;
+  coloredPillStyle?: boolean;
+  mobileTight?: boolean;
   className?: string;
 }) {
-  if (compact && !onBrandGreen) {
+  if (coloredPillStyle) {
+    const controlHeightClass = compact
+      ? HERO_COMPACT_CONTROL_HEIGHT
+      : cn(HERO_AMOUNT_CONTROL_HEIGHT, mobileTight && "max-lg:h-10");
+    const textSizeClass = compact
+      ? "text-base"
+      : cn("text-sm lg:text-base", mobileTight && "max-lg:text-sm");
+
     if (!selected) {
+      if (compact) {
+        return (
+          <CompactAmountPill
+            selected={false}
+            ariaPressed={false}
+            className={className}
+            onClick={onFocus}
+          >
+            $ Other
+          </CompactAmountPill>
+        );
+      }
+
       return (
-        <CompactAmountPill
-          selected={false}
-          ariaPressed={false}
-          className={className}
+        <button
+          type="button"
+          aria-pressed={false}
           onClick={onFocus}
+          className={cn(
+            HERO_AMOUNT_PILL_BASE_CLASS,
+            HERO_AMOUNT_CONTROL_HEIGHT,
+            mobileTight && "max-lg:h-10 max-lg:px-3 max-lg:text-sm",
+            HERO_AMOUNT_UNSELECTED_CLASS,
+            className,
+          )}
         >
           $ Other
-        </CompactAmountPill>
+        </button>
       );
     }
 
     return (
-      <label className={cn("relative flex w-full min-w-0 items-center", HERO_COMPACT_CONTROL_HEIGHT, className)}>
-        <span className="pointer-events-none absolute left-3 z-10 text-base font-semibold leading-none text-kale/70">
+      <label
+        className={cn(
+          "relative flex w-full min-w-0 shrink-0 items-center",
+          controlHeightClass,
+          className,
+        )}
+      >
+        <span
+          className={cn(
+            "pointer-events-none absolute left-3 z-10 font-semibold leading-none text-kale/70 lg:left-4",
+            textSizeClass,
+          )}
+        >
           $
         </span>
         <TextInput
@@ -364,7 +389,8 @@ function HeroOtherAmountInput({
           aria-label="Custom donation amount"
           theme="onWhite"
           className={cn(
-            "h-full w-full min-w-0 rounded-[99px] py-0 pl-7 pr-2 text-base font-semibold leading-none",
+            "box-border h-full min-h-0 w-full min-w-0 rounded-[99px] border py-0 pl-7 pr-2 font-semibold leading-none lg:pl-8 lg:pr-4",
+            textSizeClass,
             "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
           )}
         />
@@ -394,7 +420,8 @@ function HeroOtherAmountInput({
   return (
     <label
       className={cn(
-        "relative inline-flex h-11 w-full min-w-0 items-center lg:h-[45px]",
+        "relative inline-flex w-full min-w-0 shrink-0 items-center",
+        HERO_AMOUNT_CONTROL_HEIGHT,
         className,
       )}
     >
@@ -420,7 +447,7 @@ function HeroOtherAmountInput({
         aria-label="Custom donation amount"
         theme={onBrandGreen ? "onColor" : "onWhite"}
         className={cn(
-          "h-full w-full min-w-0 rounded-[99px] pl-8 pr-4 text-sm font-semibold leading-none lg:text-base",
+          "box-border h-full min-h-0 w-full min-w-0 rounded-[99px] border py-0 pl-8 pr-4 text-sm font-semibold leading-none lg:text-base",
           onBrandGreen
             ? "border-0 bg-white text-[var(--section-btn-primary-label,#003619)] placeholder:text-[var(--section-btn-primary-label,#003619)]/60 focus:border-0"
             : "border-0 bg-[var(--section-btn-primary-bg,#00843d)] text-[var(--section-btn-primary-label,#ffffff)] placeholder:text-[var(--section-btn-primary-label,#ffffff)]/70 focus:border-0",
@@ -430,34 +457,6 @@ function HeroOtherAmountInput({
     </label>
   );
 }
-
-function ToggleButton({
-  selected,
-  onClick,
-  children,
-}: {
-  selected: boolean;
-  onClick: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={selected}
-      className={cn(
-        "flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-3xl border px-4 py-3 text-base font-semibold leading-none transition-colors lg:rounded-full",
-        selected
-          ? "border-kale bg-se-green-100 text-kale"
-          : "border-neutral-250 bg-white text-kale hover:border-neutral-300",
-      )}
-    >
-      {children}
-    </button>
-  );
-}
-
-const DEFAULT_PRESETS = [500, 130, 85, 55, 25, 10];
 
 function DonationFormShell({
   sectionTheme,
@@ -523,11 +522,15 @@ function HeroDonationForm({
   inCard,
   className,
   defaultAmount = 20,
+  defaultFrequency = "one-time",
   eyebrow,
   hideHeader = false,
   headerTitle,
   hideMealsImpact = false,
   compact = false,
+  coloredAmounts = false,
+  mobileTight = false,
+  relaxedAmountGrid = false,
   embedded = false,
   formCard = "brand-green",
   onSubmit,
@@ -537,20 +540,25 @@ function HeroDonationForm({
   | "inCard"
   | "className"
   | "defaultAmount"
+  | "defaultFrequency"
   | "eyebrow"
   | "hideHeader"
   | "headerTitle"
   | "hideMealsImpact"
   | "compact"
+  | "coloredAmounts"
+  | "mobileTight"
+  | "relaxedAmountGrid"
   | "embedded"
   | "formCard"
   | "onSubmit"
 >) {
-  const [frequency, setFrequency] = useState<DonationFrequency>("one-time");
+  const [frequency, setFrequency] = useState<DonationFrequency>(defaultFrequency);
   const [amount, setAmount] = useState(defaultAmount);
   const [isCustomAmount, setIsCustomAmount] = useState(false);
   const [customAmount, setCustomAmount] = useState("");
   const isDarkFormCard = formCard === "brand-green" || formCard === "kale";
+  const coloredPillStyle = !isDarkFormCard && (compact || coloredAmounts);
   const buttonScheme = isDarkFormCard ? "dark" : "light";
   const selectedAmount = getHeroSelectedAmount(
     isCustomAmount ? Number(customAmount) || amount : amount,
@@ -576,17 +584,23 @@ function HeroDonationForm({
       embedded={embedded}
       className={cn(
         !embedded && compact && "border border-neutral-250",
-        !embedded && !compact && "gap-4 p-4 sm:p-5 lg:p-6",
+        !embedded && !compact && cn("gap-4 p-4 sm:p-5 lg:p-6", mobileTight && "max-lg:gap-3 max-lg:p-3"),
         className,
       )}
       formCard={formCard}
       onSubmit={handleSubmit}
     >
-      <div className={cn("flex w-full min-w-0 flex-col", compact ? "gap-3" : "gap-4")}>
+      <div
+        className={cn(
+          "flex w-full min-w-0 flex-col",
+          compact ? "gap-3" : cn("gap-4", mobileTight && "max-lg:gap-2.5"),
+        )}
+      >
         {!hideHeader && (
           <div
             className={cn(
               "flex w-full min-w-0 flex-col gap-1.5",
+              mobileTight && "max-lg:gap-1",
               !isDarkFormCard && "items-center text-center",
             )}
           >
@@ -597,19 +611,22 @@ function HeroDonationForm({
             )}
             <h3
               className={cn(
-                "w-full min-w-0 font-sans text-[clamp(1.25rem,4vw,1.75rem)] font-medium leading-[1.2] tracking-[-0.03em] lg:text-[1.75rem]",
+                "w-full min-w-0 font-sans font-medium leading-[1.2] tracking-[-0.03em]",
+                mobileTight
+                  ? "text-[clamp(1.25rem,4vw,1.75rem)] max-lg:text-lg max-lg:leading-[1.25] max-lg:tracking-[-0.025em] lg:text-[1.75rem]"
+                  : "text-[clamp(1.25rem,4vw,1.75rem)] lg:text-[1.75rem]",
                 !headerTitle && "lg:whitespace-nowrap",
                 isDarkFormCard ? "text-white" : "text-kale",
               )}
             >
               {headerTitle ?? (
                 <>
-                  The food is donated;{" "}
+                  <span className="max-lg:block">The food is donated;</span>
                   <em className={cn("not-italic", headerEmphasisClass)}>your gift moves it.</em>
                 </>
               )}
             </h3>
-            {!hideMealsImpact && (
+            {!hideMealsImpact && !coloredPillStyle && (
               <p
                 aria-live="polite"
                 className={cn(
@@ -631,8 +648,9 @@ function HeroDonationForm({
           frequency={frequency}
           onFrequencyChange={setFrequency}
           onBrandGreen={isDarkFormCard}
-          compactLight={compact && !isDarkFormCard}
+          compactLight={coloredPillStyle}
           compact={compact}
+          mobileTight={mobileTight}
         />
 
         {compact ? (
@@ -644,6 +662,7 @@ function HeroDonationForm({
                 selected={!isCustomAmount && amount === presetAmount}
                 onBrandGreen={isDarkFormCard}
                 compact
+                coloredPillStyle={coloredPillStyle}
                 onClick={() => {
                   setIsCustomAmount(false);
                   setCustomAmount("");
@@ -656,6 +675,7 @@ function HeroDonationForm({
               selected={!isCustomAmount && amount === HERO_PRESET_AMOUNTS[3]}
               onBrandGreen={isDarkFormCard}
               compact
+              coloredPillStyle={coloredPillStyle}
               onClick={() => {
                 setIsCustomAmount(false);
                 setCustomAmount("");
@@ -668,6 +688,7 @@ function HeroDonationForm({
                 value={customAmount}
                 onBrandGreen={isDarkFormCard}
                 compact
+                coloredPillStyle={coloredPillStyle}
                 className="w-full"
                 onFocus={() => {
                   if (!isCustomAmount) {
@@ -684,13 +705,27 @@ function HeroDonationForm({
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          <div
+            className={cn(
+              "grid grid-cols-3",
+              coloredPillStyle
+                ? relaxedAmountGrid
+                  ? "gap-2 sm:gap-3"
+                  : cn(
+                      "gap-x-1 gap-y-1.5",
+                      mobileTight && "max-lg:gap-x-0.5 max-lg:gap-y-1",
+                    )
+                : "gap-2 sm:gap-3",
+            )}
+          >
             {HERO_PRESET_AMOUNTS.slice(0, 3).map((presetAmount) => (
               <HeroAmountPill
                 key={presetAmount}
                 amount={presetAmount}
                 selected={!isCustomAmount && amount === presetAmount}
                 onBrandGreen={isDarkFormCard}
+                coloredPillStyle={coloredPillStyle}
+                mobileTight={mobileTight}
                 className="w-full"
                 onClick={() => {
                   setIsCustomAmount(false);
@@ -703,6 +738,8 @@ function HeroDonationForm({
               amount={HERO_PRESET_AMOUNTS[3]}
               selected={!isCustomAmount && amount === HERO_PRESET_AMOUNTS[3]}
               onBrandGreen={isDarkFormCard}
+              coloredPillStyle={coloredPillStyle}
+              mobileTight={mobileTight}
               className="w-full"
               onClick={() => {
                 setIsCustomAmount(false);
@@ -715,6 +752,8 @@ function HeroDonationForm({
                 selected={isCustomAmount}
                 value={customAmount}
                 onBrandGreen={isDarkFormCard}
+                coloredPillStyle={coloredPillStyle}
+                mobileTight={mobileTight}
                 className="w-full"
                 onFocus={() => {
                   if (!isCustomAmount) {
@@ -732,10 +771,15 @@ function HeroDonationForm({
           </div>
         )}
 
-        {compact && !hideMealsImpact && (
+        {coloredPillStyle && !hideMealsImpact && (
           <p
             aria-live="polite"
-            className="text-center text-base font-medium leading-snug text-kale lg:text-lg"
+            className={cn(
+              "text-center font-medium leading-snug text-kale",
+              mobileTight
+                ? "text-sm max-lg:leading-tight lg:text-lg"
+                : "text-base lg:text-lg",
+            )}
           >
             {formatDollarAmount(selectedAmount)} ={" "}
             <span className="font-semibold text-se-green">
@@ -750,9 +794,9 @@ function HeroDonationForm({
           variant="primary"
           colorScheme={buttonScheme}
           size="md"
-          className="w-full"
+          className={cn("w-full", mobileTight && "max-lg:h-10 max-lg:text-sm")}
         >
-          {compact ? dynamicSubmitLabel : frequency === "monthly" ? "Give Monthly" : "Give Now"}
+          {dynamicSubmitLabel}
         </Button>
       </div>
     </DonationFormShell>
@@ -760,116 +804,33 @@ function HeroDonationForm({
 }
 
 function DefaultDonationForm({
-  presetAmounts = DEFAULT_PRESETS,
-  defaultAmount = 10,
+  defaultAmount = 20,
   defaultFrequency = "one-time",
-  submitLabel = "Make a donation",
   sectionTheme = "dark",
   inCard = false,
   className,
+  hideHeader = true,
+  hideMealsImpact = false,
+  headerTitle,
+  eyebrow,
   onSubmit,
 }: DonationFormProps) {
-  const [frequency, setFrequency] = useState<DonationFrequency>(defaultFrequency);
-  const [amount, setAmount] = useState(defaultAmount);
-  const [showComment, setShowComment] = useState(false);
-
-  const presetSelected = presetAmounts.includes(amount);
-
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    onSubmit?.({ frequency, amount, currency: "USD" });
-  };
-
   return (
-    <DonationFormShell
+    <HeroDonationForm
       sectionTheme={sectionTheme}
       inCard={inCard}
       className={className}
+      defaultAmount={defaultAmount}
+      defaultFrequency={defaultFrequency}
+      hideHeader={hideHeader}
+      hideMealsImpact={hideMealsImpact}
+      headerTitle={headerTitle}
+      eyebrow={eyebrow}
+      coloredAmounts
+      relaxedAmountGrid
       formCard="white"
-      onSubmit={handleSubmit}
-    >
-      <div className="flex gap-3">
-        <ToggleButton
-          selected={frequency === "one-time"}
-          onClick={() => setFrequency("one-time")}
-        >
-          One-time
-        </ToggleButton>
-        <ToggleButton
-          selected={frequency === "monthly"}
-          onClick={() => setFrequency("monthly")}
-        >
-          <HeartIcon className="text-se-green-base" />
-          Monthly
-        </ToggleButton>
-      </div>
-
-      <div className="grid grid-cols-3 gap-3">
-        {presetAmounts.map((preset) => (
-          <AmountButton
-            key={preset}
-            amount={preset}
-            selected={presetSelected && amount === preset}
-            onClick={() => setAmount(preset)}
-          />
-        ))}
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between rounded-3xl border border-neutral-250 px-5 py-4 lg:rounded-full">
-          <label className="flex min-w-0 flex-1 items-baseline gap-2">
-            <span className="text-xl font-semibold text-kale/70">$</span>
-            <input
-              type="number"
-              min={1}
-              step={1}
-              value={amount}
-              onChange={(event) => setAmount(Number(event.target.value) || 0)}
-              aria-label="Donation amount"
-              className="min-w-0 flex-1 bg-transparent text-[clamp(28px,6vw,40px)] font-semibold leading-none tracking-[-0.04em] text-se-green-base outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-            />
-          </label>
-          <button
-            type="button"
-            className="flex shrink-0 cursor-pointer items-center gap-1 text-sm font-medium text-kale/70"
-            aria-label="Currency"
-          >
-            USD
-            <ChevronDownIcon />
-          </button>
-        </div>
-
-        <Button
-          type="button"
-          variant="tertiary"
-          colorScheme="light"
-          size="sm"
-          onClick={() => setShowComment((open) => !open)}
-          className="self-start"
-        >
-          Add comment
-        </Button>
-
-        {showComment && (
-          <textarea
-            rows={3}
-            placeholder="Leave a note with your gift"
-            aria-label="Donation comment"
-            className="w-full resize-none rounded-[var(--radius-sm)] border border-neutral-250 bg-neutral-100 px-4 py-3 text-base leading-[1.4] text-kale placeholder:text-neutral-400 outline-none transition-colors focus:border-se-green-base"
-          />
-        )}
-      </div>
-
-      <Button
-        type="submit"
-        variant="primary"
-        colorScheme="light"
-        size="md"
-        className="w-full rounded-3xl lg:rounded-[99px]"
-      >
-        {submitLabel}
-      </Button>
-    </DonationFormShell>
+      onSubmit={onSubmit}
+    />
   );
 }
 
