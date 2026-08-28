@@ -57,7 +57,7 @@ const states = groupByState(profiles);
 <style>
   .find-food-resource-layout {
     display: flex;
-    align-items: stretch;
+    align-items: center;
     gap: var(--space--4xl);
     width: 100%;
   }
@@ -75,9 +75,20 @@ const states = groupByState(profiles);
     min-width: 0;
   }
 
+  #find-food-state-select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: calc(var(--space--sm) + var(--icon--md) + var(--space--sm));
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%2318181b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--space--sm) center;
+    background-size: var(--icon--md);
+  }
+
   @media screen and (max-width: 767px) {
     .find-food-resource-layout {
       flex-direction: column;
+      align-items: stretch;
       gap: var(--space--2xl);
     }
 

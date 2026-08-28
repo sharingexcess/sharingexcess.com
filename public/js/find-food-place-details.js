@@ -484,7 +484,7 @@
           "Directions",
           renderProfileBadge(
             details.googleMapsUri,
-            "Open in Google Maps \uD83D\uDD17",
+            "\uD83D\uDDFA\uFE0F Open in Google Maps",
             "Open in Google Maps",
           ),
           false,
@@ -499,7 +499,7 @@
           "Website",
           renderProfileBadge(
             details.websiteUri,
-            formatWebsiteHostname(details.websiteUri),
+            "\uD83D\uDD17 " + formatWebsiteHostname(details.websiteUri),
             details.websiteUri,
           ),
           false,
@@ -513,11 +513,7 @@
       fields.push(
         renderProfileField(
           "Phone",
-          '<a href="' +
-            escapeHtml(phoneTelHref(phone)) +
-            '">' +
-            escapeHtml(phone) +
-            "</a>",
+          renderProfileBadge(phoneTelHref(phone), "\uD83D\uDCDE " + phone, phone),
           false,
           2,
         ),

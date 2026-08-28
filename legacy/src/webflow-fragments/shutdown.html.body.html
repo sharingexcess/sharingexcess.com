@@ -390,7 +390,6 @@
      function initPhiladelphiaMap() {
          const container = document.getElementById('philadelphia-map');
          if (!container) {
-             console.warn('Philadelphia map container not found, retrying...');
              setTimeout(initPhiladelphiaMap, 100);
              return;
          }
@@ -405,7 +404,6 @@
          });
          // Wait for map to load before adding markers
          map.on('load', () => {
-             console.log(`Philadelphia map loaded, adding ${locations.length} markers...`);
              addMarkers(map, locations);
          });
      }
@@ -424,7 +422,6 @@
              const lng = parseFloat(location.lng);
              // Skip if coordinates are invalid
              if (isNaN(lat) || isNaN(lng)) {
-                 console.warn('Invalid coordinates for location:', location);
                  return;
              }
              // Extend bounds to include this marker
@@ -449,7 +446,6 @@
                  maxZoom: 13
              });
          }
-         console.log(`Added ${markerCount} markers to Philadelphia map`);
      }
      // Create popup content HTML
      function createPopupContent(location) {
@@ -616,7 +612,6 @@
      function initNewYorkMap() {
          const container = document.getElementById('new-york-map');
          if (!container) {
-             console.warn('New York map container not found, retrying...');
              setTimeout(initNewYorkMap, 100);
              return;
          }
@@ -631,7 +626,6 @@
          });
          // Wait for map to load before adding markers
          map.on('load', () => {
-             console.log(`New York map loaded, adding ${locations.length} markers...`);
              addMarkers(map, locations);
          });
      }
@@ -650,7 +644,6 @@
              const lng = parseFloat(location.lng);
              // Skip if coordinates are invalid
              if (isNaN(lat) || isNaN(lng)) {
-                 console.warn('Invalid coordinates for location:', location);
                  return;
              }
              // Extend bounds to include this marker
@@ -675,7 +668,6 @@
                  maxZoom: 13
              });
          }
-         console.log(`Added ${markerCount} markers to New York map`);
      }
      // Create popup content HTML
      function createPopupContent(location) {
@@ -830,7 +822,6 @@
      function initChicagoMap() {
          const container = document.getElementById('chicago-map');
          if (!container) {
-             console.warn('Chicago map container not found, retrying...');
              setTimeout(initChicagoMap, 100);
              return;
          }
@@ -845,7 +836,6 @@
          });
          // Wait for map to load before adding markers
          map.on('load', () => {
-             console.log(`Chicago map loaded, adding ${locations.length} markers...`);
              addMarkers(map, locations);
          });
      }
@@ -864,7 +854,6 @@
              const lng = parseFloat(location.lng);
              // Skip if coordinates are invalid
              if (isNaN(lat) || isNaN(lng)) {
-                 console.warn('Invalid coordinates for location:', location);
                  return;
              }
              // Extend bounds to include this marker
@@ -889,7 +878,6 @@
                  maxZoom: 13
              });
          }
-         console.log(`Added ${markerCount} markers to the map`);
      }
      // Create popup content HTML
      function createPopupContent(location) {
@@ -1105,7 +1093,6 @@
      function initDetroitMap() {
          const container = document.getElementById('detroit-map');
          if (!container) {
-             console.warn('Detroit map container not found, retrying...');
              setTimeout(initDetroitMap, 100);
              return;
          }
@@ -1120,7 +1107,6 @@
          });
          // Wait for map to load before adding markers
          map.on('load', () => {
-             console.log(`Detroit map loaded, adding ${locations.length} markers...`);
              addMarkers(map, locations);
          });
      }
@@ -1139,7 +1125,6 @@
              const lng = parseFloat(location.lng);
              // Skip if coordinates are invalid
              if (isNaN(lat) || isNaN(lng)) {
-                 console.warn('Invalid coordinates for location:', location);
                  return;
              }
              // Extend bounds to include this marker
@@ -1164,7 +1149,6 @@
                  maxZoom: 13
              });
          }
-         console.log(`Added ${markerCount} markers to Detroit map`);
      }
      // Create popup content HTML
      function createPopupContent(location) {
@@ -1585,7 +1569,6 @@
     // Check that a counter element is on the page before anything else
     const impact_counter_element = document.querySelector(".impact-counter");
     if (!impact_counter_element) {
-      console.log("no impact counter element found");
       return;
     }
     const total_distribution_counter_element = document.querySelector("#total-distributions-counter");
@@ -1594,14 +1577,11 @@
     const total_ghg_counter_element = document.querySelector("#total-ghg-counter");
     // Next, get the impact data from the window object (we try 2x before using a default)
     if (!window.se_impact_data) {
-      console.log("impact_data", window.se_impact_data, has_recursed);
       // // if impact data is not yet available, wait 2s then recurse
       if (!has_recursed) {
-        console.log("no window.se_impact_data found, recursing");
         window.setTimeout(() => renderLiveImpactData(true), 3000);
         return;
       } else {
-        console.log("no window.se_impact_data found, setting to default");
         // if we've already recursed, give up and set the impact data to a default value
         window.se_impact_data = {
           count: 137204,

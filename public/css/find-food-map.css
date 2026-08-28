@@ -4,6 +4,8 @@
 .find-food-map-wrapper {
   --find-food-link-blue: oklch(0.6 0.146 251);
   background: #f8f8f8;
+  border: 1px solid #ececec;
+  border-radius: var(--radius--md, 0.5rem);
   font-family: Poppins, sans-serif;
 }
 

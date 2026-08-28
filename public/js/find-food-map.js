@@ -37,7 +37,6 @@
 
   if (typeof mapboxgl === "undefined" || !mapContainer || !geojson) {
     hideLoading();
-    console.warn("Find food map unavailable: missing Mapbox, container, or data.");
     return;
   }
 
@@ -166,9 +165,11 @@
     '<button type="button" class="find-food-map-zoom-btn" data-zoom-action="out" aria-label="Zoom out">' +
     ZOOM_OUT_ICON +
     "</button>" +
-    '<button type="button" class="find-food-map-zoom-btn" data-zoom-action="fit" aria-label="Zoom to fit">' +
-    ZOOM_FIT_ICON +
-    "</button>" +
+    (isPreview
+      ? ""
+      : '<button type="button" class="find-food-map-zoom-btn" data-zoom-action="fit" aria-label="Zoom to fit">' +
+        ZOOM_FIT_ICON +
+        "</button>") +
     '<button type="button" class="find-food-map-zoom-btn" data-zoom-action="in" aria-label="Zoom in">' +
     ZOOM_IN_ICON +
     "</button>" +
@@ -505,8 +506,7 @@
     });
 
     map.on("idle", hideLoading);
-  } catch (error) {
+  } catch (_error) {
     hideLoading();
-    console.warn("Failed to initialize find food map:", error);
   }
 })();

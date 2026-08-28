@@ -88,7 +88,7 @@
   // we are checking to see if this is the staging or dev site, in which case mixpanel will not fire
   window.addEventListener("load", () => {
     mixpanel.init("92ff02f79a76d5efaf6b7d67324684a8", {
-      debug: window.location.hostname.includes("webflow"),
+      debug: false,
       record_sessions_percent: 100,
       product: window.location.hostname,
     });
@@ -127,17 +127,13 @@
           component_id: el.getAttribute("data-mixpanel-component-id"),
           element: el,
         }));
-        console.log(list);
       };
-    } catch (error) {
-      console.error("Error while attaching mixpanel events to elements:", error);
-    }
+    } catch {}
   });
 </script>
   <!--  FUNDRAISE UP INIT  -->
   <script id="FundraiseUpInit">
   function fundraiseUpInit(w, d, s, n, a) {
-    console.log("Init Fundraise Up...");
     if (!w[n]) {
       var l = "call,catch,on,once,set,then,track".split(","),
         i,

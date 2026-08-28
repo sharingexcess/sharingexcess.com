@@ -55,16 +55,10 @@ const stateAbbrToName: Record<string, string> = {
   WY: "Wyoming",
 };
 
-const warnedUnknownAbbrs = new Set<string>();
-
 export function stateDisplayName(abbr: string): string {
   const normalized = abbr.trim().toUpperCase();
   const name = stateAbbrToName[normalized];
   if (!name) {
-    if (!warnedUnknownAbbrs.has(normalized)) {
-      warnedUnknownAbbrs.add(normalized);
-      console.warn(`[find-food] Unknown state abbreviation: ${abbr}`);
-    }
     return abbr;
   }
   return name;
