@@ -1,0 +1,28 @@
+---
+import { formatLastSharingExcessDistribution } from "../../lib/find-food/format-last-distribution";
+
+interface Props {
+  timestamp: number | null | undefined;
+  class?: string;
+}
+
+const { timestamp, class: className } = Astro.props;
+const formatted = formatLastSharingExcessDistribution(timestamp);
+---
+
+{
+  formatted && (
+    <p class:list={["find-food-last-distribution", className]}>
+      Last Sharing Excess delivery: {formatted}
+    </p>
+  )
+}
+
+<style>
+  .find-food-last-distribution {
+    font-size: var(--font-size--sm, 0.875rem);
+    color: var(--color--green-primary, #008236);
+    font-weight: 500;
+    margin: 0;
+  }
+</style>

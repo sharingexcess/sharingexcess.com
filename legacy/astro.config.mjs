@@ -18,6 +18,6 @@ export default {
   compressHTML: false,
   trailingSlash: "never",
   build: {
-    format: "file",
+    format: "directory",
   },
 };

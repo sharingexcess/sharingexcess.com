@@ -214,7 +214,6 @@ border-top-color:#008236;
   if (typeof SEHomepageImpactMap === 'undefined') {
     var loadingLogo = document.getElementById('loading-logo');
     if (loadingLogo) loadingLogo.style.display = 'none';
-    console.warn('Homepage impact map script not loaded.');
     return;
   }
   SEHomepageImpactMap.init({
@@ -653,7 +652,6 @@ function renderLiveImpactData(has_recursed = false) {
   // Check that a counter element is on the page before anything else
   const impact_counter_element = document.querySelector(".impact-counter");
   if (!impact_counter_element) {
-    console.log("no impact counter element found");
     return;
   }
   const total_distribution_counter_element = document.querySelector("#total-distributions-counter");
@@ -662,14 +660,11 @@ function renderLiveImpactData(has_recursed = false) {
   const total_ghg_counter_element = document.querySelector("#total-ghg-counter");
   // Next, get the impact data from the window object (we try 2x before using a default)
   if (!window.se_impact_data) {
-    console.log("impact_data", window.se_impact_data, has_recursed);
     // // if impact data is not yet available, wait 2s then recurse
     if (!has_recursed) {
-      console.log("no window.se_impact_data found, recursing");
       window.setTimeout(() => renderLiveImpactData(true), 3000);
       return;
     } else {
-      console.log("no window.se_impact_data found, setting to default");
       // if we've already recursed, give up and set the impact data to a default value
       window.se_impact_data = {
         count: 137204,

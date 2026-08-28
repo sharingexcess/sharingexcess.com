@@ -1,5 +1,6 @@
 ---
 import "../styles/tailwind.css";
+import SurplusApiOrigin from "../components/layout/SurplusApiOrigin.astro";
 
 interface Props {
   htmlAttrs: Record<string, string>;
@@ -12,14 +13,7 @@ const { htmlAttrs, headHtml, bodyHtml } = Astro.props;
 <!DOCTYPE html>
 <html {...htmlAttrs}>
   <head>
-    <script is:inline>
-      window.__SE_SURPLUS_API_ORIGIN = (function () {
-        var host = location.hostname;
-        return host === "sharingexcess.com" || host === "www.sharingexcess.com"
-          ? "https://surplus-api.sharingexcess.com"
-          : "https://surplus-api.staging.sharingexcess.com";
-      })();
-    </script>
+    <SurplusApiOrigin />
     <script
       src="https://js.sentry-cdn.com/d73e9e40eaf6f191cb6758409bebcaa4.min.js"
       crossorigin="anonymous"></script>

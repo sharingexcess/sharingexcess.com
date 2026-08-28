@@ -24,10 +24,12 @@ function isExternalHref(href: string): boolean {
   );
 }
 
-/** Routes that match Astro static output (`build.format: "file"` → `about.html` on disk). */
+/** Routes that match Astro static output (`build.format: "directory"` → `/about/index.html` on disk). */
 function htmlFileToRoute(filePath: string): string {
   const f = filePath.replace(/^\/+/, "");
   if (f === "index.html") return "/";
+  if (f.endsWith(".html")) return "/" + f.slice(0, -5);
+  if (f.endsWith(".htm")) return "/" + f.slice(0, -4);
   return "/" + f;
 }
 
@@ -173,6 +175,8 @@ function pagePathToAstroPath(pageRel: string): string {
   return join(sub, `${file}.astro`);
 }
 
+const SKIP_ASTRO_PAGE = new Set(["find-food.html"]);
+
 async function main() {
   await mkdir(FRAG, { recursive: true });
   await mkdir(PAGES, { recursive: true });
@@ -204,6 +208,10 @@ async function main() {
     await writeFile(bodyPath, bodyInner, "utf-8");
 
     const astroOut = pagePathToAstroPath(pageRel);
+    if (SKIP_ASTRO_PAGE.has(pageRel)) {
+      console.error(`Skipped page (custom route): ${pageRel}`);
+      continue;
+    }
     await mkdir(dirname(astroOut), { recursive: true });
 
     // Compute import paths robustly

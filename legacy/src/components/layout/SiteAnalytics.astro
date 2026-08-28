@@ -61,7 +61,7 @@
   })(document, window.mixpanel || []);
   window.addEventListener("load", () => {
     mixpanel.init("92ff02f79a76d5efaf6b7d67324684a8", {
-      debug: window.location.hostname.includes("webflow"),
+      debug: false,
       record_sessions_percent: 100,
       product: window.location.hostname,
     });
@@ -90,16 +90,13 @@
         });
       });
       window.listMixpanelComponents = function () {
-        const list = Array.from(document.querySelectorAll("[data-mixpanel-component]")).map((el) => ({
+        return Array.from(document.querySelectorAll("[data-mixpanel-component]")).map((el) => ({
           component: el.getAttribute("data-mixpanel-component"),
           component_id: el.getAttribute("data-mixpanel-component-id"),
           element: el,
         }));
-        console.log(list);
       };
-    } catch (error) {
-      console.error("Error while attaching mixpanel events to elements:", error);
-    }
+    } catch (_error) {}
   });
 </script>
 <script id="FundraiseUpInit">

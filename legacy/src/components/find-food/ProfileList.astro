@@ -1,0 +1,64 @@
+---
+interface Props {
+  items: Array<{
+    label: string;
+    href: string;
+    sublabel?: string;
+  }>;
+}
+
+const { items } = Astro.props;
+---
+
+<ul class="find-food-profile-list">
+  {
+    items.map((item) => (
+      <li class="find-food-profile-list-item">
+        <a href={item.href} class="find-food-profile-list-link">
+          <span class="find-food-profile-list-name">{item.label}</span>
+          {item.sublabel && (
+            <span class="find-food-profile-list-sublabel">{item.sublabel}</span>
+          )}
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .find-food-profile-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space--sm);
+  }
+
+  .find-food-profile-list-item {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    padding-bottom: var(--space--sm);
+  }
+
+  .find-food-profile-list-link {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .find-food-profile-list-link:hover .find-food-profile-list-name {
+    color: var(--color--green-primary, #008236);
+  }
+
+  .find-food-profile-list-name {
+    font-weight: 600;
+    font-size: var(--font-size--md, 1rem);
+  }
+
+  .find-food-profile-list-sublabel {
+    font-size: var(--font-size--sm, 0.875rem);
+    color: rgba(0, 0, 0, 0.64);
+  }
+</style>

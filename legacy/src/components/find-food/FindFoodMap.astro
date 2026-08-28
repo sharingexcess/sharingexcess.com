@@ -1,0 +1,114 @@
+---
+import { profilesToGeoJson } from "../../lib/find-food/geojson";
+import type { PublicFindFoodProfile } from "../../lib/find-food/types";
+
+interface Props {
+  profiles: PublicFindFoodProfile[];
+  variant?: "section" | "embedded";
+  heading?: string;
+  description?: string;
+}
+
+const {
+  profiles,
+  variant = "section",
+  heading = "Find a Partner Location Near You",
+  description = "Browse locations where Sharing Excess partners distribute rescued food. Click a marker for details.",
+} = Astro.props;
+
+const geojson = profilesToGeoJson(profiles);
+const isEmbedded = variant === "embedded";
+---
+
+{
+  isEmbedded ? (
+    <>
+      <div class="find-food-map-wrapper find-food-map-wrapper--embedded find-food-map-wrapper--with-search">
+        <div id="find-food-map"></div>
+        <div id="find-food-map-loading" class="find-food-map-loading">
+          <img src="/images/logo.png" alt="Loading map" width="80" />
+        </div>
+      </div>
+    </>
+  ) : (
+    <section class="section background-green">
+      <div class="content-container">
+        <h2 class="color-white margin-bottom-sm">{heading}</h2>
+        <p class="margin-bottom-2xl color-white-80">{description}</p>
+        <div class="find-food-map-wrapper">
+          <div id="find-food-map"></div>
+          <div id="find-food-map-loading" class="find-food-map-loading">
+            <img src="/images/logo.png" alt="Loading map" width="80" />
+          </div>
+        </div>
+        <p class="color-white-64 font-size-xs width-100 text-align-center margin-top-sm">
+          {profiles.length} partner location{profiles.length === 1 ? "" : "s"} shown
+        </p>
+      </div>
+    </section>
+  )
+}
+
+<link rel="stylesheet" href="/css/find-food-map.css" />
+{
+  isEmbedded && (
+    <>
+      <link
+        href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.css"
+        rel="stylesheet"
+      />
+      <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.min.js"
+      ></script>
+    </>
+  )
+}
+
+<script define:vars={{ geojson }}>
+  window.__FIND_FOOD_GEOJSON = geojson;
+</script>
+<script defer src="/js/find-food-place-details.js"></script>
+<script defer src="/js/find-food-map.js"></script>
+
+<style>
+  .find-food-map-wrapper {
+    position: relative;
+    width: 100%;
+    height: 480px;
+    overflow: hidden;
+  }
+
+  .find-food-map-wrapper--embedded {
+    height: 400px;
+  }
+
+  @media screen and (min-width: 768px) {
+    .find-food-map-wrapper {
+      height: 560px;
+    }
+
+    .find-food-map-wrapper--embedded {
+      height: 640px;
+    }
+  }
+
+  #find-food-map {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .find-food-map-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .find-food-map-loading.is-hidden {
+    display: none;
+  }
+</style>

@@ -1,6 +1,4 @@
 function getImpactData() {
-  console.log("getting impact data");
-  var start = performance.now();
   window.se_impact_data = null;
 
   var controller = new AbortController();
@@ -17,11 +15,9 @@ function getImpactData() {
     })
     .then(function (data) {
       window.se_impact_data = data;
-      console.log(data, performance.now() - start);
     })
     .catch(function (error) {
       clearTimeout(timeoutId);
-      console.warn("Failed to load impact data:", error);
     });
 }
 

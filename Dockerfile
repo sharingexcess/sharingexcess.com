@@ -9,6 +9,8 @@ RUN cd legacy && bun install --frozen-lockfile
 
 COPY legacy/ ./legacy/
 COPY public/ ./public/
+ARG PUBLIC_API_SERVER_URL=https://api.sharingexcess.com
+ENV PUBLIC_API_SERVER_URL=${PUBLIC_API_SERVER_URL}
 RUN cd legacy && bun run build
 
 FROM oven/bun:slim

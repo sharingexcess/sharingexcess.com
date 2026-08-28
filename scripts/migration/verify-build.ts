@@ -31,7 +31,15 @@ async function main() {
   const pages = await listHtml(DIST);
   console.error(`Found ${pages.length} HTML files in dist.`);
 
-  const required = ["index.html", "css/sharingexcess.webflow.css", "js/webflow.js", "images/favicon.png"];
+  const required = [
+    "index.html",
+    "about/index.html",
+    "find-food/index.html",
+    "serve.json",
+    "css/sharingexcess.webflow.css",
+    "js/webflow.js",
+    "images/favicon.png",
+  ];
   let ok = true;
   for (const r of required) {
     const p = join(DIST, r);
