@@ -34,7 +34,7 @@ async function main() {
   const required = [
     "index.html",
     "about/index.html",
-    "find-food/index.html",
+    "free-food/index.html",
     "serve.json",
     "css/sharingexcess.webflow.css",
     "js/webflow.js",

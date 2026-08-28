@@ -143,7 +143,7 @@ export const FOOTER_NAV_SECTIONS: FooterNavSection[] = [
   {
     title: "Get Food",
     links: [
-      { label: "Find Food", href: "/find-food" },
+      { label: "Free Food", href: "/free-food" },
       { label: "For Community Organizations", href: "/get-involved/partners#community-orgs" },
     ],
   },

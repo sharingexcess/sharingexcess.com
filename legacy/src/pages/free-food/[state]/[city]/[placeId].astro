@@ -40,8 +40,8 @@ if (!verified) {
 
 const stateName = stateDisplayName(profile.state);
 const canonical = new URL(profilePath(profile), Astro.site).href;
-const pageTitle = `${profile.name} | Find Food | Sharing Excess`;
-const description = `Find free food at ${profile.name} in ${profile.city}, ${stateName}. Partner location on the Sharing Excess find food map.`;
+const pageTitle = `${profile.name} | Free Food | Sharing Excess`;
+const description = `Find free food at ${profile.name} in ${profile.city}, ${stateName}. Partner location on the Sharing Excess free food map.`;
 ---
 
 <FindFoodLayout
@@ -53,7 +53,7 @@ const description = `Find free food at ${profile.name} in ${profile.city}, ${sta
     <div class="content-container">
       <Breadcrumbs
         crumbs={[
-          { label: "Find Food", href: "/find-food" },
+          { label: "Free Food", href: "/free-food" },
           { label: stateName, href: statePath(profile.state) },
           { label: profile.city, href: cityPath(profile.state, profile.city) },
           { label: profile.name },

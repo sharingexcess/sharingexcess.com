@@ -25,7 +25,7 @@ interface Props {
 const { stateAbbr, stateName, profiles } = Astro.props;
 const { state } = Astro.params;
 
-const canonical = new URL(`/find-food/${state}`, Astro.site).href;
+const canonical = new URL(`/free-food/${state}`, Astro.site).href;
 const pageTitle = `Free Food in ${stateName} | Sharing Excess`;
 const description = `Find free food distribution locations partnered with Sharing Excess in ${stateName}. Browse cities and partner locations near you.`;
 
@@ -51,7 +51,7 @@ const cities = [...cityCounts.entries()]
     <div class="content-container">
       <Breadcrumbs
         crumbs={[
-          { label: "Find Food", href: "/find-food" },
+          { label: "Free Food", href: "/free-food" },
           { label: stateName },
         ]}
       />

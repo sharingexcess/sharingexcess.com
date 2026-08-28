@@ -31,7 +31,7 @@ interface Props {
 const { stateName, cityName, profiles } = Astro.props;
 const { state, city } = Astro.params;
 
-const canonical = new URL(`/find-food/${state}/${city}`, Astro.site).href;
+const canonical = new URL(`/free-food/${state}/${city}`, Astro.site).href;
 const pageTitle = `Free Food in ${cityName}, ${stateName} | Sharing Excess`;
 const description = `Find free food distribution locations in ${cityName}, ${stateName} partnered with Sharing Excess.`;
 
@@ -50,7 +50,7 @@ const locationItems = profiles.map((profile) => ({
     <div class="content-container">
       <Breadcrumbs
         crumbs={[
-          { label: "Find Food", href: "/find-food" },
+          { label: "Free Food", href: "/free-food" },
           { label: stateName, href: statePath(profiles[0].state) },
           { label: cityName },
         ]}

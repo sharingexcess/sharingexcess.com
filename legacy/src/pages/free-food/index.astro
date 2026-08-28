@@ -7,10 +7,10 @@ import { fetchProfiles } from "../../lib/find-food/api";
 
 const profiles = await fetchProfiles();
 
-const title = "Find Food: Local Distributions + Pop-ups | Sharing Excess";
+const title = "Free Food: Local Distributions + Pop-ups | Sharing Excess";
 const description =
   "Looking for fresh, free groceries near you? We partner with local organizations and businesses to bring rescued produce directly to the community - no sign-up or ID required.All events are free and open to the public.";
-const canonical = new URL("/find-food", Astro.site).href;
+const canonical = new URL("/free-food", Astro.site).href;
 ---
 
 <FindFoodLayout

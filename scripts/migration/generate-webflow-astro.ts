@@ -175,7 +175,7 @@ function pagePathToAstroPath(pageRel: string): string {
   return join(sub, `${file}.astro`);
 }
 
-const SKIP_ASTRO_PAGE = new Set(["find-food.html"]);
+const SKIP_ASTRO_PAGE = new Set(["free-food.html"]);
 
 async function main() {
   await mkdir(FRAG, { recursive: true });

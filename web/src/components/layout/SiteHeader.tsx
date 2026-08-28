@@ -78,8 +78,8 @@ export interface SiteHeaderProps {
 
 export const DEFAULT_NAV_ITEMS: SiteHeaderNavItem[] = [
   {
-    label: "Find Food",
-    href: "/find-food",
+    label: "Free Food",
+    href: "/free-food",
   },
   {
     label: "Get Involved",

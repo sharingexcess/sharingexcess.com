@@ -3,7 +3,7 @@ import { stateSlug } from "./states";
 import type { PublicFindFoodProfile } from "./types";
 
 export function statePath(abbr: string): string {
-  return `/find-food/${stateSlug(abbr)}`;
+  return `/free-food/${stateSlug(abbr)}`;
 }
 
 export function cityPath(abbr: string, city: string): string {

@@ -74,7 +74,7 @@ Rescued food is redistributed to food pantries, shelters, schools, soup kitchens
 
 ### Is it free?
 
-Yes. Sharing Excess provides [free food to all recipients](/find-food).
+Yes. Sharing Excess provides [free food to all recipients](/free-food).
 
 ### What about the food that's not good enough to share?
 

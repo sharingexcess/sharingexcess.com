@@ -49,12 +49,12 @@
     if (singlePlaceId) {
       lastDistributionFetchPromise = fetch(
         getApiOrigin() +
-          "/public/find_food/profiles/" +
+          "/public/free_food/profiles/" +
           encodeURIComponent(singlePlaceId),
       )
         .then(function (res) {
           if (!res.ok) {
-            throw new Error("Find food profile failed (" + res.status + ")");
+            throw new Error("Free food profile failed (" + res.status + ")");
           }
           return res.json();
         })
@@ -75,10 +75,10 @@
       return lastDistributionFetchPromise;
     }
 
-    lastDistributionFetchPromise = fetch(getApiOrigin() + "/public/find_food/profiles")
+    lastDistributionFetchPromise = fetch(getApiOrigin() + "/public/free_food/profiles")
       .then(function (res) {
         if (!res.ok) {
-          throw new Error("Find food profiles failed (" + res.status + ")");
+          throw new Error("Free food profiles failed (" + res.status + ")");
         }
         return res.json();
       })
@@ -652,7 +652,7 @@
 
   function fetchPlaceDetails(placeId) {
     var origin = getApiOrigin();
-    return fetch(origin + "/public/find_food/places/" + encodeURIComponent(placeId) + "/details")
+    return fetch(origin + "/public/free_food/places/" + encodeURIComponent(placeId) + "/details")
       .then(function (res) {
         if (!res.ok) {
           return res
