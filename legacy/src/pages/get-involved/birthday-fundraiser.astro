@@ -3,6 +3,7 @@ import SiteHead from "../../components/layout/SiteHead.astro";
 import SiteHeader from "../../components/layout/SiteHeader.astro";
 import PageHeader from "../../components/layout/PageHeader.astro";
 import SiteFooter from "../../components/layout/SiteFooter.astro";
+import SurplusApiOrigin from "../../components/layout/SurplusApiOrigin.astro";
 import "../../styles/tailwind.css";
 
 const pageTitle = "Start a Birthday Fundraiser | Sharing Excess";
@@ -49,14 +50,7 @@ const samplePhotos = [
 <!doctype html>
 <html data-wf-site="67d1d2d9c708819c5185d49c" lang="en">
   <head>
-    <script is:inline>
-      window.__SE_SURPLUS_API_ORIGIN = (function () {
-        var host = location.hostname;
-        return host === "sharingexcess.com" || host === "www.sharingexcess.com"
-          ? "https://surplus-api.sharingexcess.com"
-          : "https://surplus-api.staging.sharingexcess.com";
-      })();
-    </script>
+    <SurplusApiOrigin />
     <script
       src="https://js.sentry-cdn.com/d73e9e40eaf6f191cb6758409bebcaa4.min.js"
       crossorigin="anonymous"></script>

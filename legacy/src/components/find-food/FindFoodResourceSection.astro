@@ -1,0 +1,91 @@
+---
+import FindFoodMap from "./FindFoodMap.astro";
+import { groupByState } from "../../lib/find-food/grouping";
+import { statePath } from "../../lib/find-food/urls";
+import type { PublicFindFoodProfile } from "../../lib/find-food/types";
+
+interface Props {
+  profiles: PublicFindFoodProfile[];
+}
+
+const { profiles } = Astro.props;
+const states = groupByState(profiles);
+---
+
+<section class="section find-food-resource-section">
+  <div class="content-container find-food-resource-layout">
+    <div class="find-food-resource-copy">
+      <h2 class="margin-bottom-lg">SE Powered Food Resource Locations</h2>
+      <p class="max-width-720 color-black-64 margin-bottom-lg">
+        Sharing Excess helps supply food to all of the community resources available on the map (and many more, too!)
+      </p>
+      <p class="max-width-720 color-black-64 margin-bottom-2xl">
+        All contact information and hours are provided by the organization's own listing on <em>Google Maps</em> - please be sure to contact the organizations directly to confirm availability.
+      </p>
+
+      <div class="find-food-state-select-wrap margin-bottom-2xl width-100">
+        <label for="find-food-state-select" class="label font-size-xs margin-bottom-sm display-block">
+          Find resources by state
+        </label>
+        <select id="find-food-state-select" class="input font-size-sm width-100">
+          <option value="">Select a state</option>
+          {
+            states.map((state) => (
+              <option value={statePath(state.abbr)}>{state.name}</option>
+            ))
+          }
+        </select>
+      </div>
+
+      <p class="max-width-720 color-black-64 margin-bottom-lg">Looking to join our list of resources?</p>
+      <a href="/contact" class="button w-inline-block">Reach Out to Our Team</a>
+    </div>
+    <div class="find-food-resource-map">
+      <FindFoodMap profiles={profiles} variant="embedded" />
+    </div>
+  </div>
+</section>
+
+<script>
+  const select = document.getElementById("find-food-state-select");
+  select?.addEventListener("change", (event) => {
+    const target = event.target as HTMLSelectElement;
+    if (target.value) window.location.href = target.value;
+  });
+</script>
+
+<style>
+  .find-food-resource-layout {
+    display: flex;
+    align-items: stretch;
+    gap: var(--space--4xl);
+    width: 100%;
+  }
+
+  .find-food-resource-copy {
+    flex: 0 0 36%;
+    max-width: 36%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .find-food-resource-map {
+    flex: 1 1 64%;
+    min-width: 0;
+  }
+
+  @media screen and (max-width: 767px) {
+    .find-food-resource-layout {
+      flex-direction: column;
+      gap: var(--space--2xl);
+    }
+
+    .find-food-resource-copy,
+    .find-food-resource-map {
+      flex: 1 1 auto;
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+</style>

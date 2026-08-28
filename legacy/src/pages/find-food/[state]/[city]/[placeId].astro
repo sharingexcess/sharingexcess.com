@@ -1,0 +1,65 @@
+---
+import FindFoodLayout from "../../../../components/find-food/FindFoodLayout.astro";
+import Breadcrumbs from "../../../../components/find-food/Breadcrumbs.astro";
+import RecipientProfile from "../../../../components/find-food/RecipientProfile.astro";
+import { fetchProfiles } from "../../../../lib/find-food/api";
+import { findProfileByPlaceId } from "../../../../lib/find-food/grouping";
+import { stateDisplayName, stateSlug } from "../../../../lib/find-food/states";
+import { slugify } from "../../../../lib/find-food/slugify";
+import { cityPath, profilePath, statePath } from "../../../../lib/find-food/urls";
+
+export async function getStaticPaths() {
+  const profiles = await fetchProfiles();
+
+  return profiles.map((profile) => ({
+    params: {
+      state: stateSlug(profile.state),
+      city: slugify(profile.city),
+      placeId: profile.googlePlaceId,
+    },
+    props: { profile },
+  }));
+}
+
+interface Props {
+  profile: import("../../../../lib/find-food/types").PublicFindFoodProfile;
+}
+
+const { profile } = Astro.props;
+const { state, city, placeId } = Astro.params;
+
+const verified = findProfileByPlaceId(
+  [profile],
+  state ?? "",
+  city ?? "",
+  placeId ?? "",
+);
+if (!verified) {
+  throw new Error(`Profile place ID mismatch for ${placeId}`);
+}
+
+const stateName = stateDisplayName(profile.state);
+const canonical = new URL(profilePath(profile), Astro.site).href;
+const pageTitle = `${profile.name} | Find Food | Sharing Excess`;
+const description = `Find free food at ${profile.name} in ${profile.city}, ${stateName}. Partner location on the Sharing Excess find food map.`;
+---
+
+<FindFoodLayout
+  title={pageTitle}
+  description={description}
+  canonical={canonical}
+  includeMapbox={true}>
+  <section class="section find-food-profile-section">
+    <div class="content-container">
+      <Breadcrumbs
+        crumbs={[
+          { label: "Find Food", href: "/find-food" },
+          { label: stateName, href: statePath(profile.state) },
+          { label: profile.city, href: cityPath(profile.state, profile.city) },
+          { label: profile.name },
+        ]}
+      />
+      <RecipientProfile profile={profile} />
+    </div>
+  </section>
+</FindFoodLayout>

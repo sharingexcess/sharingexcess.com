@@ -1,0 +1,45 @@
+---
+import FindFoodProfileMap from "./FindFoodProfileMap.astro";
+import { stateDisplayName } from "../../lib/find-food/states";
+import type { PublicFindFoodProfile } from "../../lib/find-food/types";
+
+interface Props {
+  profile: PublicFindFoodProfile;
+}
+
+const { profile } = Astro.props;
+const stateName = stateDisplayName(profile.state);
+const badgeLabel = `${profile.city}, ${profile.state}`;
+---
+
+<article class="find-food-profile-card">
+  <div class="find-food-profile-cover" data-profile-cover>
+    <div class="find-food-map-panel-cover-placeholder"></div>
+  </div>
+  <div class="find-food-profile-header">
+    <span class="find-food-map-panel-badge">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
+      {badgeLabel}
+    </span>
+  </div>
+  <div class="find-food-profile-body">
+    <h1 class="find-food-profile-title">{profile.name}</h1>
+    <p
+      class="find-food-profile-subtitle find-food-last-distribution"
+      data-last-distribution-place-id={profile.googlePlaceId}>
+      Last Sharing Excess delivery: —
+    </p>
+    <div
+      class="find-food-place-details"
+      data-place-id={profile.googlePlaceId}
+      data-location-name={profile.name}>
+      <p class="find-food-place-details-loading">Loading location details…</p>
+      <div class="find-food-place-details-content" hidden></div>
+    </div>
+  </div>
+  <FindFoodProfileMap profile={profile} />
+</article>
+
+<link rel="stylesheet" href="/css/find-food-map.css" />
+<link rel="stylesheet" href="/css/find-food-profile.css" />
+<script defer src="/js/find-food-place-details.js"></script>

@@ -1,0 +1,65 @@
+---
+import FindFoodLayout from "../../../components/find-food/FindFoodLayout.astro";
+import Breadcrumbs from "../../../components/find-food/Breadcrumbs.astro";
+import ProfileList from "../../../components/find-food/ProfileList.astro";
+import { fetchProfiles } from "../../../lib/find-food/api";
+import { groupByCity } from "../../../lib/find-food/grouping";
+import { profilePath, statePath } from "../../../lib/find-food/urls";
+
+export async function getStaticPaths() {
+  const profiles = await fetchProfiles();
+  const cities = groupByCity(profiles);
+
+  return cities.map((city) => ({
+    params: { state: city.stateSlug, city: city.citySlug },
+    props: {
+      stateAbbr: city.abbr,
+      stateName: city.stateName,
+      cityName: city.city,
+      profiles: city.profiles,
+    },
+  }));
+}
+
+interface Props {
+  stateAbbr: string;
+  stateName: string;
+  cityName: string;
+  profiles: import("../../../lib/find-food/types").PublicFindFoodProfile[];
+}
+
+const { stateName, cityName, profiles } = Astro.props;
+const { state, city } = Astro.params;
+
+const canonical = new URL(`/find-food/${state}/${city}`, Astro.site).href;
+const pageTitle = `Free Food in ${cityName}, ${stateName} | Sharing Excess`;
+const description = `Find free food distribution locations in ${cityName}, ${stateName} partnered with Sharing Excess.`;
+
+const locationItems = profiles.map((profile) => ({
+  label: profile.name,
+  href: profilePath(profile),
+  sublabel: `${profile.city}, ${profile.state}`,
+}));
+---
+
+<FindFoodLayout
+  title={pageTitle}
+  description={description}
+  canonical={canonical}>
+  <section class="section">
+    <div class="content-container">
+      <Breadcrumbs
+        crumbs={[
+          { label: "Find Food", href: "/find-food" },
+          { label: stateName, href: statePath(profiles[0].state) },
+          { label: cityName },
+        ]}
+      />
+      <h2 class="margin-bottom-lg">Locations in {cityName}, {stateName}</h2>
+      <p class="max-width-720 color-black-64 margin-bottom-2xl">
+        {profiles.length} partner location{profiles.length === 1 ? "" : "s"} in {cityName}.
+      </p>
+      <ProfileList items={locationItems} />
+    </div>
+  </section>
+</FindFoodLayout>

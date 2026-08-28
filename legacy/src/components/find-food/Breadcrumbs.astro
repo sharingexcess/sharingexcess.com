@@ -1,0 +1,72 @@
+---
+interface Crumb {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  crumbs: Crumb[];
+}
+
+const { crumbs } = Astro.props;
+---
+
+<nav class="find-food-breadcrumbs margin-bottom-lg" aria-label="Breadcrumb">
+  <ol class="find-food-breadcrumbs-list">
+    {
+      crumbs.map((crumb, index) => {
+        const isLast = index === crumbs.length - 1;
+        return (
+          <li class="find-food-breadcrumbs-item">
+            {!isLast && crumb.href ? (
+              <a href={crumb.href} class="find-food-breadcrumbs-link">
+                {crumb.label}
+              </a>
+            ) : (
+              <span class="find-food-breadcrumbs-current" aria-current={isLast ? "page" : undefined}>
+                {crumb.label}
+              </span>
+            )}
+            {!isLast && <span class="find-food-breadcrumbs-separator" aria-hidden="true">/</span>}
+          </li>
+        );
+      })
+    }
+  </ol>
+</nav>
+
+<style>
+  .find-food-breadcrumbs-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space--xs);
+    font-size: var(--font-size--sm, 0.875rem);
+  }
+
+  .find-food-breadcrumbs-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space--xs);
+  }
+
+  .find-food-breadcrumbs-link {
+    color: var(--color--green-primary, #008236);
+    text-decoration: none;
+  }
+
+  .find-food-breadcrumbs-link:hover {
+    text-decoration: underline;
+  }
+
+  .find-food-breadcrumbs-current {
+    color: rgba(0, 0, 0, 0.64);
+  }
+
+  .find-food-breadcrumbs-separator {
+    color: rgba(0, 0, 0, 0.32);
+  }
+</style>

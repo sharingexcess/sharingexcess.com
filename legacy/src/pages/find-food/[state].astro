@@ -1,0 +1,66 @@
+---
+import FindFoodLayout from "../../components/find-food/FindFoodLayout.astro";
+import Breadcrumbs from "../../components/find-food/Breadcrumbs.astro";
+import ProfileList from "../../components/find-food/ProfileList.astro";
+import { fetchProfiles } from "../../lib/find-food/api";
+import { groupByState } from "../../lib/find-food/grouping";
+import { cityPath } from "../../lib/find-food/urls";
+
+export async function getStaticPaths() {
+  const profiles = await fetchProfiles();
+  const states = groupByState(profiles);
+
+  return states.map((state) => ({
+    params: { state: state.slug },
+    props: { stateAbbr: state.abbr, stateName: state.name, profiles: state.profiles },
+  }));
+}
+
+interface Props {
+  stateAbbr: string;
+  stateName: string;
+  profiles: import("../../lib/find-food/types").PublicFindFoodProfile[];
+}
+
+const { stateAbbr, stateName, profiles } = Astro.props;
+const { state } = Astro.params;
+
+const canonical = new URL(`/find-food/${state}`, Astro.site).href;
+const pageTitle = `Free Food in ${stateName} | Sharing Excess`;
+const description = `Find free food distribution locations partnered with Sharing Excess in ${stateName}. Browse cities and partner locations near you.`;
+
+const cityCounts = new Map<string, number>();
+for (const profile of profiles) {
+  cityCounts.set(profile.city, (cityCounts.get(profile.city) ?? 0) + 1);
+}
+
+const cities = [...cityCounts.entries()]
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([cityName, count]) => ({
+    label: cityName,
+    href: cityPath(stateAbbr, cityName),
+    sublabel: `${count} location${count === 1 ? "" : "s"}`,
+  }));
+---
+
+<FindFoodLayout
+  title={pageTitle}
+  description={description}
+  canonical={canonical}>
+  <section class="section">
+    <div class="content-container">
+      <Breadcrumbs
+        crumbs={[
+          { label: "Find Food", href: "/find-food" },
+          { label: stateName },
+        ]}
+      />
+      <h2 class="margin-bottom-lg">Cities in {stateName}</h2>
+      <p class="max-width-720 color-black-64 margin-bottom-2xl">
+        {profiles.length} partner location{profiles.length === 1 ? "" : "s"} in {stateName}.
+        Select a city to browse available locations.
+      </p>
+      <ProfileList items={cities} />
+    </div>
+  </section>
+</FindFoodLayout>
