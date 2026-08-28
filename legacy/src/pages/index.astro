@@ -1,8 +1,10 @@
 ---
 import WebflowHtml from "../layouts/WebflowHtml.astro";
+import { getImpactMapEmbedUrl } from "../lib/impact-map-embed-origin";
 import headHtml from "../webflow-fragments/index.html.head.html?raw";
-import bodyHtml from "../webflow-fragments/index.html.body.html?raw";
+import rawBodyHtml from "../webflow-fragments/index.html.body.html?raw";
 
 const htmlAttrs = {"data-wf-page":"67d1d2d9c708819c5185d47f","data-wf-site":"67d1d2d9c708819c5185d49c","lang":"en"} as Record<string, string>;
+const bodyHtml = rawBodyHtml.replaceAll("__IMPACT_MAP_EMBED_URL__", getImpactMapEmbedUrl());
 ---
 <WebflowHtml htmlAttrs={htmlAttrs} headHtml={headHtml} bodyHtml={bodyHtml} />

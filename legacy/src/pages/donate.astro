@@ -1,0 +1,321 @@
+---
+import SiteHead from "../components/layout/SiteHead.astro";
+import SiteHeader from "../components/layout/SiteHeader.astro";
+import PageHeader from "../components/layout/PageHeader.astro";
+import SiteFooter from "../components/layout/SiteFooter.astro";
+import SurplusApiOrigin from "../components/layout/SurplusApiOrigin.astro";
+import "../styles/tailwind.css";
+
+const pageTitle = "Donate | Sharing Excess";
+const description =
+  "Support Sharing Excess with a cash gift, fundraiser, stock donation, donor-advised fund, IRA contribution, or cryptocurrency.";
+const canonical = new URL("/donate", Astro.site).href;
+const bannerImage = "/images/Donate-Monthly_1.avif";
+
+const FREEWILL_BASE = "https://partner.freewill.com/smartgiving/sharingexcess";
+
+const donationOptions = [
+  [
+    {
+      title: "Donate Now",
+      description:
+        "Make a one-time or monthly gift to help us rescue surplus food and deliver it to communities in need.",
+      href: "?form=donate",
+      imageClass: "donate-now-background-image",
+      mixpanel: "button_donate_page_donate_now",
+      external: false,
+    },
+    {
+      title: "Start a Fundraiser",
+      description:
+        "Rally your friends, family, or coworkers to fight hunger and food waste with a personal fundraising campaign.",
+      href: "/get-involved/fundraise",
+      imageClass: "fundraiser-card-background-image",
+      mixpanel: "button_donate_page_start_a_fundraiser",
+      external: false,
+    },
+    {
+      title: "Contribute Stock",
+      description:
+        "Donate appreciated securities and avoid capital gains taxes while maximizing your charitable impact.",
+      href: `${FREEWILL_BASE}?product=STOCK_GIFT`,
+      imageClass: "stock-background-image",
+      mixpanel: "button_donate_page_contribute_stock",
+      external: true,
+    },
+  ],
+  [
+    {
+      title: "Donor Advised Funds",
+      description:
+        "Recommend a grant from your donor-advised fund to support food rescue and hunger relief nationwide.",
+      href: `${FREEWILL_BASE}?product=DAF`,
+      imageClass: "daf-background-image",
+      mixpanel: "button_donate_page_donor_advised_funds",
+      external: true,
+      tallTitle: true,
+    },
+    {
+      title: "Retirement Accounts",
+      description:
+        "Make a qualified charitable distribution from your IRA if you are 70½ or older and reduce your taxable income.",
+      href: `${FREEWILL_BASE}?product=QCD`,
+      imageClass: "ira-background-image",
+      mixpanel: "button_donate_page_individual_retirement_accounts",
+      external: true,
+    },
+    {
+      title: "Cryptocurrency",
+      description:
+        "Give Bitcoin, Ethereum, and other digital assets to help us move more rescued food to people who need it.",
+      href: `${FREEWILL_BASE}?product=CRYPTO`,
+      imageClass: "crypto-background-image",
+      mixpanel: "button_donate_page_cryptocurrency",
+      external: true,
+    },
+  ],
+];
+---
+
+<!doctype html>
+<html data-wf-site="67d1d2d9c708819c5185d49c" lang="en">
+  <head>
+    <SurplusApiOrigin />
+    <script
+      src="https://js.sentry-cdn.com/d73e9e40eaf6f191cb6758409bebcaa4.min.js"
+      crossorigin="anonymous"></script>
+    <script is:inline>
+      Sentry.onLoad(function () {
+        var isProduction =
+          window.location.hostname === "sharingexcess.com" ||
+          window.location.hostname === "www.sharingexcess.com";
+        Sentry.init({
+          env: isProduction ? "production" : "staging",
+          autoSessionTracking: true,
+          tracesSampleRate: 1.0,
+          replaysSessionSampleRate: isProduction ? 0.1 : 1.0,
+          replaysOnErrorSampleRate: 1.0,
+          ignoreErrors: ["Script error.", "ResizeObserver loop", /webkit\.messageHandlers/],
+          denyUrls: [/extensions\//i, /^chrome:\/\//i],
+        });
+      });
+    </script>
+    <SiteHead title={pageTitle} description={description} canonical={canonical} />
+  </head>
+  <body>
+    <SiteHeader />
+
+    <PageHeader
+      title="Donate"
+      image={bannerImage}
+      imageAlt="Volunteers preparing rescued produce for community distribution"
+    />
+
+    <div class="section background-black-4">
+      <div class="content-container flex column align-items-center gap-2xl">
+        <div class="flex column align-items-center width-100">
+          <h4 class="eyebrow color-green-primary margin-bottom-lg">SUPPORT OUR MISSION</h4>
+          <h2 class="margin-bottom-lg text-align-center">Choose how you'd like to give</h2>
+          <p class="max-width-720 text-align-center color-black-64">
+            Every dollar helps us rescue surplus food and get it to communities facing hunger. Pick the
+            option that works best for you.
+          </p>
+        </div>
+        {
+          donationOptions.map((row) => (
+            <div class="flex row mobile-column gap-xl width-100">
+              {row.map((option) => (
+                <a
+                  href={option.href}
+                  data-mixpanel-component={option.mixpanel}
+                  class="width-100 w-inline-block no-link-styling"
+                  {...(option.external
+                    ? { target: "_blank", rel: "noopener noreferrer" }
+                    : {})}
+                >
+                  <div class={`hover-animation-card ${option.imageClass}`}>
+                    <div
+                      class:list={[
+                        "hover-animation-card-content",
+                        { "hover-animation-card-content--tall": option.tallTitle },
+                      ]}
+                    >
+                      <h4 class="color-white">{option.title}</h4>
+                      <p class="color-white font-size-sm">{option.description}</p>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="content-container">
+        <div class="center-block">
+          <h2 class="text-align-center">More ways to donate:</h2>
+          <p class="para black center _800px"></p>
+          <div
+            class="w-layout-grid flex row justify-center align-items-center gap-lg wrap margin-bottom-2xl"
+          >
+            <a
+              href="https://account.venmo.com/u/sharingexcess"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="link-block-3 w-inline-block"
+              ><img
+                class="image-10 no-margin"
+                src="/images/Venmo-Symbol.png"
+                alt="Venmo"
+                data-mixpanel-component-id="venmo"
+                data-mixpanel-component="logo_donate_page_more_ways_to_donate"
+                loading="lazy"
+                srcset="/images/Venmo-Symbol.avif 500w, /images/Venmo-Symbol.png 3840w" /></a
+            >
+            <a
+              href="https://www.paypal.com/paypalme/sharingexcess"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="link-block-3 w-inline-block"
+              ><img
+                class="image-10 no-margin"
+                src="/images/PayPal-Logo.png"
+                alt="PayPal"
+                data-mixpanel-component-id="paypal"
+                data-mixpanel-component="logo_donate_page_more_ways_to_donate"
+                loading="lazy"
+                srcset="/images/PayPal-Logo.avif 500w, /images/PayPal-Logo.avif 800w, /images/PayPal-Logo-p-1080.png 1080w, /images/PayPal-Logo.png 3840w" /></a
+            >
+            <a
+              href="https://cash.app/$SharingExcess"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="link-block-3 w-inline-block"
+              ><img
+                class="image-10 no-margin"
+                src="/images/1660060378cash-app-symbols_1.avif"
+                alt="Cash App"
+                data-mixpanel-component-id="cash_app"
+                data-mixpanel-component="logo_donate_page_more_ways_to_donate"
+                loading="lazy"
+                srcset="/images/1660060378cash-app-symbols_11660060378cash-app-symbols.avif 500w, /images/1660060378cash-app-symbols_1.avif 2000w" /></a
+            >
+          </div>
+        </div>
+        <div class="flex row mobile-column gap-xl width-100">
+          <a href="/?form=donate" class="width-100 w-inline-block">
+            <div class="image-card-with-text-overlay donate-monthly-background-image">
+              <div class="image-card-with-text-overlay-content">
+                <h4 class="color-white">Donate Monthly</h4>
+              </div>
+            </div>
+          </a>
+          <a href="/get-involved/fundraise" class="width-100 w-inline-block">
+            <div class="image-card-with-text-overlay fundraiser-background-image">
+              <div class="image-card-with-text-overlay-content">
+                <h4 class="color-white">Start a Fundraiser</h4>
+              </div>
+            </div>
+          </a>
+          <a href="/contact" class="width-100 w-inline-block">
+            <div class="image-card-with-text-overlay sponsor-an-event-background-image">
+              <div class="image-card-with-text-overlay-content">
+                <h4 class="color-white">Sponsor an Event</h4>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <SiteFooter />
+
+    <script
+      src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=67d1d2d9c708819c5185d49c"
+      type="text/javascript"
+      integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+      crossorigin="anonymous"></script>
+    <script src="/js/webflow.js" type="text/javascript"></script>
+    <script defer src="/js/cookie-consent.js"></script>
+    <script defer src="/js/header-scroll.js"></script>
+
+    <style>
+      .hover-animation-card-content {
+        height: 56px;
+        gap: 0;
+      }
+
+      .hover-animation-card-content p {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: opacity 0.24s ease-out, max-height 0.24s ease-out;
+      }
+
+      .hover-animation-card-content--tall {
+        height: 80px;
+      }
+
+      .hover-animation-card:hover .hover-animation-card-content {
+        background-color: var(--black--black-64);
+        height: 256px;
+        gap: var(--space--lg);
+      }
+
+      .hover-animation-card:hover .hover-animation-card-content p {
+        max-height: 180px;
+        opacity: 1;
+      }
+
+      .hover-animation-card.donate-now-background-image {
+        background-image: linear-gradient(180deg, transparent, var(--black--black-80)),
+          url("/images/Donate-Monthly_1.avif");
+        background-position: 0 0, 50%;
+        background-size: auto, cover;
+        overflow: hidden;
+      }
+
+      .hover-animation-card.fundraiser-card-background-image {
+        background-image: linear-gradient(180deg, transparent, var(--black--black-80)),
+          url("/images/Start-A-Fundraiser_1.avif");
+        background-position: 0 0, 50%;
+        background-size: auto, cover;
+        overflow: hidden;
+      }
+
+      .hover-animation-card.stock-background-image {
+        background-image: linear-gradient(180deg, transparent, var(--black--black-80)),
+          url("/images/Learn-More---Financials_1.avif");
+        background-position: 0 0, 50%;
+        background-size: auto, cover;
+        overflow: hidden;
+      }
+
+      .hover-animation-card.daf-background-image {
+        background-image: linear-gradient(180deg, transparent, var(--black--black-80)),
+          url("/images/Screen-Shot-2023-07-17-at-9.09.58-PM.remini-enhanced_1.avif");
+        background-position: 0 0, 50%;
+        background-size: auto, cover;
+        overflow: hidden;
+      }
+
+      .hover-animation-card.ira-background-image {
+        background-image: linear-gradient(180deg, transparent, var(--black--black-80)),
+          url("/images/Screen-Shot-2023-07-17-at-6.44.52-PM_1.avif");
+        background-position: 0 0, 50%;
+        background-size: auto, cover;
+        overflow: hidden;
+      }
+
+      .hover-animation-card.crypto-background-image {
+        background-image: linear-gradient(180deg, transparent, var(--black--black-80)),
+          url("/images/53773492941_9df87a59f9_k.jpg");
+        background-position: 0 0, 50%;
+        background-size: auto, cover;
+        overflow: hidden;
+      }
+    </style>
+  </body>
+</html>

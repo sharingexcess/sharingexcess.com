@@ -19,7 +19,11 @@
         <h3 class="color-white">Menu</h3>
         <a href="#" class="w-inline-block" aria-label="Close menu"><img src="/images/chevron-last.svg" loading="lazy" alt=""></a>
       </div>
-      <div data-delay="0" data-hover="true" class="nav-dropdown w-dropdown">
+      
+      <a href="/find-food.html" data-mixpanel-component-id="news" data-mixpanel-component="nav_dropdown" class="nav-link w-nav-link">Find Food</a>
+
+      <a href="/donate-food.html" data-mixpanel-component-id="news" data-mixpanel-component="nav_dropdown" class="nav-link w-nav-link">Donate Food</a>
+<div data-delay="0" data-hover="true" class="nav-dropdown w-dropdown">
         <div data-mixpanel-component-id="about" data-mixpanel-component="nav_dropdown" class="nav-dropdown-toggle w-dropdown-toggle">
           <a href="/about.html" class="nav-dropdown-top-level-link w-inline-block">
             <div data-mixpanel-component-id="about" data-mixpanel-component="nav_button" class="nav-link dropdown">About</div>
@@ -53,11 +57,9 @@
           <a href="https://shop.sharingexcess.com/collections/all" target="_blank" class="nav-dropdown-list-item w-dropdown-link">Store</a>
         </nav>
       </div>
-      <a href="/find-food.html" data-mixpanel-component-id="news" data-mixpanel-component="nav_dropdown" class="nav-link w-nav-link">Find Food</a>
-      <a href="/donate-food.html" data-mixpanel-component-id="news" data-mixpanel-component="nav_dropdown" class="nav-link w-nav-link">Donate Food</a>
       <a href="/contact.html" data-mixpanel-component-id="contact" data-mixpanel-component="nav_dropdown" class="nav-link w-nav-link">Contact</a>
       <div class="nav-button-container">
-        <a data-mixpanel-component="nav_donate_button" href="/?form=donate" class="button w-inline-block"><img loading="lazy" src="/images/hand-heart-icon.svg" alt="" class="icon-md">
+        <a data-mixpanel-component="nav_donate_button" href="/donate" class="button w-inline-block"><img loading="lazy" src="/images/hand-heart-icon.svg" alt="" class="icon-md">
           <div>Donate</div>
         </a>
         <a data-mixpanel-component="nav_partner_login_button" href="https://surplus.sharingexcess.com" target="_blank" class="button secondary-white w-inline-block"><img loading="lazy" src="/images/user-icon.svg" alt="" class="icon-md">
@@ -72,10 +74,10 @@
     <h1 class="color-white mobile-font-size-2xl margin-bottom-lg">Rescuing Food,<br>Feeding Communities</h1>
     <p class="font-size-md color-white max-width-640 line-height-1-6 mobile-font-size-sm margin-bottom-xl">Sharing Excess rescues and distributes more than <strong class="bold-text background-green-primary padding-x-sm">2,000,000 lbs. of food</strong> every week in partnership with grocers, wholesalers, and farmers.<br></p>
     <div class="flex gap-md mobile-column">
-      <a data-mixpanel-component="hero_donate_now_button" href="/?form=donate" class="button lg w-inline-block"><img src="/images/hand-heart-icon.svg" loading="lazy" alt="" class="icon-lg">
+      <a data-mixpanel-component="hero_donate_now_button" href="/donate" class="button w-inline-block"><img src="/images/hand-heart-icon.svg" loading="lazy" alt="" class="icon-md">
         <div>Support Our Mission</div>
       </a>
-      <a data-mixpanel-component="hero_donate_now_button" href="/get-involved/partner.html" class="button secondary-white lg w-inline-block"><img src="/images/handshake.svg" loading="lazy" alt="" class="icon-lg">
+      <a data-mixpanel-component="hero_donate_now_button" href="/get-involved/partner.html" class="button secondary-white w-inline-block"><img src="/images/handshake.svg" loading="lazy" alt="" class="icon-md">
         <div>Donate Surplus Food</div>
       </a>
     </div>
@@ -156,76 +158,18 @@
 </div>
 <div class="section background-black mobile-flex-basis-100">
   <div class="content-container mobile-display-block">
-    <div class="_50-50-container">
+    <div class="_50-50-container impact-map-section">
       <div class="_50-50-child static-height">
-        <div class="interactive-map w-embed w-script">
-          
-          <html>
-          <head>
-            <meta charset="utf-8">
-            <title>Mapbox Green Clusters with Logo</title>
-            <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-            <link href="https://api.mapbox.com/mapbox-gl-js/v3.11.0/mapbox-gl.css" rel="stylesheet">
-            <script src="https://api.mapbox.com/mapbox-gl-js/v3.11.0/mapbox-gl.js"></script>
-            <style>
-body, html { margin: 0; padding: 0; }
-#impact-map {
-position: absolute;
-inset: 0;
-width: 100%;
-height: 100%;
-border-radius: 7px;
-overflow: hidden;
-}
-#loading-logo {
-position: absolute;
-top: 50%;
-left: 50%;
-transform: translate(-50%, -50%);
-z-index: 10;
-display: flex;
-justify-content: center;
-align-items: center;
-border-radius: 10px;
-box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-.impact-popup .mapboxgl-popup-content{
-background:#008236;
-color:#fff;
-border-radius:4px;
-padding:8px 12px;
-box-shadow:0 2px 6px rgba(0,0,0,.3);
-font-size:13px;
-}
-.impact-popup .mapboxgl-popup-tip{
-border-top-color:#008236;
-}
-</style>
-          </head>
-          <body>
-            <div id="impact-map"></div>
-            <!-- <div id="location-count" style="position:absolute; top:10px; left:50%; transform:translateX(-50%); color:white; background-color:#008236; padding:6px 12px; border-radius:4px; font-family:'Poppins', sans-serif; z-index:10;">Loading locations...</div>  -->
-            <div id="loading-logo">
-              <img src="/images/logo.png" alt="Loading Logo" width="80">
-            </div>
-            <script src="/js/homepage-impact-map.js"></script>
-            <script>
-(function () {
-  if (typeof SEHomepageImpactMap === 'undefined') {
-    var loadingLogo = document.getElementById('loading-logo');
-    if (loadingLogo) loadingLogo.style.display = 'none';
-    return;
-  }
-  SEHomepageImpactMap.init({
-    container: 'impact-map',
-    loadingLogoId: 'loading-logo'
-  });
-})();
-            </script>
-          </body>
-          </html>
+        <div class="interactive-map interactive-map-home">
+          <iframe
+            src="__IMPACT_MAP_EMBED_URL__"
+            title="Sharing Excess impact map"
+            loading="lazy"
+            allow="geolocation"
+            style="position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:7px;"
+          ></iframe>
         </div>
-        <p class="color-white-64 font-size-xs width-100 text-align-center italitcs margin-top-sm">The Sharing Excess food distribution network, with over 2,000 rescue partners.</p>
+        <p class="font-size-2xs margin-top-sm color-white-64 width-100 text-align-center">Explore more at <a href="https://map.sharingexcess.com" target="_blank" rel="noopener noreferrer">map.sharingexcess.com</a></p>
       </div>
       <div class="_50-50-child flex column align-items-center">
         <!-- Impact lbs: initial display before live data (updated 5/9/25) -->
@@ -243,13 +187,13 @@ border-top-color:#008236;
           <div class="impact-counter-digit">7</div>
         </div>
         <h4 class="width-100 text-align-center color-white margin-bottom-xs mobile-font-size-md">pounds of food distributed so far</h4>
-        <p class="font-size-2xs margin-bottom-lg color-white-64 width-100 text-align-center">(live data from <a href="https://surplus.sharingexcess.com" target="_blank">surplus.sharingexcess.com</a>)</p>
+        <p class="font-size-2xs margin-top-lg margin-bottom-lg color-white-64 width-100 text-align-center"><span class="flex row align-items-center justify-center gap-sm"><span class="live-indicator" aria-hidden="true"></span><span>Live data from <a href="https://surplus.sharingexcess.com" target="_blank" rel="noopener noreferrer">Surplus</a>, our proprietary food rescue platform</span></span></p>
         <p class="paragraph color-white text-align-center margin-bottom-xl">Since 2018, Sharing Excess has distributed enough surplus to feed over <strong>10 million people</strong> across the country. Thanks to our <a href="https://surplus.sharingexcess.com" target="_blank">Surplus app</a> , we know exactly where every pound of food came from - and where it went. Because food shouldn't go to waste. And impact shouldn't be a mystery.</p>
         <div class="button-container">
           <a data-mixpanel-component="button_home_page_our_mission_learn_more" href="/about/impact.html" class="button w-inline-block"><img src="/images/chart-icon.svg" loading="lazy" alt="" class="icon-lg">
             <div>Impact&#160;Data</div>
           </a>
-          <a data-mixpanel-component="button_home_page_our_mission_learn_more" href="https://docs.sharingexcess.com/docs/impact-measurement" target="_blank" class="button secondary-white w-inline-block"><img src="/images/chart-icon.svg" loading="lazy" alt="" class="icon-lg">
+          <a data-mixpanel-component="button_home_page_our_mission_learn_more" href="https://surplus.sharingexcess.com/docs/impact-measurement" target="_blank" class="button secondary-white w-inline-block"><img src="/images/chart-icon.svg" loading="lazy" alt="" class="icon-lg">
             <div>How&#160;We Measure</div>
           </a>
         </div>
@@ -497,6 +441,24 @@ infiniteScrollBanners.forEach((banner) => {
 <!--  END: Hover Animation Cards Custom CSS  -->
 <!--  START: Impact Counter Custom CSS and Rendering Logic  -->
 <style>
+.interactive-map-home {
+  height: 504px;
+}
+@media screen and (min-width: 992px) {
+  .impact-map-section > ._50-50-child:first-child {
+    flex: 0 57.5%;
+    width: 57.5%;
+  }
+  .impact-map-section > ._50-50-child:last-child {
+    flex: 0 42.5%;
+    width: 42.5%;
+  }
+}
+@media screen and (max-width: 767px), screen and (max-width: 479px) {
+  .interactive-map-home {
+    height: 336px;
+  }
+}
 /* We use a pseudo-elements to add a "flapping panel" effect to the impact counter digits */
 /* Add a "bar" through the center of the digit */
 .impact-counter .impact-counter-digit::after {
@@ -718,18 +680,6 @@ function renderLiveImpactData(has_recursed = false) {
 }
 window.addEventListener("load", () => renderLiveImpactData());
 </script>
-<!--  Mapbox-GL-JS CSS & JS  – only one copy per site  -->
-<link href="https://api.mapbox.com/mapbox-gl-js/v3.1.0/mapbox-gl.css" rel="stylesheet">
-<script src="https://api.mapbox.com/mapbox-gl-js/v3.1.0/mapbox-gl.js"></script>
-<style>
-/* let the map fill its wrapper */
-#impact-map {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-</style>
 <!--  CUSTOM STYLING  -->
 <style>
 /* This custom CSS is used to animate the play button over the mr. beast video */
