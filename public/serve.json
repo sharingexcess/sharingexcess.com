@@ -8,6 +8,7 @@
     { "source": "/find-food", "destination": "/free-food", "type": 301 },
     { "source": "/find-food/:state", "destination": "/free-food/:state", "type": 301 },
     { "source": "/find-food/:state/:city", "destination": "/free-food/:state/:city", "type": 301 },
-    { "source": "/find-food/:state/:city/:placeId", "destination": "/free-food/:state/:city/:placeId", "type": 301 }
+    { "source": "/find-food/:state/:city/:placeId", "destination": "/free-food/:state/:city/:placeId", "type": 301 },
+    { "source": "/100million", "destination": "/sponsor-a-truck", "type": 301 }
   ]
 }

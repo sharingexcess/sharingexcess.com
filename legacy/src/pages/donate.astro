@@ -17,6 +17,15 @@ const FREEWILL_BASE = "https://partner.freewill.com/smartgiving/sharingexcess";
 const donationOptions = [
   [
     {
+      title: "Sponsor a Truckload",
+      description:
+        "For $1,750, cover one truck run. Each load is 35,000+ pounds for partners serving hungry neighbors.",
+      href: "/sponsor-a-truck?form=FUNKDABHTGG&amount=1750&modifyAmount=no",
+      imageClass: "truckload-background-image",
+      mixpanel: "button_donate_page_sponsor_truckload",
+      external: false,
+    },
+    {
       title: "Donate Now",
       description:
         "Make a one-time or monthly gift to help us rescue surplus food and deliver it to communities in need.",
@@ -267,6 +276,14 @@ const donationOptions = [
       .hover-animation-card:hover .hover-animation-card-content p {
         max-height: 180px;
         opacity: 1;
+      }
+
+      .hover-animation-card.truckload-background-image {
+        background-image: linear-gradient(180deg, transparent, var(--black--black-80)),
+          url("/images/53795236385_30b4365f56_k.jpg");
+        background-position: 0 0, 50%;
+        background-size: auto, cover;
+        overflow: hidden;
       }
 
       .hover-animation-card.donate-now-background-image {

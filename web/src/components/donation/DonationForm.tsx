@@ -34,7 +34,7 @@ const HERO_PRESETS = [
   { amount: 20, impact: "240 meals" },
   { amount: 60, impact: "720 meals" },
   { amount: 120, impact: "1,440 meals" },
-  { amount: 1290, impact: "a full truckload" },
+  { amount: 1750, impact: "a full truckload" },
 ] as const;
 
 function HeartIcon({ className }: { className?: string }) {
