@@ -1,7 +1,11 @@
 export interface PublicFindFoodProfile {
   name: string;
+  /** Street address line 1. Optional at runtime until the Surplus API ships it. */
+  address1?: string | null;
+  address2?: string | null;
   city: string;
   state: string;
+  zip?: string | null;
   lat: number;
   lng: number;
   googlePlaceId: string;

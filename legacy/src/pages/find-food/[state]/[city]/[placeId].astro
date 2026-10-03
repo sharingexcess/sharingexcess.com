@@ -7,6 +7,7 @@ import { findProfileByPlaceId } from "../../../../lib/find-food/grouping";
 import { stateDisplayName, stateSlug } from "../../../../lib/find-food/states";
 import { slugify } from "../../../../lib/find-food/slugify";
 import { cityPath, profilePath, statePath } from "../../../../lib/find-food/urls";
+import { streetAddress } from "../../../../lib/find-food/address";
 
 export async function getStaticPaths() {
   const profiles = await fetchProfiles();
@@ -42,6 +43,33 @@ const stateName = stateDisplayName(profile.state);
 const canonical = new URL(profilePath(profile), Astro.site).href;
 const pageTitle = `${profile.name} | Free Food | Sharing Excess`;
 const description = `Find free food at ${profile.name} in ${profile.city}, ${stateName}. Partner location on the Sharing Excess free food map.`;
+
+/* schema.org JSON-LD from Surplus data only (no Google-sourced hours/phone/photos). */
+const street = streetAddress(profile);
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  name: profile.name,
+  url: canonical,
+  ...(street
+    ? {
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: street,
+          addressLocality: profile.city,
+          addressRegion: profile.state,
+          ...(profile.zip ? { postalCode: profile.zip } : {}),
+          addressCountry: "US",
+        },
+      }
+    : {}),
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: profile.lat,
+    longitude: profile.lng,
+  },
+};
+const jsonLdHtml = JSON.stringify(jsonLd).replace(/</g, "\\u003c");
 ---
 
 <FindFoodLayout
@@ -49,6 +77,7 @@ const description = `Find free food at ${profile.name} in ${profile.city}, ${sta
   description={description}
   canonical={canonical}
   includeMapbox={true}>
+  <script slot="head" type="application/ld+json" is:inline set:html={jsonLdHtml} />
   <section class="section find-food-profile-section">
     <div class="content-container">
       <Breadcrumbs

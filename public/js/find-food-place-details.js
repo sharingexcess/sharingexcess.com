@@ -441,8 +441,10 @@
     );
   }
 
-  function renderProfileFieldsHtml(details) {
+  function renderProfileFieldsHtml(details, options) {
     var fields = [];
+    /* Profile pages render the Surplus street address statically (build time). */
+    var hasStaticAddress = Boolean(options && options.hasStaticAddress);
 
     var photoGrid = renderProfilePhotoGridHtml(details);
     if (photoGrid) {
@@ -453,7 +455,7 @@
       );
     }
 
-    var address = formatAddress(details);
+    var address = hasStaticAddress ? "" : formatAddress(details);
     if (address) {
       fields.push(renderProfileField("Address", escapeHtml(address), false, 1));
     }
@@ -468,7 +470,7 @@
             "Open in Google Maps",
           ),
           false,
-          2,
+          address ? 2 : 1,
         ),
       );
     }
@@ -521,8 +523,8 @@
     return '<div class="find-food-profile-fields">' + fields.join("") + "</div>";
   }
 
-  function renderProfileContentHtml(details, locationName) {
-    return renderProfileFieldsHtml(details);
+  function renderProfileContentHtml(details, locationName, options) {
+    return renderProfileFieldsHtml(details, options);
   }
 
   function hydrateProfileCover(block, details) {
@@ -677,7 +679,10 @@
       .then(function (details) {
         if (isProfilePage) {
           hydrateProfileCover(block, details);
-          contentEl.innerHTML = renderProfileContentHtml(details, locationName);
+          var card = block.closest(".find-food-profile-card");
+          contentEl.innerHTML = renderProfileContentHtml(details, locationName, {
+            hasStaticAddress: Boolean(card && card.querySelector("[data-static-address]")),
+          });
         } else {
           contentEl.innerHTML = renderFullHtml(details, locationName);
         }
