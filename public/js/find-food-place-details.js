@@ -135,26 +135,6 @@
     return details.formattedAddress || "";
   }
 
-  function formatAccessibility(options) {
-    if (!options) return "";
-
-    var items = [];
-    if (options.wheelchairAccessibleParking) {
-      items.push("Wheelchair accessible parking");
-    }
-    if (options.wheelchairAccessibleEntrance) {
-      items.push("Wheelchair accessible entrance");
-    }
-    if (options.wheelchairAccessibleRestroom) {
-      items.push("Wheelchair accessible restroom");
-    }
-    if (options.wheelchairAccessibleSeating) {
-      items.push("Wheelchair accessible seating");
-    }
-
-    return items.map(escapeHtml).join(", ");
-  }
-
   function renderPhotoAttributions(attributions) {
     if (!attributions || attributions.length === 0) return "";
 
@@ -525,11 +505,6 @@
       fields.push(renderProfileField("Hours", hours, true));
     }
 
-    var accessibility = formatAccessibility(details.accessibilityOptions);
-    if (accessibility) {
-      fields.push(renderProfileField("Accessibility", accessibility, true));
-    }
-
     if (details.googleMapsUri) {
       fields.push(renderGoogleAttribution(details.googleMapsUri).replace(
         "find-food-map-panel-google-attribution",
@@ -618,11 +593,6 @@
       rows.push(
         "<div><dt>Status</dt><dd>" + escapeHtml(details.businessStatus) + "</dd></div>",
       );
-    }
-
-    var accessibility = formatAccessibility(details.accessibilityOptions);
-    if (accessibility) {
-      rows.push("<div><dt>Accessibility</dt><dd>" + accessibility + "</dd></div>");
     }
 
     if (rows.length > 0) {

@@ -26,13 +26,6 @@ export interface PublicFindFoodPlaceOpeningHours {
   periods?: PublicFindFoodPlaceOpeningHoursPeriod[];
 }
 
-export interface PublicFindFoodPlaceAccessibilityOptions {
-  wheelchairAccessibleParking?: boolean | null;
-  wheelchairAccessibleEntrance?: boolean | null;
-  wheelchairAccessibleRestroom?: boolean | null;
-  wheelchairAccessibleSeating?: boolean | null;
-}
-
 export interface PublicFindFoodPlacePhotoAttribution {
   displayName?: string | null;
   uri?: string | null;
@@ -57,7 +50,6 @@ export interface PublicFindFoodPlaceDetails {
   primaryTypeDisplayName: string | null;
   businessStatus: string | null;
   utcOffsetMinutes: number | null;
-  accessibilityOptions: PublicFindFoodPlaceAccessibilityOptions | null;
   regularOpeningHours: PublicFindFoodPlaceOpeningHours | null;
   currentOpeningHours: PublicFindFoodPlaceOpeningHours | null;
   photos: PublicFindFoodPlacePhoto[];
