@@ -1,6 +1,6 @@
 ---
 import FindFoodProfileMap from "./FindFoodProfileMap.astro";
-import { stateDisplayName } from "../../lib/find-food/states";
+import { formatProfileAddress } from "../../lib/find-food/address";
 import type { PublicFindFoodProfile } from "../../lib/find-food/types";
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
 }
 
 const { profile } = Astro.props;
-const stateName = stateDisplayName(profile.state);
+const address = formatProfileAddress(profile);
 const badgeLabel = `${profile.city}, ${profile.state}`;
 ---
 
@@ -24,6 +24,13 @@ const badgeLabel = `${profile.city}, ${profile.state}`;
   </div>
   <div class="find-food-profile-body">
     <h1 class="find-food-profile-title">{profile.name}</h1>
+    {
+      address && (
+        <address class="find-food-profile-address" data-static-address>
+          {address}
+        </address>
+      )
+    }
     <p
       class="find-food-profile-subtitle find-food-last-distribution"
       data-last-distribution-place-id={profile.googlePlaceId}>

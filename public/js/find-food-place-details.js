@@ -49,12 +49,12 @@
     if (singlePlaceId) {
       lastDistributionFetchPromise = fetch(
         getApiOrigin() +
-          "/public/free_food/profiles/" +
+          "/public/find_food/profiles/" +
           encodeURIComponent(singlePlaceId),
       )
         .then(function (res) {
           if (!res.ok) {
-            throw new Error("Free food profile failed (" + res.status + ")");
+            throw new Error("Find food profile failed (" + res.status + ")");
           }
           return res.json();
         })
@@ -75,10 +75,10 @@
       return lastDistributionFetchPromise;
     }
 
-    lastDistributionFetchPromise = fetch(getApiOrigin() + "/public/free_food/profiles")
+    lastDistributionFetchPromise = fetch(getApiOrigin() + "/public/find_food/profiles")
       .then(function (res) {
         if (!res.ok) {
-          throw new Error("Free food profiles failed (" + res.status + ")");
+          throw new Error("Find food profiles failed (" + res.status + ")");
         }
         return res.json();
       })
@@ -133,26 +133,6 @@
 
   function formatAddress(details) {
     return details.formattedAddress || "";
-  }
-
-  function formatAccessibility(options) {
-    if (!options) return "";
-
-    var items = [];
-    if (options.wheelchairAccessibleParking) {
-      items.push("Wheelchair accessible parking");
-    }
-    if (options.wheelchairAccessibleEntrance) {
-      items.push("Wheelchair accessible entrance");
-    }
-    if (options.wheelchairAccessibleRestroom) {
-      items.push("Wheelchair accessible restroom");
-    }
-    if (options.wheelchairAccessibleSeating) {
-      items.push("Wheelchair accessible seating");
-    }
-
-    return items.map(escapeHtml).join(", ");
   }
 
   function renderPhotoAttributions(attributions) {
@@ -461,8 +441,10 @@
     );
   }
 
-  function renderProfileFieldsHtml(details) {
+  function renderProfileFieldsHtml(details, options) {
     var fields = [];
+    /* Profile pages render the Surplus street address statically (build time). */
+    var hasStaticAddress = Boolean(options && options.hasStaticAddress);
 
     var photoGrid = renderProfilePhotoGridHtml(details);
     if (photoGrid) {
@@ -473,7 +455,7 @@
       );
     }
 
-    var address = formatAddress(details);
+    var address = hasStaticAddress ? "" : formatAddress(details);
     if (address) {
       fields.push(renderProfileField("Address", escapeHtml(address), false, 1));
     }
@@ -488,7 +470,7 @@
             "Open in Google Maps",
           ),
           false,
-          2,
+          address ? 2 : 1,
         ),
       );
     }
@@ -525,11 +507,6 @@
       fields.push(renderProfileField("Hours", hours, true));
     }
 
-    var accessibility = formatAccessibility(details.accessibilityOptions);
-    if (accessibility) {
-      fields.push(renderProfileField("Accessibility", accessibility, true));
-    }
-
     if (details.googleMapsUri) {
       fields.push(renderGoogleAttribution(details.googleMapsUri).replace(
         "find-food-map-panel-google-attribution",
@@ -546,8 +523,8 @@
     return '<div class="find-food-profile-fields">' + fields.join("") + "</div>";
   }
 
-  function renderProfileContentHtml(details, locationName) {
-    return renderProfileFieldsHtml(details);
+  function renderProfileContentHtml(details, locationName, options) {
+    return renderProfileFieldsHtml(details, options);
   }
 
   function hydrateProfileCover(block, details) {
@@ -620,11 +597,6 @@
       );
     }
 
-    var accessibility = formatAccessibility(details.accessibilityOptions);
-    if (accessibility) {
-      rows.push("<div><dt>Accessibility</dt><dd>" + accessibility + "</dd></div>");
-    }
-
     if (rows.length > 0) {
       sections.push("<dl>" + rows.join("") + "</dl>");
       sections.push(
@@ -652,7 +624,7 @@
 
   function fetchPlaceDetails(placeId) {
     var origin = getApiOrigin();
-    return fetch(origin + "/public/free_food/places/" + encodeURIComponent(placeId) + "/details")
+    return fetch(origin + "/public/find_food/places/" + encodeURIComponent(placeId) + "/details")
       .then(function (res) {
         if (!res.ok) {
           return res
@@ -707,7 +679,10 @@
       .then(function (details) {
         if (isProfilePage) {
           hydrateProfileCover(block, details);
-          contentEl.innerHTML = renderProfileContentHtml(details, locationName);
+          var card = block.closest(".find-food-profile-card");
+          contentEl.innerHTML = renderProfileContentHtml(details, locationName, {
+            hasStaticAddress: Boolean(card && card.querySelector("[data-static-address]")),
+          });
         } else {
           contentEl.innerHTML = renderFullHtml(details, locationName);
         }

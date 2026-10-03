@@ -20,6 +20,7 @@
     "typescript": "^6.0.2"
   },
   "dependencies": {
+    "@astrojs/sitemap": "3.7.4",
     "@astrojs/tailwind": "^6.0.2",
     "astro": "6.4.4",
     "linkedom": "^0.18.12",
