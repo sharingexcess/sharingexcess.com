@@ -52,6 +52,14 @@ function isAssetPath(resolvedNoLeading: string): boolean {
   return /^(css|js|images|documents|videos)\//.test(resolvedNoLeading);
 }
 
+/** Webflow-era routes renamed in Astro (old paths 301 via public/serve.json). */
+function applyRouteAliases(path: string): string {
+  if (path === "/free-food" || path.startsWith("/free-food/")) {
+    return "/find-food" + path.slice("/free-food".length);
+  }
+  return path;
+}
+
 function toSiteUrl(resolvedNoLeading: string, hash?: string): string {
   const ext = (/\.([^.]+)$/.exec(resolvedNoLeading)?.[1] ?? "").toLowerCase();
   const isHtml = ext === "html" || ext === "htm";
@@ -63,6 +71,7 @@ function toSiteUrl(resolvedNoLeading: string, hash?: string): string {
   } else {
     path = "/" + resolvedNoLeading;
   }
+  path = applyRouteAliases(path);
   return hash ? `${path}#${hash}` : path;
 }
 
@@ -175,7 +184,8 @@ function pagePathToAstroPath(pageRel: string): string {
   return join(sub, `${file}.astro`);
 }
 
-const SKIP_ASTRO_PAGE = new Set(["free-food.html"]);
+/** Webflow pages replaced by custom Astro routes (`src/pages/find-food/`). */
+const SKIP_ASTRO_PAGE = new Set(["find-food.html", "free-food.html"]);
 
 async function main() {
   await mkdir(FRAG, { recursive: true });

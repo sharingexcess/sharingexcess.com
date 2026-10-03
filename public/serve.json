@@ -3,12 +3,13 @@
   "trailingSlash": false,
   "redirects": [
     { "source": "/index.html", "destination": "/", "type": 301 },
-    { "source": "/find-food.html", "destination": "/free-food", "type": 301 },
+    { "source": "/find-food.html", "destination": "/find-food", "type": 301 },
+    { "source": "/free-food.html", "destination": "/find-food", "type": 301 },
     { "source": "/:path.html", "destination": "/:path", "type": 301 },
-    { "source": "/find-food", "destination": "/free-food", "type": 301 },
-    { "source": "/find-food/:state", "destination": "/free-food/:state", "type": 301 },
-    { "source": "/find-food/:state/:city", "destination": "/free-food/:state/:city", "type": 301 },
-    { "source": "/find-food/:state/:city/:placeId", "destination": "/free-food/:state/:city/:placeId", "type": 301 },
+    { "source": "/free-food", "destination": "/find-food", "type": 301 },
+    { "source": "/free-food/:state", "destination": "/find-food/:state", "type": 301 },
+    { "source": "/free-food/:state/:city", "destination": "/find-food/:state/:city", "type": 301 },
+    { "source": "/free-food/:state/:city/:placeId", "destination": "/find-food/:state/:city/:placeId", "type": 301 },
     { "source": "/100million", "destination": "/sponsor-a-truck", "type": 301 }
   ]
 }
